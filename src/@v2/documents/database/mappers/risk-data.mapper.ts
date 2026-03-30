@@ -94,7 +94,7 @@ export class RiskDataMapper {
     return data.map((RiskData) => this.toModel(RiskData));
   }
 
-  private static quantityParse(data: IRiskDataMapper) {
+  static quantityParse(data: IRiskDataMapper) {
     const quantityObject: Pick<IRiskDataModel, 'quantityQui' | 'quantityHeat' | 'quantityRadiation' | 'quantityVibrationFB' | 'quantityNoise' | 'quantityVibrationL'> = {
       quantityQui: null,
       quantityNoise: null,

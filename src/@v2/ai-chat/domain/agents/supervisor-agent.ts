@@ -32,10 +32,10 @@ Analise a mensagem e responda APENAS com uma das seguintes categorias:
 
 Responda SOMENTE com a categoria, sem explicacao.`;
 
-
 export interface PageContext {
   companyId?: string;
   homogeneousGroupId?: string;
+  hierarchyId?: string;
 }
 
 export interface SupervisorUser {
@@ -171,16 +171,23 @@ export async function* streamSupervisorAgent(input: SupervisorInput): AsyncGener
 
       // Company context
       if (input.pageContext.companyId) {
-        contextParts.push(`Empresa sendo visualizada: ID ${input.pageContext.companyId}`);
+        contextParts.push(`- Empresa (companyId): ${input.pageContext.companyId}`);
       }
 
       // Homogeneous group context
       if (input.pageContext.homogeneousGroupId) {
-        contextParts.push(`Grupo homogêneo sendo visualizado: ID ${input.pageContext.homogeneousGroupId}`);
+        contextParts.push(`- Grupo homogêneo (groupId): ${input.pageContext.homogeneousGroupId}`);
+        contextParts.push(`IMPORTANTE: Quando o usuário se referir a "este grupo", "esse grupo", ou "o grupo que estou vendo", use EXATAMENTE este groupId: ${input.pageContext.homogeneousGroupId}`);
+      }
+
+      // Hierarchy context
+      if (input.pageContext.hierarchyId) {
+        contextParts.push(`- Hierarquia (hierarchyId): ${input.pageContext.hierarchyId}`);
+        contextParts.push(`IMPORTANTE: Quando o usuário se referir a "este cargo", "esse cargo", ou "o cargo que estou vendo", use EXATAMENTE este hierarchyId: ${input.pageContext.hierarchyId}`);
       }
 
       if (contextParts.length > 0) {
-        userMessageText = `[CONTEXTO DA PÁGINA]\n${contextParts.join('\n')}\n\n${input.message}`;
+        userMessageText = `[CONTEXTO DA PÁGINA ATUAL]\n${contextParts.join('\n')}\n\n[MENSAGEM DO USUÁRIO]\n${input.message}`;
       }
     }
 

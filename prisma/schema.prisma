@@ -365,6 +365,7 @@ model Company {
   Task                       Task[]
   CompanyFlags               CompanyFlags?
   formAiAnalyses             FormAiAnalysis[]
+  aiPendingActions           AiPendingAction[]
 
   @@index([name])
   @@index([isClinic])
@@ -2313,19 +2314,20 @@ model User {
   taskProjectMembers     TaskProjectMembers[]
   ActionPlanRulesOnUsers ActionPlanRulesOnUsers[]
   aiThreads              AiThread[]
-  aiFiles                AiFile[]   @relation("AiFileUploader")
+  aiFiles                AiFile[]                    @relation("AiFileUploader")
+  aiPendingActions       AiPendingAction[]
 
   @@unique([id, name])
   @@index([email])
 }
 
 model AiThread {
-  id            String      @id @default(cuid())
-  title         String      @default("Novo Chat")
+  id            String    @id @default(cuid())
+  title         String    @default("Novo Chat")
   userId        Int
   lastMessageAt DateTime?
-  created_at    DateTime    @default(now())
-  updated_at    DateTime    @updatedAt
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
   deleted_at    DateTime?
 
   user     User        @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -2337,17 +2339,18 @@ model AiThread {
 }
 
 model AiMessage {
-  id              String          @id @default(cuid())
+  id              String            @id @default(cuid())
   threadId        String
   role            AiMessageRoleEnum
-  content         String          @db.Text
+  content         String            @db.Text
   toolName        String?
   toolStatus      String?
   toolDescription String?
-  created_at      DateTime        @default(now())
+  created_at      DateTime          @default(now())
 
-  thread AiThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
-  files  AiMessageFile[]
+  thread         AiThread          @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  files          AiMessageFile[]
+  pendingActions AiPendingAction[]
 
   @@index([threadId])
   @@index([created_at])
@@ -2394,6 +2397,45 @@ model AiMessageFile {
   @@unique([messageId, fileId])
   @@index([messageId])
   @@index([fileId])
+}
+
+model AiPendingAction {
+  id           String                     @id @default(cuid())
+  userId       Int
+  companyId    String
+  messageId    String
+  service      AiPendingActionServiceEnum
+  payload      Json                       @db.JsonB
+  status       AiPendingActionStatusEnum  @default(PENDING)
+  summary      String?                    @db.Text
+  executedAt   DateTime?
+  errorMessage String?                    @db.Text
+  created_at   DateTime                   @default(now())
+  updated_at   DateTime                   @updatedAt
+
+  user    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  message AiMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([companyId])
+  @@index([messageId])
+  @@index([status])
+  @@index([created_at])
+}
+
+enum AiPendingActionServiceEnum {
+  UPSERT_RISK_DATA
+  UPSERT_MANY_RISK_DATA
+}
+
+enum AiPendingActionStatusEnum {
+  PENDING
+  EXECUTING
+  COMPLETED
+  FAILED
+  CANCELLED
+  EXPIRED
 }
 
 model UserCompany {

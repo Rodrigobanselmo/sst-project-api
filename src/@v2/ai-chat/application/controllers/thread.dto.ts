@@ -22,6 +22,10 @@ export class PageContextDto {
   @IsOptional()
   @IsString()
   homogeneousGroupId?: string;
+
+  @IsOptional()
+  @IsString()
+  hierarchyId?: string;
 }
 
 export class SendMessageDto {

@@ -1,10 +1,20 @@
 import { HomoTypeEnum } from '@/@v2/shared/domain/enum/security/homo-type.enum';
+import { getOriginHomogeneousGroup } from '@/@v2/shared/domain/functions/security/get-origin-homogeneous-group.func';
+import { RiskDataMapper } from '@/@v2/documents/database/mappers/risk-data.mapper';
 import { tool } from '@langchain/core/tools';
 import type { PrismaClient } from '@prisma/client';
 import Fuse from 'fuse.js';
 import { z } from 'zod';
+import { normalizeString } from '../../../../shared/utils/normalizeString';
 import { CharacterizationTypeTranslation, HierarchyTypeTranslation, HomoTypeTranslation } from '../../translations/characterization.translation';
 import { withErrorHandling } from './tool-error-handler';
+import { QuantityTypeEnum } from '@/@v2/shared/domain/enum/security/quantity-type.enum';
+import { RiskDataQuantityHeatVO } from '@/@v2/shared/domain/values-object/security/risk-data-quantity-heat.vo';
+import { RiskDataQuantityNoiseVO } from '@/@v2/shared/domain/values-object/security/risk-data-quantity-noise.vo';
+import { RiskDataQuantityQuiVO } from '@/@v2/shared/domain/values-object/security/risk-data-quantity-qui.vo';
+import { RiskDataQuantityRadiationVO } from '@/@v2/shared/domain/values-object/security/risk-data-quantity-radiation.vo';
+import { RiskDataQuantityVibrationFBVO } from '@/@v2/shared/domain/values-object/security/risk-data-quantity-vibration-fb.vo';
+import { RiskDataQuantityVibrationLVO } from '@/@v2/shared/domain/values-object/security/risk-data-quantity-vibration-l.vo';
 
 export function createCharacterizationTools(deps: { prisma: PrismaClient; defaultCompanyId: string }) {
   const { prisma, defaultCompanyId } = deps;
@@ -22,6 +32,31 @@ export function createCharacterizationTools(deps: { prisma: PrismaClient; defaul
       // Use provided companyId or fall back to the default (company being viewed)
       const targetCompanyId = companyId ?? defaultCompanyId;
 
+      // Get current company info to check if it has consulting contracts
+      const currentCompany = await prisma.company.findUnique({
+        where: { id: targetCompanyId },
+        select: {
+          id: true,
+          receivingServiceContracts: {
+            where: { status: 'ACTIVE' },
+            select: {
+              applyingServiceCompanyId: true,
+            },
+          },
+        },
+      });
+
+      // Build list of company IDs to search from
+      // 1. The target company itself
+      // 2. Consulting companies that have active contracts with the target company
+      const companyIdsToSearch = [targetCompanyId];
+
+      if (currentCompany?.receivingServiceContracts) {
+        currentCompany.receivingServiceContracts.forEach((contract) => {
+          companyIdsToSearch.push(contract.applyingServiceCompanyId);
+        });
+      }
+
       const isPsic = riskTypes.includes('PSIC');
       // replcate PSIC with ERG
       const riskTypesWithErg = riskTypes.map((t) => t.replace('PSIC', 'ERG')) as any[];
@@ -30,7 +65,12 @@ export function createCharacterizationTools(deps: { prisma: PrismaClient; defaul
         where: {
           status: 'ACTIVE',
           deleted_at: null,
-          companyId: targetCompanyId,
+          OR: [
+            // System risks (available to everyone)
+            { system: true },
+            // Risks from the target company or consulting companies
+            { companyId: { in: companyIdsToSearch } },
+          ],
           type: { in: riskTypesWithErg },
           ...(isPsic ? { subTypes: { some: { sub_type: { sub_type: 'PSICOSOCIAL' } } } } : {}),
         },
@@ -59,6 +99,7 @@ export function createCharacterizationTools(deps: { prisma: PrismaClient; defaul
           nome: r.name,
           tipo: r.type,
         };
+
         // Only include appendix if it exists
         if (r.appendix) {
           result.anexo = r.appendix;
@@ -144,24 +185,38 @@ export function createCharacterizationTools(deps: { prisma: PrismaClient; defaul
       let results: ((typeof allGroups)[0] & { score: number })[];
 
       if (searchTerm) {
-        // Configure Fuse.js for fuzzy search
-        const fuse = new Fuse(allGroups, {
-          keys: ['name', 'description'],
+        // Normalize groups data for accent-insensitive search
+        const normalizedGroups = allGroups.map((g) => ({
+          ...g,
+          normalizedName: normalizeString(g.name)?.toLowerCase() || '',
+          normalizedDescription: normalizeString(g.description)?.toLowerCase() || '',
+        }));
+
+        // Normalize search term
+        const normalizedSearchTerm = normalizeString(searchTerm)?.toLowerCase() || searchTerm;
+
+        // Configure Fuse.js for fuzzy search on normalized data
+        const fuse = new Fuse(normalizedGroups, {
+          keys: ['normalizedName', 'normalizedDescription'],
           threshold: 0.4, // 0 = exact match, 1 = match anything (0.4 is a good balance)
           includeScore: true,
           ignoreLocation: true, // Search anywhere in the string
           minMatchCharLength: 2,
         });
 
-        // Perform fuzzy search
-        const fuseResults = fuse.search(searchTerm);
+        // Perform fuzzy search with normalized term
+        const fuseResults = fuse.search(normalizedSearchTerm);
 
         // Map results with score (Fuse.js score: 0 = perfect match, 1 = no match)
         // We invert it so higher score = better match
-        results = fuseResults.map((result) => ({
-          ...result.item,
-          score: 1 - (result.score ?? 0),
-        }));
+        // Remove normalized fields from results
+        results = fuseResults.map((result) => {
+          const { normalizedName, normalizedDescription, ...itemWithoutNormalized } = result.item;
+          return {
+            ...itemWithoutNormalized,
+            score: 1 - (result.score ?? 0),
+          };
+        });
       } else {
         // No search term - return all with perfect score
         results = allGroups.map((g) => ({ ...g, score: 1 }));
@@ -203,7 +258,7 @@ export function createCharacterizationTools(deps: { prisma: PrismaClient; defaul
           tamanhoPagina: pageSize,
           temProximaPagina: hasNextPage,
           grupos: simplified,
-          dica: 'Use a ferramenta obter_detalhes_grupo com o ID para ver informações completas (hierarquia, riscos, etc.). Use o parâmetro "page" para ver mais resultados.',
+          dica: 'Para ver informações completas (hierarquia, riscos, etc.), use a ferramenta obter_detalhes_grupo com o campo "id" EXATAMENTE como aparece acima (copie o UUID completo sem modificações). Use o parâmetro "page" para ver mais resultados.',
         },
         null,
         2,
@@ -282,24 +337,37 @@ export function createCharacterizationTools(deps: { prisma: PrismaClient; defaul
       let results: ((typeof allHierarchies)[0] & { score: number })[];
 
       if (searchTerm) {
-        // Configure Fuse.js for fuzzy search
-        const fuse = new Fuse(allHierarchies, {
-          keys: ['name'],
+        // Normalize hierarchies data for accent-insensitive search
+        const normalizedHierarchies = allHierarchies.map((h) => ({
+          ...h,
+          normalizedName: normalizeString(h.name)?.toLowerCase() || '',
+        }));
+
+        // Normalize search term
+        const normalizedSearchTerm = normalizeString(searchTerm)?.toLowerCase() || searchTerm;
+
+        // Configure Fuse.js for fuzzy search on normalized data
+        const fuse = new Fuse(normalizedHierarchies, {
+          keys: ['normalizedName'],
           threshold: 0.4, // 0 = exact match, 1 = match anything (0.4 is a good balance)
           includeScore: true,
           ignoreLocation: true, // Search anywhere in the string
           minMatchCharLength: 2,
         });
 
-        // Perform fuzzy search
-        const fuseResults = fuse.search(searchTerm);
+        // Perform fuzzy search with normalized term
+        const fuseResults = fuse.search(normalizedSearchTerm);
 
         // Map results with score (Fuse.js score: 0 = perfect match, 1 = no match)
         // We invert it so higher score = better match
-        results = fuseResults.map((result) => ({
-          ...result.item,
-          score: 1 - (result.score ?? 0),
-        }));
+        // Remove normalizedName from results
+        results = fuseResults.map((result) => {
+          const { normalizedName, ...itemWithoutNormalized } = result.item;
+          return {
+            ...itemWithoutNormalized,
+            score: 1 - (result.score ?? 0),
+          };
+        });
       } else {
         // No search term - return all with perfect score
         results = allHierarchies.map((h) => ({ ...h, score: 1 }));
@@ -589,7 +657,14 @@ export function createCharacterizationTools(deps: { prisma: PrismaClient; defaul
         'Use após buscar_grupos_homogeneos.',
       schema: z.object({
         _actionDescription: z.string().describe('Escreva uma breve descrição do que você está fazendo. DEVE ser no MESMO IDIOMA que o usuário está usando.'),
-        groupId: z.string().describe('ID do grupo homogêneo obtido da ferramenta buscar_grupos_homogeneos'),
+        groupId: z
+          .string()
+          .uuid()
+          .describe(
+            'ID UUID do grupo homogêneo (formato: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx). ' +
+              'Obtenha este ID EXATAMENTE como retornado pela ferramenta buscar_grupos_homogeneos no campo "id". ' +
+              'NÃO concatene, NÃO modifique, NÃO adicione outros valores. Use APENAS o UUID completo.',
+          ),
       }),
     },
   );
@@ -1048,6 +1123,12 @@ export function createCharacterizationTools(deps: { prisma: PrismaClient; defaul
                   id: true,
                   name: true,
                   type: true,
+                  characterization: {
+                    select: {
+                      name: true,
+                      type: true,
+                    },
+                  },
                   hierarchyOnHomogeneous: {
                     where: {
                       hierarchyId: { in: hierarchyIds },
@@ -1092,55 +1173,84 @@ export function createCharacterizationTools(deps: { prisma: PrismaClient; defaul
         OUTROS: 'Outros',
       };
 
-      // Process risks and group by hierarchy origin
-      const risksByOrigin: any = {};
+      // Categorize risks by origin type
+      const riscosProprios: any[] = []; // risks directly on this hierarchy
+      const riscosHerdadosHierarquia: Record<string, { origem: any; riscos: any[] }> = {}; // inherited from parent hierarchies
+      const riscosDeGrupos: Record<string, { origem: any; riscos: any[] }> = {}; // from homogeneous groups (environments, workstations, etc.)
       const allRisks: any[] = [];
 
       risks.forEach((risk) => {
         risk.riskFactorData.forEach((riskData) => {
-          // Find which hierarchy this risk comes from
           const originHierarchy = riskData.homogeneousGroup.hierarchyOnHomogeneous[0]?.hierarchy;
+          if (!originHierarchy) return;
 
-          if (originHierarchy) {
-            const originKey = originHierarchy.id;
+          const group = riskData.homogeneousGroup;
+          const isHierarchyGroup = group.type === HomoTypeEnum.HIERARCHY;
+          const isFromSelf = originHierarchy.id === hierarchy.id;
 
-            if (!risksByOrigin[originKey]) {
-              risksByOrigin[originKey] = {
-                hierarquia: {
+          const origin = getOriginHomogeneousGroup({
+            name: group.name,
+            type: group.type as HomoTypeEnum,
+            characterization: group.characterization as { name: string; type: any } | null,
+            hierarchy: isHierarchyGroup ? { name: originHierarchy.name, type: originHierarchy.type as any } : null,
+          });
+
+          const riskInfo: any = {
+            id: risk.id,
+            nome: risk.name,
+            tipo: RiskTypeTranslation[risk.type] || risk.type,
+            tipoEmIngles: risk.type,
+            severidade: risk.severity,
+            ...(risk.cas && { cas: risk.cas }),
+            nivelRisco: riskData.level,
+            probabilidade: riskData.probability,
+            ...(riskData.probabilityAfter && { probabilidadeApos: riskData.probabilityAfter }),
+          };
+
+          allRisks.push(riskInfo);
+
+          if (isHierarchyGroup && isFromSelf) {
+            // Risk directly on this hierarchy
+            riscosProprios.push(riskInfo);
+          } else if (isHierarchyGroup && !isFromSelf) {
+            // Risk inherited from a parent hierarchy
+            const key = originHierarchy.id;
+            if (!riscosHerdadosHierarquia[key]) {
+              riscosHerdadosHierarquia[key] = {
+                origem: {
                   id: originHierarchy.id,
-                  nome: originHierarchy.name,
+                  nome: origin.name,
                   tipo: HierarchyTypeTranslation[originHierarchy.type],
-                  tipoEmIngles: originHierarchy.type,
+                  tipoOrigem: origin.type,
                 },
                 riscos: [],
               };
             }
-
-            const riskInfo = {
-              id: risk.id,
-              nome: risk.name,
-              tipo: RiskTypeTranslation[risk.type] || risk.type,
-              tipoEmIngles: risk.type,
-              severidade: risk.severity,
-              codigoEsocial: risk.esocialCode,
-              ...(risk.cas && { cas: risk.cas }),
-              grupoHomogeneo: {
-                id: riskData.homogeneousGroup.id,
-                nome: riskData.homogeneousGroup.name,
-                tipo: HomoTypeTranslation[riskData.homogeneousGroup.type],
-              },
-              nivelRisco: riskData.level,
-              probabilidade: riskData.probability,
-              ...(riskData.probabilityAfter && { probabilidadeApos: riskData.probabilityAfter }),
-            };
-
-            risksByOrigin[originKey].riscos.push(riskInfo);
-            allRisks.push(riskInfo);
+            riscosHerdadosHierarquia[key].riscos.push(riskInfo);
+          } else {
+            // Risk from a homogeneous group (environment, workstation, etc.)
+            const key = group.id;
+            if (!riscosDeGrupos[key]) {
+              riscosDeGrupos[key] = {
+                origem: {
+                  id: group.id,
+                  nome: origin.name,
+                  tipo: origin.type,
+                  hierarquiaVinculada: {
+                    id: originHierarchy.id,
+                    nome: originHierarchy.name,
+                    tipo: HierarchyTypeTranslation[originHierarchy.type],
+                  },
+                },
+                riscos: [],
+              };
+            }
+            riscosDeGrupos[key].riscos.push(riskInfo);
           }
         });
       });
 
-      const result = {
+      const result: any = {
         hierarquiaConsultada: {
           id: hierarchy.id,
           nome: hierarchy.name,
@@ -1149,7 +1259,6 @@ export function createCharacterizationTools(deps: { prisma: PrismaClient; defaul
         },
         totalRiscos: allRisks.length,
         totalRiscosUnicos: risks.length,
-        riscosPorOrigem: Object.values(risksByOrigin),
         resumoPorTipo: Object.entries(
           allRisks.reduce(
             (acc, r) => {
@@ -1161,6 +1270,32 @@ export function createCharacterizationTools(deps: { prisma: PrismaClient; defaul
         ).map(([tipo, quantidade]) => ({ tipo, quantidade })),
       };
 
+      if (riscosProprios.length > 0) {
+        result.riscosProprios = {
+          descricao: 'Riscos vinculados diretamente a esta hierarquia',
+          total: riscosProprios.length,
+          riscos: riscosProprios,
+        };
+      }
+
+      const herdados = Object.values(riscosHerdadosHierarquia);
+      if (herdados.length > 0) {
+        result.riscosHerdadosDaHierarquia = {
+          descricao: 'Riscos herdados de hierarquias superiores (setor pai, diretoria, etc.)',
+          total: herdados.reduce((sum, h) => sum + h.riscos.length, 0),
+          origens: herdados,
+        };
+      }
+
+      const grupos = Object.values(riscosDeGrupos);
+      if (grupos.length > 0) {
+        result.riscosDeGruposHomogeneos = {
+          descricao: 'Riscos vindos de grupos homogêneos (ambientes, postos de trabalho, equipamentos, atividades)',
+          total: grupos.reduce((sum, g) => sum + g.riscos.length, 0),
+          origens: grupos,
+        };
+      }
+
       return JSON.stringify(result, null, 2);
     },
     {
@@ -1168,15 +1303,14 @@ export function createCharacterizationTools(deps: { prisma: PrismaClient; defaul
       description:
         'Obtém TODOS os riscos ocupacionais associados a uma hierarquia específica (cargo, setor, diretoria, etc.), incluindo riscos DIRETOS e HERDADOS. ' +
         'IMPORTANTE SOBRE COMO RISCOS SÃO VINCULADOS: Riscos podem ser vinculados de 3 formas: ' +
-        '(1) DIRETAMENTE ao cargo/setor específico, ' +
-        '(2) Através de GRUPOS HOMOGÊNEOS (ambientes, postos de trabalho, equipamentos, atividades) que o cargo pertence, ' +
-        '(3) Através da HIERARQUIA SUPERIOR - um cargo herda os riscos de seu setor pai, que herda os riscos de sua diretoria, e assim por diante. ' +
-        'Esta ferramenta retorna TODOS os riscos das 3 formas acima, mostrando a ORIGEM de cada risco (de qual hierarquia ou grupo homogêneo o risco vem). ' +
+        '(1) DIRETAMENTE ao cargo/setor específico (retornados em "riscosProprios"), ' +
+        '(2) Através da HIERARQUIA SUPERIOR - um cargo herda os riscos de seu setor pai, que herda os riscos de sua diretoria, e assim por diante (retornados em "riscosHerdadosDaHierarquia"), ' +
+        '(3) Através de GRUPOS HOMOGÊNEOS (ambientes, postos de trabalho, equipamentos, atividades) que o cargo pertence (retornados em "riscosDeGruposHomogeneos"). ' +
+        'O JSON de resposta organiza os riscos nessas 3 categorias, cada uma com sua descrição, total e lista agrupada por origem. ' +
         'DIFERENÇA COM obter_detalhes_hierarquia: A ferramenta obter_detalhes_hierarquia retorna informações gerais do cargo/setor E apenas riscos vinculados DIRETAMENTE. ' +
         'Esta ferramenta (obter_riscos_hierarquia) é ESPECÍFICA para riscos e retorna TODOS os riscos (diretos + herdados + de grupos homogêneos). ' +
         'QUANDO USAR: Use esta ferramenta quando o usuário perguntar especificamente sobre RISCOS, PERIGOS, EXPOSIÇÕES de um cargo/setor. ' +
         'Exemplos: "Quais riscos o cargo X está exposto?", "Liste todos os riscos do setor Y", "Que perigos afetam este cargo?". ' +
-        'Retorna informações detalhadas incluindo: nome do risco, tipo (Físico, Químico, Biológico, Ergonômico, Acidente), severidade, nível de risco, probabilidade, grupo homogêneo associado e origem (de qual hierarquia o risco vem). ' +
         'Use após buscar_hierarquias ou quando já souber o ID da hierarquia.',
       schema: z.object({
         _actionDescription: z.string().describe('Escreva uma breve descrição do que você está fazendo. DEVE ser no MESMO IDIOMA que o usuário está usando.'),
@@ -1185,7 +1319,511 @@ export function createCharacterizationTools(deps: { prisma: PrismaClient; defaul
     },
   );
 
-  return [searchRisksByTypeTool, getRiskDetailsTool, searchHomogeneousGroupsTool, getGroupDetailsTool, searchHierarchyTool, getHierarchyDetailsTool, getRisksByHierarchyTool].map((t) =>
-    withErrorHandling(t),
+  const getRiskDataDetailsTool = tool(
+    async ({ riskId, groupId, hierarchyId }) => {
+      // Build where clause to find the specific RiskFactorData
+      const where: any = {
+        riskId: riskId,
+        deletedAt: null,
+      };
+
+      // Add optional filters
+      if (groupId) {
+        where.homogeneousGroupId = groupId;
+      }
+      if (hierarchyId) {
+        where.hierarchyId = hierarchyId;
+      }
+
+      const riskData = await prisma.riskFactorData.findFirst({
+        where,
+        select: {
+          id: true,
+          probability: true,
+          probabilityAfter: true,
+          exposure: true,
+          level: true,
+          json: true,
+          activities: true,
+          startDate: true,
+          endDate: true,
+          createdAt: true,
+          updatedAt: true,
+          // Risk factor info
+          riskFactor: {
+            select: {
+              id: true,
+              name: true,
+              type: true,
+              severity: true,
+              esocialCode: true,
+              cas: true,
+              appendix: true,
+              symptoms: true,
+              propagation: true,
+            },
+          },
+          // Homogeneous group info
+          homogeneousGroup: {
+            select: {
+              id: true,
+              name: true,
+              type: true,
+              description: true,
+              characterization: {
+                select: {
+                  name: true,
+                  type: true,
+                },
+              },
+              hierarchyOnHomogeneous: {
+                select: {
+                  hierarchy: {
+                    select: {
+                      id: true,
+                      name: true,
+                      type: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+          // Hierarchy info
+          hierarchy: {
+            select: {
+              id: true,
+              name: true,
+              type: true,
+            },
+          },
+          // EPIs (Equipamentos de Proteção Individual)
+          epiToRiskFactorData: {
+            select: {
+              epiId: true,
+              efficientlyCheck: true,
+              epcCheck: true,
+              longPeriodsCheck: true,
+              maintenanceCheck: true,
+              sanitationCheck: true,
+              tradeSignCheck: true,
+              trainingCheck: true,
+              unstoppedCheck: true,
+              validationCheck: true,
+              lifeTimeInDays: true,
+              epi: {
+                select: {
+                  id: true,
+                  ca: true,
+                  description: true,
+                  equipment: true,
+                  observation: true,
+                  restriction: true,
+                  expiredDate: true,
+                },
+              },
+            },
+          },
+          // Engineering controls (Medidas de Engenharia)
+          engsToRiskFactorData: {
+            select: {
+              recMedId: true,
+              efficientlyCheck: true,
+              recMed: {
+                select: {
+                  id: true,
+                  medName: true,
+                  medType: true,
+                  status: true,
+                },
+              },
+            },
+          },
+          // Generate sources (Fontes Geradoras)
+          generateSources: {
+            select: {
+              id: true,
+              name: true,
+              status: true,
+            },
+          },
+          // Administrative measures (Medidas Administrativas)
+          adms: {
+            select: {
+              id: true,
+              medName: true,
+              medType: true,
+              status: true,
+            },
+          },
+          // Recommendations (Recomendações)
+          recs: {
+            select: {
+              sequential_id: true,
+              recMed: {
+                select: {
+                  id: true,
+                  recName: true,
+                  recType: true,
+                  status: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      if (!riskData) {
+        return JSON.stringify({
+          erro: 'Dado de risco não encontrado',
+          mensagem:
+            'Nenhum RiskData encontrado para este riskId, ou não corresponde aos filtros fornecidos (groupId/hierarchyId). Verifique se o risco está vinculado ao grupo/hierarquia especificado.',
+        });
+      }
+
+      // Calculate final probability: prioritize DB value, then quantitative, then qualitative
+      const calculatedProbability = riskData.probability;
+      const calculatedProbabilityAfter = riskData.probabilityAfter;
+
+      // Build response object
+      const result: any = {
+        id: riskData.id,
+        risco: {
+          id: riskData.riskFactor.id,
+          nome: riskData.riskFactor.name,
+          tipo: riskData.riskFactor.type,
+          severidade: riskData.riskFactor.severity,
+          ...(riskData.riskFactor.esocialCode && { codigoESocial: riskData.riskFactor.esocialCode }),
+          ...(riskData.riskFactor.cas && { cas: riskData.riskFactor.cas }),
+          ...(riskData.riskFactor.appendix && { anexo: riskData.riskFactor.appendix }),
+          ...(riskData.riskFactor.symptoms && { sintomas: riskData.riskFactor.symptoms }),
+          ...(riskData.riskFactor.propagation && riskData.riskFactor.propagation.length > 0 && { propagacao: riskData.riskFactor.propagation }),
+        },
+        probabilidade: calculatedProbability,
+        probabilidadeAposRecomendacoes: calculatedProbabilityAfter,
+        exposicao: riskData.exposure,
+        nivelRisco: riskData.level,
+        dataInicio: riskData.startDate,
+        dataFim: riskData.endDate,
+      };
+
+      // Add group info
+      if (riskData.homogeneousGroup) {
+        const group = riskData.homogeneousGroup;
+        const isHierarchyGroup = group.type === HomoTypeEnum.HIERARCHY;
+        const originHierarchy = group.hierarchyOnHomogeneous?.[0]?.hierarchy;
+
+        const origin = getOriginHomogeneousGroup({
+          name: group.name,
+          type: group.type as HomoTypeEnum,
+          characterization: group.characterization as { name: string; type: any } | null,
+          hierarchy: isHierarchyGroup && originHierarchy ? { name: originHierarchy.name, type: originHierarchy.type as any } : null,
+        });
+
+        result.grupoHomogeneo = {
+          id: group.id,
+          nome: origin.name,
+          tipo: origin.type,
+          tipoOriginal: HomoTypeTranslation[group.type],
+          tipoEmIngles: group.type,
+          ...(group.description && { descricao: group.description }),
+        };
+      }
+
+      // Add hierarchy info
+      if (riskData.hierarchy) {
+        result.hierarquia = {
+          id: riskData.hierarchy.id,
+          nome: riskData.hierarchy.name,
+          tipo: HierarchyTypeTranslation[riskData.hierarchy.type],
+          tipoEmIngles: riskData.hierarchy.type,
+        };
+      }
+
+      // Add activities if present
+      if (riskData.activities) {
+        result.atividades = riskData.activities;
+      }
+
+      // Parse and add quantity data (quantitative measurements) using existing logic
+      if (riskData.json) {
+        const riskDataForMapper = {
+          ...riskData,
+          riskFactor: riskData.riskFactor,
+          adms: [],
+          recs: [],
+          generateSources: [],
+          engsToRiskFactorData: [],
+          epiToRiskFactorData: [],
+          examsToRiskFactorData: [],
+          dataRecs: [],
+        } as any;
+
+        const quantityData = RiskDataMapper.quantityParse(riskDataForMapper);
+
+        if (quantityData) {
+          const dadosQuantitativos: any = {};
+
+          // Noise (Ruído)
+          if (quantityData.quantityNoise) {
+            const noise = quantityData.quantityNoise;
+            result.probabilidade = noise.probability;
+
+            dadosQuantitativos.ruido = {
+              tipo: 'RUÍDO',
+              anexo: noise.appendix === '2' ? 'Anexo 2 - Ruído de Impacto' : 'Anexo 1 - Ruído Contínuo/Intermitente',
+              medicoes: {
+                ...(noise.ltcatq3 && { ltcatq3: `${noise.ltcatq3} dB` }),
+                ...(noise.ltcatq5 && { ltcatq5: `${noise.ltcatq5} dB` }),
+                ...(noise.nr15q5 && { nr15q5: `${noise.nr15q5} dB` }),
+              },
+            };
+          }
+
+          // Chemical (Químico)
+          if (quantityData.quantityQui) {
+            const qui = quantityData.quantityQui;
+            result.probabilidade = qui.probability;
+
+            dadosQuantitativos.quimico = {
+              tipo: 'QUÍMICO',
+              ...(qui.unit && { unidade: qui.unit }),
+              ...(qui.manipulation && { manipulacao: qui.manipulation }),
+              limites: {
+                ...(qui.nr15lt && {
+                  nr15lt: {
+                    limite: qui.nr15lt,
+                    valor: qui.nr15ltValue,
+                    tipo: qui.isNr15Teto ? 'Valor Teto' : 'Limite de Tolerância',
+                    probabilidade: qui.nr15ltProb,
+                  },
+                }),
+                ...(qui.stel && {
+                  stel: {
+                    limite: qui.stel,
+                    valor: qui.stelValue,
+                    tipo: qui.isStelTeto ? 'ACGIH C (Ceiling)' : 'ACGIH TLV-STEL',
+                    probabilidade: qui.stelProb,
+                  },
+                }),
+                ...(qui.twa && {
+                  twa: {
+                    limite: qui.twa,
+                    valor: qui.twaValue,
+                    tipo: qui.isTwaTeto ? 'ACGIH C (Ceiling)' : 'ACGIH TLV-TWA',
+                    probabilidade: qui.twaProb,
+                  },
+                }),
+                ...(qui.vmp && {
+                  vmp: {
+                    limite: qui.vmp,
+                    valor: qui.vmpValue,
+                    tipo: qui.isVmpTeto ? 'Valor Teto' : 'Valor Máximo Permitido',
+                    probabilidade: qui.vmpProb,
+                  },
+                }),
+              },
+              probabilidade: qui.probability,
+            };
+          }
+
+          // Vibration Full Body (Vibração Corpo Inteiro)
+          if (quantityData.quantityVibrationFB) {
+            const vfb = quantityData.quantityVibrationFB;
+            result.probabilidade = vfb.probability;
+
+            dadosQuantitativos.vibracaoCorpoInteiro = {
+              tipo: 'VIBRAÇÃO CORPO INTEIRO',
+              medicoes: {
+                ...(vfb.aren && { aren: `${vfb.aren} m/s²` }),
+                ...(vfb.vdvr && { vdvr: `${vfb.vdvr} m/s^1.75` }),
+              },
+              probabilidade: vfb.probability,
+            };
+          }
+
+          // Vibration Localized (Vibração Localizada - Mãos e Braços)
+          if (quantityData.quantityVibrationL) {
+            const vl = quantityData.quantityVibrationL;
+            result.probabilidade = vl.probability;
+
+            dadosQuantitativos.vibracaoLocalizada = {
+              tipo: 'VIBRAÇÃO LOCALIZADA (MÃOS E BRAÇOS)',
+              medicoes: {
+                ...(vl.aren && { aren: `${vl.aren} m/s²` }),
+              },
+              probabilidade: vl.probability,
+            };
+          }
+
+          // Radiation (Radiação)
+          if (quantityData.quantityRadiation) {
+            const rad = quantityData.quantityRadiation;
+            result.probabilidade = rad.probability;
+
+            dadosQuantitativos.radiacao = {
+              tipo: 'RADIAÇÃO IONIZANTE',
+              doses: {
+                ...(rad.doseFB && { corpoInteiro: `${rad.doseFB} mSv`, probabilidade: rad.doseFBProb }),
+                ...(rad.doseEye && { cristalino: `${rad.doseEye} mSv`, probabilidade: rad.doseEyeProb }),
+                ...(rad.doseSkin && { pele: `${rad.doseSkin} mSv`, probabilidade: rad.doseSkinProb }),
+                ...(rad.doseHand && { extremidades: `${rad.doseHand} mSv`, probabilidade: rad.doseHandProb }),
+                ...(rad.doseFBPublic && { corpoInteiroPublico: `${rad.doseFBPublic} mSv`, probabilidade: rad.doseFBPublicProb }),
+                ...(rad.doseEyePublic && { cristalinoPublico: `${rad.doseEyePublic} mSv`, probabilidade: rad.doseEyePublicProb }),
+                ...(rad.doseSkinPublic && { pelePublico: `${rad.doseSkinPublic} mSv`, probabilidade: rad.doseSkinPublicProb }),
+              },
+              probabilidade: rad.probability,
+            };
+          }
+
+          // Heat (Calor)
+          if (quantityData.quantityHeat) {
+            const heat = quantityData.quantityHeat;
+            result.probabilidade = heat.probability;
+
+            dadosQuantitativos.calor = {
+              tipo: 'CALOR',
+              medicoes: {
+                ibtug: heat.ibtug,
+                ...(heat.mw && { taxaMetabolica: `${heat.mw} W` }),
+                aclimatizado: heat.isAcclimatized ? 'Sim' : 'Não',
+              },
+              limites: {
+                ...(heat.ibtugNA && { nivelAcao: heat.ibtugNA }),
+                ...(heat.ibtugLEO && { limiteExposicaoOcupacional: heat.ibtugLEO }),
+                ...(heat.ibtugTETO && { valorTeto: heat.ibtugTETO }),
+                ...(heat.ibtugLII && { limiteInadequacao: heat.ibtugLII }),
+              },
+              probabilidade: heat.probability,
+            };
+          }
+
+          if (Object.keys(dadosQuantitativos).length > 0) {
+            result.dadosQuantitativos = dadosQuantitativos;
+          }
+        }
+      }
+
+      // Add EPIs
+      if (riskData.epiToRiskFactorData && riskData.epiToRiskFactorData.length > 0) {
+        result.epis = {
+          total: riskData.epiToRiskFactorData.length,
+          lista: riskData.epiToRiskFactorData.map((epiData) => {
+            // EPI is effective only if ALL checks are true
+            const isEficaz =
+              epiData.efficientlyCheck &&
+              epiData.epcCheck &&
+              epiData.longPeriodsCheck &&
+              epiData.maintenanceCheck &&
+              epiData.sanitationCheck &&
+              epiData.tradeSignCheck &&
+              epiData.trainingCheck &&
+              epiData.unstoppedCheck &&
+              epiData.validationCheck;
+
+            return {
+              epiId: epiData.epi.id,
+              ca: epiData.epi.ca,
+              descricao: epiData.epi.description,
+              equipamento: epiData.epi.equipment,
+              eficaz: isEficaz,
+              ...(epiData.lifeTimeInDays && { tempoVidaDias: epiData.lifeTimeInDays }),
+              ...(epiData.epi.observation && { observacao: epiData.epi.observation }),
+              ...(epiData.epi.restriction && { restricao: epiData.epi.restriction }),
+              ...(epiData.epi.expiredDate && { dataValidade: epiData.epi.expiredDate }),
+            };
+          }),
+        };
+      }
+
+      // Add engineering measures
+      if (riskData.engsToRiskFactorData && riskData.engsToRiskFactorData.length > 0) {
+        result.medidasEngenharia = {
+          total: riskData.engsToRiskFactorData.length,
+          lista: riskData.engsToRiskFactorData.map((engData) => ({
+            id: engData.recMed.id,
+            nome: engData.recMed.medName,
+            tipo: engData.recMed.medType,
+            status: engData.recMed.status,
+            eficaz: engData.efficientlyCheck,
+          })),
+        };
+      }
+
+      // Add generate sources
+      if (riskData.generateSources && riskData.generateSources.length > 0) {
+        result.fontesGeradoras = {
+          total: riskData.generateSources.length,
+          lista: riskData.generateSources.map((source) => ({
+            id: source.id,
+            nome: source.name,
+            status: source.status,
+          })),
+        };
+      }
+
+      // Add administrative measures
+      if (riskData.adms && riskData.adms.length > 0) {
+        result.medidasAdministrativas = {
+          total: riskData.adms.length,
+          lista: riskData.adms.map((adm) => ({
+            id: adm.id,
+            nome: adm.medName,
+            tipo: adm.medType,
+            status: adm.status,
+          })),
+        };
+      }
+
+      // Add recommendations
+      if (riskData.recs && riskData.recs.length > 0) {
+        result.recomendacoes = {
+          total: riskData.recs.length,
+          lista: riskData.recs.map((rec) => ({
+            id: rec.recMed.id,
+            sequencial: rec.sequential_id,
+            nome: rec.recMed.recName,
+            tipo: rec.recMed.recType,
+            status: rec.recMed.status,
+          })),
+        };
+      }
+
+      result.metadados = {
+        dataCriacao: riskData.createdAt,
+        dataAtualizacao: riskData.updatedAt,
+      };
+
+      return JSON.stringify(result, null, 2);
+    },
+    {
+      name: 'obter_dados_completos_risco',
+      description:
+        'Obtém TODOS os dados completos de um RiskData (caracterização de risco) incluindo TODAS as suas relações: ' +
+        'EPIs (Equipamentos de Proteção Individual), medidas de engenharia, medidas administrativas, fontes geradoras, recomendações, ' +
+        'dados JSON personalizados, atividades, probabilidades, níveis de exposição, e todas as informações do risco associado. ' +
+        'QUANDO USAR: Use esta ferramenta quando o usuário perguntar sobre DETALHES COMPLETOS de como um risco específico está caracterizado ' +
+        'em um grupo homogêneo ou hierarquia, incluindo medidas de controle, EPIs recomendados, fontes geradoras, etc. ' +
+        'Exemplos: "Quais EPIs são usados para o risco X no grupo Y?", "Me mostre todas as medidas de controle do risco Z", ' +
+        '"Detalhe a caracterização completa do ruído no ambiente de produção". ' +
+        'IMPORTANTE: Esta ferramenta busca por riskId (ID do RiskFactor genérico) e pode filtrar por grupo e hierarquia.',
+      schema: z.object({
+        _actionDescription: z.string().describe('Escreva uma breve descrição do que você está fazendo. DEVE ser no MESMO IDIOMA que o usuário está usando.'),
+        riskId: z.string().uuid().describe('ID do RiskFactor (UUID) - este é o ID do risco genérico/fator de risco'),
+        groupId: z.string().uuid().optional().describe('ID do grupo homogêneo (opcional) - use para filtrar que o RiskData pertence a este grupo específico'),
+        hierarchyId: z.string().optional().describe('ID da hierarquia (opcional) - use para filtrar que o RiskData pertence a esta hierarquia específica'),
+      }),
+    },
   );
+
+  return [
+    searchRisksByTypeTool,
+    getRiskDetailsTool,
+    searchHomogeneousGroupsTool,
+    getGroupDetailsTool,
+    searchHierarchyTool,
+    getHierarchyDetailsTool,
+    getRisksByHierarchyTool,
+    getRiskDataDetailsTool,
+  ].map((t) => withErrorHandling(t));
 }
