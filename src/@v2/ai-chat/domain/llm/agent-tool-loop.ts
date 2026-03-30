@@ -49,10 +49,7 @@ export async function* agentToolLoop(options: AgentToolLoopOptions): AsyncGenera
 
     if (!accumulated) break;
 
-    const toolCalls =
-      'tool_calls' in accumulated && Array.isArray(accumulated.tool_calls)
-        ? (accumulated.tool_calls as Array<{ id?: string; name: string; args: Record<string, unknown> }>)
-        : [];
+    const toolCalls = 'tool_calls' in accumulated && Array.isArray(accumulated.tool_calls) ? (accumulated.tool_calls as Array<{ id?: string; name: string; args: Record<string, unknown> }>) : [];
 
     if (toolCalls.length === 0) break;
 
@@ -71,6 +68,21 @@ export async function* agentToolLoop(options: AgentToolLoopOptions): AsyncGenera
         // Pass callbacks so tool execution traces nest under the parent in LangSmith
         const toolResult = await (foundTool.invoke as (args: unknown, config?: any) => Promise<string>)(toolCall.args, callConfig);
         const resultStr = typeof toolResult === 'string' ? toolResult : JSON.stringify(toolResult);
+
+        // Check if tool result contains an action card (backend-driven mutation)
+        let actionCardData: any = null;
+        try {
+          const parsed = JSON.parse(resultStr);
+          if (parsed._action_type && parsed._action_id) {
+            actionCardData = {
+              actionId: parsed._action_id,
+              summary: parsed._action_summary || 'Ação pendente',
+              details: parsed._action_details || {},
+            };
+          }
+        } catch {
+          // Not JSON or doesn't have action markers — proceed normally
+        }
 
         if (resultStr.startsWith(BINARY_RESULT_PREFIX)) {
           const binaryJson = resultStr.slice(BINARY_RESULT_PREFIX.length);
@@ -100,6 +112,16 @@ export async function* agentToolLoop(options: AgentToolLoopOptions): AsyncGenera
             result: resultStr,
             success: !resultStr.toLowerCase().startsWith('failed'),
           };
+
+          // Emit action_card SSE event if detected
+          if (actionCardData) {
+            yield {
+              type: 'action_card',
+              actionId: actionCardData.actionId,
+              summary: actionCardData.summary,
+              details: actionCardData.details,
+            };
+          }
 
           currentMessages.push({
             role: 'tool',

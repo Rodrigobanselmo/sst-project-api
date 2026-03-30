@@ -1,6 +1,6 @@
+import { RiskDataMapper } from '@/@v2/documents/database/mappers/risk-data.mapper';
 import { HomoTypeEnum } from '@/@v2/shared/domain/enum/security/homo-type.enum';
 import { getOriginHomogeneousGroup } from '@/@v2/shared/domain/functions/security/get-origin-homogeneous-group.func';
-import { RiskDataMapper } from '@/@v2/documents/database/mappers/risk-data.mapper';
 import { tool } from '@langchain/core/tools';
 import type { PrismaClient } from '@prisma/client';
 import Fuse from 'fuse.js';
@@ -8,16 +8,16 @@ import { z } from 'zod';
 import { normalizeString } from '../../../../shared/utils/normalizeString';
 import { CharacterizationTypeTranslation, HierarchyTypeTranslation, HomoTypeTranslation } from '../../translations/characterization.translation';
 import { withErrorHandling } from './tool-error-handler';
-import { QuantityTypeEnum } from '@/@v2/shared/domain/enum/security/quantity-type.enum';
-import { RiskDataQuantityHeatVO } from '@/@v2/shared/domain/values-object/security/risk-data-quantity-heat.vo';
-import { RiskDataQuantityNoiseVO } from '@/@v2/shared/domain/values-object/security/risk-data-quantity-noise.vo';
-import { RiskDataQuantityQuiVO } from '@/@v2/shared/domain/values-object/security/risk-data-quantity-qui.vo';
-import { RiskDataQuantityRadiationVO } from '@/@v2/shared/domain/values-object/security/risk-data-quantity-radiation.vo';
-import { RiskDataQuantityVibrationFBVO } from '@/@v2/shared/domain/values-object/security/risk-data-quantity-vibration-fb.vo';
-import { RiskDataQuantityVibrationLVO } from '@/@v2/shared/domain/values-object/security/risk-data-quantity-vibration-l.vo';
 
-export function createCharacterizationTools(deps: { prisma: PrismaClient; defaultCompanyId: string }) {
-  const { prisma, defaultCompanyId } = deps;
+export interface CharacterizationToolsDeps {
+  prisma: PrismaClient;
+  defaultCompanyId: string;
+  userId?: number;
+  messageId?: string;
+}
+
+export function createCharacterizationTools(deps: CharacterizationToolsDeps) {
+  const { prisma, defaultCompanyId, userId, messageId } = deps;
 
   const searchRisksByTypeTool = tool(
     async ({ riskTypes, companyId }) => {
@@ -1816,7 +1816,150 @@ export function createCharacterizationTools(deps: { prisma: PrismaClient; defaul
     },
   );
 
-  return [
+  // ─── AI-Driven Risk Data Update Tool ─────────────────────────
+  // This tool PROPOSES changes instead of executing them directly
+  // Returns a special JSON format that triggers an "action_card" SSE event
+  const proposeRiskDataUpdateTool = tool(
+    async ({ riskId, groupId, hierarchyId, epis, recs, engs, adms, generateSources, probability, probabilityAfter, activities, startDate, endDate }) => {
+      // Validate that we have the required dependencies
+      if (!userId || !messageId) {
+        return JSON.stringify({
+          erro: 'Configuração inválida',
+          mensagem: 'Esta ferramenta requer configuração adicional para funcionar. Entre em contato com o suporte.',
+        });
+      }
+
+      // Validate required fields
+      if (!riskId) {
+        return JSON.stringify({
+          erro: 'Campo obrigatório ausente',
+          mensagem: 'É necessário informar o ID do risco (riskId).',
+        });
+      }
+
+      if (!groupId && !hierarchyId) {
+        return JSON.stringify({
+          erro: 'Campo obrigatório ausente',
+          mensagem: 'É necessário informar o ID do grupo homogêneo (groupId) OU o ID da hierarquia (hierarchyId).',
+        });
+      }
+
+      // Fetch risk and group/hierarchy names for summary
+      const risk = await prisma.riskFactors.findUnique({
+        where: { id: riskId },
+        select: { name: true },
+      });
+
+      let targetName = '';
+      if (groupId) {
+        const group = await prisma.homogeneousGroup.findUnique({
+          where: { id: groupId },
+          select: { name: true, description: true },
+        });
+        if (group) {
+          targetName = group.description.includes('(//)') ? group.description.split('(//)')[0] : group.name;
+        }
+      } else if (hierarchyId) {
+        const hierarchy = await prisma.hierarchy.findUnique({
+          where: { id: hierarchyId },
+          select: { name: true },
+        });
+        targetName = hierarchy?.name || '';
+      }
+
+      // Build payload for UpsertRiskDataService
+      const payload: any = {
+        riskId,
+        companyId: defaultCompanyId,
+        riskFactorGroupDataId: '', // Will be populated by service
+      };
+
+      // Add target (group or hierarchy)
+      if (groupId) {
+        payload.homogeneousGroupId = groupId;
+      } else if (hierarchyId) {
+        payload.hierarchyId = hierarchyId;
+      }
+
+      // Add optional fields
+      if (epis && epis.length > 0) payload.epis = epis;
+      if (recs && recs.length > 0) payload.recs = recs;
+      if (engs && engs.length > 0) payload.engs = engs;
+      if (adms && adms.length > 0) payload.adms = adms;
+      if (generateSources && generateSources.length > 0) payload.generateSources = generateSources;
+      if (probability !== undefined) payload.probability = probability;
+      if (probabilityAfter !== undefined) payload.probabilityAfter = probabilityAfter;
+      if (activities) payload.activities = activities;
+      if (startDate) payload.startDate = startDate;
+      if (endDate) payload.endDate = endDate;
+
+      // Generate human-readable summary
+      const changes: string[] = [];
+      if (epis && epis.length > 0) changes.push(`${epis.length} EPI(s)`);
+      if (recs && recs.length > 0) changes.push(`${recs.length} recomendação(ões)`);
+      if (engs && engs.length > 0) changes.push(`${engs.length} medida(s) de engenharia`);
+      if (adms && adms.length > 0) changes.push(`${adms.length} medida(s) administrativa(s)`);
+      if (generateSources && generateSources.length > 0) changes.push(`${generateSources.length} fonte(s) geradora(s)`);
+      if (probability !== undefined) changes.push(`probabilidade: ${probability}`);
+      if (probabilityAfter !== undefined) changes.push(`probabilidade após: ${probabilityAfter}`);
+
+      const summary = `Atualizar risco "${risk?.name || riskId}" em "${targetName}": ${changes.join(', ')}`;
+
+      // Create pending action directly in database using Prisma
+      const action = await prisma.aiPendingAction.create({
+        data: {
+          userId,
+          companyId: defaultCompanyId,
+          messageId,
+          service: 'UPSERT_RISK_DATA' as any, // Will be AiPendingActionServiceEnum.UPSERT_RISK_DATA after migration
+          status: 'PENDING' as any, // Will be AiPendingActionStatusEnum.PENDING after migration
+          payload,
+          summary,
+        },
+      });
+
+      // Return special JSON format to trigger action_card SSE event
+      return JSON.stringify({
+        _action_type: 'upsert_risk_data',
+        _action_id: action.id,
+        _action_summary: summary,
+        _action_details: {
+          risco: risk?.name,
+          alvo: targetName,
+          alteracoes: changes,
+        },
+        mensagem: `✅ Ação preparada: ${summary}. Aguardando sua autorização para executar.`,
+      });
+    },
+    {
+      name: 'propor_atualizacao_risco',
+      description:
+        'Propõe uma atualização nos dados de caracterização de um risco específico em um grupo homogêneo ou hierarquia. ' +
+        'Esta ferramenta NÃO executa a alteração imediatamente - ela cria uma proposta que o usuário deve autorizar. ' +
+        'Use esta ferramenta quando o usuário pedir para ADICIONAR, REMOVER ou MODIFICAR: EPIs, recomendações, medidas de engenharia, ' +
+        'medidas administrativas, fontes geradoras, probabilidades, ou outras características de um risco. ' +
+        'IMPORTANTE: Requer riskId (ID do risco) e groupId (ID do grupo homogêneo) OU hierarchyId (ID da hierarquia).',
+      schema: z.object({
+        _actionDescription: z.string().describe('Escreva uma breve descrição do que você está propondo. DEVE ser no MESMO IDIOMA que o usuário está usando.'),
+        riskId: z.string().uuid().describe('ID do risco (RiskFactor) que será atualizado'),
+        groupId: z.string().uuid().optional().describe('ID do grupo homogêneo onde o risco será atualizado'),
+        hierarchyId: z.string().optional().describe('ID da hierarquia onde o risco será atualizado'),
+        epis: z.array(z.number()).optional().describe('Array de IDs de EPIs para associar ao risco'),
+        recs: z.array(z.string()).optional().describe('Array de IDs de recomendações (RecMed) para associar ao risco'),
+        engs: z.array(z.string()).optional().describe('Array de IDs de medidas de engenharia (RecMed) para associar ao risco'),
+        adms: z.array(z.string()).optional().describe('Array de IDs de medidas administrativas (RecMed) para associar ao risco'),
+        generateSources: z.array(z.string()).optional().describe('Array de IDs de fontes geradoras (GenerateSource) para associar ao risco'),
+        probability: z.number().min(1).max(5).optional().describe('Probabilidade de ocorrência do risco (1-5)'),
+        probabilityAfter: z.number().min(1).max(5).optional().describe('Probabilidade após medidas de controle (1-5)'),
+        activities: z.string().optional().describe('Descrição das atividades relacionadas ao risco'),
+        startDate: z.string().optional().describe('Data de início da exposição ao risco (formato ISO)'),
+        endDate: z.string().optional().describe('Data de fim da exposição ao risco (formato ISO)'),
+      }),
+    },
+  );
+
+  // Build tools array
+  const tools: any[] = [
     searchRisksByTypeTool,
     getRiskDetailsTool,
     searchHomogeneousGroupsTool,
@@ -1825,5 +1968,12 @@ export function createCharacterizationTools(deps: { prisma: PrismaClient; defaul
     getHierarchyDetailsTool,
     getRisksByHierarchyTool,
     getRiskDataDetailsTool,
-  ].map((t) => withErrorHandling(t));
+  ];
+
+  // Only add mutation tool if dependencies are available
+  if (userId && messageId) {
+    tools.push(proposeRiskDataUpdateTool);
+  }
+
+  return tools.map((t) => withErrorHandling(t));
 }
