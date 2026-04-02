@@ -10,6 +10,8 @@ type IParams = {
   sections: ISectionOptions[];
   documentVersionId: string;
   companyId: string;
+  /** Inserido só na primeira parte (chunk 0) quando o anexo é dividido em vários ficheiros. */
+  leadingSections?: ISectionOptions[];
 };
 
 export function createDocumentAttachments(params: IParams): IDocumentAttachment[] {
@@ -18,9 +20,11 @@ export function createDocumentAttachments(params: IParams): IDocumentAttachment[
 
   const attachmentsChunks = sectionChunks.map((section, index) => {
     const id = v4();
+    const sectionWithLead =
+      index === 0 && params.leadingSections?.length ? [...params.leadingSections, ...section] : section;
     return {
       id: id,
-      section: section,
+      section: sectionWithLead,
       model: new AttachmentModel({
         name: `${params.name}${hasManyChunks ? ` - Parte ${index + 1}` : ''}`,
         link: `${process.env.APP_HOST}/download/pgr/anexos?ref1=${params.documentVersionId}&ref2=${id}&ref3=${params.companyId}`,

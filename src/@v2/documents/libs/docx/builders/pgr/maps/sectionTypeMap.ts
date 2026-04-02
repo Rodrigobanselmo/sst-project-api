@@ -15,7 +15,6 @@ import { actionPlanTableSection } from '../../../components/tables/actionPlan/ac
 import { APPRTableSection } from '../../../components/tables/appr/appr.section';
 import { APPRByGroupTableSection } from '../../../components/tables/apprByGroup/appr-group.section';
 import { dataConverter } from '../../../converter/data.converter';
-import { PGR_ANNEX_SUBCOVER_CHAPTER_LINES } from '../constants/pgr-annex-subcover-titles';
 import { VariablesPGREnum } from '../enums/variables.enum';
 import { convertToDocxHelper } from '../functions/convertToDocx';
 import { replaceAllVariables } from '../functions/replaceAllVariables';
@@ -106,24 +105,9 @@ export class SectionsMapClass {
         ...sectionLandscapeProperties,
       };
 
-      const isAnnexAttachmentsSection = Boolean(
-        children?.some((c) => c.type === DocumentChildrenTypeEnum.ATTACHMENTS),
-      );
-      if (!isAnnexAttachmentsSection) {
-        return mainSection;
-      }
-
-      const docTitle = replaceAllVariables(`??${VariablesPGREnum.DOCUMENT_TITLE}??`, this.variables);
-      const annexSubcovers = PGR_ANNEX_SUBCOVER_CHAPTER_LINES.map((chapterLine) =>
-        chapterSection({
-          version: this.version,
-          chapter: chapterLine,
-          imagePath: this.data.documentBase.mainLogoPath,
-          title: docTitle,
-        }),
-      );
-
-      return [mainSection, ...annexSubcovers];
+      // Subcapas por anexo ficam no início de cada ficheiro de anexo e no consolidado (document-pgr.product),
+      // não aqui — evita lista de anexos + 3 capas seguidas antes do conteúdo real.
+      return mainSection;
     },
     [DocumentSectionTypeEnum.ITERABLE_ENVIRONMENTS]: (): ISectionOptions[] =>
       allCharacterizationSections(this.data.homogeneousGroups, this.oldData.hierarchyData, this.oldData.homoGroupTree, 'env', (x, v) => this.convertToDocx(x, v)).map(({ footerText, children }) => ({

@@ -11,6 +11,7 @@ import { AddQueueDocumentService } from '../services/document/document/add-queue
 import { DownloadAttachmentsService } from '../services/document/document/download-attachment-doc.service';
 import { DownloadDocumentService } from '../services/document/document/download-doc.service';
 import { GetDocVariablesService } from '../services/document/document/get-doc-variables.service';
+import { DownloadPgrConsolidatedDocxService } from '../services/document/document/download-pgr-consolidated-docx.service';
 import { Response } from 'express';
 
 @Controller('documents/base')
@@ -20,6 +21,7 @@ export class DocumentsBaseController {
     private readonly downloadDocService: DownloadDocumentService,
     private readonly addQueueDocumentService: AddQueueDocumentService,
     private readonly getDocVariablesService: GetDocVariablesService,
+    private readonly downloadPgrConsolidatedDocxService: DownloadPgrConsolidatedDocxService,
   ) {}
 
   @Permissions(
@@ -34,6 +36,25 @@ export class DocumentsBaseController {
       isContract: true,
     },
   )
+  // Segmento opcional :companyId para o @User() popular targetCompanyId via getCompanyId(params),
+  // igual ao GET /:docId/:companyId? do download simples (JWT sozinho pode ser outra empresa).
+  @Get('/pgr-consolidated/docx/:docId/:companyId?')
+  async downloadPgrConsolidatedWord(
+    @Res() res: Response,
+    @User() userPayloadDto: UserPayloadDto,
+    @Param('docId') docId: string,
+  ) {
+    const companyId = userPayloadDto.targetCompanyId;
+    const { buffer, fileName } = await this.downloadPgrConsolidatedDocxService.execute(docId, companyId);
+
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    );
+    res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
+    res.send(buffer);
+  }
+
   @Get('/:docId/attachment/:attachmentId/:companyId?')
   async downloadAttachment(@Res() res, @User() userPayloadDto: UserPayloadDto, @Param('docId') docId: string, @Param('attachmentId') attachmentId: string) {
     const { fileKey, fileStream } = await this.pgrDownloadAttachmentsService.execute(userPayloadDto, docId, attachmentId);
