@@ -2347,6 +2347,7 @@ model AiMessage {
   toolStatus      String?
   toolDescription String?
   created_at      DateTime          @default(now())
+  updated_at      DateTime          @updatedAt
 
   thread         AiThread          @relation(fields: [threadId], references: [id], onDelete: Cascade)
   files          AiMessageFile[]
@@ -2408,6 +2409,7 @@ model AiPendingAction {
   payload      Json                       @db.JsonB
   status       AiPendingActionStatusEnum  @default(PENDING)
   summary      String?                    @db.Text
+  details      Json?                      @db.JsonB // Human-readable formatted details for UI display
   executedAt   DateTime?
   errorMessage String?                    @db.Text
   created_at   DateTime                   @default(now())

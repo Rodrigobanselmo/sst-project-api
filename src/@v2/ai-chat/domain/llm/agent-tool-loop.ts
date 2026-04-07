@@ -12,21 +12,37 @@ export interface AgentToolLoopOptions {
   tools: StructuredToolInterface[];
   callbacks?: CallbackManager;
   maxIterations?: number;
+  /** Optional smarter LLM to use for specific tools that require more reasoning */
+  smarterLlm?: BaseChatModel;
+  /** Tool names that should always use the smarter LLM */
+  toolsRequiringSmarterLlm?: string[];
 }
 
 /**
  * Shared tool loop for all agents.
  * Streams LLM responses, detects tool calls, executes tools, and loops until a final text response.
+ *
+ * When smarterLlm is provided, it switches to it only for the iteration after
+ * a tool in toolsRequiringSmarterLlm returns — so the smarter model processes
+ * that tool's result while all other iterations use the default (fast) LLM.
  */
 export async function* agentToolLoop(options: AgentToolLoopOptions): AsyncGenerator<StreamEvent, void, undefined> {
-  const { tools, callbacks, maxIterations = 300 } = options;
-  const llm = options.llm.bindTools(tools);
+  const { tools, callbacks, maxIterations = 300, smarterLlm, toolsRequiringSmarterLlm = [] } = options;
+  const defaultLlm = options.llm.bindTools(tools);
+  const boundSmarterLlm = smarterLlm ? smarterLlm.bindTools(tools) : null;
   const callConfig = callbacks ? { callbacks } : undefined;
 
   let currentMessages = [...options.messages];
+  let useSmartNextIteration = false;
 
   for (let i = 0; i < maxIterations; i++) {
-    const stream = await llm.stream(currentMessages, callConfig);
+    const activeLlm = useSmartNextIteration && boundSmarterLlm ? boundSmarterLlm : defaultLlm;
+    if (useSmartNextIteration && boundSmarterLlm) {
+      console.log(`[AgentToolLoop] Using SMARTER LLM for this iteration`);
+    }
+    useSmartNextIteration = false;
+
+    const stream = await activeLlm.stream(currentMessages, callConfig);
     let accumulated: any = null;
 
     for await (const chunk of stream) {
@@ -63,6 +79,11 @@ export async function* agentToolLoop(options: AgentToolLoopOptions): AsyncGenera
       const description = (args._actionDescription as string | undefined) ?? toolCall.name;
 
       yield { type: 'tool_start', tool: toolCall.name, args, description };
+
+      // Flag smarter LLM for next iteration if this tool requires it
+      if (boundSmarterLlm && toolsRequiringSmarterLlm.includes(toolCall.name)) {
+        useSmartNextIteration = true;
+      }
 
       try {
         // Pass callbacks so tool execution traces nest under the parent in LangSmith

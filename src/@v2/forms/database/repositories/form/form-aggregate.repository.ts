@@ -62,6 +62,7 @@ export class FormAggregateRepository {
     const formAggregate = await this.prisma.form.findFirst({
       where: {
         id: params.id,
+        deleted_at: null,
         OR: [
           {
             company_id: { in: accessibleCompanyIds },

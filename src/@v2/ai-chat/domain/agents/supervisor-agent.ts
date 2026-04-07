@@ -54,16 +54,24 @@ export interface SupervisorInput {
   usersRepository: UsersRepository;
   prisma: PrismaClient;
   llm: BaseChatModel;
+  /** Dedicated fast LLM for intent classification (always fast regardless of user mode) */
+  classifierLlm?: BaseChatModel;
+  /** Smarter LLM for tools that require more reasoning */
+  smarterLlm?: BaseChatModel;
   /** Pre-extracted file contents from controller (avoids double S3 download) */
   extractedContents?: Map<string, ExtractionResult>;
   /** Page context from frontend (URL params, current page info) */
   pageContext?: PageContext;
+  /** Thread ID for context */
+  threadId?: string;
+  /** Assistant message ID (created before agent loop for tool linking) */
+  assistantMessageId?: string;
 }
 
 /**
  * Builds context-aware system prompt with page context
  */
-function buildContextAwarePrompt(basePrompt: string, pageContext?: PageContext, userCompanyId?: string): string {
+function buildContextAwarePrompt(basePrompt: string, pageContext?: PageContext): string {
   if (!pageContext) return basePrompt;
 
   const contextParts: string[] = [];
@@ -90,8 +98,8 @@ ${contextParts.join('\n')}`;
 /**
  * Classifies user intent using LLM
  */
-async function classifyIntent(llm: BaseChatModel, message: string, history: BaseMessage[], callbacks: CallbackManager, pageContext?: PageContext, userCompanyId?: string): Promise<AgentType> {
-  const systemPrompt = buildContextAwarePrompt(SUPERVISOR_SYSTEM_PROMPT, pageContext, userCompanyId);
+async function classifyIntent(llm: BaseChatModel, message: string, history: BaseMessage[], callbacks: CallbackManager, pageContext?: PageContext): Promise<AgentType> {
+  const systemPrompt = buildContextAwarePrompt(SUPERVISOR_SYSTEM_PROMPT, pageContext);
   const response = await llm.invoke([new SystemMessage(systemPrompt), ...history, new HumanMessage(message)], { callbacks });
 
   const content = typeof response.content === 'string' ? response.content.trim().toLowerCase() : '';
@@ -108,7 +116,9 @@ async function classifyIntent(llm: BaseChatModel, message: string, history: Base
  */
 export async function* streamSupervisorAgent(input: SupervisorInput): AsyncGenerator<StreamEvent, void, undefined> {
   // Create a parent run for LangSmith to group all traces
-  const companyId = input.user.targetCompanyId ?? input.user.companyId;
+  // IMPORTANT: Use pageContext.companyId (from frontend URL/view) as the primary source
+  // Fall back to user's company only if pageContext is not available
+  const companyId = input.pageContext?.companyId ?? input.user.targetCompanyId ?? input.user.companyId;
 
   const parentRun = new RunTree({
     name: 'SupervisorAgent',
@@ -135,7 +145,7 @@ export async function* streamSupervisorAgent(input: SupervisorInput): AsyncGener
 
     // Only send last few messages for classification — enough for context, avoids sending the full history
     const recentHistory = historyMessages.slice(-6);
-    const agentType = await classifyIntent(input.llm, input.message, recentHistory, classifyCallbacks, input.pageContext, companyId);
+    const agentType = await classifyIntent(input.classifierLlm ?? input.llm, input.message, recentHistory, classifyCallbacks, input.pageContext);
     await endRun(classifyRun, { outputs: { agentType } });
 
     // Emit agent start event
@@ -247,10 +257,13 @@ export async function* streamSupervisorAgent(input: SupervisorInput): AsyncGener
           companyId,
           prisma: input.prisma,
           llm: input.llm,
+          smarterLlm: input.smarterLlm,
           prebuiltHistoryMessages: historyMessages,
           prebuiltCurrentMessage: currentUserMessage,
           additionalTools: fileTools,
           callbacks: agentCallbacks,
+          userId: input.user.userId,
+          assistantMessageId: input.assistantMessageId,
         })) {
           yield event;
         }

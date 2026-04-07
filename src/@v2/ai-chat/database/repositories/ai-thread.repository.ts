@@ -26,6 +26,16 @@ export interface AiFileAttachment {
   extractionType?: string | null;
 }
 
+export interface AIMessagePendingAction {
+  id: string;
+  service: string;
+  payload: any;
+  details?: any; // Formatted details for UI display
+  status: string;
+  summary: string | null;
+  errorMessage: string | null;
+}
+
 export interface AIMessage {
   id: string;
   threadId: string;
@@ -36,6 +46,7 @@ export interface AIMessage {
   toolDescription?: string | null;
   createdAt: Date;
   attachments?: AiFileAttachment[];
+  pendingActions?: AIMessagePendingAction[];
 }
 
 export interface AIThreadConnection {
@@ -150,9 +161,7 @@ export class AiThreadRepository {
           threadId,
           role: role as AiMessageRoleEnum,
           content,
-          ...(fileIds && fileIds.length > 0
-            ? { files: { create: fileIds.map((fileId) => ({ fileId })) } }
-            : {}),
+          ...(fileIds && fileIds.length > 0 ? { files: { create: fileIds.map((fileId) => ({ fileId })) } } : {}),
         },
         include: { files: { include: { file: true } } },
       });
@@ -198,6 +207,23 @@ export class AiThreadRepository {
     return this.mapMessage(message);
   }
 
+  async updateMessage(messageId: string, content: string): Promise<AIMessage | null> {
+    const message = await this.prisma.aiMessage.update({
+      where: { id: messageId },
+      data: { content, updated_at: new Date() },
+    });
+
+    return this.mapMessage(message);
+  }
+
+  async deleteMessage(messageId: string): Promise<boolean> {
+    await this.prisma.aiMessage.delete({
+      where: { id: messageId },
+    });
+
+    return true;
+  }
+
   async getMessages(threadId: string, userId: number, options: { first?: number; before?: string | null } = {}): Promise<AIMessageConnection> {
     const { first = 50, before } = options;
 
@@ -210,10 +236,13 @@ export class AiThreadRepository {
       this.prisma.aiMessage.count({ where: { threadId } }),
       this.prisma.aiMessage.findMany({
         where: { threadId },
-        orderBy: { created_at: 'desc' },
+        orderBy: { updated_at: 'desc' },
         take: first + 1,
         ...(before && { cursor: { id: before }, skip: 1 }),
-        include: { files: { include: { file: true } } },
+        include: {
+          files: { include: { file: true } },
+          pendingActions: true,
+        },
       }),
     ]);
 
@@ -247,7 +276,7 @@ export class AiThreadRepository {
         threadId,
         role: { in: ['user', 'assistant'] },
       },
-      orderBy: { created_at: 'desc' },
+      orderBy: { updated_at: 'desc' },
       take: limit,
       include: { files: { include: { file: true } } },
     });
@@ -290,10 +319,25 @@ export class AiThreadRepository {
 
   private mapMessageWithFiles(raw: any): AIMessage {
     const attachments = this.mapFileAttachments(raw.files);
+    const pendingActions = this.mapPendingActions(raw.pendingActions);
     return {
       ...this.mapMessage(raw),
       ...(attachments.length > 0 ? { attachments } : {}),
+      ...(pendingActions.length > 0 ? { pendingActions } : {}),
     };
+  }
+
+  private mapPendingActions(actions: any[] | undefined): AIMessagePendingAction[] {
+    if (!actions || actions.length === 0) return [];
+    return actions.map((a: any) => ({
+      id: a.id,
+      service: a.service,
+      payload: a.payload,
+      details: a.details, // Include formatted details
+      status: a.status,
+      summary: a.summary,
+      errorMessage: a.errorMessage,
+    }));
   }
 
   private mapFileAttachments(files: any[] | undefined): AiFileAttachment[] {

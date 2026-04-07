@@ -122,6 +122,7 @@ export class UpsertRiskDataDto {
   @Type(() => Date)
   endDate?: Date;
 
+  // ADD operations
   @ValidateNested({ each: true })
   @IsOptional()
   @Type(() => UpdateRecMedDto)
@@ -141,6 +142,31 @@ export class UpsertRiskDataDto {
   @IsOptional()
   @Type(() => UpdateRecMedDto)
   engsAddOnly?: UpdateRecMedDto[];
+
+  @IsString({ each: true })
+  @IsOptional()
+  episCas?: string[];
+
+  // REMOVE operations (only names needed)
+  @IsString({ each: true })
+  @IsOptional()
+  removeEpisCas?: string[];
+
+  @IsString({ each: true })
+  @IsOptional()
+  removeRecs?: string[];
+
+  @IsString({ each: true })
+  @IsOptional()
+  removeAdms?: string[];
+
+  @IsString({ each: true })
+  @IsOptional()
+  removeEngs?: string[];
+
+  @IsString({ each: true })
+  @IsOptional()
+  removeGenerateSources?: string[];
 }
 
 export class UpsertManyRiskDataDto {
@@ -249,6 +275,52 @@ export class UpsertManyRiskDataDto {
   @IsDate({ message: 'Data de fim inválida' })
   @Type(() => Date)
   endDate?: Date;
+
+  // ADD operations
+  @ValidateNested({ each: true })
+  @IsOptional()
+  @Type(() => UpdateRecMedDto)
+  recAddOnly?: UpdateRecMedDto[];
+
+  @ValidateNested({ each: true })
+  @IsOptional()
+  @Type(() => UpdateRecMedDto)
+  admsAddOnly?: UpdateRecMedDto[];
+
+  @ValidateNested({ each: true })
+  @IsOptional()
+  @Type(() => UpdateGenerateSourceDto)
+  generateSourcesAddOnly?: UpdateGenerateSourceDto[];
+
+  @ValidateNested({ each: true })
+  @IsOptional()
+  @Type(() => UpdateRecMedDto)
+  engsAddOnly?: UpdateRecMedDto[];
+
+  @IsString({ each: true })
+  @IsOptional()
+  episCas?: string[];
+
+  // REMOVE operations (only names needed)
+  @IsString({ each: true })
+  @IsOptional()
+  removeEpisCas?: string[];
+
+  @IsString({ each: true })
+  @IsOptional()
+  removeRecs?: string[];
+
+  @IsString({ each: true })
+  @IsOptional()
+  removeAdms?: string[];
+
+  @IsString({ each: true })
+  @IsOptional()
+  removeEngs?: string[];
+
+  @IsString({ each: true })
+  @IsOptional()
+  removeGenerateSources?: string[];
 }
 
 export class DeleteManyRiskDataDto {

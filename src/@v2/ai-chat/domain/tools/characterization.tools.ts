@@ -2,7 +2,7 @@ import { RiskDataMapper } from '@/@v2/documents/database/mappers/risk-data.mappe
 import { HomoTypeEnum } from '@/@v2/shared/domain/enum/security/homo-type.enum';
 import { getOriginHomogeneousGroup } from '@/@v2/shared/domain/functions/security/get-origin-homogeneous-group.func';
 import { tool } from '@langchain/core/tools';
-import type { PrismaClient } from '@prisma/client';
+import { AiPendingActionServiceEnum, AiPendingActionStatusEnum, type PrismaClient } from '@prisma/client';
 import Fuse from 'fuse.js';
 import { z } from 'zod';
 import { normalizeString } from '../../../../shared/utils/normalizeString';
@@ -1820,7 +1820,28 @@ export function createCharacterizationTools(deps: CharacterizationToolsDeps) {
   // This tool PROPOSES changes instead of executing them directly
   // Returns a special JSON format that triggers an "action_card" SSE event
   const proposeRiskDataUpdateTool = tool(
-    async ({ riskId, groupId, hierarchyId, epis, recs, engs, adms, generateSources, probability, probabilityAfter, activities, startDate, endDate }) => {
+    async ({
+      _actionDescription,
+      companyId,
+      riskIds,
+      groupIds,
+      hierarchyIds,
+      epis,
+      recs,
+      engs,
+      adms,
+      generateSources,
+      removeEpis,
+      removeRecs,
+      removeEngs,
+      removeAdms,
+      removeGenerateSources,
+      probability,
+      probabilityAfter,
+      activities,
+      startDate,
+      endDate,
+    }) => {
       // Validate that we have the required dependencies
       if (!userId || !messageId) {
         return JSON.stringify({
@@ -1829,92 +1850,179 @@ export function createCharacterizationTools(deps: CharacterizationToolsDeps) {
         });
       }
 
-      // Validate required fields
-      if (!riskId) {
+      // Validate required fields - riskIds is mandatory and must have at least one item
+      if (!riskIds || riskIds.length === 0) {
         return JSON.stringify({
           erro: 'Campo obrigatório ausente',
-          mensagem: 'É necessário informar o ID do risco (riskId).',
+          mensagem: 'É necessário informar ao menos um ID de risco no array riskIds.',
         });
       }
 
-      if (!groupId && !hierarchyId) {
+      // Validate that at least one target is provided (group or hierarchy)
+      if ((!groupIds || groupIds.length === 0) && (!hierarchyIds || hierarchyIds.length === 0)) {
         return JSON.stringify({
           erro: 'Campo obrigatório ausente',
-          mensagem: 'É necessário informar o ID do grupo homogêneo (groupId) OU o ID da hierarquia (hierarchyId).',
+          mensagem: 'É necessário informar ao menos um: groupIds (array de IDs de grupos) OU hierarchyIds (array de IDs de hierarquias).',
         });
       }
 
-      // Fetch risk and group/hierarchy names for summary
-      const risk = await prisma.riskFactors.findUnique({
-        where: { id: riskId },
-        select: { name: true },
-      });
+      // Build summary for the action
+      let summaryParts: string[] = [];
 
-      let targetName = '';
-      if (groupId) {
-        const group = await prisma.homogeneousGroup.findUnique({
-          where: { id: groupId },
-          select: { name: true, description: true },
-        });
-        if (group) {
-          targetName = group.description.includes('(//)') ? group.description.split('(//)')[0] : group.name;
-        }
-      } else if (hierarchyId) {
-        const hierarchy = await prisma.hierarchy.findUnique({
-          where: { id: hierarchyId },
+      // Fetch names for summary (limit to first few for readability)
+      if (riskIds && riskIds.length > 0) {
+        const risks = await prisma.riskFactors.findMany({
+          where: { id: { in: riskIds.slice(0, 3) } },
           select: { name: true },
         });
-        targetName = hierarchy?.name || '';
+        const riskNames = risks.map((r) => r.name).join(', ');
+        summaryParts.push(`riscos: ${riskNames}${riskIds.length > 3 ? ` e mais ${riskIds.length - 3}` : ''}`);
       }
 
-      // Build payload for UpsertRiskDataService
+      if (groupIds && groupIds.length > 0) {
+        const groups = await prisma.homogeneousGroup.findMany({
+          where: { id: { in: groupIds.slice(0, 3) } },
+          select: { name: true, description: true },
+        });
+        const groupNames = groups.map((g) => (g.description.includes('(//)') ? g.description.split('(//)')[0] : g.name)).join(', ');
+        summaryParts.push(`grupos: ${groupNames}${groupIds.length > 3 ? ` e mais ${groupIds.length - 3}` : ''}`);
+      }
+
+      if (hierarchyIds && hierarchyIds.length > 0) {
+        const hierarchies = await prisma.hierarchy.findMany({
+          where: { id: { in: hierarchyIds.slice(0, 3) } },
+          select: { name: true },
+        });
+        const hierarchyNames = hierarchies.map((h) => h.name).join(', ');
+        summaryParts.push(`hierarquias: ${hierarchyNames}${hierarchyIds.length > 3 ? ` e mais ${hierarchyIds.length - 3}` : ''}`);
+      }
+
+      const targetSummary = summaryParts.join(' | ');
+
+      // Build payload for UpsertManyRiskDataService (many-risk strategy)
       const payload: any = {
-        riskId,
-        companyId: defaultCompanyId,
+        companyId: companyId, // Use the companyId from the tool parameter
         riskFactorGroupDataId: '', // Will be populated by service
       };
 
-      // Add target (group or hierarchy)
-      if (groupId) {
-        payload.homogeneousGroupId = groupId;
-      } else if (hierarchyId) {
-        payload.hierarchyId = hierarchyId;
+      // Add targets - already in array format
+      if (riskIds && riskIds.length > 0) {
+        payload.riskIds = riskIds;
+      }
+      if (groupIds && groupIds.length > 0) {
+        payload.homogeneousGroupIds = groupIds;
+      }
+      if (hierarchyIds && hierarchyIds.length > 0) {
+        payload.hierarchyIds = hierarchyIds;
       }
 
       // Add optional fields
-      if (epis && epis.length > 0) payload.epis = epis;
-      if (recs && recs.length > 0) payload.recs = recs;
-      if (engs && engs.length > 0) payload.engs = engs;
-      if (adms && adms.length > 0) payload.adms = adms;
-      if (generateSources && generateSources.length > 0) payload.generateSources = generateSources;
       if (probability !== undefined) payload.probability = probability;
       if (probabilityAfter !== undefined) payload.probabilityAfter = probabilityAfter;
       if (activities) payload.activities = activities;
       if (startDate) payload.startDate = startDate;
       if (endDate) payload.endDate = endDate;
 
+      // ADD operations: Convert EPI CAS codes to array for lookup
+      if (epis && epis.length > 0) {
+        payload.episCas = epis; // Array of CAS strings
+      }
+
+      // Convert to AddOnly format (will upsert by name)
+      if (recs && recs.length > 0) {
+        payload.recAddOnly = recs.map((name) => ({
+          recName: name,
+        }));
+      }
+
+      if (adms && adms.length > 0) {
+        payload.admsAddOnly = adms.map((name) => ({
+          medName: name,
+          medType: 'ADM',
+        }));
+      }
+
+      if (engs && engs.length > 0) {
+        payload.engsAddOnly = engs.map((name) => ({
+          medName: name,
+          recType: 'ENG',
+        }));
+      }
+
+      if (generateSources && generateSources.length > 0) {
+        payload.generateSourcesAddOnly = generateSources.map((item) => ({
+          name: item.name,
+        }));
+      }
+
+      // REMOVE operations: Just pass the arrays of names
+      if (removeEpis && removeEpis.length > 0) {
+        payload.removeEpisCas = removeEpis; // Array of CAS codes to remove
+      }
+
+      if (removeRecs && removeRecs.length > 0) {
+        payload.removeRecs = removeRecs; // Array of names
+      }
+
+      if (removeAdms && removeAdms.length > 0) {
+        payload.removeAdms = removeAdms; // Array of names
+      }
+
+      if (removeEngs && removeEngs.length > 0) {
+        payload.removeEngs = removeEngs; // Array of names
+      }
+
+      if (removeGenerateSources && removeGenerateSources.length > 0) {
+        payload.removeGenerateSources = removeGenerateSources; // Array of names
+      }
+
       // Generate human-readable summary
       const changes: string[] = [];
-      if (epis && epis.length > 0) changes.push(`${epis.length} EPI(s)`);
-      if (recs && recs.length > 0) changes.push(`${recs.length} recomendação(ões)`);
-      if (engs && engs.length > 0) changes.push(`${engs.length} medida(s) de engenharia`);
-      if (adms && adms.length > 0) changes.push(`${adms.length} medida(s) administrativa(s)`);
-      if (generateSources && generateSources.length > 0) changes.push(`${generateSources.length} fonte(s) geradora(s)`);
-      if (probability !== undefined) changes.push(`probabilidade: ${probability}`);
-      if (probabilityAfter !== undefined) changes.push(`probabilidade após: ${probabilityAfter}`);
 
-      const summary = `Atualizar risco "${risk?.name || riskId}" em "${targetName}": ${changes.join(', ')}`;
+      // ADD operations
+      if (epis && epis.length > 0) changes.push(`➕ EPIs (CAS): ${epis.join(', ')}`);
+      if (recs && recs.length > 0) changes.push(`➕ Recomendações: ${recs.join(', ')}`);
+      if (engs && engs.length > 0) changes.push(`➕ Medidas de Engenharia: ${engs.join(', ')}`);
+      if (adms && adms.length > 0) changes.push(`➕ Medidas Administrativas: ${adms.join(', ')}`);
+      if (generateSources && generateSources.length > 0) changes.push(`➕ Fontes Geradoras: ${generateSources.map((s) => s.name).join(', ')}`);
+
+      // REMOVE operations
+      if (removeEpis && removeEpis.length > 0) changes.push(`➖ Remover EPIs (CAS): ${removeEpis.join(', ')}`);
+      if (removeRecs && removeRecs.length > 0) changes.push(`➖ Remover Recomendações: ${removeRecs.join(', ')}`);
+      if (removeEngs && removeEngs.length > 0) changes.push(`➖ Remover Medidas de Engenharia: ${removeEngs.join(', ')}`);
+      if (removeAdms && removeAdms.length > 0) changes.push(`➖ Remover Medidas Administrativas: ${removeAdms.join(', ')}`);
+      if (removeGenerateSources && removeGenerateSources.length > 0) changes.push(`➖ Remover Fontes Geradoras: ${removeGenerateSources.join(', ')}`);
+
+      // UPDATE operations
+      if (probability !== undefined) changes.push(`📊 Probabilidade: ${probability}`);
+      if (probabilityAfter !== undefined) changes.push(`📊 Probabilidade Após: ${probabilityAfter}`);
+
+      const summary = _actionDescription || `Atualizar ${targetSummary}: ${changes.join(' | ')}`;
+
+      // Fetch company name to display in action card
+      const company = await prisma.company.findUnique({
+        where: { id: companyId },
+        select: { name: true, id: true },
+      });
+
+      // Prepare formatted details for UI display
+      const details = {
+        empresa: company?.name || companyId,
+        alvos: targetSummary,
+        alteracoes: changes.join(', '),
+      };
 
       // Create pending action directly in database using Prisma
       const action = await prisma.aiPendingAction.create({
         data: {
           userId,
-          companyId: defaultCompanyId,
+          companyId: companyId, // Use the companyId from the tool parameter
           messageId,
-          service: 'UPSERT_RISK_DATA' as any, // Will be AiPendingActionServiceEnum.UPSERT_RISK_DATA after migration
-          status: 'PENDING' as any, // Will be AiPendingActionStatusEnum.PENDING after migration
+          service: AiPendingActionServiceEnum.UPSERT_MANY_RISK_DATA,
+          status: AiPendingActionStatusEnum.PENDING,
           payload,
           summary,
+          details, // Save formatted details to database
         },
       });
 
@@ -1923,32 +2031,49 @@ export function createCharacterizationTools(deps: CharacterizationToolsDeps) {
         _action_type: 'upsert_risk_data',
         _action_id: action.id,
         _action_summary: summary,
-        _action_details: {
-          risco: risk?.name,
-          alvo: targetName,
-          alteracoes: changes,
-        },
-        mensagem: `✅ Ação preparada: ${summary}. Aguardando sua autorização para executar.`,
+        _action_details: details,
+        mensagem: `✅ Ação preparada. Aguardando sua autorização para executar.`,
       });
     },
     {
       name: 'propor_atualizacao_risco',
       description:
-        'Propõe uma atualização nos dados de caracterização de um risco específico em um grupo homogêneo ou hierarquia. ' +
+        'Propõe uma atualização nos dados de caracterização de um ou MÚLTIPLOS riscos em grupos homogêneos ou hierarquias. ' +
         'Esta ferramenta NÃO executa a alteração imediatamente - ela cria uma proposta que o usuário deve autorizar. ' +
+        '⚠️ IMPORTANTE - SEMPRE BUSQUE PRIMEIRO: Antes de chamar esta ferramenta para REMOVER ou MODIFICAR algo, SEMPRE chame obter_dados_completos_risco PRIMEIRO para ver o estado atual e saber exatamente o que existe. ' +
         'Use esta ferramenta quando o usuário pedir para ADICIONAR, REMOVER ou MODIFICAR: EPIs, recomendações, medidas de engenharia, ' +
-        'medidas administrativas, fontes geradoras, probabilidades, ou outras características de um risco. ' +
-        'IMPORTANTE: Requer riskId (ID do risco) e groupId (ID do grupo homogêneo) OU hierarchyId (ID da hierarquia).',
+        'medidas administrativas, fontes geradoras, probabilidades, ou outras características de risco(s). ' +
+        'Você pode atualizar MÚLTIPLOS riscos de uma só vez (usando array de riskIds). ' +
+        'Requer: riskIds (array com ao menos 1 ID de risco) E (groupIds OU hierarchyIds).',
       schema: z.object({
         _actionDescription: z.string().describe('Escreva uma breve descrição do que você está propondo. DEVE ser no MESMO IDIOMA que o usuário está usando.'),
-        riskId: z.string().uuid().describe('ID do risco (RiskFactor) que será atualizado'),
-        groupId: z.string().uuid().optional().describe('ID do grupo homogêneo onde o risco será atualizado'),
-        hierarchyId: z.string().optional().describe('ID da hierarquia onde o risco será atualizado'),
-        epis: z.array(z.number()).optional().describe('Array de IDs de EPIs para associar ao risco'),
-        recs: z.array(z.string()).optional().describe('Array de IDs de recomendações (RecMed) para associar ao risco'),
-        engs: z.array(z.string()).optional().describe('Array de IDs de medidas de engenharia (RecMed) para associar ao risco'),
-        adms: z.array(z.string()).optional().describe('Array de IDs de medidas administrativas (RecMed) para associar ao risco'),
-        generateSources: z.array(z.string()).optional().describe('Array de IDs de fontes geradoras (GenerateSource) para associar ao risco'),
+        companyId: z.string().uuid().describe('ID da empresa onde a alteração será realizada. OBRIGATÓRIO - sempre use o ID da empresa que o usuário está visualizando/modificando'),
+        riskIds: z.array(z.string().uuid()).min(1).describe('Array de IDs dos riscos (RiskFactor) que serão atualizados. OBRIGATÓRIO - ao menos 1 ID'),
+        groupIds: z.array(z.string().uuid()).optional().describe('Array de IDs dos grupos homogêneos onde os riscos serão atualizados. Use groupIds OU hierarchyIds'),
+        hierarchyIds: z.array(z.string().uuid()).optional().describe('Array de IDs das hierarquias onde os riscos serão atualizados. Use groupIds OU hierarchyIds'),
+
+        // ADD operations
+        epis: z.array(z.string()).optional().describe('Array de códigos CAS de EPIs para ADICIONAR/associar ao risco. Ex: ["7664-93-9", "1333-74-0"]'),
+        recs: z.array(z.string()).optional().describe('Array com nomes de recomendações a serem ADICIONADAS. Ex: ["Usar luvas", "Vigilância médica"]'),
+        engs: z.array(z.string()).optional().describe('Array com nomes de medidas de engenharia a serem ADICIONADAS. Ex: ["Instalar exaustor", "Melhorar ventilação"]'),
+        adms: z.array(z.string()).optional().describe('Array com nomes de medidas administrativas a serem ADICIONADAS. Ex: ["Rodízio de função", "Treinamento"]'),
+        generateSources: z
+          .array(
+            z.object({
+              name: z.string().describe('Nome da fonte geradora'),
+            }),
+          )
+          .optional()
+          .describe('Array de objetos com fontes geradoras a serem ADICIONADAS. Ex: [{name: "Máquina de corte"}]'),
+
+        // REMOVE operations (only names needed)
+        removeEpis: z.array(z.string()).optional().describe('Array de códigos CAS de EPIs para REMOVER do risco. Ex: ["7664-93-9"]'),
+        removeRecs: z.array(z.string()).optional().describe('Array de nomes de recomendações a serem REMOVIDAS. Ex: ["Usar luvas", "Usar protetor auricular"]'),
+        removeEngs: z.array(z.string()).optional().describe('Array de nomes de medidas de engenharia a serem REMOVIDAS. Ex: ["Instalar exaustor", "Sistema de ventilação"]'),
+        removeAdms: z.array(z.string()).optional().describe('Array de nomes de medidas administrativas a serem REMOVIDAS. Ex: ["Rodízio de função", "Treinamento de segurança"]'),
+        removeGenerateSources: z.array(z.string()).optional().describe('Array de nomes de fontes geradoras a serem REMOVIDAS. Ex: ["Máquina de corte", "Prensa hidráulica"]'),
+
+        // UPDATE/SET operations
         probability: z.number().min(1).max(5).optional().describe('Probabilidade de ocorrência do risco (1-5)'),
         probabilityAfter: z.number().min(1).max(5).optional().describe('Probabilidade após medidas de controle (1-5)'),
         activities: z.string().optional().describe('Descrição das atividades relacionadas ao risco'),

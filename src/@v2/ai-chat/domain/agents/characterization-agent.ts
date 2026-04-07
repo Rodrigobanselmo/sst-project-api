@@ -76,6 +76,8 @@ export interface CharacterizationAgentInput {
   companyId: string;
   prisma: PrismaClient;
   llm: BaseChatModel;
+  /** Smarter LLM for tools that require more reasoning (e.g., propor_atualizacao_risco) */
+  smarterLlm?: BaseChatModel;
   /** Pre-built LangChain history messages from supervisor (uses cached file extractions) */
   prebuiltHistoryMessages?: BaseMessage[];
   /** Pre-built current user message from supervisor (with actual file content) */
@@ -84,6 +86,10 @@ export interface CharacterizationAgentInput {
   additionalTools?: StructuredToolInterface[];
   /** LangSmith tracing callbacks from parent run */
   callbacks?: CallbackManager;
+  /** User ID for action tracking */
+  userId?: number;
+  /** Assistant message ID (created before agent loop for tool linking) */
+  assistantMessageId?: string;
 }
 
 /**
@@ -96,6 +102,8 @@ export async function* streamCharacterizationAgent(input: CharacterizationAgentI
   const characterizationTools = createCharacterizationTools({
     prisma: input.prisma,
     defaultCompanyId: input.companyId,
+    userId: input.userId,
+    messageId: input.assistantMessageId,
   });
   const tools = [...characterizationTools, ...(input.additionalTools ?? [])];
 
@@ -115,5 +123,12 @@ export async function* streamCharacterizationAgent(input: CharacterizationAgentI
 
   const messages = [new SystemMessage(CHARACTERIZATION_AGENT_SYSTEM_PROMPT), ...historyMessages, currentUserMessage];
 
-  yield* agentToolLoop({ llm: input.llm, messages, tools, callbacks: input.callbacks });
+  yield* agentToolLoop({
+    llm: input.llm,
+    messages,
+    tools,
+    callbacks: input.callbacks,
+    smarterLlm: input.smarterLlm,
+    toolsRequiringSmarterLlm: ['propor_atualizacao_risco'],
+  });
 }

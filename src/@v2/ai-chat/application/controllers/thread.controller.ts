@@ -129,6 +129,10 @@ export class ThreadController {
     res.setHeader('X-Accel-Buffering', 'no');
     res.flushHeaders();
 
+    // Create assistant message BEFORE agent loop (with empty content)
+    // This allows tools to reference the messageId during execution
+    const assistantMessage = await this.aiThreadRepository.addMessage(threadId, 'assistant', '');
+
     let fullResponse = '';
     const toolMessages: Array<{ id: string; toolName: string }> = [];
 
@@ -140,6 +144,8 @@ export class ThreadController {
         mode: dto.mode,
         extractedContents,
         pageContext: dto.pageContext,
+        threadId, // Pass threadId so tools can access it
+        assistantMessageId: assistantMessage.id, // Pass messageId for tools
       })) {
         // Accumulate content for saving
         if (event.type === 'content') {
@@ -167,9 +173,12 @@ export class ThreadController {
         }
       }
 
-      // Save the full AI response
+      // Update the assistant message with the full response
       if (fullResponse) {
-        await this.aiThreadRepository.addMessage(threadId, 'assistant', fullResponse);
+        await this.aiThreadRepository.updateMessage(assistantMessage.id, fullResponse);
+      } else {
+        // If no response, delete the empty message
+        await this.aiThreadRepository.deleteMessage(assistantMessage.id);
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';

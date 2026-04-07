@@ -26,7 +26,7 @@ export class UpsertRiskDataService {
     const keepEmpty = upsertRiskDataDto.keepEmpty;
     const workspaceId = upsertRiskDataDto.workspaceId;
     const type = upsertRiskDataDto.type;
-    const { recAddOnly, admsAddOnly, generateSourcesAddOnly, engsAddOnly } = upsertRiskDataDto;
+    const { recAddOnly, admsAddOnly, generateSourcesAddOnly, engsAddOnly, episCas } = upsertRiskDataDto;
 
     delete upsertRiskDataDto.keepEmpty;
     delete upsertRiskDataDto.workspaceId;
@@ -35,6 +35,7 @@ export class UpsertRiskDataService {
     delete upsertRiskDataDto.admsAddOnly;
     delete upsertRiskDataDto.generateSourcesAddOnly;
     delete upsertRiskDataDto.engsAddOnly;
+    delete upsertRiskDataDto.episCas;
 
     if ('startDate' in upsertRiskDataDto) {
       if (!upsertRiskDataDto.startDate) upsertRiskDataDto.startDate = null;
@@ -103,7 +104,7 @@ export class UpsertRiskDataService {
     }
 
     // Check if there are any "add only" fields to process
-    const hasAddOnlyFields = recAddOnly?.length > 0 || admsAddOnly?.length > 0 || generateSourcesAddOnly?.length > 0 || engsAddOnly?.length > 0;
+    const hasAddOnlyFields = recAddOnly?.length > 0 || admsAddOnly?.length > 0 || generateSourcesAddOnly?.length > 0 || engsAddOnly?.length > 0 || episCas?.length > 0;
 
     if (hasAddOnlyFields) {
       // Reconstruct the original DTO with add only fields for processing
@@ -117,6 +118,7 @@ export class UpsertRiskDataService {
         admsAddOnly,
         generateSourcesAddOnly,
         engsAddOnly,
+        episCas,
       };
 
       await this.updateAddOnlyFields(addOnlyDto, riskData);
@@ -126,7 +128,7 @@ export class UpsertRiskDataService {
   }
 
   async updateAddOnlyFields(upsertRiskDataDto: UpsertRiskDataDto, riskData: any) {
-    const { recAddOnly, admsAddOnly, generateSourcesAddOnly, engsAddOnly, ...restDto } = upsertRiskDataDto;
+    const { recAddOnly, admsAddOnly, generateSourcesAddOnly, engsAddOnly, episCas, ...restDto } = upsertRiskDataDto;
 
     // Fetch the complete risk data with all relationships
     const existingRiskData = await this.prisma.riskFactorData.findFirst({
@@ -358,6 +360,59 @@ export class UpsertRiskDataService {
             },
           });
         }
+      }
+    }
+
+    // Handle episCas (EPIs by CA code)
+    if (episCas && episCas.length > 0) {
+      const notFoundCas: string[] = [];
+
+      for (const ca of episCas) {
+        // Find EPI by CA code
+        const epi = await this.prisma.epi.findFirst({
+          where: {
+            ca: ca,
+            status: 'ACTIVE',
+          },
+        });
+
+        if (!epi) {
+          notFoundCas.push(ca);
+          continue; // Skip this CA and continue with others
+        }
+
+        // Check if connection already exists
+        const existingConnection = await this.prisma.epiToRiskFactorData.findUnique({
+          where: {
+            riskFactorDataId_epiId: {
+              epiId: epi.id,
+              riskFactorDataId: existingRiskData.id,
+            },
+          },
+        });
+
+        if (!existingConnection) {
+          await this.prisma.epiToRiskFactorData.create({
+            data: {
+              epiId: epi.id,
+              riskFactorDataId: existingRiskData.id,
+              efficientlyCheck: false,
+              epcCheck: false,
+              longPeriodsCheck: false,
+              maintenanceCheck: false,
+              sanitationCheck: false,
+              tradeSignCheck: false,
+              trainingCheck: false,
+              unstoppedCheck: false,
+              validationCheck: false,
+            },
+          });
+        }
+      }
+
+      // If any CAs were not found, throw an error to notify the user
+      if (notFoundCas.length > 0) {
+        throw new Error(`EPIs com os seguintes códigos CA não foram encontrados: ${notFoundCas.join(', ')}. ` + `Verifique se os códigos estão corretos e se os EPIs estão cadastrados no sistema.`);
       }
     }
   }

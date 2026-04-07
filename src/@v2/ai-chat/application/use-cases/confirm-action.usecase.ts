@@ -2,14 +2,12 @@ import { Injectable, NotFoundException, ForbiddenException, BadRequestException 
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
 import { AiPendingActionRepository } from '../../database/repositories/ai-pending-action.repository';
 import { AiPendingActionServiceEnum, AiPendingActionStatusEnum } from '@prisma/client';
-import { UpsertRiskDataService } from '../../../../modules/sst/services/risk-data/upsert-risk-data/upsert-risk.service';
 import { UpsertManyRiskDataService } from '../../../../modules/sst/services/risk-data/upsert-many-risk-data/upsert-many-risk-data.service';
 
 @Injectable()
 export class ConfirmActionUseCase {
   constructor(
     private readonly aiPendingActionRepository: AiPendingActionRepository,
-    private readonly upsertRiskDataService: UpsertRiskDataService,
     private readonly upsertManyRiskDataService: UpsertManyRiskDataService,
   ) {}
 
@@ -39,10 +37,6 @@ export class ConfirmActionUseCase {
       let result: any;
 
       switch (action.service) {
-        case AiPendingActionServiceEnum.UPSERT_RISK_DATA:
-          result = await this.upsertRiskDataService.execute(action.payload as any);
-          break;
-
         case AiPendingActionServiceEnum.UPSERT_MANY_RISK_DATA:
           result = await this.upsertManyRiskDataService.execute(action.payload as any);
           break;
