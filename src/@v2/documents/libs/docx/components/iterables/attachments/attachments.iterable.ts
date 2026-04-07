@@ -15,7 +15,7 @@ export const attachmentsIterable = (attachments: AttachmentModel[], convertToDoc
         [
           {
             type: DocumentSectionChildrenTypeEnum.BULLET,
-            text: `<link>??${VariablesPGREnum.ATTACHMENT_LINK}??|ANEXO 0${index + 1} – ??${VariablesPGREnum.ATTACHMENT_NAME}??<link>`,
+            text: `ANEXO 0${index + 1} – ??${VariablesPGREnum.ATTACHMENT_NAME}??`,
           },
         ],
         variables,

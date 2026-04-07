@@ -48,6 +48,15 @@ import { ProductDocumentINSAL } from './factories/document/products/document-ins
     RiskDAO,
     RiskDataDAO,
   ],
-  exports: [CreatorDocumentPGR, CreatorDocumentPER, CreatorDocumentLTCAT, CreatorDocumentINSAL, CreatorDocumentPreview],
+  exports: [
+    CreatorDocumentPGR,
+    CreatorDocumentPER,
+    CreatorDocumentLTCAT,
+    CreatorDocumentINSAL,
+    CreatorDocumentPreview,
+    DocumentDAO,
+    DocumentVersionRepository,
+    DownloadImageService,
+  ],
 })
 export class DocumentModule {}

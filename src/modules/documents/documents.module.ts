@@ -42,6 +42,7 @@ import { DocumentModule } from '@/@v2/documents/document.module';
 import { PerUploadService } from './services/document/document/upload-per-doc.service';
 import { LtcatUploadService } from './services/document/document/upload-ltcat-doc.service';
 import { InsalUploadService } from './services/document/document/upload-insal-doc.service';
+import { DownloadPgrConsolidatedDocxService } from './services/document/document/download-pgr-consolidated-docx.service';
 
 @Module({
   controllers: [DocumentModelController, DocumentsPgrController, DocumentsPdfController, DocumentsBaseController],
@@ -81,6 +82,7 @@ import { InsalUploadService } from './services/document/document/upload-insal-do
     DownloadPreviewModel,
     PdfVisitReportDataService,
     ServerlessLambdaProvider,
+    DownloadPgrConsolidatedDocxService,
   ],
   exports: [DocumentPGRFactory],
 })

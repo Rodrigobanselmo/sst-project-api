@@ -14,7 +14,7 @@ import { summarySections } from '../../../base/layouts/summary/summary';
 import { HierarchyMapData, IHierarchyMap, IHomoGroupMap } from '../../../converter/hierarchy.converter';
 import { convertToDocxHelper } from '../functions/convertToDocx';
 import { replaceAllVariables } from '../functions/replaceAllVariables';
-import { ISectionChildrenType } from '../types/elements.types';
+import { DocumentSectionChildrenTypeEnum, ISectionChildrenType } from '../types/elements.types';
 import {
   IAllDocumentSectionType,
   IChapter,
@@ -29,6 +29,7 @@ import { allCharacterizationSections } from '../../../components/iterables/all-c
 import { APPRTableSection } from '../../../components/tables/appr/appr.section';
 import { actionPlanTableSection } from '../../../components/tables/actionPlan/actionPlan.section';
 import { APPRByGroupTableSection } from '../../../components/tables/apprByGroup/appr-group.section';
+import { PGR_ANNEX_SUBCOVER_CHAPTER_LINES } from '../constants/pgr-annex-subcover-titles';
 import { VariablesPGREnum } from '../enums/variables.enum';
 
 type IMapSectionDocumentType = Record<string, (arg: IAllDocumentSectionType) => ISectionOptions | ISectionOptions[]>;
@@ -57,6 +58,8 @@ export class SectionsMapClass {
   private consultantLogoPath: string;
   private version: string;
   private elementsMap: IMapElementDocumentType;
+  /** Template for footer middle line when SECTION omits `footerText` (carried from last CHAPTER or last explicit SECTION). */
+  private lastChapterFooterTemplate = '';
   private cover: DocumentCoverEntity;
   private document: RiskFactorGroupDataEntity & DocumentDataEntity & DocumentDataPGRDto;
   private homogeneousGroup: IHomoGroupMap;
@@ -112,19 +115,69 @@ export class SectionsMapClass {
         companyName: `${this.company.name} ${this.company.initials ? `(${this.company.initials})` : ''}`,
         ...(this.cover && (this.cover.json as any)),
       }),
-    [DocumentSectionTypeEnum.CHAPTER]: ({ text }: IChapter) =>
-      chapterSection({
+    [DocumentSectionTypeEnum.CHAPTER]: ({ text }: IChapter) => {
+      if (text && String(text).trim() !== '') {
+        this.lastChapterFooterTemplate = text;
+      }
+      return chapterSection({
         version: this.version,
         chapter: replaceAllVariables(text, this.variables),
         imagePath: this.logoPath,
         title: replaceAllVariables(`??${VariablesPGREnum.DOCUMENT_TITLE}??`, this.variables),
-      }),
-    [DocumentSectionTypeEnum.SECTION]: ({ title, children, footerText, ...rest }: ISection) => ({
-      children: this.convertToDocx(children),
-      ...this.getFooterHeader(footerText, title),
-      ...rest,
-      ...sectionLandscapeProperties,
-    }),
+      });
+    },
+    [DocumentSectionTypeEnum.SECTION]: ({ title, children, footerText, ...rest }: ISection) => {
+      const explicitFooter =
+        footerText && String(footerText).trim() !== ''
+          ? footerText
+          : title && String(title).trim() !== ''
+            ? title
+            : '';
+
+      let fromTitleChild = '';
+      if (!explicitFooter.trim() && children?.length) {
+        const t = children.find((c) => c.type === DocumentSectionChildrenTypeEnum.TITLE);
+        if (t && 'text' in t && t.text) fromTitleChild = String(t.text);
+      }
+
+      const rawChapterFooterTemplate = explicitFooter.trim()
+        ? explicitFooter
+        : fromTitleChild.trim()
+          ? fromTitleChild
+          : this.lastChapterFooterTemplate;
+
+      if (explicitFooter.trim()) {
+        this.lastChapterFooterTemplate = explicitFooter;
+      } else if (fromTitleChild.trim()) {
+        this.lastChapterFooterTemplate = fromTitleChild;
+      }
+
+      const mainSection: ISectionOptions = {
+        children: this.convertToDocx(children),
+        ...this.getFooterHeader(rawChapterFooterTemplate),
+        ...rest,
+        ...sectionLandscapeProperties,
+      };
+
+      const isAnnexAttachmentsSection = Boolean(
+        children?.some((c) => c.type === DocumentSectionChildrenTypeEnum.ATTACHMENTS),
+      );
+      if (!isAnnexAttachmentsSection) {
+        return mainSection;
+      }
+
+      const docTitle = replaceAllVariables(`??${VariablesPGREnum.DOCUMENT_TITLE}??`, this.variables);
+      const annexSubcovers = PGR_ANNEX_SUBCOVER_CHAPTER_LINES.map((chapterLine) =>
+        chapterSection({
+          version: this.version,
+          chapter: chapterLine,
+          imagePath: this.logoPath,
+          title: docTitle,
+        }),
+      );
+
+      return [mainSection, ...annexSubcovers];
+    },
     [DocumentSectionTypeEnum.ITERABLE_ENVIRONMENTS]: (): ISectionOptions[] =>
       allCharacterizationSections(this.environments, this.hierarchy, this.homogeneousGroup, 'env', (x, v) =>
         this.convertToDocx(x, v),

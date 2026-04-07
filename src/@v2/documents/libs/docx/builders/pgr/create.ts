@@ -34,20 +34,10 @@ export class DocumentBuildPGR {
   }
 
   public async build() {
-    const sections: ISectionOptions[] = (
-      await Promise.all(
-        this.sections.map(async (docSection) => {
-          return this.convertToSections(docSection.data);
-        }),
-      )
-    ).reduce((acc, result) => {
-      if (Array.isArray(result)) {
-        return [...acc, ...result];
-      }
-
-      return [...acc, result];
-    }, []);
-
+    const sections: ISectionOptions[] = [];
+    for (const docSection of this.sections) {
+      sections.push(...(await this.convertToSections(docSection.data)));
+    }
     return sections;
   }
 
@@ -71,8 +61,6 @@ export class DocumentBuildPGR {
   private async convertToSections(data: IAllDocumentSectionType[]): Promise<ISectionOptions[]> {
     const sections: ISectionOptions[] = [];
 
-    console.log('2131');
-
     const elementsMap = new ElementsMapClass({
       data: this.data,
       variables: this.variables,
@@ -86,45 +74,43 @@ export class DocumentBuildPGR {
       version: this.version,
     }).map;
 
-    await Promise.all(
-      data.map(async (child) => {
-        if ('removeWithSomeEmptyVars' in child) {
-          const isEmpty = child.removeWithSomeEmptyVars?.some((variable) => !this.variables[variable]);
-          if (isEmpty) {
-            return null;
-          }
+    for (const child of data) {
+      if ('removeWithSomeEmptyVars' in child) {
+        const isEmpty = child.removeWithSomeEmptyVars?.some((variable) => !this.variables[variable]);
+        if (isEmpty) {
+          continue;
         }
+      }
 
-        if ('removeWithAllEmptyVars' in child) {
-          const isEmpty = child.removeWithAllEmptyVars?.every((variable) => !this.variables[variable]);
-          if (isEmpty) {
-            return null;
-          }
+      if ('removeWithAllEmptyVars' in child) {
+        const isEmpty = child.removeWithAllEmptyVars?.every((variable) => !this.variables[variable]);
+        if (isEmpty) {
+          continue;
         }
+      }
 
-        if ('removeWithAllValidVars' in child) {
-          const isNotEmpty = child.removeWithAllValidVars?.every((variable) => this.variables[variable]);
-          if (isNotEmpty) {
-            return null;
-          }
+      if ('removeWithAllValidVars' in child) {
+        const isNotEmpty = child.removeWithAllValidVars?.every((variable) => this.variables[variable]);
+        if (isNotEmpty) {
+          continue;
         }
+      }
 
-        if ('addWithAllVars' in child) {
-          const isNotEmpty = child.addWithAllVars?.every((variable) => this.variables[variable]);
-          if (!isNotEmpty) {
-            return null;
-          }
+      if ('addWithAllVars' in child) {
+        const isNotEmpty = child.addWithAllVars?.every((variable) => this.variables[variable]);
+        if (!isNotEmpty) {
+          continue;
         }
+      }
 
-        const section = await sectionsMap[child.type](child);
+      const section = await sectionsMap[child.type](child);
 
-        if (Array.isArray(section)) {
-          return sections.push(...section);
-        }
-
-        return sections.push(section);
-      }),
-    );
+      if (Array.isArray(section)) {
+        sections.push(...section);
+      } else {
+        sections.push(section);
+      }
+    }
 
     return sections;
   }

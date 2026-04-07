@@ -3,6 +3,7 @@ import { ISectionOptions, Paragraph, Table } from 'docx';
 import { DocumentSectionTypeEnum } from '@/@v2/documents/domain/enums/document-section-type.enum';
 import { DocumentPGRModel } from '@/@v2/documents/domain/models/document-pgr.model';
 import { ISectionChildrenType } from '../../../../../domain/types/elements.types';
+import { DocumentChildrenTypeEnum } from '../../../../../domain/enums/document-children-type.enum';
 import { IChapter, ICover, ISection } from '../../../../../domain/types/section.types';
 import { sectionLandscapeProperties } from '../../../base/config/styles';
 import { chapterSection } from '../../../base/layouts/chapter/chapter';
@@ -37,6 +38,8 @@ export class SectionsMapClass {
   private version: string;
   private variables: IDocVariables;
   private elementsMap: IMapElementDocumentType;
+  /** Template for footer middle line when SECTION omits `footerText` (carried from last CHAPTER or last explicit SECTION). */
+  private lastChapterFooterTemplate = '';
 
   constructor({ version, variables, data, elementsMap }: IDocumentClassType) {
     this.data = data;
@@ -58,19 +61,54 @@ export class SectionsMapClass {
         coverProps,
       });
     },
-    [DocumentSectionTypeEnum.CHAPTER]: ({ text }: IChapter) =>
-      chapterSection({
+    [DocumentSectionTypeEnum.CHAPTER]: ({ text }: IChapter) => {
+      if (text && String(text).trim() !== '') {
+        this.lastChapterFooterTemplate = text;
+      }
+      return chapterSection({
         version: this.version,
         chapter: replaceAllVariables(text || '', this.variables),
         imagePath: this.data.documentBase.mainLogoPath,
         title: replaceAllVariables(`??${VariablesPGREnum.DOCUMENT_TITLE}??`, this.variables),
-      }),
-    [DocumentSectionTypeEnum.SECTION]: ({ title, children, footerText, ...rest }: ISection) => ({
-      children: this.convertToDocx(children),
-      ...this.getFooterHeader(footerText || '', title),
-      ...rest,
-      ...sectionLandscapeProperties,
-    }),
+      });
+    },
+    [DocumentSectionTypeEnum.SECTION]: ({ title, children, footerText, ...rest }: ISection) => {
+      const explicitFooter =
+        footerText && String(footerText).trim() !== ''
+          ? footerText
+          : title && String(title).trim() !== ''
+            ? title
+            : '';
+
+      let fromTitleChild = '';
+      if (!explicitFooter.trim() && children?.length) {
+        const t = children.find((c) => c.type === DocumentChildrenTypeEnum.TITLE);
+        if (t && 'text' in t && t.text) fromTitleChild = String(t.text);
+      }
+
+      const rawChapterFooterTemplate = explicitFooter.trim()
+        ? explicitFooter
+        : fromTitleChild.trim()
+          ? fromTitleChild
+          : this.lastChapterFooterTemplate;
+
+      if (explicitFooter.trim()) {
+        this.lastChapterFooterTemplate = explicitFooter;
+      } else if (fromTitleChild.trim()) {
+        this.lastChapterFooterTemplate = fromTitleChild;
+      }
+
+      const mainSection: ISectionOptions = {
+        children: this.convertToDocx(children),
+        ...this.getFooterHeader(rawChapterFooterTemplate),
+        ...rest,
+        ...sectionLandscapeProperties,
+      };
+
+      // Subcapas por anexo ficam no início de cada ficheiro de anexo e no consolidado (document-pgr.product),
+      // não aqui — evita lista de anexos + 3 capas seguidas antes do conteúdo real.
+      return mainSection;
+    },
     [DocumentSectionTypeEnum.ITERABLE_ENVIRONMENTS]: (): ISectionOptions[] =>
       allCharacterizationSections(this.data.homogeneousGroups, this.oldData.hierarchyData, this.oldData.homoGroupTree, 'env', (x, v) => this.convertToDocx(x, v)).map(({ footerText, children }) => ({
         children,

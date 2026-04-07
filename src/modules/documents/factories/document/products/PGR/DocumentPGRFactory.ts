@@ -527,8 +527,8 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
   public getVersionName = (data: PromiseInfer<ReturnType<DocumentPGRFactoryProduct['getData']>>) => {
     const version = data.versions?.[0];
 
-    if (!version) return `${dayjs().format('MM_DD_YYYY')}`;
-    return `${dayjs(data.versions[0].created_at).format('MM_DD_YYYY')} - REV. ${version.version}`;
+    if (!version) return `${dayjs().format('DD/MM/YYYY')}`;
+    return `${dayjs(data.versions[0].created_at).format('DD/MM/YYYY')} — REV. ${version.version}`;
   };
 
   public getFileName = (info: IDocumentPGRBody, type = 'PGR') => {
