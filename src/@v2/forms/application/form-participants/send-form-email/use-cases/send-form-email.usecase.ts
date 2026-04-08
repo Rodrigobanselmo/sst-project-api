@@ -59,15 +59,15 @@ export class SendFormEmailUseCase {
         cryptoAdapter: this.cryptoAdapter,
       });
 
-      allParticipants = allParticipants.concat(participants.results);
+      // Filter participants who haven't received email yet (if not sending to specific IDs)
+      const participantsToAdd = !params.participantIds?.length ? participants.results.filter((participant) => !participant.emailSent) : participants.results;
+
+      allParticipants = allParticipants.concat(participantsToAdd);
 
       // Check if we have more participants to fetch
+      // Continue if we got a full page, as there might be more
       hasMore = participants.results.length === limit;
       page++;
-    }
-
-    if (!params.participantIds?.length) {
-      allParticipants = allParticipants.filter((participant) => !participant.emailSent);
     }
 
     // Create a participants object that matches the expected structure
