@@ -366,6 +366,8 @@ model Company {
   CompanyFlags               CompanyFlags?
   formAiAnalyses             FormAiAnalysis[]
   aiPendingActions           AiPendingAction[]
+  formPreliminaryLibraryQuestions FormPreliminaryLibraryQuestion[]
+  formPreliminaryLibraryBlocks    FormPreliminaryLibraryBlock[]
 
   @@index([name])
   @@index([isClinic])
@@ -1561,6 +1563,79 @@ model FormQuestionIdentifier {
   deleted_at         DateTime?
 
   form_question_data FormQuestionDetailsData[]
+}
+
+/// Biblioteca de Perguntas Preliminares — templates reutilizáveis (cópia na aplicação; sem FK viva).
+model FormPreliminaryLibraryQuestion {
+  id              String                               @id @default(cuid())
+  system          Boolean                              @default(false)
+  company_id      String?
+  name            String
+  question_text   String
+  question_type   FormPreliminaryLibraryQuestionTypeEnum
+  category        FormPreliminaryLibraryCategoryEnum
+  identifier_type FormIdentifierTypeEnum
+  accept_other    Boolean                              @default(false)
+  created_at      DateTime                             @default(now())
+  updated_at      DateTime                             @updatedAt
+  deleted_at      DateTime?
+
+  company    Company?                           @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  options    FormPreliminaryLibraryQuestionOption[]
+  blockItems FormPreliminaryLibraryBlockItem[]
+
+  @@index([company_id])
+  @@index([system])
+  @@index([category])
+  @@map("form_preliminary_library_question")
+}
+
+model FormPreliminaryLibraryQuestionOption {
+  id                   String   @id @default(cuid())
+  library_question_id  String
+  text                 String
+  order                Int
+  value                Int?
+  created_at           DateTime @default(now())
+  updated_at           DateTime @updatedAt
+  deleted_at           DateTime?
+
+  library_question FormPreliminaryLibraryQuestion @relation(fields: [library_question_id], references: [id], onDelete: Cascade)
+
+  @@index([library_question_id])
+  @@map("form_preliminary_library_question_option")
+}
+
+model FormPreliminaryLibraryBlock {
+  id          String    @id @default(cuid())
+  system      Boolean   @default(false)
+  company_id  String?
+  name        String
+  description String?
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+  deleted_at  DateTime?
+
+  company Company?                        @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  items   FormPreliminaryLibraryBlockItem[]
+
+  @@index([company_id])
+  @@index([system])
+  @@map("form_preliminary_library_block")
+}
+
+model FormPreliminaryLibraryBlockItem {
+  id                  String @id @default(cuid())
+  block_id            String
+  library_question_id String
+  order               Int
+
+  block            FormPreliminaryLibraryBlock    @relation(fields: [block_id], references: [id], onDelete: Cascade)
+  library_question FormPreliminaryLibraryQuestion @relation(fields: [library_question_id], references: [id], onDelete: Restrict)
+
+  @@unique([block_id, library_question_id])
+  @@index([block_id])
+  @@map("form_preliminary_library_block_item")
 }
 
 model GenerateSource {
@@ -2974,6 +3049,18 @@ enum FormIdentifierTypeEnum {
   OFFICE
   SUB_OFFICE
   CUSTOM
+}
+
+enum FormPreliminaryLibraryQuestionTypeEnum {
+  SINGLE_CHOICE
+  TEXT
+}
+
+enum FormPreliminaryLibraryCategoryEnum {
+  DEMOGRAPHIC
+  ORGANIZATIONAL
+  SEGMENTATION
+  OTHER
 }
 
 enum FormTypeEnum {

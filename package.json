@@ -15,7 +15,7 @@
     "dev:webpack": "./scripts/increase-limits.sh nest build --webpack --webpackPath webpack.config.js --watch",
     "dev:tsx": "tsx watch src/main.ts",
     "start:debug": "npx prisma generate && ./scripts/increase-limits.sh nest start --debug --watch --preserveWatchOutput",
-    "seed": "node dist/prisma/seed.js",
+    "seed": "npx ts-node prisma/seed.ts",
     "prisma:run": "npx ts-node prisma/run.ts",
     "migrate": "npx prisma migrate dev && npx prisma generate",
     "reset": "npx prisma migrate reset && yarn seed",
@@ -164,6 +164,9 @@
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.5.3",
     "webpack-node-externals": "^3.0.0"
+  },
+  "prisma": {
+    "seed": "npx ts-node prisma/seed.ts"
   },
   "jest": {
     "moduleFileExtensions": [
