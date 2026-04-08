@@ -46,6 +46,9 @@ export class SendFormEmailUseCase {
     const limit = 500; // Process in batches for better performance
     let hasMore = true;
 
+    console.log(`[SendFormEmail] Starting email send for application ${params.applicationId}`);
+    console.log(`[SendFormEmail] Specific participant IDs: ${params.participantIds?.length || 0}`);
+
     while (hasMore) {
       const participants = await this.formParticipantsDAO.browse({
         page,
@@ -59,8 +62,12 @@ export class SendFormEmailUseCase {
         cryptoAdapter: this.cryptoAdapter,
       });
 
+      console.log(`[SendFormEmail] Page ${page}: Retrieved ${participants.results.length} participants`);
+
       // Filter participants who haven't received email yet (if not sending to specific IDs)
       const participantsToAdd = !params.participantIds?.length ? participants.results.filter((participant) => !participant.emailSent) : participants.results;
+
+      console.log(`[SendFormEmail] Page ${page}: After filtering, ${participantsToAdd.length} participants to add`);
 
       allParticipants = allParticipants.concat(participantsToAdd);
 
@@ -69,6 +76,8 @@ export class SendFormEmailUseCase {
       hasMore = participants.results.length === limit;
       page++;
     }
+
+    console.log(`[SendFormEmail] Total participants to send email: ${allParticipants.length}`);
 
     // Create a participants object that matches the expected structure
     const participants = {
