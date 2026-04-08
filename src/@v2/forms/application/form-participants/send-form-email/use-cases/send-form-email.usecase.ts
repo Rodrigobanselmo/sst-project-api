@@ -63,6 +63,10 @@ export class SendFormEmailUseCase {
       });
 
       console.log(`[SendFormEmail] Page ${page}: Retrieved ${participants.results.length} participants`);
+      console.log(`[SendFormEmail] Page ${page}: Email sent status breakdown:`, {
+        sent: participants.results.filter((p) => p.emailSent).length,
+        notSent: participants.results.filter((p) => !p.emailSent).length,
+      });
 
       // Filter participants who haven't received email yet (if not sending to specific IDs)
       const participantsToAdd = !params.participantIds?.length ? participants.results.filter((participant) => !participant.emailSent) : participants.results;
