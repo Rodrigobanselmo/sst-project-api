@@ -1,11 +1,10 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from '@prisma/client';
 
-import { seedCompany } from "./seed/company";
-import { seedEmployees } from "./seed/employees";
-import { seedEpis } from "./seed/epis";
-import { seedFormPreliminaryLibrary } from "./seed/form-preliminary-library";
-import { seedRisks } from "./seed/risks";
-import { seedUsers } from "./seed/user";
+import { seedCompany } from './seed/company';
+import { seedEmployees } from './seed/employees';
+import { seedEpis } from './seed/epis';
+import { seedRisks } from './seed/risks';
+import { seedUsers } from './seed/user';
 
 const prisma = new PrismaClient();
 
@@ -15,7 +14,6 @@ const createUserAndCompany = async () => {
   await seedRisks(prisma, companyId);
   await seedUsers(prisma, companyId);
   await seedEpis(prisma);
-  await seedFormPreliminaryLibrary(prisma);
 };
 
 async function main() {
