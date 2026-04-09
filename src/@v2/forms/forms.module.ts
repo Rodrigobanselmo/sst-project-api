@@ -67,6 +67,19 @@ import { EditFormQuestionsAnswersAnalysisController } from './application/form-q
 import { EditFormQuestionsAnswersAnalysisUseCase } from './application/form-questions-answers/edit-form-questions-answers-analysis/use-cases/edit-form-questions-answers-analysis.usecase';
 import { PublicFormParticipantLoginController } from './application/form-application/public-form-participant-login/controllers/public-form-participant-login.controller';
 import { PublicFormParticipantLoginUseCase } from './application/form-application/public-form-participant-login/use-cases/public-form-participant-login.usecase';
+import { BrowseFormPreliminaryLibraryBlocksUseCase } from './application/form-preliminary-library/browse-form-preliminary-library-blocks/use-cases/browse-form-preliminary-library-blocks.usecase';
+import { BrowseFormPreliminaryLibraryQuestionsUseCase } from './application/form-preliminary-library/browse-form-preliminary-library-questions/use-cases/browse-form-preliminary-library-questions.usecase';
+import { CreateFormPreliminaryLibraryBlockUseCase } from './application/form-preliminary-library/create-form-preliminary-library-block/use-cases/create-form-preliminary-library-block.usecase';
+import { CreateFormPreliminaryLibraryQuestionUseCase } from './application/form-preliminary-library/create-form-preliminary-library-question/use-cases/create-form-preliminary-library-question.usecase';
+import { DeleteFormPreliminaryLibraryBlockUseCase } from './application/form-preliminary-library/delete-form-preliminary-library-block/use-cases/delete-form-preliminary-library-block.usecase';
+import { DeleteFormPreliminaryLibraryQuestionUseCase } from './application/form-preliminary-library/delete-form-preliminary-library-question/use-cases/delete-form-preliminary-library-question.usecase';
+import { FormPreliminaryLibraryBlocksController } from './application/form-preliminary-library/form-preliminary-library-blocks.controller';
+import { FormPreliminaryLibraryQuestionsController } from './application/form-preliminary-library/form-preliminary-library-questions.controller';
+import { ReadFormPreliminaryLibraryBlockUseCase } from './application/form-preliminary-library/read-form-preliminary-library-block/use-cases/read-form-preliminary-library-block.usecase';
+import { ReadFormPreliminaryLibraryQuestionUseCase } from './application/form-preliminary-library/read-form-preliminary-library-question/use-cases/read-form-preliminary-library-question.usecase';
+import { UpdateFormPreliminaryLibraryBlockUseCase } from './application/form-preliminary-library/update-form-preliminary-library-block/use-cases/update-form-preliminary-library-block.usecase';
+import { UpdateFormPreliminaryLibraryQuestionUseCase } from './application/form-preliminary-library/update-form-preliminary-library-question/use-cases/update-form-preliminary-library-question.usecase';
+import { FormPreliminaryLibraryDAO } from './database/dao/form-preliminary-library/form-preliminary-library.dao';
 import { SSTModule } from '@/modules/sst/sst.module';
 
 @Module({
@@ -95,6 +108,8 @@ import { SSTModule } from '@/modules/sst/sst.module';
     BrowseFormQuestionsAnswersAnalysisController,
     EditFormQuestionsAnswersAnalysisController,
     PublicFormParticipantLoginController,
+    FormPreliminaryLibraryQuestionsController,
+    FormPreliminaryLibraryBlocksController,
   ],
   providers: [
     // Database
@@ -143,6 +158,17 @@ import { SSTModule } from '@/modules/sst/sst.module';
     // Services
     FormApplicationCacheService,
     FormQuestionsAnswersRisksService,
+    FormPreliminaryLibraryDAO,
+    BrowseFormPreliminaryLibraryQuestionsUseCase,
+    ReadFormPreliminaryLibraryQuestionUseCase,
+    CreateFormPreliminaryLibraryQuestionUseCase,
+    UpdateFormPreliminaryLibraryQuestionUseCase,
+    DeleteFormPreliminaryLibraryQuestionUseCase,
+    BrowseFormPreliminaryLibraryBlocksUseCase,
+    ReadFormPreliminaryLibraryBlockUseCase,
+    CreateFormPreliminaryLibraryBlockUseCase,
+    UpdateFormPreliminaryLibraryBlockUseCase,
+    DeleteFormPreliminaryLibraryBlockUseCase,
   ],
   exports: [],
 })

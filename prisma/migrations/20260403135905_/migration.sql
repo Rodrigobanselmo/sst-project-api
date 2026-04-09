@@ -1,0 +1,8 @@
+-- RenameForeignKey
+ALTER TABLE "form_preliminary_library_question_option" RENAME CONSTRAINT "form_preliminary_library_question_option_library_question_id_fk" TO "form_preliminary_library_question_option_library_question__fkey";
+
+-- RenameIndex
+ALTER INDEX "form_preliminary_library_block_item_block_id_library_question_i" RENAME TO "form_preliminary_library_block_item_block_id_library_questi_key";
+
+-- RenameIndex
+ALTER INDEX "form_preliminary_library_question_option_library_question_id_id" RENAME TO "form_preliminary_library_question_option_library_question_i_idx";
