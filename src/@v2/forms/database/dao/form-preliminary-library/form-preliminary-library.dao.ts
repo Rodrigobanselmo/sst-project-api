@@ -6,6 +6,7 @@ import {
   FormPreliminaryLibraryQuestionTypeEnum,
   Prisma,
 } from '@prisma/client';
+import { getFormCatalogAccessibleOrWhereParts } from '../../utils/form-catalog-accessible-where';
 
 const questionListInclude = {
   options: {
@@ -42,20 +43,6 @@ export type FormPreliminaryLibraryBlockDetail = Prisma.FormPreliminaryLibraryBlo
 export class FormPreliminaryLibraryDAO {
   constructor(private readonly prisma: PrismaServiceV2) {}
 
-  private accessibleWhere(companyId: string): Prisma.FormPreliminaryLibraryQuestionWhereInput {
-    return {
-      deleted_at: null,
-      OR: [{ system: true }, { company_id: companyId }],
-    };
-  }
-
-  private accessibleWhereBlock(companyId: string): Prisma.FormPreliminaryLibraryBlockWhereInput {
-    return {
-      deleted_at: null,
-      OR: [{ system: true }, { company_id: companyId }],
-    };
-  }
-
   async browseQuestions(params: {
     companyId: string;
     category?: FormPreliminaryLibraryCategoryEnum;
@@ -63,9 +50,10 @@ export class FormPreliminaryLibraryDAO {
     skip: number;
     take: number;
   }) {
+    const { questionOr } = await getFormCatalogAccessibleOrWhereParts(this.prisma, params.companyId);
     const where: Prisma.FormPreliminaryLibraryQuestionWhereInput = {
       AND: [
-        this.accessibleWhere(params.companyId),
+        { deleted_at: null, ...questionOr },
         ...(params.category ? [{ category: params.category }] : []),
         ...(params.search
           ? [
@@ -95,10 +83,12 @@ export class FormPreliminaryLibraryDAO {
   }
 
   async readQuestionForCompany(companyId: string, questionId: string) {
+    const { questionOr } = await getFormCatalogAccessibleOrWhereParts(this.prisma, companyId);
     return this.prisma.formPreliminaryLibraryQuestion.findFirst({
       where: {
         id: questionId,
-        ...this.accessibleWhere(companyId),
+        deleted_at: null,
+        ...questionOr,
       },
       include: questionListInclude,
     });
@@ -222,9 +212,10 @@ export class FormPreliminaryLibraryDAO {
   }
 
   async browseBlocks(params: { companyId: string; search?: string; skip: number; take: number }) {
+    const { blockOr } = await getFormCatalogAccessibleOrWhereParts(this.prisma, params.companyId);
     const where: Prisma.FormPreliminaryLibraryBlockWhereInput = {
       AND: [
-        this.accessibleWhereBlock(params.companyId),
+        { deleted_at: null, ...blockOr },
         ...(params.search
           ? [
               {
@@ -252,10 +243,12 @@ export class FormPreliminaryLibraryDAO {
   }
 
   async readBlockDetailForCompany(companyId: string, blockId: string) {
+    const { blockOr } = await getFormCatalogAccessibleOrWhereParts(this.prisma, companyId);
     return this.prisma.formPreliminaryLibraryBlock.findFirst({
       where: {
         id: blockId,
-        ...this.accessibleWhereBlock(companyId),
+        deleted_at: null,
+        ...blockOr,
       },
       include: blockDetailInclude,
     });
@@ -350,14 +343,15 @@ export class FormPreliminaryLibraryDAO {
     return { id: blockId };
   }
 
-  /** Valida que todas as perguntas existem e são acessíveis ao escopo (sistema + empresa). */
+  /** Valida que todas as perguntas existem e são acessíveis (mesma regra que Form / browse). */
   async assertQuestionsAccessibleForBlock(companyId: string, questionIds: string[]) {
     const unique = [...new Set(questionIds)];
+    const { questionOr } = await getFormCatalogAccessibleOrWhereParts(this.prisma, companyId);
     const found = await this.prisma.formPreliminaryLibraryQuestion.findMany({
       where: {
         id: { in: unique },
         deleted_at: null,
-        OR: [{ system: true }, { company_id: companyId }],
+        ...questionOr,
       },
       select: { id: true },
     });
