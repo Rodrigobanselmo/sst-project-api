@@ -9,6 +9,27 @@ import { getOrderByRawPrisma, IOrderByRawPrisma } from '@/@v2/shared/utils/datab
 import { FormParticipantsBrowseModelMapper } from '../../mappers/models/form-participants/form-participants-browse.mapper';
 import { Prisma } from '@prisma/client';
 
+function coerceSqlCount(value: unknown): number {
+  if (value === undefined || value === null) return 0;
+  if (typeof value === 'bigint') return Number(value);
+  const n = Number(value);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function readFilterSummaryRow(rows: unknown[]): {
+  total: number;
+  responded: number;
+} {
+  const row = rows[0] as Record<string, unknown> | undefined;
+  if (!row) return { total: 0, responded: 0 };
+  const totalVal = row.total ?? row.Total ?? row.count;
+  const respondedVal = row.responded ?? row.Responded;
+  return {
+    total: coerceSqlCount(totalVal),
+    responded: coerceSqlCount(respondedVal),
+  };
+}
+
 @Injectable()
 export class FormParticipantsDAO {
   constructor(private readonly prisma: PrismaServiceV2) {}
@@ -101,8 +122,11 @@ export class FormParticipantsDAO {
       OFFSET ${pagination.offSet};
     `;
 
-    const totalParticipantsPromise = this.prisma.$queryRaw<{ total: number }[]>`
-      SELECT COUNT(DISTINCT emp."id") AS total
+    /** Mesmos JOINs da listagem + `form_answers`, para totais do recorte filtrado (não só da página). */
+    const filterSummaryPromise = this.prisma.$queryRaw<{ total: number; responded: number }[]>`
+      SELECT
+        COUNT(DISTINCT emp."id")::int AS total,
+        COUNT(DISTINCT CASE WHEN form_answers."id" IS NOT NULL THEN emp."id" END)::int AS responded
       FROM
         "Employee" emp
       LEFT JOIN
@@ -127,14 +151,26 @@ export class FormParticipantsDAO {
         "FormParticipantsWorkspace" form_part_ws ON form_part_ws."form_participants_id" = form_part."id"
       LEFT JOIN
         "FormParticipantsHierarchy" form_part_hier ON form_part_hier."form_participants_id" = form_part."id"
+      LEFT JOIN
+        "FormParticipantsAnswers" form_answers ON form_answers."form_application_id" = ${filters.applicationId}
+        AND form_answers."employee_id" = emp."id"
+        AND form_answers."status" IN ('VALID')
       ${gerWhereRawPrisma(whereParams)};
     `;
 
-    const [participants, totalParticipants] = await Promise.all([participantsPromise, totalParticipantsPromise]);
+    const [participants, filterSummaryRows] = await Promise.all([participantsPromise, filterSummaryPromise]);
+
+    const { total, responded } = readFilterSummaryRow(filterSummaryRows);
 
     return FormParticipantsBrowseModelMapper.toModel({
       results: participants,
-      pagination: { limit: pagination.limit, page: pagination.page, total: Number(totalParticipants[0].total) },
+      pagination: { limit: pagination.limit, page: pagination.page, total },
+      filterSummary: {
+        totalParticipants: total,
+        respondedCount: responded,
+        notRespondedCount: Math.max(0, total - responded),
+        responseRatePercent: total > 0 ? Math.round((responded / total) * 1000) / 10 : 0,
+      },
       cryptoAdapter,
     });
   }

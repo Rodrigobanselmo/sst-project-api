@@ -6,6 +6,12 @@ import { CryptoAdapter } from '@/@v2/shared/adapters/crypto/models/crypto.interf
 export type IFormParticipantsBrowseModelMapper = {
   results: IFormParticipantsBrowseResultModelMapper[];
   pagination: IPaginationModelMapper;
+  filterSummary: {
+    totalParticipants: number;
+    respondedCount: number;
+    notRespondedCount: number;
+    responseRatePercent: number;
+  };
   cryptoAdapter: CryptoAdapter;
 };
 
@@ -14,6 +20,7 @@ export class FormParticipantsBrowseModelMapper {
     return new FormParticipantsBrowseModel({
       results: FormParticipantsBrowseResultModelMapper.toModels(prisma.results, prisma.cryptoAdapter),
       pagination: PaginationModelMapper.toModel(prisma.pagination),
+      filterSummary: prisma.filterSummary,
     });
   }
 }
