@@ -105,6 +105,16 @@ export class FormPreliminaryLibraryDAO {
     });
   }
 
+  /** Blocos não excluídos que ainda referenciam a pergunta na biblioteca. */
+  async countActiveBlocksReferencingLibraryQuestion(libraryQuestionId: string): Promise<number> {
+    return this.prisma.formPreliminaryLibraryBlockItem.count({
+      where: {
+        library_question_id: libraryQuestionId,
+        block: { deleted_at: null },
+      },
+    });
+  }
+
   async createQuestionWithOptions(
     data: {
       system: boolean;
@@ -205,6 +215,25 @@ export class FormPreliminaryLibraryDAO {
   async softDeleteQuestion(companyId: string, questionId: string) {
     const existing = await this.prisma.formPreliminaryLibraryQuestion.findFirst({
       where: { id: questionId, company_id: companyId, system: false, deleted_at: null },
+    });
+    if (!existing) return null;
+    const now = new Date();
+    await this.prisma.$transaction([
+      this.prisma.formPreliminaryLibraryQuestionOption.updateMany({
+        where: { library_question_id: questionId, deleted_at: null },
+        data: { deleted_at: now },
+      }),
+      this.prisma.formPreliminaryLibraryQuestion.update({
+        where: { id: questionId },
+        data: { deleted_at: now },
+      }),
+    ]);
+    return { id: questionId };
+  }
+
+  async softDeleteSystemLibraryQuestion(questionId: string) {
+    const existing = await this.prisma.formPreliminaryLibraryQuestion.findFirst({
+      where: { id: questionId, system: true, deleted_at: null },
     });
     if (!existing) return null;
     const now = new Date();
@@ -349,6 +378,18 @@ export class FormPreliminaryLibraryDAO {
     await this.prisma.formPreliminaryLibraryBlock.update({
       where: { id: blockId },
       data: { deleted_at: now },
+    });
+    return { id: blockId };
+  }
+
+  async softDeleteSystemLibraryBlock(blockId: string) {
+    const existing = await this.prisma.formPreliminaryLibraryBlock.findFirst({
+      where: { id: blockId, system: true, deleted_at: null },
+    });
+    if (!existing) return null;
+    await this.prisma.formPreliminaryLibraryBlock.update({
+      where: { id: blockId },
+      data: { deleted_at: new Date() },
     });
     return { id: blockId };
   }

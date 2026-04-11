@@ -25,6 +25,13 @@ export function assertMutableByCompany(system: boolean): void {
   }
 }
 
+/** Exclusão de item de catálogo global: só master ({@link UserContext.isAdmin}). */
+export function assertSystemItemDeletableByUser(system: boolean, isAdmin: boolean): void {
+  if (system && !isAdmin) {
+    throw new ForbiddenException('Templates globais do sistema só podem ser excluídos por usuário master.');
+  }
+}
+
 export function validateOptionsForQuestionType(
   questionType: FormPreliminaryLibraryQuestionTypeEnum,
   identifierType: FormIdentifierTypeEnum,
