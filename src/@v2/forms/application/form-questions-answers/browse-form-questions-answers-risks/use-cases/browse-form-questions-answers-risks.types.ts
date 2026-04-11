@@ -7,7 +7,7 @@ export namespace IBrowseFormQuestionsAnswersRisksUseCase {
   };
 
   export type Result = {
-    entityRiskMap: Record<string, Record<string, { values: number[] }>>;
+    entityRiskMap: Record<string, Record<string, { values: number[]; probability: number }>>;
     entityMap: Record<string, { id: string; type: HierarchyEnum; name: string }>;
     riskMap: Record<
       string,
@@ -19,5 +19,8 @@ export namespace IBrowseFormQuestionsAnswersRisksUseCase {
         subTypes: { sub_type: { id: number; name: string } }[];
       }
     >;
+    groupedEntityRiskMap: Record<string, Record<string, { values: number[]; probability: number }>>;
+    groupedEntityMap: Record<string, { id: string; name: string; type: string }>;
+    hierarchyGroups: Array<{ id: string; name: string; hierarchyIds: string[] }>;
   };
 }

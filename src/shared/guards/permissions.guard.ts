@@ -8,21 +8,21 @@ import { UserPayloadDto } from '../dto/user-payload.dto';
 import { asyncSome } from '../utils/asyncSome.utils';
 import { getCompanyId } from '../utils/getCompanId';
 
-type IMethods = 'GET' | 'POST' | 'PATCH' | 'DELETE';
+type IMethods = 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
 
-const methodToCrud = (method: IMethods) => {
+const methodToCrud = (method: IMethods): string => {
   switch (method) {
     case 'POST':
       return 'c';
     case 'GET':
       return 'r';
     case 'PATCH':
+    case 'PUT':
       return 'u';
     case 'DELETE':
       return 'd';
-
     default:
-      break;
+      return 'r'; // Default to read if method is unknown
   }
 };
 
@@ -49,7 +49,7 @@ const isMaster = (user: UserPayloadDto, options: IPermissionOptions, CRUD: strin
 
 const checkPermissions = (user: UserPayloadDto, options: IPermissionOptions, CRUD: string) => {
   if (!options.code) return true;
-  const crudString = typeof options.crud === 'string' ? options.crud : CRUD;
+  const crudString = typeof options.crud === 'string' ? options.crud : CRUD || 'r';
 
   if (user.permissions.length === 0) return true;
 

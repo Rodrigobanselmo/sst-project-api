@@ -63,15 +63,31 @@ export namespace IFormQuestionsAnswersRisksService {
     questions: QuestionSummary[];
   };
 
+  export type HierarchyGroupData = {
+    id: string;
+    name: string;
+    hierarchyIds: string[];
+  };
+
+  export type GroupedEntityData = {
+    id: string;
+    name: string;
+    type: string;
+  };
+
   export type Result = {
-    // New detailed data structure
     hierarchyRiskMap: Record<string, Record<string, HierarchyRiskSummary>>;
     hierarchyMap: Record<string, HierarchyData>;
     riskMap: Record<string, RiskData>;
     participantAnswers: ParticipantAnswerData[];
 
-    // Legacy format for backward compatibility with existing BrowseFormQuestionsAnswersRisksUseCase
+    // Individual sector data (used in risk analysis to list each sector separately)
     entityRiskMap: Record<string, Record<string, { values: number[]; probability: number }>>;
     entityMap: Record<string, HierarchyData>;
+
+    // Grouped data (merged sectors shown as single entities in indicators/PDF)
+    groupedEntityRiskMap: Record<string, Record<string, { values: number[]; probability: number }>>;
+    groupedEntityMap: Record<string, GroupedEntityData>;
+    hierarchyGroups: HierarchyGroupData[];
   };
 }

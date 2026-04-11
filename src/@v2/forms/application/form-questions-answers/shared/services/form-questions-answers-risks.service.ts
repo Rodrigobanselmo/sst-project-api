@@ -336,12 +336,99 @@ export class FormQuestionsAnswersRisksService {
       });
     });
 
+    // Fetch hierarchy groups for this form application
+    const hierarchyGroupsRaw = await this.prisma.formApplicationHierarchyGroup.findMany({
+      where: { form_application_id: params.formApplicationId },
+      include: { hierarchies: { select: { hierarchy_id: true } } },
+    });
+
+    // Build group mappings
+    const hierarchyToGroupMap: Record<string, string> = {};
+    const groupInfoMap: Record<string, { name: string; hierarchyIds: string[] }> = {};
+
+    hierarchyGroupsRaw.forEach((group) => {
+      const hIds = group.hierarchies.map((h) => h.hierarchy_id);
+      groupInfoMap[group.id] = { name: group.name, hierarchyIds: hIds };
+      hIds.forEach((hId) => {
+        hierarchyToGroupMap[hId] = group.id;
+      });
+    });
+
+    // Build grouped hierarchy-risk map (merges grouped hierarchies into single entities)
+    const groupedHierarchyRiskMap: Record<string, Record<string, IFormQuestionsAnswersRisksService.HierarchyRiskSummary>> = {};
+
+    Object.keys(hierarchyRiskMap).forEach((hierarchyId) => {
+      const groupId = hierarchyToGroupMap[hierarchyId];
+      const targetId = groupId || hierarchyId;
+
+      if (!groupedHierarchyRiskMap[targetId]) {
+        groupedHierarchyRiskMap[targetId] = {};
+      }
+
+      Object.entries(hierarchyRiskMap[hierarchyId]).forEach(([riskId, data]) => {
+        if (!groupedHierarchyRiskMap[targetId][riskId]) {
+          groupedHierarchyRiskMap[targetId][riskId] = {
+            riskId,
+            values: [...data.values],
+            questions: data.questions.map((q) => ({ ...q, values: [...q.values] })),
+            probability: 0,
+          };
+        } else {
+          groupedHierarchyRiskMap[targetId][riskId].values.push(...data.values);
+          // Merge questions
+          data.questions.forEach((question) => {
+            const existing = groupedHierarchyRiskMap[targetId][riskId].questions.find((q) => q.questionId === question.questionId);
+            if (existing) {
+              existing.values.push(...question.values);
+            } else {
+              groupedHierarchyRiskMap[targetId][riskId].questions.push({ ...question, values: [...question.values] });
+            }
+          });
+        }
+      });
+    });
+
+    // Recalculate probabilities for grouped map
+    Object.keys(groupedHierarchyRiskMap).forEach((targetId) => {
+      Object.keys(groupedHierarchyRiskMap[targetId]).forEach((riskId) => {
+        const riskData = groupedHierarchyRiskMap[targetId][riskId];
+        if (riskData.values.length > 0) {
+          const averageValue = riskData.values.reduce((acc, val) => acc + val, 0) / riskData.values.length;
+          riskData.probability = Math.ceil(averageValue);
+        }
+        riskData.questions.forEach((question) => {
+          if (question.values.length > 0) {
+            question.averageValue = question.values.reduce((acc, val) => acc + val, 0) / question.values.length;
+          }
+        });
+      });
+    });
+
+    // Build grouped entity map
+    const groupedEntityMap: Record<string, IFormQuestionsAnswersRisksService.GroupedEntityData> = {};
+
+    hierarchy.forEach((h) => {
+      if (!hierarchyToGroupMap[h.id]) {
+        groupedEntityMap[h.id] = { id: h.id, name: h.name, type: h.type };
+      }
+    });
+
+    Object.entries(groupInfoMap).forEach(([groupId, info]) => {
+      groupedEntityMap[groupId] = { id: groupId, name: info.name, type: 'GROUP' };
+    });
+
+    const hierarchyGroupsResult: IFormQuestionsAnswersRisksService.HierarchyGroupData[] = hierarchyGroupsRaw.map((g) => ({
+      id: g.id,
+      name: g.name,
+      hierarchyIds: g.hierarchies.map((h) => h.hierarchy_id),
+    }));
+
     return {
       hierarchyRiskMap,
       hierarchyMap,
       riskMap,
       participantAnswers: Array.from(participantAnswersMap.values()),
-      // Legacy format for backward compatibility
+      // Individual sector data (used in risk analysis to list each sector separately)
       entityRiskMap: Object.fromEntries(
         Object.entries(hierarchyRiskMap).map(([hierarchyId, risks]) => [
           hierarchyId,
@@ -349,6 +436,15 @@ export class FormQuestionsAnswersRisksService {
         ]),
       ),
       entityMap: hierarchyMap,
+      // Grouped data (merged sectors shown as single entities in indicators/PDF)
+      groupedEntityRiskMap: Object.fromEntries(
+        Object.entries(groupedHierarchyRiskMap).map(([targetId, risks]) => [
+          targetId,
+          Object.fromEntries(Object.entries(risks).map(([riskId, riskData]) => [riskId, { values: riskData.values, probability: riskData.probability }])),
+        ]),
+      ),
+      groupedEntityMap,
+      hierarchyGroups: hierarchyGroupsResult,
     };
   }
 }

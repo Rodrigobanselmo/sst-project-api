@@ -35,4 +35,8 @@ export const FormRoutes = {
     QUESTIONS: 'v2/companies/:companyId/forms/preliminary-library/questions',
     BLOCKS: 'v2/companies/:companyId/forms/preliminary-library/blocks',
   },
+  HIERARCHY_GROUP: {
+    PATH: 'v2/companies/:companyId/forms/applications/:applicationId/hierarchy-groups/',
+    PATH_ID: 'v2/companies/:companyId/forms/applications/:applicationId/hierarchy-groups/:groupId',
+  },
 } as const;

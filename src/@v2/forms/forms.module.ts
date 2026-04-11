@@ -81,6 +81,10 @@ import { UpdateFormPreliminaryLibraryBlockUseCase } from './application/form-pre
 import { UpdateFormPreliminaryLibraryQuestionUseCase } from './application/form-preliminary-library/update-form-preliminary-library-question/use-cases/update-form-preliminary-library-question.usecase';
 import { FormPreliminaryLibraryDAO } from './database/dao/form-preliminary-library/form-preliminary-library.dao';
 import { SSTModule } from '@/modules/sst/sst.module';
+import { HierarchyGroupController } from './application/hierarchy-group/hierarchy-group.controller';
+import { BrowseHierarchyGroupsUseCase } from './application/hierarchy-group/browse-hierarchy-groups/use-cases/browse-hierarchy-groups.usecase';
+import { UpsertHierarchyGroupsUseCase } from './application/hierarchy-group/upsert-hierarchy-groups/use-cases/upsert-hierarchy-groups.usecase';
+import { DeleteHierarchyGroupUseCase } from './application/hierarchy-group/delete-hierarchy-group/use-cases/delete-hierarchy-group.usecase';
 
 @Module({
   imports: [SharedModule, SSTModule, CacheModule.register()],
@@ -110,6 +114,7 @@ import { SSTModule } from '@/modules/sst/sst.module';
     PublicFormParticipantLoginController,
     FormPreliminaryLibraryQuestionsController,
     FormPreliminaryLibraryBlocksController,
+    HierarchyGroupController,
   ],
   providers: [
     // Database
@@ -169,6 +174,10 @@ import { SSTModule } from '@/modules/sst/sst.module';
     CreateFormPreliminaryLibraryBlockUseCase,
     UpdateFormPreliminaryLibraryBlockUseCase,
     DeleteFormPreliminaryLibraryBlockUseCase,
+    // Hierarchy Groups
+    BrowseHierarchyGroupsUseCase,
+    UpsertHierarchyGroupsUseCase,
+    DeleteHierarchyGroupUseCase,
   ],
   exports: [],
 })

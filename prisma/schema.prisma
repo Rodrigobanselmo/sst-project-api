@@ -1267,6 +1267,7 @@ model FormApplication {
   question_identifier_group FormQuestionGroup[]
   formApplicationRiskLog    FormApplicationRiskLog[]
   formAiAnalysis            FormAiAnalysis[]
+  hierarchyGroups           FormApplicationHierarchyGroup[]
 
   @@unique([id, company_id])
   @@index([company_id])
@@ -1315,6 +1316,31 @@ model FormApplicationRiskLog {
 
   entity_id   String
   probability Int
+}
+
+model FormApplicationHierarchyGroup {
+  id                  String   @id @default(cuid())
+  name                String
+  form_application_id String
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
+
+  form_application FormApplication                    @relation(fields: [form_application_id], references: [id], onDelete: Cascade)
+  hierarchies      FormApplicationHierarchyGroupItem[]
+
+  @@index([form_application_id])
+}
+
+model FormApplicationHierarchyGroupItem {
+  id           String @id @default(cuid())
+  group_id     String
+  hierarchy_id String
+
+  group FormApplicationHierarchyGroup @relation(fields: [group_id], references: [id], onDelete: Cascade)
+
+  @@unique([group_id, hierarchy_id])
+  @@index([group_id])
+  @@index([hierarchy_id])
 }
 
 model FormParticipants {

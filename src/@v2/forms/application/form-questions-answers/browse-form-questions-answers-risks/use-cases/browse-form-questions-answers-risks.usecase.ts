@@ -12,11 +12,13 @@ export class BrowseFormQuestionsAnswersRisksUseCase {
       formApplicationId: params.formApplicationId,
     });
 
-    // Return only the legacy format for backward compatibility
     return {
       entityRiskMap: result.entityRiskMap,
       riskMap: result.riskMap,
       entityMap: result.entityMap,
+      groupedEntityRiskMap: result.groupedEntityRiskMap,
+      groupedEntityMap: result.groupedEntityMap,
+      hierarchyGroups: result.hierarchyGroups,
     };
   }
 }
