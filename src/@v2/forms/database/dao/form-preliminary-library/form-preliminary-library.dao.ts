@@ -192,6 +192,16 @@ export class FormPreliminaryLibraryDAO {
     });
   }
 
+  /** Pergunta ainda vinculada a algum bloco da biblioteca que não foi excluído (soft delete). */
+  async countActiveBlocksReferencingLibraryQuestion(libraryQuestionId: string): Promise<number> {
+    return this.prisma.formPreliminaryLibraryBlockItem.count({
+      where: {
+        library_question_id: libraryQuestionId,
+        block: { deleted_at: null },
+      },
+    });
+  }
+
   async softDeleteQuestion(companyId: string, questionId: string) {
     const existing = await this.prisma.formPreliminaryLibraryQuestion.findFirst({
       where: { id: questionId, company_id: companyId, system: false, deleted_at: null },
