@@ -1,11 +1,6 @@
 import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service';
 import { BadRequestException, Injectable } from '@nestjs/common';
-import {
-  FormIdentifierTypeEnum,
-  FormPreliminaryLibraryCategoryEnum,
-  FormPreliminaryLibraryQuestionTypeEnum,
-  Prisma,
-} from '@prisma/client';
+import { FormIdentifierTypeEnum, FormPreliminaryLibraryCategoryEnum, FormPreliminaryLibraryQuestionTypeEnum, Prisma } from '@prisma/client';
 import { getFormCatalogAccessibleOrWhereParts } from '../../utils/form-catalog-accessible-where';
 
 const questionListInclude = {
@@ -43,13 +38,7 @@ export type FormPreliminaryLibraryBlockDetail = Prisma.FormPreliminaryLibraryBlo
 export class FormPreliminaryLibraryDAO {
   constructor(private readonly prisma: PrismaServiceV2) {}
 
-  async browseQuestions(params: {
-    companyId: string;
-    category?: FormPreliminaryLibraryCategoryEnum;
-    search?: string;
-    skip: number;
-    take: number;
-  }) {
+  async browseQuestions(params: { companyId: string; category?: FormPreliminaryLibraryCategoryEnum; search?: string; skip: number; take: number }) {
     const { questionOr } = await getFormCatalogAccessibleOrWhereParts(this.prisma, params.companyId);
     const where: Prisma.FormPreliminaryLibraryQuestionWhereInput = {
       AND: [
@@ -58,10 +47,7 @@ export class FormPreliminaryLibraryDAO {
         ...(params.search
           ? [
               {
-                OR: [
-                  { name: { contains: params.search, mode: Prisma.QueryMode.insensitive } },
-                  { question_text: { contains: params.search, mode: Prisma.QueryMode.insensitive } },
-                ],
+                OR: [{ name: { contains: params.search, mode: Prisma.QueryMode.insensitive } }, { question_text: { contains: params.search, mode: Prisma.QueryMode.insensitive } }],
               },
             ]
           : []),
@@ -202,16 +188,6 @@ export class FormPreliminaryLibraryDAO {
     });
   }
 
-  /** Pergunta ainda vinculada a algum bloco da biblioteca que não foi excluído (soft delete). */
-  async countActiveBlocksReferencingLibraryQuestion(libraryQuestionId: string): Promise<number> {
-    return this.prisma.formPreliminaryLibraryBlockItem.count({
-      where: {
-        library_question_id: libraryQuestionId,
-        block: { deleted_at: null },
-      },
-    });
-  }
-
   async softDeleteQuestion(companyId: string, questionId: string) {
     const existing = await this.prisma.formPreliminaryLibraryQuestion.findFirst({
       where: { id: questionId, company_id: companyId, system: false, deleted_at: null },
@@ -258,10 +234,7 @@ export class FormPreliminaryLibraryDAO {
         ...(params.search
           ? [
               {
-                OR: [
-                  { name: { contains: params.search, mode: Prisma.QueryMode.insensitive } },
-                  { description: { contains: params.search, mode: Prisma.QueryMode.insensitive } },
-                ],
+                OR: [{ name: { contains: params.search, mode: Prisma.QueryMode.insensitive } }, { description: { contains: params.search, mode: Prisma.QueryMode.insensitive } }],
               },
             ]
           : []),
