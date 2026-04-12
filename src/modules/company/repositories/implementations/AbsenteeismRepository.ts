@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
@@ -7,6 +7,7 @@ import { CreateAbsenteeismDto, FindAbsenteeismDto, UpdateAbsenteeismDto } from '
 
 import { AbsenteeismEntity } from '../../entities/absenteeism.entity';
 import { prismaFilter } from '../../../../shared/utils/filters/prisma.filters';
+import { resolveAbsenteeismListOrderBy } from '../../utils/absenteeism-list-order-by.util';
 
 @Injectable()
 export class AbsenteeismRepository {
@@ -40,7 +41,17 @@ export class AbsenteeismRepository {
 
     const { where } = prismaFilter(whereInit, {
       query,
-      skip: ['search', 'companyId', 'companiesIds'],
+      skip: [
+        'search',
+        'companyId',
+        'companiesIds',
+        'employeeIds',
+        'motiveIds',
+        'absenteeismOverlapStart',
+        'absenteeismOverlapEnd',
+        'listSortBy',
+        'listSortOrder',
+      ],
     });
 
     if (!options.select)
@@ -88,15 +99,45 @@ export class AbsenteeismRepository {
           ],
         },
       } as typeof options.where);
-      delete query.companiesIds;
+      delete query.companyId;
     }
 
-    if ('companiesIds' in query) {
+    if ('companiesIds' in query && query.companiesIds?.length) {
       (where.AND as any).push({
-        companyId: { in: query.companiesIds },
+        employee: { companyId: { in: query.companiesIds } },
       } as typeof options.where);
       delete query.companiesIds;
     }
+
+    if (query.employeeIds?.length) {
+      (where.AND as any).push({
+        employeeId: { in: query.employeeIds },
+      } as typeof options.where);
+      delete query.employeeIds;
+    }
+
+    if (query.motiveIds?.length) {
+      (where.AND as any).push({
+        motiveId: { in: query.motiveIds },
+      } as typeof options.where);
+      delete query.motiveIds;
+    }
+
+    const overlapStart = query.absenteeismOverlapStart
+      ? new Date(query.absenteeismOverlapStart)
+      : undefined;
+    const overlapEnd = query.absenteeismOverlapEnd ? new Date(query.absenteeismOverlapEnd) : undefined;
+    if (overlapStart && !Number.isNaN(overlapStart.getTime())) {
+      (where.AND as any).push({ endDate: { gte: overlapStart } } as typeof options.where);
+      delete query.absenteeismOverlapStart;
+    }
+    if (overlapEnd && !Number.isNaN(overlapEnd.getTime())) {
+      (where.AND as any).push({ startDate: { lte: overlapEnd } } as typeof options.where);
+      delete query.absenteeismOverlapEnd;
+    }
+
+    const orderBy =
+      options.orderBy ?? resolveAbsenteeismListOrderBy(query.listSortBy, query.listSortOrder);
 
     const response = await this.prisma.$transaction([
       this.prisma.absenteeism.count({
@@ -107,7 +148,7 @@ export class AbsenteeismRepository {
         where,
         take: pagination.take || 20,
         skip: pagination.skip || 0,
-        orderBy: { startDate: 'desc' },
+        orderBy,
       }),
     ]);
 

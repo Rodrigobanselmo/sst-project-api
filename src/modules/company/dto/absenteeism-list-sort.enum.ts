@@ -1,0 +1,7 @@
+export enum AbsenteeismListSortByEnum {
+  EMPLOYEE_NAME = 'EMPLOYEE_NAME',
+  COMPANY_NAME = 'COMPANY_NAME',
+  MOTIVE_DESC = 'MOTIVE_DESC',
+  START_DATE = 'START_DATE',
+  TIME_SPENT = 'TIME_SPENT',
+}

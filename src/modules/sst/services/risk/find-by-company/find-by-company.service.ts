@@ -3,18 +3,23 @@ import { Injectable } from '@nestjs/common';
 import { RiskRepository } from '../../../repositories/implementations/RiskRepository';
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { FindRiskDto } from '../../../dto/risk.dto';
+import { resolveRiskListOrderBy } from '../../../utils/risk-list-order-by.util';
 
 @Injectable()
 export class FindRisksByCompanyService {
   constructor(private readonly riskRepository: RiskRepository) {}
 
-  async execute({ skip, take, ...query }: FindRiskDto, user: UserPayloadDto) {
+  async execute(
+    { skip, take, listSortBy, listSortOrder, search, ...query }: FindRiskDto,
+    user: UserPayloadDto,
+  ) {
     const companyId = user.targetCompanyId;
+    const orderBy = resolveRiskListOrderBy(listSortBy, listSortOrder);
 
     const risks = await this.riskRepository.findCountNude(
       { skip, take },
       {
-        orderBy: [{ type: 'asc' }, { name: 'asc' }],
+        orderBy,
         where: {
           representAll: false, // remove standard risk
           riskFactorData: {
@@ -22,8 +27,8 @@ export class FindRisksByCompanyService {
               companyId,
             },
           },
-          ...(query.search && {
-            name: { contains: query.search, mode: 'insensitive' },
+          ...(search && {
+            name: { contains: search, mode: 'insensitive' },
           }),
         },
         select: {

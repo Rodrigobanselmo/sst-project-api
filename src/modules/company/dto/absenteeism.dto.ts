@@ -1,11 +1,21 @@
 import { DateFormat } from './../../../shared/transformers/date-format';
-import { QueryArray } from '../../../shared/transformers/query-array';
+import { QueryArray, QueryIntArray } from '../../../shared/transformers/query-array';
 import { PaginationQueryDto } from '../../../shared/dto/pagination.dto';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
-import { IsBoolean, IsDate, IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsDate,
+  IsDateString,
+  IsEnum,
+  IsIn,
+  IsInt,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 import { DateUnitEnum, StatusEnum } from '@prisma/client';
 import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
+import { AbsenteeismListSortByEnum } from './absenteeism-list-sort.enum';
 
 export class CreateAbsenteeismDto {
   // @Transform(DateFormat, { toClassOnly: true })
@@ -142,4 +152,31 @@ export class FindAbsenteeismDto extends PaginationQueryDto {
   @IsString({ each: true })
   @IsOptional()
   companiesIds?: string[];
+
+  @IsOptional()
+  @Transform(QueryIntArray, { toClassOnly: true })
+  @IsInt({ each: true })
+  employeeIds?: number[];
+
+  @IsOptional()
+  @Transform(QueryIntArray, { toClassOnly: true })
+  @IsInt({ each: true })
+  motiveIds?: number[];
+
+  @IsOptional()
+  @IsDateString()
+  absenteeismOverlapStart?: string;
+
+  @IsOptional()
+  @IsDateString()
+  absenteeismOverlapEnd?: string;
+
+  @IsOptional()
+  @IsEnum(AbsenteeismListSortByEnum)
+  listSortBy?: AbsenteeismListSortByEnum;
+
+  @IsOptional()
+  @Transform(({ value }) => (typeof value === 'string' ? value.toLowerCase() : value))
+  @IsIn(['asc', 'desc'])
+  listSortOrder?: 'asc' | 'desc';
 }

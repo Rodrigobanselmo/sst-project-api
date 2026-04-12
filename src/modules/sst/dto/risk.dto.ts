@@ -1,7 +1,20 @@
 import { PaginationQueryDto } from '../../../shared/dto/pagination.dto';
 import { GrauInsalubridade, RiskFactorsEnum, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
-import { IsArray, IsBoolean, IsEnum, IsInt, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
+import {
+  IsArray,
+  IsBoolean,
+  IsEnum,
+  IsIn,
+  IsInt,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+  ValidateNested,
+} from 'class-validator';
+import { QueryArray, QueryIntArray } from '../../../shared/transformers/query-array';
 import { StringCapitalizeParagraphTransform } from '../../../shared/transformers/string-capitalize-paragraph';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
@@ -385,6 +398,13 @@ export class UpdateRiskDto {
   subTypesIds?: number[];
 }
 
+export enum RiskListSortByEnum {
+  TYPE = 'TYPE',
+  NAME = 'NAME',
+  SEVERITY = 'SEVERITY',
+  STATUS = 'STATUS',
+}
+
 export class FindRiskDto extends PaginationQueryDto {
   @IsString()
   @IsOptional()
@@ -398,6 +418,55 @@ export class FindRiskDto extends PaginationQueryDto {
   @ToBoolean()
   @IsOptional()
   representAll: boolean;
+
+  @IsOptional()
+  @IsEnum(RiskListSortByEnum)
+  listSortBy?: RiskListSortByEnum;
+
+  @IsOptional()
+  @Transform(({ value }) => (typeof value === 'string' ? value.toLowerCase() : value))
+  @IsIn(['asc', 'desc'])
+  listSortOrder?: 'asc' | 'desc';
+
+  @IsOptional()
+  @IsArray()
+  @Transform(QueryArray, { toClassOnly: true })
+  @IsEnum(RiskFactorsEnum, { each: true })
+  riskTypes?: RiskFactorsEnum[];
+
+  @IsOptional()
+  @IsArray()
+  @Transform(QueryIntArray, { toClassOnly: true })
+  @IsInt({ each: true })
+  @Min(1, { each: true })
+  @Max(5, { each: true })
+  severities?: number[];
+
+  @IsOptional()
+  @IsArray()
+  @Transform(QueryIntArray, { toClassOnly: true })
+  @IsInt({ each: true })
+  riskSubTypeIds?: number[];
+
+  @IsOptional()
+  @ToBoolean()
+  @IsBoolean()
+  mustIsPGR?: boolean;
+
+  @IsOptional()
+  @ToBoolean()
+  @IsBoolean()
+  mustIsPPP?: boolean;
+
+  @IsOptional()
+  @ToBoolean()
+  @IsBoolean()
+  mustIsPCMSO?: boolean;
+
+  @IsOptional()
+  @ToBoolean()
+  @IsBoolean()
+  mustIsAso?: boolean;
 }
 
 export class ActivityDto {

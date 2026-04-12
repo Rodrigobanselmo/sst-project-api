@@ -406,6 +406,8 @@ export class EmployeeRepository {
         'isSchedule',
         'getAllHierarchyNames',
         'getHierarchyDescription',
+        'listSortBy',
+        'listSortOrder',
       ],
     });
 
@@ -704,6 +706,43 @@ export class EmployeeRepository {
       if (typeof options.select?.hierarchy != 'boolean' && options.select.hierarchy.select) {
         options.select.hierarchy.select.description = true;
         options.select.hierarchy.select.realDescription = true;
+      }
+    }
+
+    const listSortBy = (query as { listSortBy?: string }).listSortBy;
+    const listSortOrder = (query as { listSortOrder?: string }).listSortOrder?.toLowerCase() as
+      | 'asc'
+      | 'desc'
+      | undefined;
+    delete (query as { listSortBy?: string }).listSortBy;
+    delete (query as { listSortOrder?: string }).listSortOrder;
+
+    if (
+      listSortBy &&
+      listSortOrder &&
+      (listSortOrder === 'asc' || listSortOrder === 'desc')
+    ) {
+      const dir = listSortOrder;
+      const tieBreakName = { name: 'asc' as const };
+      const tieBreakId = { id: 'asc' as const };
+      switch (listSortBy) {
+        case 'NAME':
+          options.orderBy = [{ name: dir }, tieBreakId];
+          break;
+        case 'HIERARCHY':
+          options.orderBy = [{ hierarchy: { name: dir } }, tieBreakName, tieBreakId];
+          break;
+        case 'EXPIRED_DATE_EXAM':
+          options.orderBy = [{ expiredDateExam: { sort: dir, nulls: 'first' } }, tieBreakName, tieBreakId];
+          break;
+        case 'LAST_EXAM':
+          options.orderBy = [{ lastExam: { sort: dir, nulls: 'last' } }, tieBreakName, tieBreakId];
+          break;
+        case 'STATUS':
+          options.orderBy = [{ status: dir }, tieBreakName, tieBreakId];
+          break;
+        default:
+          break;
       }
     }
 
