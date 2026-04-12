@@ -1,11 +1,6 @@
 import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service';
 import { BadRequestException, Injectable } from '@nestjs/common';
-import {
-  FormIdentifierTypeEnum,
-  FormPreliminaryLibraryCategoryEnum,
-  FormPreliminaryLibraryQuestionTypeEnum,
-  Prisma,
-} from '@prisma/client';
+import { FormIdentifierTypeEnum, FormPreliminaryLibraryCategoryEnum, FormPreliminaryLibraryQuestionTypeEnum, Prisma } from '@prisma/client';
 import { getFormCatalogAccessibleOrWhereParts } from '../../utils/form-catalog-accessible-where';
 
 const questionListInclude = {
@@ -43,13 +38,7 @@ export type FormPreliminaryLibraryBlockDetail = Prisma.FormPreliminaryLibraryBlo
 export class FormPreliminaryLibraryDAO {
   constructor(private readonly prisma: PrismaServiceV2) {}
 
-  async browseQuestions(params: {
-    companyId: string;
-    category?: FormPreliminaryLibraryCategoryEnum;
-    search?: string;
-    skip: number;
-    take: number;
-  }) {
+  async browseQuestions(params: { companyId: string; category?: FormPreliminaryLibraryCategoryEnum; search?: string; skip: number; take: number }) {
     const { questionOr } = await getFormCatalogAccessibleOrWhereParts(this.prisma, params.companyId);
     const where: Prisma.FormPreliminaryLibraryQuestionWhereInput = {
       AND: [
@@ -58,10 +47,7 @@ export class FormPreliminaryLibraryDAO {
         ...(params.search
           ? [
               {
-                OR: [
-                  { name: { contains: params.search, mode: Prisma.QueryMode.insensitive } },
-                  { question_text: { contains: params.search, mode: Prisma.QueryMode.insensitive } },
-                ],
+                OR: [{ name: { contains: params.search, mode: Prisma.QueryMode.insensitive } }, { question_text: { contains: params.search, mode: Prisma.QueryMode.insensitive } }],
               },
             ]
           : []),
@@ -219,10 +205,7 @@ export class FormPreliminaryLibraryDAO {
         ...(params.search
           ? [
               {
-                OR: [
-                  { name: { contains: params.search, mode: Prisma.QueryMode.insensitive } },
-                  { description: { contains: params.search, mode: Prisma.QueryMode.insensitive } },
-                ],
+                OR: [{ name: { contains: params.search, mode: Prisma.QueryMode.insensitive } }, { description: { contains: params.search, mode: Prisma.QueryMode.insensitive } }],
               },
             ]
           : []),
