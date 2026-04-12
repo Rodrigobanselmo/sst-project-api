@@ -7,11 +7,89 @@ import { removeDuplicate } from '../../../../shared/utils/removeDuplicate';
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { IPrismaOptions } from '../../../../shared/interfaces/prisma-options.types';
 import { CreateRiskDto, FindRiskDto, UpdateRiskDto, UpsertRiskDto } from '../../dto/risk.dto';
+import { resolveRiskListOrderBy } from '../../utils/risk-list-order-by.util';
 import { RiskFactorsEntity } from '../../entities/risk.entity';
 import { IRiskRepository } from '../IRiskRepository.types';
 import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
 import { databaseFindChanges } from '../../../../shared/utils/databaseFindChanges';
 import { normalizeString } from '../../../../shared/utils/normalizeString';
+
+type RiskDocPresenceField = 'isPGR' | 'isPPP' | 'isPCMSO' | 'isAso';
+
+function normalizeQueryIntArray(value: unknown): number[] | undefined {
+  if (value === undefined || value === null) return undefined;
+  const arr = Array.isArray(value) ? value : [value];
+  const nums = arr
+    .flatMap((item) =>
+      typeof item === 'string' && item.includes(',')
+        ? item.split(',').map((s) => s.trim()).filter(Boolean)
+        : [item],
+    )
+    .map((x) => Number(x))
+    .filter((n) => Number.isInteger(n));
+  return nums.length ? nums : undefined;
+}
+
+/** Aligns with client getRiskDoc(): company docInfo row first, else contract-provider docInfo, else RiskFactors flags. */
+function riskDocPresenceWhere(companyId: string, flag: RiskDocPresenceField): Prisma.RiskFactorsWhereInput {
+  const companyRow: Prisma.RiskFactorsDocInfoWhereInput = {
+    companyId,
+    hierarchyId: null,
+  };
+  const fullScope: Prisma.RiskFactorsDocInfoWhereInput = {
+    hierarchyId: null,
+    OR: [
+      { companyId },
+      {
+        company: {
+          applyingServiceContracts: {
+            some: { receivingServiceCompanyId: companyId, status: StatusEnum.ACTIVE },
+          },
+        },
+      },
+    ],
+  };
+  return {
+    OR: [
+      {
+        docInfo: {
+          some: {
+            ...companyRow,
+            [flag]: true,
+          },
+        },
+      },
+      {
+        AND: [
+          { NOT: { docInfo: { some: companyRow } } },
+          {
+            OR: [
+              {
+                docInfo: {
+                  some: {
+                    hierarchyId: null,
+                    [flag]: true,
+                    company: {
+                      applyingServiceContracts: {
+                        some: {
+                          receivingServiceCompanyId: companyId,
+                          status: StatusEnum.ACTIVE,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+              {
+                AND: [{ NOT: { docInfo: { some: fullScope } } }, { [flag]: true }],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  };
+}
 
 @Injectable()
 export class RiskRepository implements IRiskRepository {
@@ -299,13 +377,48 @@ export class RiskRepository implements IRiskRepository {
   }
 
   async find(query: Partial<FindRiskDto>, pagination: PaginationQueryDto, options: Prisma.RiskFactorsFindManyArgs = {}) {
+    const listSortBy = (query as { listSortBy?: string }).listSortBy;
+    const listSortOrder = (query as { listSortOrder?: string }).listSortOrder?.toLowerCase() as
+      | 'asc'
+      | 'desc'
+      | undefined;
+    delete (query as { listSortBy?: string }).listSortBy;
+    delete (query as { listSortOrder?: string }).listSortOrder;
+
+    const riskTypes = (query as { riskTypes?: string[] }).riskTypes;
+    const severities = normalizeQueryIntArray((query as { severities?: unknown }).severities);
+    const riskSubTypeIds = normalizeQueryIntArray((query as { riskSubTypeIds?: unknown }).riskSubTypeIds);
+    const mustIsPGR = (query as { mustIsPGR?: boolean }).mustIsPGR;
+    const mustIsPPP = (query as { mustIsPPP?: boolean }).mustIsPPP;
+    const mustIsPCMSO = (query as { mustIsPCMSO?: boolean }).mustIsPCMSO;
+    const mustIsAso = (query as { mustIsAso?: boolean }).mustIsAso;
+    delete (query as { riskTypes?: string[] }).riskTypes;
+    delete (query as { severities?: number[] }).severities;
+    delete (query as { riskSubTypeIds?: number[] }).riskSubTypeIds;
+    delete (query as { mustIsPGR?: boolean }).mustIsPGR;
+    delete (query as { mustIsPPP?: boolean }).mustIsPPP;
+    delete (query as { mustIsPCMSO?: boolean }).mustIsPCMSO;
+    delete (query as { mustIsAso?: boolean }).mustIsAso;
+
     const whereInit = {
       AND: [{ OR: [{ companyId: query.companyId }, { system: true }] }],
     } as typeof options.where;
 
     const { where } = prismaFilter(whereInit, {
       query,
-      skip: ['search', 'companyId'],
+      skip: [
+        'search',
+        'companyId',
+        'listSortBy',
+        'listSortOrder',
+        'riskTypes',
+        'severities',
+        'riskSubTypeIds',
+        'mustIsPGR',
+        'mustIsPPP',
+        'mustIsPCMSO',
+        'mustIsAso',
+      ],
     });
 
     if ('search' in query && query.search) {
@@ -317,6 +430,41 @@ export class RiskRepository implements IRiskRepository {
       delete query.search;
     }
 
+    if (riskTypes?.length) {
+      (where.AND as any).push({ type: { in: riskTypes } });
+    }
+    if (severities?.length) {
+      (where.AND as any).push({ severity: { in: severities } });
+    }
+    if (riskSubTypeIds?.length) {
+      (where.AND as any).push({
+        subTypes: { some: { sub_type_id: { in: riskSubTypeIds } } },
+      });
+    }
+    const companyIdForDoc = query.companyId;
+    if (mustIsPGR === true) {
+      (where.AND as any).push(
+        companyIdForDoc ? riskDocPresenceWhere(companyIdForDoc, 'isPGR') : { isPGR: true },
+      );
+    }
+    if (mustIsPPP === true) {
+      (where.AND as any).push(
+        companyIdForDoc ? riskDocPresenceWhere(companyIdForDoc, 'isPPP') : { isPPP: true },
+      );
+    }
+    if (mustIsPCMSO === true) {
+      (where.AND as any).push(
+        companyIdForDoc ? riskDocPresenceWhere(companyIdForDoc, 'isPCMSO') : { isPCMSO: true },
+      );
+    }
+    if (mustIsAso === true) {
+      (where.AND as any).push(
+        companyIdForDoc ? riskDocPresenceWhere(companyIdForDoc, 'isAso') : { isAso: true },
+      );
+    }
+
+    const orderBy = resolveRiskListOrderBy(listSortBy, listSortOrder);
+
     const response = await this.prisma.$transaction([
       this.prisma.riskFactors.count({
         where,
@@ -325,8 +473,8 @@ export class RiskRepository implements IRiskRepository {
         where,
         take: pagination.take || 20,
         skip: pagination.skip || 0,
-        orderBy: [{ type: 'asc' }, { name: 'asc' }],
         ...options,
+        orderBy,
       }),
     ]);
 

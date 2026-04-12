@@ -60,6 +60,7 @@ export class FindRiskService {
               ],
               hierarchyId: null,
             },
+            orderBy: { id: 'asc' },
           },
         },
       },

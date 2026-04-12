@@ -1,0 +1,11 @@
+export enum CompanyListSortByEnum {
+  NAME = 'NAME',
+  FANTASY = 'FANTASY',
+  GROUP_NAME = 'GROUP_NAME',
+  CNPJ = 'CNPJ',
+  ADDRESS_STREET = 'ADDRESS_STREET',
+  CITY = 'CITY',
+  STATE = 'STATE',
+  PHONE = 'PHONE',
+  STATUS = 'STATUS',
+}

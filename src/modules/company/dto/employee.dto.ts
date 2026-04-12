@@ -2,7 +2,7 @@ import { QueryArray } from '../../../shared/transformers/query-array';
 import { PartialType } from '@nestjs/swagger';
 import { ExamHistoryEvaluationEnum, SexTypeEnum, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
-import { IsBoolean, IsDate, IsEnum, IsInt, IsNumber, IsOptional, IsString, Length, MaxLength } from 'class-validator';
+import { IsBoolean, IsDate, IsEnum, IsIn, IsInt, IsNumber, IsOptional, IsString, Length, MaxLength } from 'class-validator';
 import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
 
 import { PaginationQueryDto } from '../../../shared/dto/pagination.dto';
@@ -123,7 +123,24 @@ export class DeleteSubOfficeEmployeeDto {
   companyId: string;
 }
 
+export enum EmployeeListSortByEnum {
+  NAME = 'NAME',
+  HIERARCHY = 'HIERARCHY',
+  EXPIRED_DATE_EXAM = 'EXPIRED_DATE_EXAM',
+  LAST_EXAM = 'LAST_EXAM',
+  STATUS = 'STATUS',
+}
+
 export class FindEmployeeDto extends PaginationQueryDto {
+  @IsOptional()
+  @IsEnum(EmployeeListSortByEnum)
+  listSortBy?: EmployeeListSortByEnum;
+
+  @IsOptional()
+  @Transform(({ value }) => (typeof value === 'string' ? value.toLowerCase() : value))
+  @IsIn(['asc', 'desc'])
+  listSortOrder?: 'asc' | 'desc';
+
   @IsString()
   @IsOptional()
   search?: string;

@@ -8,6 +8,7 @@ import {
   IsDate,
   IsDefined,
   IsEnum,
+  IsIn,
   IsInt,
   IsOptional,
   IsString,
@@ -28,6 +29,7 @@ import { WorkspaceDto } from './workspace.dto';
 import { ToBoolean } from '../../../shared/decorators/boolean.decorator';
 import { UserCompanyEditDto } from './update-user-company.dto';
 import { UpdateEmployeeDto } from './employee.dto';
+import { CompanyListSortByEnum } from './company-list-sort.enum';
 
 export class CreateCompanyDto {
   @Transform(CnpjFormatTransform, { toClassOnly: true })
@@ -541,4 +543,13 @@ export class FindCompaniesDto extends PaginationQueryDto {
   @IsString({ each: true })
   @IsOptional()
   uf?: string[];
+
+  @IsOptional()
+  @IsEnum(CompanyListSortByEnum)
+  listSortBy?: CompanyListSortByEnum;
+
+  @IsOptional()
+  @Transform(({ value }) => (typeof value === 'string' ? value.toLowerCase() : value))
+  @IsIn(['asc', 'desc'])
+  listSortOrder?: 'asc' | 'desc';
 }

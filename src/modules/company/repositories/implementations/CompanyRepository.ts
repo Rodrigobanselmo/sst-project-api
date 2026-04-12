@@ -13,6 +13,7 @@ import { IPrismaOptions } from '../../../../shared/interfaces/prisma-options.typ
 import { DocumentTypeEnum, Prisma } from '@prisma/client';
 import { onlyNumbers } from '@brazilian-utils/brazilian-utils';
 import { isEnvironment } from '../../../../shared/utils/isEnvironment';
+import { resolveCompanyListOrderBy } from '../../utils/company-list-order-by.util';
 
 interface ICreateCompany extends CreateCompanyDto {
   companyId?: string;
@@ -463,6 +464,11 @@ export class CompanyRepository implements ICompanyRepository {
       delete query.findAll;
     }
 
+    const listSortBy = query.listSortBy;
+    const listSortOrder = query.listSortOrder?.toLowerCase() as 'asc' | 'desc' | undefined;
+    delete query.listSortBy;
+    delete query.listSortOrder;
+
     const whereInit = {
       AND: [
         { deleted_at: null },
@@ -484,14 +490,6 @@ export class CompanyRepository implements ICompanyRepository {
           : []),
       ],
     } as typeof options.where;
-
-    if (!options.orderBy)
-      options.orderBy = [
-        { status: 'asc' },
-        {
-          name: 'asc',
-        },
-      ];
 
     if (!options.select)
       options.select = {
@@ -527,6 +525,8 @@ export class CompanyRepository implements ICompanyRepository {
         'companiesGroupIds',
         'uf',
         'cities',
+        'listSortBy',
+        'listSortOrder',
       ],
     });
 
@@ -649,6 +649,10 @@ export class CompanyRepository implements ICompanyRepository {
       options.orderBy = [{ report: { esocialReject: 'desc' } }, { report: { esocialPendent: 'desc' } }];
     }
 
+    if (!('selectReport' in query && query.selectReport) && !options.orderBy) {
+      options.orderBy = resolveCompanyListOrderBy(listSortBy, listSortOrder);
+    }
+
     const response = await this.prisma.$transaction([
       this.prisma.company.count({
         where,
@@ -683,9 +687,30 @@ export class CompanyRepository implements ICompanyRepository {
       delete query.findAll;
     }
 
+    const listSortByAll = query.listSortBy;
+    const listSortOrderAll = query.listSortOrder?.toLowerCase() as 'asc' | 'desc' | undefined;
+    delete query.listSortBy;
+    delete query.listSortOrder;
+
     const { where } = prismaFilter(whereInit, {
       query,
-      skip: ['search', 'userId', 'groupId', 'companiesIds', 'clinicsCompanyId', 'clinicExamsIds', 'isPeriodic', 'isChange', 'isAdmission', 'isReturn', 'isDismissal', 'findAll', 'selectReport'],
+      skip: [
+        'search',
+        'userId',
+        'groupId',
+        'companiesIds',
+        'clinicsCompanyId',
+        'clinicExamsIds',
+        'isPeriodic',
+        'isChange',
+        'isAdmission',
+        'isReturn',
+        'isDismissal',
+        'findAll',
+        'selectReport',
+        'listSortBy',
+        'listSortOrder',
+      ],
     });
 
     if ('search' in query && query.search) {
@@ -768,7 +793,10 @@ export class CompanyRepository implements ICompanyRepository {
         }),
         take: pagination.take || 20,
         skip: pagination.skip || 0,
-        orderBy: { name: 'asc' },
+        orderBy:
+          'selectReport' in query && query.selectReport
+            ? options.orderBy
+            : resolveCompanyListOrderBy(listSortByAll, listSortOrderAll),
       }),
     ]);
 
