@@ -3,6 +3,9 @@ import { Injectable } from '@nestjs/common';
 import { FormParticipantsOrderByEnum } from '@/@v2/forms/application/form-participants/browse-form-participants/controllers/browse-form-participants.query';
 import { IFormParticipantsDAO } from './form-participants.types';
 import { getPagination } from '@/@v2/shared/utils/database/get-pagination';
+
+/** Alinhado ao recorte/PDF do client (lista e agrupado por setor). */
+const FORM_PARTICIPANTS_BROWSE_MAX_LIMIT = 10_000;
 import { IFormParticipantsBrowseResultModelMapper } from '../../mappers/models/form-participants/form-participants-browse-result.mapper';
 import { gerWhereRawPrisma } from '@/@v2/shared/utils/database/get-where-raw-prisma';
 import { getOrderByRawPrisma, IOrderByRawPrisma } from '@/@v2/shared/utils/database/get-order-by-raw-prisma';
@@ -35,7 +38,7 @@ export class FormParticipantsDAO {
   constructor(private readonly prisma: PrismaServiceV2) {}
 
   async browse({ limit, page, orderBy, filters, cryptoAdapter }: IFormParticipantsDAO.BrowseParams) {
-    const pagination = getPagination(page, limit);
+    const pagination = getPagination(page, limit, FORM_PARTICIPANTS_BROWSE_MAX_LIMIT);
 
     const browseWhereParams = this.browseWhere(filters);
     const filterWhereParams = this.filterWhere(filters);
