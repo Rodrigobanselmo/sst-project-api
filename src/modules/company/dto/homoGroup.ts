@@ -162,6 +162,11 @@ export class CopyHomogeneousGroupDto {
   @IsOptional()
   @IsString()
   hierarchyId?: string;
+
+  /** Quando informado, copia apenas esses fatores de risco (IDs de `RiskFactorData`). */
+  @IsOptional()
+  @IsString({ each: true })
+  riskFactorDataIds?: string[];
 }
 
 export class FindHomogeneousGroupDto extends PaginationQueryDto {

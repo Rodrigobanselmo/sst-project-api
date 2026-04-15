@@ -31,6 +31,7 @@ export class CopyHomoGroupService {
       riskGroupIdFrom,
       companyIdFrom,
       hierarchyId,
+      riskFactorDataIds,
       ...rest
     }: CopyHomogeneousGroupDto,
     userPayloadDto: UserPayloadDto,
@@ -105,12 +106,14 @@ export class CopyHomoGroupService {
       return this.riskDataRepository.upsertMany(data);
     };
 
-    const riskData = await getRiskData();
+    let riskData = (await getRiskData()) ?? [];
+    riskData = riskData.filter((r) => r.endDate == null);
+    if (riskFactorDataIds?.length) {
+      const allow = new Set(riskFactorDataIds);
+      riskData = riskData.filter((r) => allow.has(r.id));
+    }
 
-    await asyncEach(
-      riskData.filter((r) => r.endDate == null),
-      save,
-    );
+    await asyncEach(riskData, save);
 
     this.employeePPPHistoryRepository.updateManyNude({
       data: { sendEvent: true },

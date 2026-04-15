@@ -71,8 +71,13 @@ export class RiskDataController {
     isMember: true,
   })
   @Get('/:companyId/:groupId/homogeneous/:homogeneousGroupId')
-  findAllAvailableByHomogenousGroup(@User() userPayloadDto: UserPayloadDto, @Param('groupId') groupId: string, @Param('homogeneousGroupId') homogeneousGroupId: string) {
-    const companyId = userPayloadDto.targetCompanyId;
+  findAllAvailableByHomogenousGroup(
+    @User() userPayloadDto: UserPayloadDto,
+    @Param('companyId') companyIdParam: string,
+    @Param('groupId') groupId: string,
+    @Param('homogeneousGroupId') homogeneousGroupId: string,
+  ) {
+    const companyId = companyIdParam || userPayloadDto.targetCompanyId;
 
     return this.findAllByHomogeneousGroupService.execute(homogeneousGroupId, groupId, companyId);
   }

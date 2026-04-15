@@ -50,9 +50,18 @@ export class HomoGroupsController {
     isContract: true,
     isMember: true,
   })
-  @Get('all/:companyId?')
-  findByCompany(@User() userPayloadDto: UserPayloadDto) {
-    return this.findByCompanyHomoGroupService.execute(userPayloadDto);
+  @Get('all/:companyId')
+  findByCompany(
+    @Param('companyId') companyId: string,
+    @Query('onlyWithActiveRisks') onlyWithActiveRisks: string | undefined,
+    @Query('riskFactorGroupDataId') riskFactorGroupDataId: string | undefined,
+    @User() userPayloadDto: UserPayloadDto,
+  ) {
+    return this.findByCompanyHomoGroupService.execute(userPayloadDto, {
+      companyId,
+      onlyWithActiveRisks: onlyWithActiveRisks === '1' || onlyWithActiveRisks === 'true',
+      riskFactorGroupDataId,
+    });
   }
 
   @Permissions({
