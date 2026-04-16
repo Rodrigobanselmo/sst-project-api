@@ -13,6 +13,43 @@ import { getParticiantAnswersStatus } from '@/@v2/forms/domain/utils/get-partici
 export class FormQuestionsAnswersDAO {
   constructor(private readonly prisma: PrismaServiceV2) {}
 
+  /**
+   * Mesmo recorte de participantes de {@link FormParticipantsDAO.browse}:
+   * hierarquia explícita na aplicação OU hierarquia vinculada a estabelecimento participante.
+   * Respostas sem employee_id (ex.: fluxo legado) permanecem incluídas.
+   */
+  private participantAnswersInApplicationScopeSql(
+    companyId: string,
+    formApplicationId: string,
+  ): Prisma.Sql {
+    return Prisma.sql`(
+      fpa.employee_id IS NULL
+      OR EXISTS (
+        SELECT 1
+        FROM "Employee" emp
+        INNER JOIN "FormParticipants" fp ON fp.form_application_id = ${formApplicationId}
+        WHERE emp.id = fpa.employee_id
+          AND emp."companyId" = ${companyId}
+          AND (
+            EXISTS (
+              SELECT 1
+              FROM "FormParticipantsHierarchy" fph
+              WHERE fph.form_participants_id = fp.id
+                AND fph.hierarchy_id = emp."hierarchyId"
+            )
+            OR EXISTS (
+              SELECT 1
+              FROM "FormParticipantsWorkspace" fpw
+              INNER JOIN "_HierarchyToWorkspace" htw
+                ON htw."B" = fpw.workspace_id
+                AND htw."A" = emp."hierarchyId"
+              WHERE fpw.form_participants_id = fp.id
+            )
+          )
+      )
+    )`;
+  }
+
   async browse({ filters }: IFormQuestionsAnswersDAO.BrowseParams) {
     const form = await this.prisma.formApplication.findFirst({
       where: {
@@ -84,6 +121,7 @@ export class FormQuestionsAnswersDAO {
         LEFT JOIN "FormQuestionOptionData" qod ON qo."id" = qod."form_question_option_id" AND qod."deleted_at" IS NULL
         LEFT JOIN "FormAnswer" fa ON q."id" = fa."question_id" 
         INNER JOIN "FormParticipantsAnswers" fpa ON fa."participants_answers_id" = fpa."id" AND fpa."form_application_id" = ${filters.formApplicationId}
+          AND ${this.participantAnswersInApplicationScopeSql(filters.companyId, filters.formApplicationId)}
       ${gerWhereRawPrisma(whereParams)}
       GROUP BY 
         qg."id", qgd."name", qgd."description", qgd."order",
