@@ -34,8 +34,13 @@ export async function* agentToolLoop(options: AgentToolLoopOptions): AsyncGenera
 
   let currentMessages = [...options.messages];
   let useSmartNextIteration = false;
+  let hasGeneratedContent = false;
+  let totalToolCalls = 0;
+  let terminateAfterToolBatch = false;
+  let suppressContent = false;
 
   for (let i = 0; i < maxIterations; i++) {
+    console.log('[AgentToolLoop] iteration ' + i + ' starting');
     const activeLlm = useSmartNextIteration && boundSmarterLlm ? boundSmarterLlm : defaultLlm;
     if (useSmartNextIteration && boundSmarterLlm) {
       console.log(`[AgentToolLoop] Using SMARTER LLM for this iteration`);
@@ -61,7 +66,12 @@ export async function* agentToolLoop(options: AgentToolLoopOptions): AsyncGenera
               : '';
 
         if (text) {
-          yield { type: 'content', content: text };
+          if (suppressContent) {
+            console.log('[AgentToolLoop] suppressing content after navigation_card: ' + text.substring(0, 60));
+          } else {
+            hasGeneratedContent = true;
+            yield { type: 'content', content: text };
+          }
         }
       }
     } catch (streamError) {
@@ -78,6 +88,7 @@ export async function* agentToolLoop(options: AgentToolLoopOptions): AsyncGenera
     if (toolCalls.length === 0) break;
 
     currentMessages = [...currentMessages, accumulated as BaseMessage];
+    totalToolCalls += toolCalls.length;
 
     for (const toolCall of toolCalls) {
       const foundTool = tools.find((t) => t.name === toolCall.name);
@@ -100,6 +111,7 @@ export async function* agentToolLoop(options: AgentToolLoopOptions): AsyncGenera
 
         // Check if tool result contains an action card (backend-driven mutation)
         let actionCardData: any = null;
+        let navigationCardData: any = null;
         try {
           const parsed = JSON.parse(resultStr);
           if (parsed._action_type && parsed._action_id) {
@@ -107,6 +119,16 @@ export async function* agentToolLoop(options: AgentToolLoopOptions): AsyncGenera
               actionId: parsed._action_id,
               summary: parsed._action_summary || 'Ação pendente',
               details: parsed._action_details || {},
+            };
+          }
+          if (parsed._navigation_type && parsed._navigation_target && parsed._navigation_kind) {
+            navigationCardData = {
+              kind: parsed._navigation_kind,
+              target: parsed._navigation_target,
+              label: parsed._navigation_label || 'Abrir',
+              description: parsed._navigation_description,
+              params: parsed._navigation_params || {},
+              icon: parsed._navigation_icon,
             };
           }
         } catch {
@@ -152,6 +174,25 @@ export async function* agentToolLoop(options: AgentToolLoopOptions): AsyncGenera
             };
           }
 
+          // Emit navigation_card SSE event if detected
+          if (navigationCardData) {
+            yield {
+              type: 'navigation_card',
+              kind: navigationCardData.kind,
+              target: navigationCardData.target,
+              label: navigationCardData.label,
+              description: navigationCardData.description,
+              params: navigationCardData.params,
+              icon: navigationCardData.icon,
+            };
+            // The card IS the final response for navigation intent.
+            // Stop further iterations so the LLM doesn't re-emit the whole
+            // reply + tool call in a loop.
+            terminateAfterToolBatch = true;
+            suppressContent = true;
+            console.log('[AgentToolLoop] navigation_card emitted → terminateAfterToolBatch=true, suppressContent=true (iteration ' + i + ')');
+          }
+
           currentMessages.push({
             role: 'tool',
             content: resultStr,
@@ -163,6 +204,40 @@ export async function* agentToolLoop(options: AgentToolLoopOptions): AsyncGenera
         const errorMsg = error instanceof Error ? error.message : 'Unknown error';
         yield { type: 'tool_end', tool: toolCall.name, result: errorMsg, success: false };
         yield { type: 'error', message: errorMsg };
+      }
+    }
+
+    if (terminateAfterToolBatch) {
+      console.log('[AgentToolLoop] breaking outer loop after iteration ' + i);
+      break;
+    }
+  }
+  console.log('[AgentToolLoop] outer loop exited. hasGeneratedContent=' + hasGeneratedContent + ', totalToolCalls=' + totalToolCalls + ', terminateAfterToolBatch=' + terminateAfterToolBatch);
+
+  // If agent called tools but never generated content, prompt it to explain what it did
+  if (totalToolCalls > 0 && !hasGeneratedContent) {
+    console.warn(`[AgentToolLoop] Agent called ${totalToolCalls} tools but generated no content. Prompting for explanation.`);
+
+    // Add a system message asking the agent to explain what it did
+    currentMessages.push(new HumanMessage('Por favor, resuma o que você fez e responda à pergunta do usuário com base nos resultados das ferramentas que você executou.'));
+
+    // Force one more LLM call to get a summary
+    const activeLlm = defaultLlm;
+    const stream = await activeLlm.stream(currentMessages, callConfig);
+
+    for await (const chunk of stream) {
+      const text =
+        typeof chunk.content === 'string'
+          ? chunk.content
+          : Array.isArray(chunk.content)
+            ? chunk.content
+                .filter((c): c is { type: 'text'; text: string } => c.type === 'text')
+                .map((c) => c.text)
+                .join('')
+            : '';
+
+      if (text) {
+        yield { type: 'content', content: text };
       }
     }
   }

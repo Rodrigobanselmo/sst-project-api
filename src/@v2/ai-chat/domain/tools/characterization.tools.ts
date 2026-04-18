@@ -2083,8 +2083,182 @@ export function createCharacterizationTools(deps: CharacterizationToolsDeps) {
     },
   );
 
+  const searchAccessibleCompaniesTool = tool(
+    async ({ searchTerm, page = 1, pageSize = 20 }) => {
+      if (!userId) {
+        return JSON.stringify({
+          erro: 'Usuário não identificado',
+          mensagem: 'Não foi possível validar acesso às empresas.',
+        });
+      }
+
+      const directAccessFilter = { users: { some: { userId, status: 'ACTIVE' as const } } };
+
+      const companies = await prisma.company.findMany({
+        where: {
+          status: 'ACTIVE',
+          deleted_at: null,
+          OR: [
+            // (1) Direct access via UserCompany
+            directAccessFilter,
+            // (2) Client companies served by a consulting the user has access to
+            {
+              receivingServiceContracts: {
+                some: {
+                  status: 'ACTIVE',
+                  applyingServiceCompany: directAccessFilter,
+                },
+              },
+            },
+            // (3) Consulting companies that serve a client the user has access to
+            {
+              applyingServiceContracts: {
+                some: {
+                  status: 'ACTIVE',
+                  receivingServiceCompany: directAccessFilter,
+                },
+              },
+            },
+          ],
+        },
+        select: {
+          id: true,
+          name: true,
+          fantasy: true,
+          cnpj: true,
+          initials: true,
+          shortName: true,
+          isConsulting: true,
+          isClinic: true,
+          isGroup: true,
+          users: {
+            where: { userId, status: 'ACTIVE' },
+            select: { userId: true },
+          },
+        },
+      });
+
+      // Pre-compute access source per company (before fuzzy search, so the flag survives)
+      const enriched = companies.map((c) => {
+        const { users, ...rest } = c;
+        const hasDirectAccess = (users?.length ?? 0) > 0;
+        return {
+          ...rest,
+          acessoVia: hasDirectAccess ? ('direto' as const) : ('contrato' as const),
+        };
+      });
+
+      let results: ((typeof enriched)[0] & { score: number })[];
+
+      if (searchTerm) {
+        const normalized = enriched.map((c) => ({
+          ...c,
+          normalizedName: normalizeString(c.name)?.toLowerCase() || '',
+          normalizedFantasy: normalizeString(c.fantasy)?.toLowerCase() || '',
+          normalizedInitials: normalizeString(c.initials)?.toLowerCase() || '',
+          normalizedShortName: normalizeString(c.shortName)?.toLowerCase() || '',
+          normalizedCnpj: (c.cnpj || '').replace(/\D/g, ''),
+        }));
+
+        const normalizedTerm = normalizeString(searchTerm)?.toLowerCase() || searchTerm;
+
+        const fuse = new Fuse(normalized, {
+          keys: [
+            { name: 'normalizedName', weight: 0.35 },
+            { name: 'normalizedFantasy', weight: 0.35 },
+            { name: 'normalizedShortName', weight: 0.1 },
+            { name: 'normalizedInitials', weight: 0.1 },
+            { name: 'normalizedCnpj', weight: 0.1 },
+          ],
+          threshold: 0.4,
+          includeScore: true,
+          ignoreLocation: true,
+          minMatchCharLength: 2,
+        });
+
+        const fuseResults = fuse.search(normalizedTerm);
+        results = fuseResults.map((r) => {
+          const { normalizedName, normalizedFantasy, normalizedInitials, normalizedShortName, normalizedCnpj, ...rest } = r.item;
+          return { ...rest, score: 1 - (r.score ?? 0) };
+        });
+      } else {
+        results = enriched.map((c) => ({ ...c, score: 1 }));
+      }
+
+      results.sort((a, b) => {
+        if (b.score !== a.score) return b.score - a.score;
+        return a.name.localeCompare(b.name);
+      });
+
+      const startIndex = (page - 1) * pageSize;
+      const endIndex = startIndex + pageSize;
+      const paginated = results.slice(startIndex, endIndex);
+      const totalCount = results.length;
+      const hasNextPage = endIndex < totalCount;
+
+      if (paginated.length === 0) {
+        return JSON.stringify({
+          mensagem: 'Nenhuma empresa acessível encontrada com esses critérios.',
+          sugestao: searchTerm
+            ? 'Verifique a grafia do nome ou tente outro identificador (CNPJ, iniciais, nome fantasia).'
+            : 'Nenhuma empresa acessível para este usuário.',
+        });
+      }
+
+      const simplified = paginated.map((c) => ({
+        id: c.id,
+        nome: c.name,
+        nomeFantasia: c.fantasy ?? undefined,
+        cnpj: c.cnpj ?? undefined,
+        iniciais: c.initials ?? undefined,
+        nomeCurto: c.shortName ?? undefined,
+        isConsultoria: c.isConsulting || undefined,
+        isClinica: c.isClinic || undefined,
+        isGrupo: c.isGroup || undefined,
+        empresaAtual: c.id === defaultCompanyId || undefined,
+        acessoVia: c.acessoVia, // "direto" = usuário está vinculado diretamente; "contrato" = acesso via contrato de consultoria
+      }));
+
+      return JSON.stringify(
+        {
+          total: totalCount,
+          pagina: page,
+          tamanhoPagina: pageSize,
+          temProximaPagina: hasNextPage,
+          empresas: simplified,
+          dica:
+            'Use o "id" retornado como parâmetro "companyId" nas demais ferramentas ' +
+            '(listar_riscos_por_tipo, buscar_grupos_homogeneos, buscar_hierarquias) para consultar dados dessa empresa e depois importar com propor_atualizacao_risco.',
+        },
+        null,
+        2,
+      );
+    },
+    {
+      name: 'buscar_empresas_acessiveis',
+      description:
+        'Busca empresas às quais o usuário tem acesso, usando fuzzy matching sobre nome (razão social), nome fantasia, CNPJ, iniciais e nome curto. ' +
+        'Use SEMPRE que o usuário pedir para consultar/importar riscos, grupos ou hierarquias de OUTRA empresa. ' +
+        'O resultado traz o "id" da empresa — use esse id como parâmetro "companyId" em listar_riscos_por_tipo, buscar_grupos_homogeneos, buscar_hierarquias e propor_atualizacao_risco. ' +
+        'Retorna apenas empresas que o usuário tem permissão de acessar.',
+      schema: z.object({
+        _actionDescription: z.string().describe('Breve descrição do que você está fazendo. DEVE estar no MESMO IDIOMA do usuário.'),
+        searchTerm: z
+          .string()
+          .optional()
+          .describe(
+            'Texto digitado pelo usuário para identificar a empresa: pode ser nome, razão social, nome fantasia, CNPJ (com ou sem pontuação), iniciais ou nome curto. ' +
+              'Se o usuário não informar nenhum termo, omita este campo para listar todas as empresas acessíveis.',
+          ),
+        page: z.number().int().min(1).optional().default(1).describe('Número da página (padrão 1).'),
+        pageSize: z.number().int().min(1).optional().default(20).describe('Resultados por página (padrão 20).'),
+      }),
+    },
+  );
+
   // Build tools array
   const tools: any[] = [
+    searchAccessibleCompaniesTool,
     searchRisksByTypeTool,
     getRiskDetailsTool,
     searchHomogeneousGroupsTool,

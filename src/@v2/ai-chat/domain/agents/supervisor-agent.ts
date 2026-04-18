@@ -1,15 +1,17 @@
-import { SystemMessage, HumanMessage } from '@langchain/core/messages';
+import { SystemMessage, HumanMessage, AIMessage } from '@langchain/core/messages';
 import type { BaseMessage } from '@langchain/core/messages';
 import type { BaseChatModel } from '@langchain/core/language_models/chat_models';
+import type { StructuredToolInterface } from '@langchain/core/tools';
 import type { PrismaClient } from '@prisma/client';
 import { type AgentType, type StreamEvent } from '../types/stream-events';
-import { streamUserAgent } from './user-agent';
-import { streamDocumentAgent } from './document-agent';
 import { streamCharacterizationAgent } from './characterization-agent';
 import type { UsersRepository } from '../../../../modules/users/repositories/implementations/UsersRepository';
 import type { AiFileAttachment } from '../../database/repositories/ai-thread.repository';
 import { buildHistoryMessages, buildCurrentUserMessage, type FileAttachment, type ExtractionResult } from '../file-processing';
 import { createFileTools } from '../tools/file.tools';
+import { createNavigationTools } from '../tools/navigation.tools';
+import { summarizeForPrompt as summarizeNavigationCatalog } from '../navigation/navigation-catalog';
+import { agentToolLoop } from '../llm/agent-tool-loop';
 import { RunTree } from 'langsmith';
 import { createChildRun, endRun } from '../llm/tracing';
 import type { CallbackManager } from '@langchain/core/callbacks/manager';
@@ -20,17 +22,82 @@ import type { CallbackManager } from '@langchain/core/callbacks/manager';
 export const AGENT_METADATA: Record<AgentType, { name: string; description: string }> = {
   user: { name: 'Agente de Usuários', description: 'Assistente de gerenciamento de usuarios' },
   document: { name: 'Agente de Documentos', description: 'Assistente de documentos' },
-  characterization: { name: 'Agente de Caracterização', description: 'Assistente de caracterização de riscos' },
-  general: { name: 'Agente Geral', description: 'Assistente geral' },
+  characterization: { name: 'Assistente SST', description: 'Assistente de caracterização de riscos' },
+  general: { name: 'Assistente Geral', description: 'Assistente geral' },
 };
 
-const SUPERVISOR_SYSTEM_PROMPT = `Voce e um supervisor que classifica a intencao do usuario.
-Analise a mensagem e responda APENAS com uma das seguintes categorias:
-- "user" - se o usuario quer listar, buscar ou gerenciar usuarios/funcionarios/colaboradores
-- "document" - se o usuario quer gerar, criar ou gerenciar documentos
-- "characterization" - se o usuario quer consultar, listar ou analisar riscos/fatores de risco (BIO, QUI, FIS, ERG, ACI, OUTROS), ambientes de trabalho, postos de trabalho, cargos, setores, grupos homogêneos, caracterização, ou perigos ocupacionais. Na duvida entre characterization e outra categoria, prefira characterization.
+const SUPERVISOR_CLASSIFICATION_PROMPT = `Você é um supervisor que classifica a intenção do usuário.
+Analise a mensagem (e o CONTEXTO DA PÁGINA, se houver) e responda APENAS com UMA categoria.
 
-Responda SOMENTE com a categoria, sem explicacao.`;
+DIMENSÕES DE INTENÇÃO (decida qual aplica):
+
+1. **AÇÃO DIRETA / MUTATION** — usuário usa imperativo para criar/adicionar/editar/remover/atualizar DADOS reais.
+   Exemplos: "adicione risco de ruído", "edita o cargo motorista", "remove o EPI X", "atualiza a probabilidade desse risco", "cria um novo GHO Operadores".
+   → Vai para o agente DONO daquele dado (characterization para riscos/cargos/grupos/ambientes; user para funcionários).
+   ⚠️ NÃO confundir com "como cadastro X" (isso é pergunta INSTRUCIONAL → general).
+
+2. **CONSULTA DE DADOS** — usuário pede para listar/mostrar/buscar/analisar dados.
+   Exemplos: "liste meus riscos", "quais cargos tem", "mostra meus funcionários".
+   → Vai para o agente dono do dado.
+
+3. **INSTRUCIONAL / NAVEGAÇÃO** — usuário pergunta COMO/ONDE fazer, ou pede para abrir uma página/seção.
+   Exemplos: "como cadastro um risco?", "onde edito a empresa?", "abre o plano de ação", "me leva pra hierarquia".
+   → Vai para "general" (que emite card de navegação).
+
+Categorias disponíveis:
+- "characterization" — riscos (BIO, QUI, FIS, ERG, ACI, OUTROS, PSIC), grupos homogêneos (GHO), ambientes, postos, atividades, equipamentos, cargos/setores/diretorias, caracterização, EPIs/EPCs vinculados a riscos. Inclui MUTATION e CONSULTA desses dados.
+- "user" — usuários/funcionários/colaboradores: CONSULTA e MUTATION.
+- "document" — geração ou consulta de documentos.
+- "general" — apenas perguntas INSTRUCIONAIS, NAVEGAÇÃO ou ajuda conceitual sobre o sistema.
+
+USO DO CONTEXTO DA PÁGINA (se fornecido abaixo):
+- Se o usuário está em página de caracterização/risco/GHO/cargo, prefira "characterization" para mensagens ambíguas (ex: "adiciona ruído" sem dizer onde).
+- Se está em página de funcionários, prefira "user".
+- O contexto NUNCA sobrepõe uma intenção CLARA de outro tipo.
+
+EXEMPLOS DECISIVOS:
+- "adicione risco de ruído e trabalho em altura" → characterization (MUTATION em riscos)
+- "como adiciono um risco?" → general (instrucional)
+- "abre a página de riscos" → general (navegação)
+- "liste meus riscos biológicos" → characterization (consulta)
+- "edita o cargo de motorista para incluir EPI luva" → characterization (mutation em cargo/EPI)
+- "cadastre o funcionário João Silva" → user (mutation em funcionário)
+- "como cadastro um funcionário?" → general (instrucional)
+- "quais funcionários eu tenho?" → user (consulta)
+- "onde edito os dados da empresa?" → general (instrucional)
+
+Responda SOMENTE com a categoria (uma palavra), sem explicação.`;
+
+const SUPERVISOR_ORCHESTRATION_PROMPT = `Você é um assistente geral de um sistema de SST (Segurança e Saúde no Trabalho).
+
+IMPORTANTE: Sempre responda no MESMO IDIOMA que o usuário está usando.
+
+Você é especialista em ajudar o usuário a NAVEGAR pelo sistema e ENTENDER como executar tarefas.
+
+REGRA PRINCIPAL — CARDS DE NAVEGAÇÃO:
+Sempre que o usuário fizer uma pergunta INSTRUCIONAL ("como faço para...", "onde fica...", "onde edito...", "como cadastro...") OU pedir explicitamente para abrir/navegar até alguma parte do sistema ("abre X", "me leva para Y", "quero editar/cadastrar Z"):
+1. Escreva NO MÁXIMO UMA frase curta antes da tool (ex: "Vou te levar para a página de funcionários.").
+2. CHAME a ferramenta "propor_navegacao" UMA ÚNICA VEZ com a chave mais adequada.
+3. NÃO escreva mais nada depois da tool. NÃO repita a explicação. NÃO chame propor_navegacao novamente. O card já é a resposta visível.
+4. NUNCA invente URLs em texto puro.
+
+Todos os destinos são PÁGINAS (rotas) do sistema — não há modais. A página de destino sempre tem os botões/formulários para a ação que o usuário quer realizar.
+
+DESAMBIGUAÇÃO — DOCUMENTOS:
+Existem DUAS rotas distintas para documentos. Antes de propor um card de "documentos", entenda qual o usuário quer:
+1. **DOCUMENTS_GENERATE** ("Gerar novo documento") — sistema GERA um documento (PGR, LTCAT, PCMSO, Insalubridade, Periculosidade) a partir dos dados de SST. Use para "gerar/criar/emitir/produzir laudo".
+2. **DOCUMENTS_STORAGE** ("Documentos salvos") — usuário SOBE um arquivo que já tem e controla VENCIMENTO. Use para "salvar/subir/guardar/arquivar documento" ou "gerenciar vencimento".
+
+Se o usuário pedir só "documentos" / "abrir documentos" sem especificar, PERGUNTE em UMA frase: "Você quer **gerar um novo documento** (PGR, LTCAT, PCMSO, etc.) ou **salvar um documento** que já tem com controle de vencimento?" — e NÃO chame propor_navegacao ainda. Espere a resposta.
+
+A mesma lógica vale para outros casos ambíguos: se a intenção não estiver clara, pergunte primeiro, depois proponha o card.
+
+DESTINOS DISPONÍVEIS NO CATÁLOGO DE NAVEGAÇÃO:
+{{NAVIGATION_CATALOG}}
+
+Para outras perguntas (ajuda geral, dúvidas conceituais sobre SST, etc.), responda diretamente em texto.
+
+Seja claro, objetivo e útil.`;
 
 export interface PageContext {
   companyId?: string;
@@ -81,6 +148,11 @@ function buildContextAwarePrompt(basePrompt: string, pageContext?: PageContext):
     contextParts.push(`- Empresa sendo visualizada: ID ${pageContext.companyId}`);
   }
 
+  // Implied page (helps classifier bias toward the right agent)
+  if (pageContext.homogeneousGroupId || pageContext.hierarchyId) {
+    contextParts.push(`- O usuário está em uma PÁGINA DE CARACTERIZAÇÃO (riscos / GHO / cargos). Para mensagens ambíguas envolvendo riscos/EPIs/cargos/grupos, prefira o agente "characterization".`);
+  }
+
   // Homogeneous group context
   if (pageContext.homogeneousGroupId) {
     contextParts.push(`- Grupo homogêneo sendo visualizado: ID ${pageContext.homogeneousGroupId}`);
@@ -99,15 +171,51 @@ ${contextParts.join('\n')}`;
  * Classifies user intent using LLM
  */
 async function classifyIntent(llm: BaseChatModel, message: string, history: BaseMessage[], callbacks: CallbackManager, pageContext?: PageContext): Promise<AgentType> {
-  const systemPrompt = buildContextAwarePrompt(SUPERVISOR_SYSTEM_PROMPT, pageContext);
+  const systemPrompt = buildContextAwarePrompt(SUPERVISOR_CLASSIFICATION_PROMPT, pageContext);
   const response = await llm.invoke([new SystemMessage(systemPrompt), ...history, new HumanMessage(message)], { callbacks });
 
   const content = typeof response.content === 'string' ? response.content.trim().toLowerCase() : '';
 
-  if (content.includes('user')) return 'user';
-  if (content.includes('document')) return 'document';
+  if (content.includes('general')) return 'general';
   // Default to characterization — it has the broadest toolset for SST queries
   return 'characterization';
+}
+
+/**
+ * Streams general supervisor responses for system-level questions (instructional
+ * "how do I..." / navigation requests). Uses agentToolLoop so it can call
+ * `propor_navegacao` to emit navigation cards.
+ */
+async function* streamGeneralSupervisor(input: {
+  message: string;
+  history?: Array<{ role: 'user' | 'assistant'; content: string }>;
+  llm: BaseChatModel;
+  tools: StructuredToolInterface[];
+  prebuiltHistoryMessages?: BaseMessage[];
+  prebuiltCurrentMessage?: HumanMessage;
+  callbacks?: CallbackManager;
+}): AsyncGenerator<StreamEvent, void, undefined> {
+  let historyMessages: BaseMessage[];
+  let currentUserMessage: HumanMessage;
+
+  if (input.prebuiltHistoryMessages && input.prebuiltCurrentMessage) {
+    historyMessages = input.prebuiltHistoryMessages;
+    currentUserMessage = input.prebuiltCurrentMessage;
+  } else {
+    historyMessages = (input.history ?? []).map((msg) => (msg.role === 'user' ? new HumanMessage(msg.content) : new AIMessage(msg.content)));
+    currentUserMessage = new HumanMessage(input.message);
+  }
+
+  const systemPromptWithCatalog = SUPERVISOR_ORCHESTRATION_PROMPT.replace('{{NAVIGATION_CATALOG}}', summarizeNavigationCatalog());
+
+  const messages = [new SystemMessage(systemPromptWithCatalog), ...historyMessages, currentUserMessage];
+
+  yield* agentToolLoop({
+    llm: input.llm,
+    messages,
+    tools: input.tools,
+    callbacks: input.callbacks,
+  });
 }
 
 /**
@@ -145,23 +253,18 @@ export async function* streamSupervisorAgent(input: SupervisorInput): AsyncGener
 
     // Only send last few messages for classification — enough for context, avoids sending the full history
     const recentHistory = historyMessages.slice(-6);
-    const agentType = await classifyIntent(input.fastLlm ?? input.llm, input.message, recentHistory, classifyCallbacks, input.pageContext);
+    // Classification quality matters a lot (wrong agent = wrong tools = useless reply).
+    // Use the smarter LLM if available, falling back to fast then default.
+    const classifierLlm = input.smarterLlm ?? input.fastLlm ?? input.llm;
+    const agentType = await classifyIntent(classifierLlm, input.message, recentHistory, classifyCallbacks, input.pageContext);
     await endRun(classifyRun, { outputs: { agentType } });
 
-    // Emit agent start event
+    // Emit agent start event (frontend will show loading automatically)
     yield {
       type: 'agent_start',
       agent: agentType,
       name: AGENT_METADATA[agentType].name,
       description: AGENT_METADATA[agentType].description,
-    };
-
-    // Emit a "thinking" tool event to show loading while agent prepares
-    yield {
-      type: 'tool_start',
-      tool: `${agentType}_thinking`,
-      args: {},
-      description: 'Preparando resposta...',
     };
 
     // Process current message attachments
@@ -223,16 +326,10 @@ export async function* streamSupervisorAgent(input: SupervisorInput): AsyncGener
       }
     }
 
-    // Create global file tools
+    // Create global file tools and navigation tools (available to all agents)
     const fileTools = createFileTools(input.prisma, input.user.userId);
-
-    // End the "thinking" indicator before starting agent execution
-    yield {
-      type: 'tool_end',
-      tool: `${agentType}_thinking`,
-      result: 'Pronto',
-      success: true,
-    };
+    const navigationTools = createNavigationTools({ pageContext: input.pageContext });
+    const sharedTools: StructuredToolInterface[] = [...fileTools, ...navigationTools];
 
     // Create child run for the delegated agent
     const agentName = AGENT_METADATA[agentType].name;
@@ -241,28 +338,28 @@ export async function* streamSupervisorAgent(input: SupervisorInput): AsyncGener
       inputs: { message: input.message.substring(0, 200), agentType },
     });
 
+    // Track if sub-agent generated any content
+    let subAgentGeneratedContent = false;
+    let subAgentResponse = '';
+    let toolCallCount = 0;
+
     try {
-      if (agentType === 'user') {
-        for await (const event of streamUserAgent({
+      if (agentType === 'general') {
+        // General agent: supervisor handles directly with orchestration prompt + navigation tools
+        for await (const event of streamGeneralSupervisor({
           message: input.message,
           history: input.history,
-          attachments: input.attachments,
-          companyId,
-          usersRepository: input.usersRepository,
           llm: input.llm,
+          tools: sharedTools,
           prebuiltHistoryMessages: historyMessages,
           prebuiltCurrentMessage: currentUserMessage,
-          additionalTools: fileTools,
           callbacks: agentCallbacks,
         })) {
-          yield event;
-        }
-      } else if (agentType === 'document') {
-        for await (const event of streamDocumentAgent({
-          message: input.message,
-          history: input.history,
-          companyId,
-        })) {
+          if (event.type === 'content') {
+            subAgentGeneratedContent = true;
+            subAgentResponse += event.content;
+          }
+          if (event.type === 'tool_end') toolCallCount++;
           yield event;
         }
       } else if (agentType === 'characterization') {
@@ -276,16 +373,30 @@ export async function* streamSupervisorAgent(input: SupervisorInput): AsyncGener
           smarterLlm: input.smarterLlm,
           prebuiltHistoryMessages: historyMessages,
           prebuiltCurrentMessage: currentUserMessage,
-          additionalTools: fileTools,
+          additionalTools: sharedTools,
           callbacks: agentCallbacks,
           userId: input.user.userId,
           assistantMessageId: input.assistantMessageId,
         })) {
+          if (event.type === 'content') {
+            subAgentGeneratedContent = true;
+            subAgentResponse += event.content;
+          }
+          if (event.type === 'tool_end') toolCallCount++;
           yield event;
         }
       }
 
-      await endRun(agentRun, { outputs: { success: true } });
+      // If sub-agent called tools but didn't generate any content response, notify user
+      if (!subAgentGeneratedContent && toolCallCount > 0) {
+        console.warn(`[Supervisor] Sub-agent ${agentType} called ${toolCallCount} tools but generated no content`);
+        yield {
+          type: 'content',
+          content: `⚠️ Foram executadas ${toolCallCount} operações, mas nenhuma resposta foi gerada. Isso pode indicar um problema. Tente reformular sua pergunta ou recarregue a página para ver se as informações foram salvas.`,
+        };
+      }
+
+      await endRun(agentRun, { outputs: { success: true, contentGenerated: subAgentGeneratedContent, toolCalls: toolCallCount, responseLength: subAgentResponse.length } });
     } catch (agentError) {
       await endRun(agentRun, { error: agentError instanceof Error ? agentError.message : 'Unknown error' });
       throw agentError;
