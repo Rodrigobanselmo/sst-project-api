@@ -10,6 +10,7 @@ import type { AiFileAttachment } from '../../database/repositories/ai-thread.rep
 import { buildHistoryMessages, buildCurrentUserMessage, type FileAttachment, type ExtractionResult } from '../file-processing';
 import { createFileTools } from '../tools/file.tools';
 import { createNavigationTools } from '../tools/navigation.tools';
+import { createCompanyTools } from '../tools/company.tools';
 import { summarizeForPrompt as summarizeNavigationCatalog } from '../navigation/navigation-catalog';
 import { agentToolLoop } from '../llm/agent-tool-loop';
 import { RunTree } from 'langsmith';
@@ -80,6 +81,15 @@ Sempre que o usuário fizer uma pergunta INSTRUCIONAL ("como faço para...", "on
 2. CHAME a ferramenta "propor_navegacao" UMA ÚNICA VEZ com a chave mais adequada.
 3. NÃO escreva mais nada depois da tool. NÃO repita a explicação. NÃO chame propor_navegacao novamente. O card já é a resposta visível.
 4. NUNCA invente URLs em texto puro.
+
+RESOLUÇÃO DE EMPRESA (companyId):
+Se o destino exige companyId e o usuário mencionou uma empresa pelo NOME (ex: "macdonalds", "padaria do joão", "minha clínica") em vez de já estar no contexto da página:
+1. PRIMEIRO chame "buscar_empresas_acessiveis" com searchTerm = o nome dito (mesmo com erro de grafia — a busca é fuzzy).
+2. Se houver 1 match claro (score alto / único resultado próximo), use o "id" retornado direto em propor_navegacao.params.companyId.
+3. Se houver MÚLTIPLOS resultados próximos, liste-os em UMA frase curta e pergunte qual é a empresa correta — NÃO chame propor_navegacao ainda.
+4. Se NÃO houver nenhum resultado, avise o usuário e peça outro identificador (CNPJ, nome fantasia).
+NUNCA peça o CNPJ direto sem antes tentar a busca por nome.
+Se o usuário NÃO mencionou empresa nenhuma e o pageContext já tem companyId, use o pageContext (preenchido automaticamente) — não chame buscar_empresas_acessiveis à toa.
 
 Todos os destinos são PÁGINAS (rotas) do sistema — não há modais. A página de destino sempre tem os botões/formulários para a ação que o usuário quer realizar.
 
@@ -326,10 +336,15 @@ export async function* streamSupervisorAgent(input: SupervisorInput): AsyncGener
       }
     }
 
-    // Create global file tools and navigation tools (available to all agents)
+    // Create global file/navigation/company tools (available to all agents)
     const fileTools = createFileTools(input.prisma, input.user.userId);
     const navigationTools = createNavigationTools({ pageContext: input.pageContext });
-    const sharedTools: StructuredToolInterface[] = [...fileTools, ...navigationTools];
+    const companyTools = createCompanyTools({
+      prisma: input.prisma,
+      userId: input.user.userId,
+      defaultCompanyId: companyId,
+    });
+    const sharedTools: StructuredToolInterface[] = [...fileTools, ...navigationTools, ...companyTools];
 
     // Create child run for the delegated agent
     const agentName = AGENT_METADATA[agentType].name;
