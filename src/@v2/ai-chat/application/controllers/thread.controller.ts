@@ -129,14 +129,31 @@ export class ThreadController {
     res.setHeader('X-Accel-Buffering', 'no');
     res.flushHeaders();
 
+    // Send keep-alive comments every 15 seconds to prevent connection timeout
+    const keepAliveInterval = setInterval(() => {
+      try {
+        res.write(': keep-alive\n\n');
+        if (typeof (res as any).flush === 'function') {
+          (res as any).flush();
+        }
+      } catch {
+        // Connection closed, clear interval
+        clearInterval(keepAliveInterval);
+      }
+    }, 15000);
+
     // Create assistant message BEFORE agent loop (with empty content)
     // This allows tools to reference the messageId during execution
     const assistantMessage = await this.aiThreadRepository.addMessage(threadId, 'assistant', '');
 
     let fullResponse = '';
     const toolMessages: Array<{ id: string; toolName: string }> = [];
+    let eventCount = 0;
+    let lastEventType = '';
 
     try {
+      console.log(`[StreamChat] Starting stream for thread ${threadId}, message: "${dto.message.substring(0, 50)}..."`);
+
       for await (const event of this.streamChatUseCase.execute(user, {
         message: dto.message,
         history: historyWithoutCurrent,
@@ -147,6 +164,9 @@ export class ThreadController {
         threadId, // Pass threadId so tools can access it
         assistantMessageId: assistantMessage.id, // Pass messageId for tools
       })) {
+        eventCount++;
+        lastEventType = event.type;
+
         // Accumulate content for saving
         if (event.type === 'content') {
           fullResponse += event.content;
@@ -173,16 +193,30 @@ export class ThreadController {
         }
       }
 
+      console.log(`[StreamChat] Stream completed. Events: ${eventCount}, Last event: ${lastEventType}, Response length: ${fullResponse.length}`);
+
       // Update the assistant message with the full response
       if (fullResponse) {
         await this.aiThreadRepository.updateMessage(assistantMessage.id, fullResponse);
       } else {
         // If no response, delete the empty message
+        console.warn(`[StreamChat] No response generated for thread ${threadId}`);
         await this.aiThreadRepository.deleteMessage(assistantMessage.id);
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error(`[StreamChat] Error in stream:`, error);
       res.write(`data: ${JSON.stringify({ type: 'error', message: errorMessage })}\n\n`);
+
+      // Still try to save partial response if we got any
+      if (fullResponse) {
+        console.log(`[StreamChat] Saving partial response (${fullResponse.length} chars) after error`);
+        await this.aiThreadRepository.updateMessage(assistantMessage.id, fullResponse);
+      }
+    } finally {
+      // Clear keep-alive interval when done
+      clearInterval(keepAliveInterval);
+      console.log(`[StreamChat] Stream ended for thread ${threadId}`);
     }
 
     res.write('data: [DONE]\n\n');

@@ -55,7 +55,7 @@ export interface SupervisorInput {
   prisma: PrismaClient;
   llm: BaseChatModel;
   /** Dedicated fast LLM for intent classification (always fast regardless of user mode) */
-  classifierLlm?: BaseChatModel;
+  fastLlm?: BaseChatModel;
   /** Smarter LLM for tools that require more reasoning */
   smarterLlm?: BaseChatModel;
   /** Pre-extracted file contents from controller (avoids double S3 download) */
@@ -145,7 +145,7 @@ export async function* streamSupervisorAgent(input: SupervisorInput): AsyncGener
 
     // Only send last few messages for classification — enough for context, avoids sending the full history
     const recentHistory = historyMessages.slice(-6);
-    const agentType = await classifyIntent(input.classifierLlm ?? input.llm, input.message, recentHistory, classifyCallbacks, input.pageContext);
+    const agentType = await classifyIntent(input.fastLlm ?? input.llm, input.message, recentHistory, classifyCallbacks, input.pageContext);
     await endRun(classifyRun, { outputs: { agentType } });
 
     // Emit agent start event
@@ -154,6 +154,14 @@ export async function* streamSupervisorAgent(input: SupervisorInput): AsyncGener
       agent: agentType,
       name: AGENT_METADATA[agentType].name,
       description: AGENT_METADATA[agentType].description,
+    };
+
+    // Emit a "thinking" tool event to show loading while agent prepares
+    yield {
+      type: 'tool_start',
+      tool: `${agentType}_thinking`,
+      args: {},
+      description: 'Preparando resposta...',
     };
 
     // Process current message attachments
@@ -217,6 +225,14 @@ export async function* streamSupervisorAgent(input: SupervisorInput): AsyncGener
 
     // Create global file tools
     const fileTools = createFileTools(input.prisma, input.user.userId);
+
+    // End the "thinking" indicator before starting agent execution
+    yield {
+      type: 'tool_end',
+      tool: `${agentType}_thinking`,
+      result: 'Pronto',
+      success: true,
+    };
 
     // Create child run for the delegated agent
     const agentName = AGENT_METADATA[agentType].name;

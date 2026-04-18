@@ -50,6 +50,12 @@ async function bootstrap() {
 
   app.set('trust proxy', true);
 
+  // Set server timeout to 10 minutes for long-running AI requests
+  const server = app.getHttpServer();
+  server.setTimeout(600000); // 10 minutes
+  server.keepAliveTimeout = 61000; // 61 seconds (must be higher than load balancer)
+  server.headersTimeout = 62000; // 62 seconds (must be higher than keepAliveTimeout)
+
   // app.useGlobalInterceptors(new LoggingInterceptor());
   app.useGlobalPipes(
     new ValidationPipe({
@@ -66,12 +72,7 @@ async function bootstrap() {
 
   app.enableCors({
     exposedHeaders: ['Content-Disposition'],
-    origin: [
-      'https://simplesst.com.br',
-      'https://www.simplesst.com.br',
-      'https://simplesst.com',
-      'https://www.simplesst.com',
-    ],
+    origin: ['https://simplesst.com.br', 'https://www.simplesst.com.br', 'https://simplesst.com', 'https://www.simplesst.com'],
     // origin: ['https://simplesst.com', 'http://201.75.187.24'],
     ...(isDev && {
       origin: '*',

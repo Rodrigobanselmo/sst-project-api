@@ -42,25 +42,33 @@ export async function* agentToolLoop(options: AgentToolLoopOptions): AsyncGenera
     }
     useSmartNextIteration = false;
 
-    const stream = await activeLlm.stream(currentMessages, callConfig);
     let accumulated: any = null;
 
-    for await (const chunk of stream) {
-      accumulated = accumulated ? accumulated.concat(chunk) : chunk;
+    try {
+      const stream = await activeLlm.stream(currentMessages, callConfig);
 
-      const text =
-        typeof chunk.content === 'string'
-          ? chunk.content
-          : Array.isArray(chunk.content)
+      for await (const chunk of stream) {
+        accumulated = accumulated ? accumulated.concat(chunk) : chunk;
+
+        const text =
+          typeof chunk.content === 'string'
             ? chunk.content
-                .filter((c): c is { type: 'text'; text: string } => c.type === 'text')
-                .map((c) => c.text)
-                .join('')
-            : '';
+            : Array.isArray(chunk.content)
+              ? chunk.content
+                  .filter((c): c is { type: 'text'; text: string } => c.type === 'text')
+                  .map((c) => c.text)
+                  .join('')
+              : '';
 
-      if (text) {
-        yield { type: 'content', content: text };
+        if (text) {
+          yield { type: 'content', content: text };
+        }
       }
+    } catch (streamError) {
+      const errorMsg = streamError instanceof Error ? streamError.message : 'Erro desconhecido no streaming';
+      console.error('[AgentToolLoop] Stream error:', streamError);
+      yield { type: 'error', message: `Erro ao gerar resposta: ${errorMsg}` };
+      break;
     }
 
     if (!accumulated) break;

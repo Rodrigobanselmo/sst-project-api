@@ -41,7 +41,7 @@ export class StreamChatUseCase {
   async *execute(user: UserPayloadDto, input: StreamChatInput): AsyncGenerator<StreamEvent, void, undefined> {
     const llm = this.llmFactory.create({ mode: input.mode });
     // Classifier always uses the fast LLM regardless of user-selected mode
-    const classifierLlm = input.mode === 'fast' ? llm : this.llmFactory.create({ mode: 'fast' });
+    const fastLlm = input.mode === 'fast' ? llm : this.llmFactory.create({ mode: 'fast' });
     // Smarter LLM for tools that need more reasoning (e.g., propor_atualizacao_risco)
     const smarterLlm = input.mode === 'smarter' ? llm : this.llmFactory.create({ mode: 'smarter' });
 
@@ -51,7 +51,7 @@ export class StreamChatUseCase {
       attachments: input.attachments,
       prisma: this.prisma,
       llm,
-      classifierLlm,
+      fastLlm,
       smarterLlm,
       user,
       extractedContents: input.extractedContents,

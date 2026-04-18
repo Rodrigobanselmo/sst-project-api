@@ -16,12 +16,12 @@ const MODE_CONFIG: Record<AIMode, { openaiModel: OpenAIModel; geminiModel: Gemin
   fast: {
     openaiModel: 'gpt-4o-mini',
     geminiModel: 'gemini-2.5-flash',
-    maxOutputTokens: 2000,
+    maxOutputTokens: 4000, // Increased from 2000
   },
   smarter: {
     openaiModel: 'gpt-4o',
     geminiModel: 'gemini-2.5-pro',
-    maxOutputTokens: 4000,
+    maxOutputTokens: 8000, // Increased from 4000
   },
 };
 
