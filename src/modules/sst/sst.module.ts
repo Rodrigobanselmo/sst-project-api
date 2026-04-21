@@ -57,10 +57,12 @@ import { FindByIdDocumentsService } from './services/docVersion/find-by-id-docum
 import { FindDocumentsService } from './services/docVersion/find-documents/find-documents.service';
 import { CreateRecMedService } from './services/rec-med/create-rec-med/create-rec-med.service';
 import { DeleteSoftRecMedService } from './services/rec-med/delete-soft-rec-med/delete-soft-rec-med.service';
+import { SyncMissingDerivedMeasureAfterRecMedUpdateService } from './services/rec-med/sync-missing-derived-measure-after-rec-med-update/sync-missing-derived-measure-after-rec-med-update.service';
 import { UpdateRecMedService } from './services/rec-med/update-rec-med/update-rec-med.service';
 import { UpsertRiskDataRecService } from './services/risk-data-rec/upsert-risk-data-rec/upsert-risk-data-rec.service';
 import { DeleteManyRiskDataService } from './services/risk-data/delete-many-risk-data/delete-many-risk-data.service';
 import { FindAllActionPlanService } from './services/risk-data/find-all-action-plan/find-all-action-plan.service';
+import { SyncDerivedMeasuresFromPlanService } from './services/risk-data/sync-derived-measures-from-plan/sync-derived-measures-from-plan.service';
 import { FindAllByGroupAndRiskService } from './services/risk-data/find-by-group-risk/find-by-group-risk.service';
 import { FindAllByHierarchyService } from './services/risk-data/find-by-hierarchy/find-by-hierarchy.service';
 import { FindAllByHomogeneousGroupService } from './services/risk-data/find-by-homogeneous-group/find-by-homogeneous-group.service';
@@ -139,6 +141,7 @@ import { CacheModule } from '@nestjs/cache-manager';
     ExamRiskRepository,
     ExamToClinicRepository,
     FindAllActionPlanService,
+    SyncDerivedMeasuresFromPlanService,
     FindAllAvailableRiskService,
     FindAllByCompanyService,
     FindAllByGroupAndRiskService,
@@ -164,6 +167,7 @@ import { CacheModule } from '@nestjs/cache-manager';
     UpdateEpiService,
     UpdateExamService,
     UpdateGenerateSourceService,
+    SyncMissingDerivedMeasureAfterRecMedUpdateService,
     UpdateRecMedService,
     UpdateRiskService,
     UpsertExamToClinicService,

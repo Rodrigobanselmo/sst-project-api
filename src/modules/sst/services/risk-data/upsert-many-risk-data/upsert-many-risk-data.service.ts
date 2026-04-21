@@ -10,6 +10,7 @@ import { RiskGroupDataRepository } from '../../../repositories/implementations/R
 import { hierarchyCreateHomo } from '../upsert-risk-data/upsert-risk.service';
 import { CheckEmployeeExamService } from '../../exam/check-employee-exam/check-employee-exam.service';
 import { PrismaService } from '../../../../../prisma/prisma.service';
+import { SyncMissingDerivedMeasureAfterRecMedUpdateService } from '../../rec-med/sync-missing-derived-measure-after-rec-med-update/sync-missing-derived-measure-after-rec-med-update.service';
 
 @Injectable()
 export class UpsertManyRiskDataService {
@@ -21,6 +22,7 @@ export class UpsertManyRiskDataService {
     private readonly employeePPPHistoryRepository: EmployeePPPHistoryRepository,
     private readonly checkEmployeeExamService: CheckEmployeeExamService,
     private readonly prisma: PrismaService,
+    private readonly syncMissingDerivedMeasureAfterRecMedUpdate: SyncMissingDerivedMeasureAfterRecMedUpdateService,
   ) {}
 
   async execute(upsertRiskDataDto: UpsertManyRiskDataDto) {
@@ -255,6 +257,10 @@ export class UpsertManyRiskDataService {
               risk_data_id: existingRiskData.id,
             },
           });
+        }
+
+        if (recData.recType != null) {
+          await this.syncMissingDerivedMeasureAfterRecMedUpdate.execute(recMed.id, companyId);
         }
       }
     }
@@ -499,6 +505,7 @@ export class UpsertManyRiskDataService {
         });
 
         if (recMed) {
+          await this.riskDataRepository.assertRecMedUnlinkAllowedByActionPlanOrThrow(existingRiskData.id, recMed.id);
           // Delete the junction table entry
           await this.prisma.recMedOnRiskData.deleteMany({
             where: {

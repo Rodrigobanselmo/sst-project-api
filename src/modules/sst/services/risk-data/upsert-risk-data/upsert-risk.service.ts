@@ -9,6 +9,8 @@ import { CheckEmployeeExamService } from '../../exam/check-employee-exam/check-e
 import { EmployeePPPHistoryRepository } from './../../../../company/repositories/implementations/EmployeePPPHistoryRepository';
 import { RiskGroupDataRepository } from './../../../../../modules/sst/repositories/implementations/RiskGroupDataRepository';
 import { PrismaService } from '../../../../../prisma/prisma.service';
+import { SyncMissingDerivedMeasureAfterRecMedUpdateService } from '../../rec-med/sync-missing-derived-measure-after-rec-med-update/sync-missing-derived-measure-after-rec-med-update.service';
+import { tryPromoteResidualToCurrentWhenPlanFullyImplemented } from '../../../../../@v2/security/action-plan/database/utils/try-promote-residual-to-current-when-plan-fully-implemented';
 
 @Injectable()
 export class UpsertRiskDataService {
@@ -20,7 +22,35 @@ export class UpsertRiskDataService {
     private readonly employeePPPHistoryRepository: EmployeePPPHistoryRepository,
     private readonly checkEmployeeExamService: CheckEmployeeExamService,
     private readonly prisma: PrismaService,
+    private readonly syncMissingDerivedMeasureAfterRecMedUpdate: SyncMissingDerivedMeasureAfterRecMedUpdateService,
   ) {}
+
+  /**
+   * Fluxo da tela de Caracterização salva por `POST /risk-data` e pode regravar `probability`.
+   * Para manter a regra do Plano de Ação, tenta re-promover residual->atual em todos
+   * os workspaces que tenham itens de plano para este risco-dado.
+   */
+  private async tryPromoteFromExistingPlanWorkspaces(
+    riskFactorDataId: string,
+    companyId: string,
+  ): Promise<void> {
+    const workspaceRows = await this.prisma.riskFactorDataRec.findMany({
+      where: { riskFactorDataId, companyId },
+      select: { workspaceId: true },
+      distinct: ['workspaceId'],
+    });
+    if (!workspaceRows.length) return;
+
+    await this.prisma.$transaction(async (tx) => {
+      for (const row of workspaceRows) {
+        await tryPromoteResidualToCurrentWhenPlanFullyImplemented(tx, {
+          riskFactorDataId,
+          workspaceId: row.workspaceId,
+          companyId,
+        });
+      }
+    });
+  }
 
   async execute(upsertRiskDataDto: UpsertRiskDataDto) {
     const keepEmpty = upsertRiskDataDto.keepEmpty;
@@ -124,6 +154,11 @@ export class UpsertRiskDataService {
       await this.updateAddOnlyFields(addOnlyDto, riskData);
     }
 
+    await this.tryPromoteFromExistingPlanWorkspaces(
+      riskData.id,
+      upsertRiskDataDto.companyId,
+    );
+
     return riskData;
   }
 
@@ -199,6 +234,10 @@ export class UpsertRiskDataService {
               risk_data_id: existingRiskData.id,
             },
           });
+        }
+
+        if (recData.recType != null) {
+          await this.syncMissingDerivedMeasureAfterRecMedUpdate.execute(recMed.id, restDto.companyId);
         }
       }
     }

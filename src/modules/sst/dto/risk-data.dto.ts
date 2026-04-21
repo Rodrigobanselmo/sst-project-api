@@ -336,6 +336,19 @@ export class DeleteManyRiskDataDto {
   ids: string[];
 }
 
+export class SyncDerivedMeasuresFromPlanDto {
+  @IsString()
+  riskFactorGroupDataId: string;
+
+  @IsString()
+  workspaceId: string;
+
+  /** Alinha escopo com GET `/risk-group-data/:companyId` quando o JWT ainda usa outro `companyId` base (ex.: modal de caracterização). */
+  @IsString()
+  @IsOptional()
+  companyId?: string;
+}
+
 export class FindRiskDataDto extends PaginationQueryDto {
   @IsString()
   @IsOptional()

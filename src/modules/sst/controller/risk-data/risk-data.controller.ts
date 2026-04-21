@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 
 import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
@@ -9,9 +9,16 @@ import { FindAllActionPlanService } from '../../services/risk-data/find-all-acti
 import { FindAllByGroupAndRiskService } from '../../services/risk-data/find-by-group-risk/find-by-group-risk.service';
 import { FindAllByHierarchyService } from '../../services/risk-data/find-by-hierarchy/find-by-hierarchy.service';
 import { FindAllByHomogeneousGroupService } from '../../services/risk-data/find-by-homogeneous-group/find-by-homogeneous-group.service';
+import { SyncDerivedMeasuresFromPlanService } from '../../services/risk-data/sync-derived-measures-from-plan/sync-derived-measures-from-plan.service';
 import { UpsertManyRiskDataService } from '../../services/risk-data/upsert-many-risk-data/upsert-many-risk-data.service';
 import { UpsertRiskDataService } from '../../services/risk-data/upsert-risk-data/upsert-risk.service';
-import { DeleteManyRiskDataDto, FindRiskDataDto, UpsertManyRiskDataDto, UpsertRiskDataDto } from '../../dto/risk-data.dto';
+import {
+  DeleteManyRiskDataDto,
+  FindRiskDataDto,
+  SyncDerivedMeasuresFromPlanDto,
+  UpsertManyRiskDataDto,
+  UpsertRiskDataDto,
+} from '../../dto/risk-data.dto';
 
 @Controller('risk-data')
 export class RiskDataController {
@@ -23,7 +30,30 @@ export class RiskDataController {
     private readonly findAllByHierarchyService: FindAllByHierarchyService,
     private readonly deleteManyRiskDataService: DeleteManyRiskDataService,
     private readonly findAllActionPlanService: FindAllActionPlanService,
+    private readonly syncDerivedMeasuresFromPlanService: SyncDerivedMeasuresFromPlanService,
   ) {}
+
+  @Permissions({
+    code: PermissionEnum.RISK_DATA,
+    crud: 'cu',
+    isContract: true,
+    isMember: true,
+  })
+  @Post('sync-derived-measures-from-plan')
+  syncDerivedMeasuresFromPlan(
+    @User() userPayloadDto: UserPayloadDto,
+    @Body() dto: SyncDerivedMeasuresFromPlanDto,
+  ) {
+    const companyId = dto.companyId ?? userPayloadDto.targetCompanyId;
+    if (!companyId) {
+      throw new BadRequestException('Company ID is missing');
+    }
+    return this.syncDerivedMeasuresFromPlanService.execute(
+      dto.riskFactorGroupDataId,
+      dto.workspaceId,
+      companyId,
+    );
+  }
 
   @Permissions({
     code: PermissionEnum.RISK_DATA,

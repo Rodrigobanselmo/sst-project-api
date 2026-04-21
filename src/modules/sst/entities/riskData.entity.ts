@@ -18,7 +18,7 @@ import { EpiEntity } from './epi.entity';
 import { GenerateSourceEntity } from './generateSource.entity';
 import { RecMedEntity } from './recMed.entity';
 import { RiskFactorsEntity } from './risk.entity';
-import { Prisma, RiskFactorData } from '.prisma/client';
+import { Prisma, RiskFactorData, StatusEnum } from '.prisma/client';
 import { RiskDataRecEntity } from './riskDataRec.entity';
 import { EpiRiskDataEntity } from './epiRiskData.entity';
 import { EngsRiskDataEntity } from './engsRiskData.entity';
@@ -51,6 +51,12 @@ export class RiskFactorDataEntity implements RiskFactorData {
   exams?: ExamEntity[];
   exposure: ExposureTypeEnum | null;
   dataRecs?: RiskDataRecEntity[];
+  riskFactorDataRecDerivedMeasures?: {
+    derivedRecMedId: string;
+    sourceRecMedId: string;
+    workspaceId: string;
+    riskFactorDataRec: { status: StatusEnum };
+  }[];
   level: number;
   json: Prisma.JsonValue;
   activities: Prisma.JsonValue | null;

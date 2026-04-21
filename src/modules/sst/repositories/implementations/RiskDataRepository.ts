@@ -2,13 +2,13 @@ import { m2mGetDeletedIds } from './../../../../shared/utils/m2mFilterIds';
 import { isEnvironment } from '../../../../shared/utils/isEnvironment';
 import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { removeDuplicate } from '../../../../shared/utils/removeDuplicate';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { FindRiskDataDto, UpsertManyRiskDataDto, UpsertRiskDataDto } from '../../dto/risk-data.dto';
 import { IRiskFactorDataEntity, RiskFactorDataEntity } from '../../entities/riskData.entity';
-import { Prisma, PrismaPromise } from '@prisma/client';
+import { Prisma, PrismaPromise, StatusEnum } from '@prisma/client';
 import { getMatrizRisk } from '../../../../shared/utils/matriz';
 import { EpiRiskDataEntity } from '../../entities/epiRiskData.entity';
 import { EpiRoRiskDataDto } from '../../dto/epi-risk-data.dto';
@@ -21,6 +21,51 @@ import { v4 } from 'uuid';
 @Injectable()
 export class RiskDataRepository {
   constructor(private prisma: PrismaService) {}
+
+  /**
+   * Bloqueia desvincular recomendação do risco-dado se existir item no Plano de Ação
+   * com status diferente de Pendente (rastreabilidade).
+   */
+  async assertRecMedUnlinkAllowedByActionPlanOrThrow(riskFactorDataId: string, recMedId: string): Promise<void> {
+    const blocking = await this.prisma.riskFactorDataRec.findFirst({
+      where: {
+        riskFactorDataId,
+        recMedId,
+        status: { not: StatusEnum.PENDING },
+      },
+      select: { id: true, status: true },
+    });
+    if (blocking) {
+      throw new BadRequestException(
+        'Não é possível excluir esta recomendação: o item correspondente no Plano de Ação já possui status diferente de Pendente (Iniciado, Concluído ou Cancelado).',
+      );
+    }
+  }
+
+  private async ensureRecRemovalsAllowedByActionPlan(riskFactorDataId: string, nextRecMedIds: string[]): Promise<void> {
+    const existing = await this.prisma.recMedOnRiskData.findMany({
+      where: { risk_data_id: riskFactorDataId },
+      select: { rec_med_id: true },
+    });
+    const next = new Set(nextRecMedIds);
+    const removed = existing.map((e) => e.rec_med_id).filter((rid) => !next.has(rid));
+    if (removed.length === 0) return;
+
+    const blocking = await this.prisma.riskFactorDataRec.findFirst({
+      where: {
+        riskFactorDataId,
+        recMedId: { in: removed },
+        status: { not: StatusEnum.PENDING },
+      },
+      select: { recMedId: true },
+    });
+    if (blocking) {
+      throw new BadRequestException(
+        'Não é possível excluir esta recomendação: o item correspondente no Plano de Ação já possui status diferente de Pendente (Iniciado, Concluído ou Cancelado).',
+      );
+    }
+  }
+
   async upsert(upsertRiskDataDto: Omit<UpsertRiskDataDto, 'keepEmpty' | 'type'>): Promise<RiskFactorDataEntity> {
     const level = await this.addLevel(upsertRiskDataDto);
     if (level) upsertRiskDataDto.level = level;
@@ -240,6 +285,23 @@ export class RiskDataRepository {
             recMed: true,
           },
         },
+        dataRecs: {
+          select: {
+            id: true,
+            status: true,
+            recMedId: true,
+            workspaceId: true,
+            riskFactorDataId: true,
+          },
+        },
+        riskFactorDataRecDerivedMeasures: {
+          select: {
+            derivedRecMedId: true,
+            sourceRecMedId: true,
+            workspaceId: true,
+            riskFactorDataRec: { select: { status: true } },
+          },
+        },
         epiToRiskFactorData: { include: { epi: true } },
         engsToRiskFactorData: { include: { recMed: true } },
         examsToRiskFactorData: { include: { exam: true } },
@@ -391,6 +453,11 @@ export class RiskDataRepository {
     }
 
     if (!createId) createId = v4();
+
+    const targetRiskDataId = id || createId;
+    if (recs !== undefined) {
+      await this.ensureRecRemovalsAllowedByActionPlan(targetRiskDataId, recs);
+    }
 
     const riskData = (await this.prisma.riskFactorData.upsert({
       create: {
@@ -544,6 +611,10 @@ export class RiskDataRepository {
     }
 
     const createId = id || v4();
+
+    if (recs !== undefined) {
+      await this.ensureRecRemovalsAllowedByActionPlan(id || createId, recs);
+    }
 
     const riskData = (await this.prisma.riskFactorData.upsert({
       create: {

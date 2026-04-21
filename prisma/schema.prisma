@@ -332,10 +332,11 @@ model Company {
   professionalsResponsibles  ProfessionalCouncilResponsible[]
   protocol                   Protocol[]
   protocolToRisk             ProtocolToRisk[]
-  recMed                     RecMed[]
-  riskFactorData             RiskFactorData[]
-  riskFactorDataRec          RiskFactorDataRec[]
-  riskFactorDocument         RiskFactorDocument[]
+  recMed                            RecMed[]
+  riskFactorData                    RiskFactorData[]
+  riskFactorDataRec                 RiskFactorDataRec[]
+  riskFactorDataRecDerivedMeasures  RiskFactorDataRecDerivedMeasure[]
+  riskFactorDocument                RiskFactorDocument[]
   riskFactorGroupData        RiskFactorGroupData[]
   riskFactors                RiskFactors[]
   riskDocInfo                RiskFactorsDocInfo[]
@@ -1930,6 +1931,8 @@ model RecMed {
   generateSource                      GenerateSource?                       @relation(fields: [generateSourceId], references: [id], onDelete: Cascade)
   risk                                RiskFactors                           @relation(fields: [riskId], references: [id], onDelete: Cascade)
   dataRecs                            RiskFactorDataRec[]
+  derivedMeasuresAsSource             RiskFactorDataRecDerivedMeasure[]     @relation("RecMedDerivedMeasureSource")
+  derivedMeasuresAsDerived            RiskFactorDataRecDerivedMeasure[]     @relation("RecMedDerivedMeasureDerived")
   engsToRiskFactorData                EngsToRiskFactorData[]
   adms                                RiskFactorData[]                      @relation("adms")
   recs                                RecMedOnRiskData[]
@@ -2131,6 +2134,7 @@ model RiskFactorData {
   riskFactorGroupData                 RiskFactorGroupData                   @relation(fields: [riskFactorGroupDataId], references: [id])
   riskFactor                          RiskFactors                           @relation(fields: [riskId], references: [id])
   dataRecs                            RiskFactorDataRec[]
+  riskFactorDataRecDerivedMeasures    RiskFactorDataRecDerivedMeasure[]
   probabilityAfterCalc                RiskFactorProbability?                @relation("RiskFactorProbabilityAfter")
   probabilityCalc                     RiskFactorProbability?                @relation("RiskFactorProbabilityBefore")
   epiToRiskFactorData                 EpiToRiskFactorData[]
@@ -2199,11 +2203,35 @@ model RiskFactorDataRec {
   responsible_updated_at  DateTime?
   responsible_notified_at DateTime?
 
-  comments RiskFactorDataRecComments[]
-  photos   RiskFactorDataRecPhoto[]
-  Task     Task[]
+  comments      RiskFactorDataRecComments[]
+  photos        RiskFactorDataRecPhoto[]
+  Task          Task[]
+  derivedMeasure RiskFactorDataRecDerivedMeasure?
 
   @@unique([riskFactorDataId, recMedId, workspaceId])
+}
+
+model RiskFactorDataRecDerivedMeasure {
+  id                   String             @id @default(uuid())
+  riskFactorDataRecId  String             @unique
+  sourceRecMedId       String
+  derivedRecMedId      String
+  riskFactorDataId     String
+  workspaceId          String
+  companyId            String
+  destinationMedType   MeasuresTypeEnum
+  sourceRecType        RecTypeEnum?
+  created_at           DateTime           @default(now())
+  updated_at           DateTime           @updatedAt
+
+  riskFactorDataRec RiskFactorDataRec @relation(fields: [riskFactorDataRecId], references: [id], onDelete: Cascade)
+  sourceRecMed      RecMed            @relation("RecMedDerivedMeasureSource", fields: [sourceRecMedId], references: [id], onDelete: Restrict)
+  derivedRecMed     RecMed            @relation("RecMedDerivedMeasureDerived", fields: [derivedRecMedId], references: [id], onDelete: Restrict)
+  riskFactorData    RiskFactorData    @relation(fields: [riskFactorDataId], references: [id], onDelete: Cascade)
+  workspace         Workspace         @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  company           Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([riskFactorDataId, sourceRecMedId, workspaceId])
 }
 
 model RiskFactorDataRecPhoto {
@@ -2605,8 +2633,9 @@ model Workspace {
   hierarchy                 Hierarchy[]                 @relation("HierarchyToWorkspace")
   homogeneousGroup          HomogeneousGroup[]
   documentData              DocumentData[]
-  RiskFactorDataRec         RiskFactorDataRec[]
-  DocumentControl           DocumentControl[]
+  RiskFactorDataRec                 RiskFactorDataRec[]
+  riskFactorDataRecDerivedMeasures  RiskFactorDataRecDerivedMeasure[]
+  DocumentControl                   DocumentControl[]
   FormParticipantsWorkspace FormParticipantsWorkspace[]
   ActionPlanRules           ActionPlanRules[]
 
