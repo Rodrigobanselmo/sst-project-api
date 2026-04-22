@@ -264,7 +264,7 @@ export class ElementsMapClass {
     [DocumentSectionChildrenTypeEnum.QUANTITY_CONSIDERATION_TABLES]: () => considerationsQuantityTable((x, v) => this.convertToDocx(x, v)),
     [DocumentSectionChildrenTypeEnum.HIERARCHY_ORG_TABLE]: () =>
       hierarchyHomoOrgSection(this.hierarchy, this.homogeneousGroup, {
-        showDescription: false,
+        showDescription: true,
         showHomogeneous: false,
         showHomogeneousDescription: false,
       })['children'],

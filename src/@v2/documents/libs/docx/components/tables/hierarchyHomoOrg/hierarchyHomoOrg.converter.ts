@@ -50,7 +50,6 @@ export const hierarchyPlanConverter = (
     groupIdFilter: undefined,
   },
 ) => {
-  let hasAtLeastOneDescription = false;
   const allHierarchyPlan = {} as Record<string, IHierarchyPlan<any>>;
   const hierarchyColumns = {} as Record<string, number>;
 
@@ -60,8 +59,6 @@ export const hierarchyPlanConverter = (
 
       const org = [...hierarchyList, 'EMPLOYEE'].map((orgType) => {
         const hierarchyData = hierarchiesData.org.find((org) => org.typeEnum === orgType);
-
-        if (hierarchiesData.descRh) hasAtLeastOneDescription = true;
 
         if (!hierarchyData) {
           return {
@@ -254,9 +251,9 @@ export const hierarchyPlanConverter = (
     // const isSubOffice = row[row.length - 1].isSubOffice;
     const description = row[row.length - 1].description;
 
-    if (showDescription && hasAtLeastOneDescription)
+    if (showDescription)
       row[row.length] = {
-        text: description,
+        text: description != null && description !== '' ? String(description) : '',
         borders: borderStyleGlobal(palette.common.white.string),
       };
     row[row.length] = {
@@ -266,7 +263,7 @@ export const hierarchyPlanConverter = (
     };
   });
 
-  if (showDescription && hasAtLeastOneDescription)
+  if (showDescription)
     headerData[headerData.length] = {
       text: 'Descrição do cargo',
       borders: borderStyleGlobal(palette.common.white.string),
