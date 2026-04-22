@@ -5,13 +5,13 @@ import { DocumentPGRModel } from '@/@v2/documents/domain/models/document-pgr.mod
 import { ISectionChildrenType } from '../../../../../domain/types/elements.types';
 import { DocumentChildrenTypeEnum } from '../../../../../domain/enums/document-children-type.enum';
 import { IChapter, ICover, ISection } from '../../../../../domain/types/section.types';
-import { sectionLandscapeProperties } from '../../../base/config/styles';
+import { sectionLandscapeActionPlanAnnexProperties, sectionLandscapeProperties } from '../../../base/config/styles';
 import { chapterSection } from '../../../base/layouts/chapter/chapter';
 import { coverSections } from '../../../base/layouts/cover/cover';
 import { headerAndFooter } from '../../../base/layouts/headerAndFooter/headerAndFooter';
 import { summarySections } from '../../../base/layouts/summary/summary';
 import { allCharacterizationSections } from '../../../components/iterables/all-characterization/all-characterization.sections';
-import { actionPlanTableSection } from '../../../components/tables/actionPlan/actionPlan.section';
+import { actionPlanAnnexSectionHeadersFooters, actionPlanTableSection } from '../../../components/tables/actionPlan/actionPlan.section';
 import { APPRTableSection } from '../../../components/tables/appr/appr.section';
 import { APPRByGroupTableSection } from '../../../components/tables/apprByGroup/appr-group.section';
 import { dataConverter } from '../../../converter/data.converter';
@@ -98,11 +98,15 @@ export class SectionsMapClass {
         this.lastChapterFooterTemplate = fromTitleChild;
       }
 
+      const includesActionPlanTable = Boolean(children?.some((c) => c.type === DocumentChildrenTypeEnum.PLAN_TABLE));
+
       const mainSection: ISectionOptions = {
         children: this.convertToDocx(children),
-        ...this.getFooterHeader(rawChapterFooterTemplate),
+        ...(includesActionPlanTable
+          ? actionPlanAnnexSectionHeadersFooters()
+          : this.getFooterHeader(rawChapterFooterTemplate)),
         ...rest,
-        ...sectionLandscapeProperties,
+        ...(includesActionPlanTable ? sectionLandscapeActionPlanAnnexProperties : sectionLandscapeProperties),
       };
 
       // Subcapas por anexo ficam no início de cada ficheiro de anexo e no consolidado (document-pgr.product),
@@ -131,7 +135,14 @@ export class SectionsMapClass {
         isHideCA: Boolean(this.variables[VariablesPGREnum.IS_HIDE_CA]),
         isHideOrigin: Boolean(this.variables[VariablesPGREnum.IS_HIDE_ORIGIN_COLUMN]),
       }),
-    [DocumentSectionTypeEnum.ACTION_PLAN]: () => actionPlanTableSection(this.oldData.documentRiskData, this.oldData.hierarchyTree),
+    [DocumentSectionTypeEnum.ACTION_PLAN]: () => {
+      const plan = actionPlanTableSection(this.oldData.documentRiskData, this.oldData.hierarchyTree);
+      return {
+        ...actionPlanAnnexSectionHeadersFooters(),
+        ...plan,
+        properties: sectionLandscapeActionPlanAnnexProperties,
+      };
+    },
 
     // *PERICULOSIDADE string --------------------->
     [DocumentSectionTypeEnum.PERICULOSIDADE_ACTIVITIES]: (): ISectionOptions[] =>

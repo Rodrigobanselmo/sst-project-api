@@ -11,22 +11,27 @@ export const firstRiskInventoryTableSection = (
   homoGroupTree: IHomoGroupMap,
   hierarchyData: HierarchyMapData,
   isByGroup: boolean,
+  options?: { omitInventoryBannerRow?: boolean },
 ) => {
   const riskInventoryData = documentConverter(riskFactorGroupData, homoGroupTree, hierarchyData, isByGroup);
 
   const tableHeaderElements = new TableHeaderElements();
   const tableBodyElements = new TableBodyElements();
 
+  const bannerRow =
+    options?.omitInventoryBannerRow === true
+      ? []
+      : [
+          tableHeaderElements.headerTitle({
+            text: 'INVENTÁRIO DE RISCO (APP/APR)',
+            columnSpan: firstRiskInventoryHeader.length,
+            borders: borderBottomStyle,
+          }),
+        ];
+
   const table = new Table({
     width: { size: 100, type: WidthType.PERCENTAGE },
-    rows: [
-      tableHeaderElements.headerTitle({
-        text: 'INVENTÁRIO DE RISCO (APP/APR)',
-        columnSpan: firstRiskInventoryHeader.length,
-        borders: borderBottomStyle,
-      }),
-      ...riskInventoryData.map((data) => tableBodyElements.tableRow(data.map(tableBodyElements.tableCell))),
-    ],
+    rows: [...bannerRow, ...riskInventoryData.map((data) => tableBodyElements.tableRow(data.map(tableBodyElements.tableCell)))],
   });
 
   return table;

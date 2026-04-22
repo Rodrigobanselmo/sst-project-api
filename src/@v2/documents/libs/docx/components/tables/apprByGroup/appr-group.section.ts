@@ -1,10 +1,12 @@
 import { HomoTypeEnum } from '@prisma/client';
-import { ISectionOptions, PageOrientation, Paragraph, Table } from 'docx';
+import { ISectionOptions, Paragraph, Table } from 'docx';
 
 import { removeDuplicate } from '@/@v2/shared/utils/helpers/remove-duplicate';
 import { sortString } from '@/@v2/shared/utils/sorts/string.sort';
+import { sectionLandscapeRiskInventoryAnnexProperties } from '../../../base/config/styles';
 import { originRiskMap } from '../../../constants/origin-risk';
 import { HierarchyMapData, IDocumentRiskGroupDataConverter, IGHODataConverter, IHierarchyData, IHierarchyDataConverter, IHierarchyMap, IHomoGroupMap } from '../../../converter/hierarchy.converter';
+import { riskInventoryAnnexByGseHeadersFooters } from '../appr/riskInventoryAnnexSectionFrame';
 import { officeRiskInventoryTableSection } from './parts/2-offices/offices.table';
 import { firstRiskInventoryTableSection } from './parts/first/first.table';
 import { secondRiskInventoryTableSection } from './parts/second/second.table';
@@ -132,7 +134,9 @@ export const APPRByGroupTableSection = (
 
       const episDeduplicated = epis.filter((epi, index, self) => index === self.findIndex((t) => t.ca === epi.ca));
 
-      const firstTable = firstRiskInventoryTableSection(riskFactorGroupData, homoGroupTree, hierarchy, isByGroup);
+      const firstTable = firstRiskInventoryTableSection(riskFactorGroupData, homoGroupTree, hierarchy, isByGroup, {
+        omitInventoryBannerRow: true,
+      });
       const officeTable = officeRiskInventoryTableSection(hierarchy);
       const secondTable = secondRiskInventoryTableSection(hierarchy, isByGroup);
       const epiTable = epiRiskInventoryTableSection(episDeduplicated, options.isHideCA);
@@ -145,12 +149,8 @@ export const APPRByGroupTableSection = (
 
   const setSection = (tables: any[]) => ({
     children: [...tables],
-    properties: {
-      page: {
-        margin: { left: 500, right: 500, top: 500, bottom: 500 },
-        size: { orientation: PageOrientation.LANDSCAPE },
-      },
-    },
+    ...riskInventoryAnnexByGseHeadersFooters(),
+    properties: sectionLandscapeRiskInventoryAnnexProperties,
   });
 
   return sectionsTables.map((table) => setSection(table));

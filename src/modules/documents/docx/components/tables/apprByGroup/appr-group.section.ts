@@ -2,9 +2,10 @@ import { DocumentDataEntity } from './../../../../../sst/entities/documentData.e
 import { DocumentDataPGRDto } from './../../../../../sst/dto/document-data-pgr.dto';
 import { HierarchyEntity } from './../../../../../company/entities/hierarchy.entity';
 import { HomoTypeEnum } from '@prisma/client';
-import { ISectionOptions, PageOrientation } from 'docx';
+import { ISectionOptions } from 'docx';
 import { removeDuplicate } from '../../../../../../shared/utils/removeDuplicate';
 
+import { sectionLandscapeRiskInventoryAnnexProperties } from '../../../base/config/styles';
 import { originRiskMap } from '../../../../../../shared/constants/maps/origin-risk';
 import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
 import { HomoGroupEntity } from '../../../../../company/entities/homoGroup.entity';
@@ -12,6 +13,7 @@ import { HierarchyMapData, IHierarchyData, IHierarchyMap, IHomoGroupMap } from '
 import { firstRiskInventoryTableSection } from './parts/first/first.table';
 import { secondRiskInventoryTableSection } from './parts/second/second.table';
 import { thirdRiskInventoryTableSection } from './parts/third/third.table';
+import { riskInventoryAnnexByGseHeadersFooters } from '../appr/riskInventoryAnnexSectionFrame';
 import { officeRiskInventoryTableSection } from './parts/2-offices/offices.table';
 import { sortString } from '../../../../../../shared/utils/sorts/string.sort';
 
@@ -127,7 +129,9 @@ export const APPRByGroupTableSection = (
 
   hierarchyDataHomoGroup.forEach((hierarchy) => {
     const createTable = () => {
-      const firstTable = firstRiskInventoryTableSection(riskFactorGroupData, homoGroupTree, hierarchy, isByGroup);
+      const firstTable = firstRiskInventoryTableSection(riskFactorGroupData, homoGroupTree, hierarchy, isByGroup, {
+        omitInventoryBannerRow: true,
+      });
       const officeTable = officeRiskInventoryTableSection(hierarchy);
       const secondTable = secondRiskInventoryTableSection(hierarchy, isByGroup);
       const thirdTable = thirdRiskInventoryTableSection(riskFactorGroupData, hierarchy, hierarchyTree);
@@ -139,12 +143,8 @@ export const APPRByGroupTableSection = (
 
   const setSection = (tables: any[]) => ({
     children: [...tables],
-    properties: {
-      page: {
-        margin: { left: 500, right: 500, top: 500, bottom: 500 },
-        size: { orientation: PageOrientation.LANDSCAPE },
-      },
-    },
+    ...riskInventoryAnnexByGseHeadersFooters(),
+    properties: sectionLandscapeRiskInventoryAnnexProperties,
   });
 
   return sectionsTables.map((table) => setSection(table));

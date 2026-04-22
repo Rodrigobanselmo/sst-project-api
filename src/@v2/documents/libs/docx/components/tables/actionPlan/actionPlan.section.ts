@@ -1,10 +1,13 @@
 import { ISectionOptions, PageOrientation, Table, WidthType } from 'docx';
 
+import { sectionTitleOnlyHeadersFooters } from '../../../base/layouts/annex/sectionTitleOnlyHeadersFooters';
 import { IDocumentRiskGroupDataConverter, IHierarchyMap } from '../../../converter/hierarchy.converter';
-import { actionPlanHeader, actionPlanTitle } from './actionPlan.constant';
+import { actionPlanHeader, actionPlanSectionTitle } from './actionPlan.constant';
 import { actionPlanConverter } from './actionPlan.converter';
 import { TableBodyElements } from './elements/body';
 import { TableHeaderElements } from './elements/header';
+
+export const actionPlanAnnexSectionHeadersFooters = () => sectionTitleOnlyHeadersFooters(actionPlanSectionTitle);
 
 export const actionPlanTableSection = (document: IDocumentRiskGroupDataConverter, hierarchyTree: IHierarchyMap) => {
   const actionPlanData = actionPlanConverter(document.riskGroupData, document.documentVersion, hierarchyTree);
@@ -15,7 +18,6 @@ export const actionPlanTableSection = (document: IDocumentRiskGroupDataConverter
   const table = new Table({
     width: { size: 100, type: WidthType.PERCENTAGE },
     rows: [
-      tableHeaderElements.headerTitle(actionPlanTitle, actionPlanHeader.length),
       tableHeaderElements.headerRow(actionPlanHeader.map(tableHeaderElements.headerCell)),
       ...actionPlanData.map((data) => tableBodyElements.tableRow(data.map(tableBodyElements.tableCell))),
     ],

@@ -3,11 +3,15 @@ import { DocumentDataPGRDto } from './../../../../../sst/dto/document-data-pgr.d
 import { PageOrientation, Table, WidthType } from 'docx';
 
 import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
+import { sectionTitleOnlyHeadersFooters } from '../../../base/layouts/annex/sectionTitleOnlyHeadersFooters';
 import { IHierarchyMap } from '../../../converter/hierarchy.converter';
-import { actionPlanHeader, actionPlanTitle } from './actionPlan.constant';
+import { actionPlanHeader, actionPlanSectionTitle } from './actionPlan.constant';
 import { actionPlanConverter } from './actionPlan.converter';
 import { TableBodyElements } from './elements/body';
 import { TableHeaderElements } from './elements/header';
+
+/** Cabeçalho/rodapé exclusivos do anexo Plano de Ação: só o título no header; rodapé vazio (sem logo/página/versão). */
+export const actionPlanAnnexSectionHeadersFooters = () => sectionTitleOnlyHeadersFooters(actionPlanSectionTitle);
 
 export const actionPlanTableSection = (
   riskFactorGroupData: RiskFactorGroupDataEntity & DocumentDataEntity & DocumentDataPGRDto,
@@ -21,7 +25,6 @@ export const actionPlanTableSection = (
   const table = new Table({
     width: { size: 100, type: WidthType.PERCENTAGE },
     rows: [
-      tableHeaderElements.headerTitle(actionPlanTitle, actionPlanHeader.length),
       tableHeaderElements.headerRow(actionPlanHeader.map(tableHeaderElements.headerCell)),
       ...actionPlanData.map((data) => tableBodyElements.tableRow(data.map(tableBodyElements.tableCell))),
     ],

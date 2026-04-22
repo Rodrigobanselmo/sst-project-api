@@ -1,9 +1,11 @@
 import { HierarchyEnum } from '@prisma/client';
-import { ISectionOptions, PageOrientation, Paragraph, Table } from 'docx';
+import { ISectionOptions, Paragraph, Table } from 'docx';
 
 import { asyncBatch } from '@/@v2/shared/utils/helpers/async-batch';
 import { sortString } from '@/@v2/shared/utils/sorts/string.sort';
+import { sectionLandscapeRiskInventoryAnnexProperties } from '../../../base/config/styles';
 import { HierarchyMapData, IDocumentRiskGroupDataConverter, IHierarchyData, IHomoGroupMap } from '../../../converter/hierarchy.converter';
+import { riskInventoryAnnexByJobHeadersFooters } from './riskInventoryAnnexSectionFrame';
 import { simulateAwait } from '../../../helpers/simulate-await';
 import { epiRiskInventoryTableSection } from './parts/epi/epi.table';
 import { firstRiskInventoryTableSection } from './parts/first/first.table';
@@ -39,7 +41,9 @@ export const APPRTableSection = async (
 
       const episDeduplicated = epis.filter((epi, index, self) => index === self.findIndex((t) => t.ca === epi.ca));
 
-      const firstTable = firstRiskInventoryTableSection(riskFactorGroupData, homoGroupTree, hierarchy, isByGroup);
+      const firstTable = firstRiskInventoryTableSection(riskFactorGroupData, homoGroupTree, hierarchy, isByGroup, {
+        omitInventoryBannerRow: true,
+      });
       const secondTable = secondRiskInventoryTableSection(hierarchy, isByGroup);
       const epiTable = epiRiskInventoryTableSection(episDeduplicated, options.isHideCA);
       const thirdTable = thirdRiskInventoryTableSection(riskFactorGroupData, hierarchy, isByGroup, options);
@@ -86,12 +90,8 @@ export const APPRTableSection = async (
 
   const setSection = (tables: any[]) => ({
     children: [...tables],
-    properties: {
-      page: {
-        margin: { left: 500, right: 500, top: 500, bottom: 500 },
-        size: { orientation: PageOrientation.LANDSCAPE },
-      },
-    },
+    ...riskInventoryAnnexByJobHeadersFooters(),
+    properties: sectionLandscapeRiskInventoryAnnexProperties,
   });
 
   return sectionsTables.map((table) => setSection(table));

@@ -6,7 +6,7 @@ import { CompanyEntity } from './../../../../../company/entities/company.entity'
 import { CharacterizationEntity } from './../../../../../company/entities/characterization.entity';
 import { ISectionOptions } from 'docx';
 
-import { sectionLandscapeProperties } from '../../../base/config/styles';
+import { sectionLandscapeActionPlanAnnexProperties, sectionLandscapeProperties } from '../../../base/config/styles';
 import { chapterSection } from '../../../base/layouts/chapter/chapter';
 import { coverSections } from '../../../base/layouts/cover/cover';
 import { headerAndFooter } from '../../../base/layouts/headerAndFooter/headerAndFooter';
@@ -27,7 +27,7 @@ import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroup
 import { IMapElementDocumentType } from './elementTypeMap';
 import { allCharacterizationSections } from '../../../components/iterables/all-characterization/all-characterization.sections';
 import { APPRTableSection } from '../../../components/tables/appr/appr.section';
-import { actionPlanTableSection } from '../../../components/tables/actionPlan/actionPlan.section';
+import { actionPlanAnnexSectionHeadersFooters, actionPlanTableSection } from '../../../components/tables/actionPlan/actionPlan.section';
 import { APPRByGroupTableSection } from '../../../components/tables/apprByGroup/appr-group.section';
 import { PGR_ANNEX_SUBCOVER_CHAPTER_LINES } from '../constants/pgr-annex-subcover-titles';
 import { VariablesPGREnum } from '../enums/variables.enum';
@@ -152,11 +152,17 @@ export class SectionsMapClass {
         this.lastChapterFooterTemplate = fromTitleChild;
       }
 
+      const includesActionPlanTable = Boolean(
+        children?.some((c) => c.type === DocumentSectionChildrenTypeEnum.PLAN_TABLE),
+      );
+
       const mainSection: ISectionOptions = {
         children: this.convertToDocx(children),
-        ...this.getFooterHeader(rawChapterFooterTemplate),
+        ...(includesActionPlanTable
+          ? actionPlanAnnexSectionHeadersFooters()
+          : this.getFooterHeader(rawChapterFooterTemplate)),
         ...rest,
-        ...sectionLandscapeProperties,
+        ...(includesActionPlanTable ? sectionLandscapeActionPlanAnnexProperties : sectionLandscapeProperties),
       };
 
       const isAnnexAttachmentsSection = Boolean(
@@ -197,7 +203,14 @@ export class SectionsMapClass {
     [DocumentSectionTypeEnum.APR]: () => APPRTableSection(this.document, this.hierarchy, this.homogeneousGroup),
     [DocumentSectionTypeEnum.APR_GROUP]: () =>
       APPRByGroupTableSection(this.document, this.hierarchyHighLevelsData, this.hierarchyTree, this.homogeneousGroup),
-    [DocumentSectionTypeEnum.ACTION_PLAN]: () => actionPlanTableSection(this.document, this.hierarchyTree),
+    [DocumentSectionTypeEnum.ACTION_PLAN]: () => {
+      const plan = actionPlanTableSection(this.document, this.hierarchyTree);
+      return {
+        ...actionPlanAnnexSectionHeadersFooters(),
+        ...plan,
+        properties: sectionLandscapeActionPlanAnnexProperties,
+      };
+    },
   };
 
   getFooterHeader = (footerText: string, title?: string) => {

@@ -48,6 +48,24 @@ export const sectionLandscapeProperties: ISectionPropertiesOptions = {
   },
 };
 
+/** Paisagem do anexo Plano de Ação: cabeçalho/rodapé mínimos (só título no header; rodapé vazio). */
+export const sectionLandscapeActionPlanAnnexProperties: ISectionPropertiesOptions = {
+  page: {
+    margin: {
+      left: 500,
+      right: 500,
+      top: 500,
+      bottom: 500,
+      footer: 72,
+      header: 200,
+    },
+    size: { orientation: PageOrientation.LANDSCAPE },
+  },
+};
+
+/** Mesmas margens dos anexos enxutos PGR (inventário por função / por GSE). */
+export const sectionLandscapeRiskInventoryAnnexProperties = sectionLandscapeActionPlanAnnexProperties;
+
 export const sectionCoverProperties: ISectionPropertiesOptions = {
   page: {
     margin: {

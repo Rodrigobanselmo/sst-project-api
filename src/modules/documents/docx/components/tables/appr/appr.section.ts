@@ -1,12 +1,14 @@
 import { DocumentDataEntity } from './../../../../../sst/entities/documentData.entity';
 import { DocumentDataPGRDto } from './../../../../../sst/dto/document-data-pgr.dto';
-import { HierarchyEnum, HomogeneousGroup } from '@prisma/client';
-import { ISectionOptions, PageOrientation } from 'docx';
+import { HierarchyEnum } from '@prisma/client';
+import { ISectionOptions } from 'docx';
 import { sortString } from '../../../../../../shared/utils/sorts/string.sort';
 import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
 import { HierarchyEntity } from '../../../../../company/entities/hierarchy.entity';
 
+import { sectionLandscapeRiskInventoryAnnexProperties } from '../../../base/config/styles';
 import { hierarchyConverter, IHierarchyData, IHomoGroupMap } from '../../../converter/hierarchy.converter';
+import { riskInventoryAnnexByJobHeadersFooters } from './riskInventoryAnnexSectionFrame';
 import { firstRiskInventoryTableSection } from './parts/first/first.table';
 import { secondRiskInventoryTableSection } from './parts/second/second.table';
 import { thirdRiskInventoryTableSection } from './parts/third/third.table';
@@ -31,7 +33,9 @@ export const APPRTableSection = (
     .sort((a, b) => sortString(a.org.map((o) => o.name).join(), b.org.map((o) => o.name).join()))
     .forEach((hierarchy) => {
       const createTable = () => {
-        const firstTable = firstRiskInventoryTableSection(riskFactorGroupData, homoGroupTree, hierarchy, isByGroup);
+        const firstTable = firstRiskInventoryTableSection(riskFactorGroupData, homoGroupTree, hierarchy, isByGroup, {
+          omitInventoryBannerRow: true,
+        });
         const secondTable = secondRiskInventoryTableSection(hierarchy, isByGroup);
         const thirdTable = thirdRiskInventoryTableSection(riskFactorGroupData, hierarchy, isByGroup);
 
@@ -70,12 +74,8 @@ export const APPRTableSection = (
 
   const setSection = (tables: any[]) => ({
     children: [...tables],
-    properties: {
-      page: {
-        margin: { left: 500, right: 500, top: 500, bottom: 500 },
-        size: { orientation: PageOrientation.LANDSCAPE },
-      },
-    },
+    ...riskInventoryAnnexByJobHeadersFooters(),
+    properties: sectionLandscapeRiskInventoryAnnexProperties,
   });
 
   return sectionsTables.map((table) => setSection(table));
