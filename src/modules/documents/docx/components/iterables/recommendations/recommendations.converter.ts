@@ -1,6 +1,7 @@
 import { RecTypeEnum } from '@prisma/client';
 
 import { RiskFactorDataEntity } from '../../../../../sst/entities/riskData.entity';
+import { shouldHideRecommendationInPgr } from '../../../utils/pgr-recommendation-document-visibility';
 
 export const recommendationsConverter = (riskData: Partial<RiskFactorDataEntity>[]) => {
   const remove = ['Não aplicável', 'Não verificada', 'Não implementada'];
@@ -24,6 +25,8 @@ export const recommendationsConverter = (riskData: Partial<RiskFactorDataEntity>
 
   riskData.forEach((data) => {
     (data?.recs || []).forEach((rec) => {
+      if (shouldHideRecommendationInPgr(data?.dataRecs, rec.id)) return;
+
       if (remove.includes(rec.recName)) return;
 
       if (rec.recType === RecTypeEnum.ENG) {

@@ -15,6 +15,7 @@ import { ThirdRiskInventoryColumnEnum } from './third.constant';
 import { originRiskMap } from '../../../../../../../../shared/constants/maps/origin-risk';
 import { sortString } from '../../../../../../../../shared/utils/sorts/string.sort';
 import { isRiskValidForHierarchyData } from '../../../appr/parts/third/third.converter';
+import { shouldHideRecommendationInPgr } from '../../../../../utils/pgr-recommendation-document-visibility';
 
 export const dataConverter = (
   riskGroup: RiskFactorGroupDataEntity & DocumentDataEntity & DocumentDataPGRDto,
@@ -144,7 +145,10 @@ export const dataConverter = (
       };
 
       cells[ThirdRiskInventoryColumnEnum.RECOMMENDATIONS] = {
-        text: riskData.recs.map((rec) => rec.recName).join('\n'),
+        text: riskData.recs
+          .filter((rec) => !shouldHideRecommendationInPgr(riskData.dataRecs, rec.id))
+          .map((rec) => rec.recName)
+          .join('\n'),
         size: 7,
         ...base,
       };

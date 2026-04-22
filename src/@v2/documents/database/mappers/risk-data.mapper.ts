@@ -85,6 +85,7 @@ export class RiskDataMapper {
             recommendationId: recData.recMedId,
             responsibleName: recData.responsibleName,
             endDate: recData.endDate,
+            status: recData.status,
           }),
       ),
     });

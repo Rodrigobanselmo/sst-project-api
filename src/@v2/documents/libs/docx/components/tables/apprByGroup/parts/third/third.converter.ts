@@ -1,4 +1,5 @@
 import { RiskFactorsEnum } from '@prisma/client';
+import { shouldHideRecommendationInPgr } from '@/modules/documents/docx/utils/pgr-recommendation-document-visibility';
 import { AlignmentType } from 'docx';
 import { palette } from '../../../../../constants/palette';
 import { HierarchyMapData, IDocumentRiskGroupDataConverter, IHierarchyMap } from '../../../../../converter/hierarchy.converter';
@@ -155,7 +156,10 @@ export const dataConverter = (
       };
 
       cells[ThirdRiskInventoryColumnEnum.RECOMMENDATIONS] = {
-        text: riskData.riskData.recommendations.map((rec) => rec.name).join('\n'),
+        text: riskData.riskData.recommendations
+          .filter((rec) => !shouldHideRecommendationInPgr(riskData.riskData.recommendationsData, rec.id))
+          .map((rec) => rec.name)
+          .join('\n'),
         size: 7,
         ...base,
       };

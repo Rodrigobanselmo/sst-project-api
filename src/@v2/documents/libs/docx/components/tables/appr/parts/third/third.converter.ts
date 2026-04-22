@@ -4,6 +4,7 @@ import { palette } from '../../../../../constants/palette';
 import { HierarchyMapData, IDocumentRiskGroupDataConverter, IGHODataConverter } from '../../../../../converter/hierarchy.converter';
 
 import { RiskDataModel } from '@/@v2/documents/domain/models/risk-data.model';
+import { shouldHideRecommendationInPgr } from '@/modules/documents/docx/utils/pgr-recommendation-document-visibility';
 import { getMatrizRisk } from '@/@v2/shared/domain/functions/security/get-matrix-risk.func';
 import { sortNumber } from '@/@v2/shared/utils/sorts/number.sort';
 import { sortString } from '@/@v2/shared/utils/sorts/string.sort';
@@ -168,7 +169,10 @@ export const dataConverter = (
       };
 
       cells[ThirdRiskInventoryColumnEnum.RECOMMENDATIONS] = {
-        text: riskData.recommendations.map((rec) => rec.name).join('\n'),
+        text: riskData.recommendations
+          .filter((rec) => !shouldHideRecommendationInPgr(riskData.recommendationsData, rec.id))
+          .map((rec) => rec.name)
+          .join('\n'),
         size: 7,
         ...base,
       };

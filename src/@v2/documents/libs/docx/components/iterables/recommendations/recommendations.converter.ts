@@ -1,6 +1,7 @@
 import { RecTypeEnum } from '@prisma/client';
 
 import { IRiskGroupDataConverter } from '../../../converter/hierarchy.converter';
+import { shouldHideRecommendationInPgr } from '@/modules/documents/docx/utils/pgr-recommendation-document-visibility';
 
 export const recommendationsConverter = (riskData: IRiskGroupDataConverter[]) => {
   const remove = ['Não aplicável', 'Não verificada', 'Não implementada'];
@@ -24,6 +25,8 @@ export const recommendationsConverter = (riskData: IRiskGroupDataConverter[]) =>
 
   riskData.forEach((data) => {
     (data?.riskData.recommendations || []).forEach((rec) => {
+      if (shouldHideRecommendationInPgr(data.riskData.recommendationsData, rec.id)) return;
+
       if (remove.includes(rec.name)) return;
 
       if (rec.type === RecTypeEnum.ENG) {
