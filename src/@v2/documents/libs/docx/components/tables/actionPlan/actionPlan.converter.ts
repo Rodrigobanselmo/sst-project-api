@@ -24,7 +24,7 @@ const actionPlanStatusLabelMap: Record<string, string> = {
   PENDENTE: 'Pendente',
   INICIADO: 'Iniciado',
   CONCLUIDO: 'Concluído',
-  'CONCLUÍDO': 'Concluído',
+  CONCLUÍDO: 'Concluído',
   CANCELADO: 'Cancelado',
   REJEITADO: 'Rejeitado',
 };
@@ -46,6 +46,30 @@ const getActionPlanStatusLabel = (statusValue: unknown): string => {
 };
 
 export const actionPlanConverter = (riskGroup: IRiskGroupDataConverter[], documentVersion: DocumentVersionModel, hierarchyTree: IHierarchyMap) => {
+  const STATUS_MARKER = '●';
+  const statusLabelMap: Record<string, string> = {
+    PENDING: 'Pendente',
+    PROGRESS: 'Iniciado',
+    IN_PROGRESS: 'Iniciado',
+    DONE: 'Concluído',
+    CANCELED: 'Cancelado',
+  };
+
+  const formatStatusLabel = (status?: unknown) => {
+    if (status == null) return statusLabelMap.PENDING;
+
+    const normalizedStatus = typeof status === 'string' ? status.trim().toUpperCase() : String(status).trim().toUpperCase();
+
+    return statusLabelMap[normalizedStatus] || statusLabelMap.PENDING;
+  };
+
+  const statusTextColorMap: Record<string, string> = {
+    Concluído: palette.table.attention.string,
+    Iniciado: palette.text.simple.string,
+    Cancelado: palette.text.attention.string,
+    Pendente: '7A7A7A',
+  };
+
   const homogeneousGroupsMap = new Map<string, bodyTableProps[][]>();
   const actionPlanData: bodyTableProps[][] = [];
 
@@ -79,7 +103,7 @@ export const actionPlanConverter = (riskGroup: IRiskGroupDataConverter[], docume
 
         const dataRecFound = dataRecs?.find((dataRec) => dataRec.recommendationId == rec.id);
         const responsibleName = dataRecFound?.responsibleName || '';
-        const statusText = getActionPlanStatusLabel(dataRecFound?.status);
+        const statusText = formatStatusLabel(dataRecFound?.status);
         const level = riskData.riskData.level;
 
         const getDue = () => {
@@ -95,61 +119,80 @@ export const actionPlanConverter = (riskGroup: IRiskGroupDataConverter[], docume
         };
 
         const due = getDue();
-        const dueText = due ? due.format('D [de] MMMM YYYY') : level === 6 ? 'ação imediata' : 'sem prazo';
+        const dueText = due ? due.format('DD/MM/YY') : level === 6 ? 'ação imediata' : 'sem prazo';
 
         cells[ActionPlanColumnEnum.ITEM] = {
           text: '',
           size: 2,
+          isVertical: false,
           borders: borderStyleGlobal(palette.common.white.string),
         };
         cells[ActionPlanColumnEnum.ORIGIN] = {
           text: origin || '',
-          size: 5,
+          size: 15,
+          isVertical: false,
           borders: borderStyleGlobal(palette.common.white.string),
         };
         cells[ActionPlanColumnEnum.RISK] = {
           text: riskData.riskData.risk.name,
-          size: 10,
+          size: 12,
+          isVertical: false,
           borders: borderStyleGlobal(palette.common.white.string),
         };
         cells[ActionPlanColumnEnum.SOURCE] = {
           text: riskData.riskData.generateSources.map((gs) => gs.name).join('\n'),
-          size: 10,
+          size: 35,
+          isVertical: false,
           borders: borderStyleGlobal(palette.common.white.string),
         };
         cells[ActionPlanColumnEnum.SEVERITY] = {
           text: String(riskData.riskData.risk.severity),
-          size: 1,
+          size: 2,
+          isVertical: false,
           borders: borderStyleGlobal(palette.common.white.string),
         };
         cells[ActionPlanColumnEnum.PROBABILITY] = {
           text: String(riskData.riskData.probability || '-'),
-          size: 1,
+          size: 2,
+          isVertical: false,
           borders: borderStyleGlobal(palette.common.white.string),
         };
         cells[ActionPlanColumnEnum.RO] = {
           text: matrixRiskMap[getMatrizRisk(riskData.riskData.risk.severity, riskData.riskData.probability)].label,
           size: 5,
+          isVertical: false,
           borders: borderStyleGlobal(palette.common.white.string),
         };
         cells[ActionPlanColumnEnum.INTERVENTION] = {
           text: matrixRiskMap[getMatrizRisk(riskData.riskData.risk.severity, riskData.riskData.probability)].intervention,
-          size: 5,
+          size: 4,
+          isVertical: true,
           borders: borderStyleGlobal(palette.common.white.string),
         };
         cells[ActionPlanColumnEnum.RECOMMENDATION] = {
           text: rec.name,
-          size: 10,
+          size: 16,
+          isVertical: false,
           borders: borderStyleGlobal(palette.common.white.string),
         };
         cells[ActionPlanColumnEnum.RESPONSIBLE] = {
           text: responsibleName,
-          size: 5,
+          size: 3,
+          isVertical: true,
           borders: borderStyleGlobal(palette.common.white.string),
         };
         cells[ActionPlanColumnEnum.DUE] = {
           text: dueText,
-          size: 5,
+          size: 2,
+          isVertical: true,
+          borders: borderStyleGlobal(palette.common.white.string),
+        };
+        cells[ActionPlanColumnEnum.STATUS] = {
+          text: STATUS_MARKER,
+          size: 2,
+          isVertical: false,
+          fontSize: 10,
+          color: statusTextColorMap[statusText] || statusTextColorMap.Pendente,
           borders: borderStyleGlobal(palette.common.white.string),
         };
         cells[ActionPlanColumnEnum.STATUS] = {
