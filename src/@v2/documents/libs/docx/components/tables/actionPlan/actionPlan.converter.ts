@@ -11,6 +11,40 @@ import { IHierarchyMap, IRiskGroupDataConverter } from '../../../converter/hiera
 import { ActionPlanColumnEnum } from './actionPlan.constant';
 import { bodyTableProps } from './elements/body';
 
+const DEFAULT_ACTION_PLAN_STATUS_LABEL = 'Pendente';
+
+const actionPlanStatusLabelMap: Record<string, string> = {
+  PENDING: 'Pendente',
+  PROGRESS: 'Iniciado',
+  DONE: 'Concluído',
+  CANCELED: 'Cancelado',
+  REJECTED: 'Rejeitado',
+  ACTIVE: DEFAULT_ACTION_PLAN_STATUS_LABEL,
+  INACTIVE: DEFAULT_ACTION_PLAN_STATUS_LABEL,
+  PENDENTE: 'Pendente',
+  INICIADO: 'Iniciado',
+  CONCLUIDO: 'Concluído',
+  'CONCLUÍDO': 'Concluído',
+  CANCELADO: 'Cancelado',
+  REJEITADO: 'Rejeitado',
+};
+
+const getActionPlanStatusLabel = (statusValue: unknown): string => {
+  if (!statusValue) return DEFAULT_ACTION_PLAN_STATUS_LABEL;
+
+  if (typeof statusValue === 'string') {
+    const normalizedStatus = statusValue.trim().toUpperCase();
+    return actionPlanStatusLabelMap[normalizedStatus] || DEFAULT_ACTION_PLAN_STATUS_LABEL;
+  }
+
+  if (typeof statusValue === 'object') {
+    const statusRecord = statusValue as Record<string, unknown>;
+    return getActionPlanStatusLabel(statusRecord.status ?? statusRecord.value ?? statusRecord.current_status);
+  }
+
+  return DEFAULT_ACTION_PLAN_STATUS_LABEL;
+};
+
 export const actionPlanConverter = (riskGroup: IRiskGroupDataConverter[], documentVersion: DocumentVersionModel, hierarchyTree: IHierarchyMap) => {
   const homogeneousGroupsMap = new Map<string, bodyTableProps[][]>();
   const actionPlanData: bodyTableProps[][] = [];
@@ -45,6 +79,7 @@ export const actionPlanConverter = (riskGroup: IRiskGroupDataConverter[], docume
 
         const dataRecFound = dataRecs?.find((dataRec) => dataRec.recommendationId == rec.id);
         const responsibleName = dataRecFound?.responsibleName || '';
+        const statusText = getActionPlanStatusLabel(dataRecFound?.status);
         const level = riskData.riskData.level;
 
         const getDue = () => {
@@ -114,6 +149,11 @@ export const actionPlanConverter = (riskGroup: IRiskGroupDataConverter[], docume
         };
         cells[ActionPlanColumnEnum.DUE] = {
           text: dueText,
+          size: 5,
+          borders: borderStyleGlobal(palette.common.white.string),
+        };
+        cells[ActionPlanColumnEnum.STATUS] = {
+          text: statusText,
           size: 5,
           borders: borderStyleGlobal(palette.common.white.string),
         };

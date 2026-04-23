@@ -14,6 +14,7 @@ export enum ActionPlanColumnEnum {
   RECOMMENDATION,
   RESPONSIBLE,
   DUE,
+  STATUS,
 }
 
 const NewActionPlanHeader = (): headerTableProps[] => {
@@ -71,6 +72,11 @@ const NewActionPlanHeader = (): headerTableProps[] => {
   };
   header[ActionPlanColumnEnum.DUE] = {
     text: 'PRAZO',
+    size: 5,
+    borders: borderStyleGlobal(palette.common.white.string),
+  };
+  header[ActionPlanColumnEnum.STATUS] = {
+    text: 'STATUS',
     size: 5,
     borders: borderStyleGlobal(palette.common.white.string),
   };

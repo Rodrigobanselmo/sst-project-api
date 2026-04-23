@@ -15,6 +15,40 @@ import { originRiskMap } from './../../../../../../shared/constants/maps/origin-
 import { ActionPlanColumnEnum } from './actionPlan.constant';
 import { bodyTableProps } from './elements/body';
 
+const DEFAULT_ACTION_PLAN_STATUS_LABEL = 'Pendente';
+
+const actionPlanStatusLabelMap: Record<string, string> = {
+  PENDING: 'Pendente',
+  PROGRESS: 'Iniciado',
+  DONE: 'Concluído',
+  CANCELED: 'Cancelado',
+  REJECTED: 'Rejeitado',
+  ACTIVE: DEFAULT_ACTION_PLAN_STATUS_LABEL,
+  INACTIVE: DEFAULT_ACTION_PLAN_STATUS_LABEL,
+  PENDENTE: 'Pendente',
+  INICIADO: 'Iniciado',
+  CONCLUIDO: 'Concluído',
+  'CONCLUÍDO': 'Concluído',
+  CANCELADO: 'Cancelado',
+  REJEITADO: 'Rejeitado',
+};
+
+const getActionPlanStatusLabel = (statusValue: unknown): string => {
+  if (!statusValue) return DEFAULT_ACTION_PLAN_STATUS_LABEL;
+
+  if (typeof statusValue === 'string') {
+    const normalizedStatus = statusValue.trim().toUpperCase();
+    return actionPlanStatusLabelMap[normalizedStatus] || DEFAULT_ACTION_PLAN_STATUS_LABEL;
+  }
+
+  if (typeof statusValue === 'object') {
+    const statusRecord = statusValue as Record<string, unknown>;
+    return getActionPlanStatusLabel(statusRecord.status ?? statusRecord.value ?? statusRecord.current_status);
+  }
+
+  return DEFAULT_ACTION_PLAN_STATUS_LABEL;
+};
+
 export const actionPlanConverter = (
   riskGroup: RiskFactorGroupDataEntity & DocumentDataEntity & DocumentDataPGRDto,
   hierarchyTree: IHierarchyMap,
@@ -51,6 +85,7 @@ export const actionPlanConverter = (
 
         const dataRecFound = dataRecs?.find((dataRec) => dataRec.recMedId == rec.id);
         const responsibleName = dataRecFound?.responsibleName || '';
+        const statusText = getActionPlanStatusLabel(dataRecFound?.status);
         const level = riskData.level || 0;
 
         const getDue = () => {
@@ -120,6 +155,11 @@ export const actionPlanConverter = (
         };
         cells[ActionPlanColumnEnum.DUE] = {
           text: dueText,
+          size: 5,
+          borders: borderStyleGlobal(palette.common.white.string),
+        };
+        cells[ActionPlanColumnEnum.STATUS] = {
+          text: statusText,
           size: 5,
           borders: borderStyleGlobal(palette.common.white.string),
         };
