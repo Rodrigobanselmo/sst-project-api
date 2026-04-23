@@ -1,4 +1,4 @@
-import { ISectionOptions, PageOrientation, Table, WidthType } from 'docx';
+import { AlignmentType, Footer, ISectionOptions, PageOrientation, Paragraph, Table, TextRun, WidthType } from 'docx';
 
 import { sectionTitleOnlyHeadersFooters } from '../../../base/layouts/annex/sectionTitleOnlyHeadersFooters';
 import { IDocumentRiskGroupDataConverter, IHierarchyMap } from '../../../converter/hierarchy.converter';
@@ -6,8 +6,38 @@ import { actionPlanHeader, actionPlanSectionTitle } from './actionPlan.constant'
 import { actionPlanConverter } from './actionPlan.converter';
 import { TableBodyElements } from './elements/body';
 import { TableHeaderElements } from './elements/header';
+import { palette } from '../../../constants/palette';
 
-export const actionPlanAnnexSectionHeadersFooters = () => sectionTitleOnlyHeadersFooters(actionPlanSectionTitle);
+export const actionPlanAnnexSectionHeadersFooters = () => {
+  const sectionLayout = sectionTitleOnlyHeadersFooters(actionPlanSectionTitle);
+
+  const createStatusLegendParagraph = () =>
+    new Paragraph({
+      alignment: AlignmentType.CENTER,
+      spacing: { before: 0, after: 0 },
+      children: [
+        new TextRun({ text: '●', color: '7A7A7A', size: 16 }),
+        new TextRun({ text: ' Pendente ', color: palette.text.main.string, size: 16 }),
+        new TextRun({ text: '|', color: palette.text.main.string, size: 16 }),
+        new TextRun({ text: ' ●', color: palette.text.simple.string, size: 16 }),
+        new TextRun({ text: ' Iniciado ', color: palette.text.main.string, size: 16 }),
+        new TextRun({ text: '|', color: palette.text.main.string, size: 16 }),
+        new TextRun({ text: ' ●', color: palette.table.attention.string, size: 16 }),
+        new TextRun({ text: ' Concluído ', color: palette.text.main.string, size: 16 }),
+        new TextRun({ text: '|', color: palette.text.main.string, size: 16 }),
+        new TextRun({ text: ' ●', color: palette.text.attention.string, size: 16 }),
+        new TextRun({ text: ' Cancelado', color: palette.text.main.string, size: 16 }),
+      ],
+    });
+
+  return {
+    ...sectionLayout,
+    footers: {
+      default: new Footer({ children: [createStatusLegendParagraph()] }),
+      first: new Footer({ children: [createStatusLegendParagraph()] }),
+    },
+  };
+};
 
 export const actionPlanTableSection = (document: IDocumentRiskGroupDataConverter, hierarchyTree: IHierarchyMap) => {
   const actionPlanData = actionPlanConverter(document.riskGroupData, document.documentVersion, hierarchyTree);

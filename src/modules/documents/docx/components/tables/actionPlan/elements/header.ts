@@ -16,6 +16,7 @@ export interface headerTableProps {
   text: string;
   size?: number;
   position?: number;
+  isVertical?: boolean;
   borders: any;
 }
 
@@ -57,13 +58,13 @@ export class TableHeaderElements {
 
   headerRow(tableCell: TableCell[]) {
     return new TableRow({
-      height: { value: 1600, rule: HeightRule.EXACT },
+      height: { value: 1100, rule: HeightRule.EXACT },
       tableHeader: true,
       children: [...tableCell],
     });
   }
 
-  headerCell({ text, size = 10, ...rest }: headerTableProps) {
+  headerCell({ text, size = 10, isVertical = false, ...rest }: headerTableProps) {
     return new TableCell({
       children: [
         ...text.split('\n').map(
@@ -86,7 +87,7 @@ export class TableHeaderElements {
         ),
       ],
       shading: { fill: palette.table.header.string },
-      textDirection: TextDirection.BOTTOM_TO_TOP_LEFT_TO_RIGHT,
+      textDirection: isVertical ? TextDirection.BOTTOM_TO_TOP_LEFT_TO_RIGHT : undefined,
       verticalAlign: VerticalAlign.CENTER,
       width: { size, type: WidthType.PERCENTAGE },
       ...rest,

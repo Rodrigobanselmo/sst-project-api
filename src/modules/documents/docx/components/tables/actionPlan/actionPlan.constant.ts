@@ -14,6 +14,7 @@ export enum ActionPlanColumnEnum {
   RECOMMENDATION,
   RESPONSIBLE,
   DUE,
+  STATUS,
 }
 
 const NewActionPlanHeader = (): headerTableProps[] => {
@@ -22,56 +23,73 @@ const NewActionPlanHeader = (): headerTableProps[] => {
   header[ActionPlanColumnEnum.ITEM] = {
     text: 'ITEM',
     size: 2,
+    isVertical: false,
     borders: borderStyleGlobal(palette.common.white.string),
   };
   header[ActionPlanColumnEnum.ORIGIN] = {
     text: 'ORIGEM',
-    size: 5,
+    size: 15,
+    isVertical: false,
     borders: borderStyleGlobal(palette.common.white.string),
   };
   header[ActionPlanColumnEnum.RISK] = {
-    text: 'PERIGOS\nFATORES DE RISCO',
-    size: 10,
+    text: 'PERIGOS /\nFATORES DE RISCO',
+    size: 12,
+    isVertical: false,
     borders: borderStyleGlobal(palette.common.white.string),
   };
   header[ActionPlanColumnEnum.SOURCE] = {
     text: 'FONTE GERADORA OU\nATIVIDADE DE RISCO',
-    size: 10,
+    size: 35,
+    isVertical: false,
     borders: borderStyleGlobal(palette.common.white.string),
   };
   header[ActionPlanColumnEnum.SEVERITY] = {
     text: 'SEVERIDADE',
-    size: 1,
+    size: 2,
+    isVertical: true,
     borders: borderStyleGlobal(palette.common.white.string),
   };
   header[ActionPlanColumnEnum.PROBABILITY] = {
     text: 'PROBABILIDADE',
-    size: 1,
+    size: 2,
+    isVertical: true,
     borders: borderStyleGlobal(palette.common.white.string),
   };
   header[ActionPlanColumnEnum.RO] = {
     text: 'RISCO OCUPACIONAL',
     size: 5,
+    isVertical: true,
     borders: borderStyleGlobal(palette.common.white.string),
   };
   header[ActionPlanColumnEnum.INTERVENTION] = {
     text: 'INTERVENÇÃO',
-    size: 5,
+    size: 4,
+    isVertical: true,
     borders: borderStyleGlobal(palette.common.white.string),
   };
   header[ActionPlanColumnEnum.RECOMMENDATION] = {
     text: 'RECOMENDAÇÕES',
-    size: 10,
+    size: 16,
+    isVertical: false,
     borders: borderStyleGlobal(palette.common.white.string),
   };
   header[ActionPlanColumnEnum.RESPONSIBLE] = {
     text: 'RESPONSÁVEL',
-    size: 5,
+    size: 3,
+    isVertical: true,
     borders: borderStyleGlobal(palette.common.white.string),
   };
   header[ActionPlanColumnEnum.DUE] = {
     text: 'PRAZO',
-    size: 5,
+    size: 2,
+    isVertical: true,
+    borders: borderStyleGlobal(palette.common.white.string),
+  };
+  header[ActionPlanColumnEnum.STATUS] = {
+    text: 'STATUS',
+    size: 2,
+    isVertical: true,
     borders: borderStyleGlobal(palette.common.white.string),
   };
 
