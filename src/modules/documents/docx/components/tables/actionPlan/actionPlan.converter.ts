@@ -196,11 +196,6 @@ export const actionPlanConverter = (riskGroup: RiskFactorGroupDataEntity & Docum
           color: statusTextColorMap[statusText] || statusTextColorMap.Pendente,
           borders: borderStyleGlobal(palette.common.white.string),
         };
-        cells[ActionPlanColumnEnum.STATUS] = {
-          text: statusText,
-          size: 5,
-          borders: borderStyleGlobal(palette.common.white.string),
-        };
 
         const rows = homogeneousGroupsMap.get(riskData.homogeneousGroupId) || [];
         homogeneousGroupsMap.set(riskData.homogeneousGroupId, [...rows, cells]);
