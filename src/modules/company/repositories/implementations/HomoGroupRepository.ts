@@ -103,6 +103,21 @@ export class HomoGroupRepository {
 
   async updateHierarchyOnHomogeneousFromGHO({ id, hierarchies, endDate = null, startDate = null }: Pick<UpdateHomoGroupDto, 'id' | 'hierarchies' | 'endDate' | 'startDate'>) {
     if (hierarchies) {
+      const nextHierarchyIds = hierarchies.map((h) => h.id).filter(Boolean);
+
+      // Lista enviada pelo organograma é a fonte de verdade: remover vínculos ativos que não vieram no PATCH.
+      // Antes só havia upsert dos itens presentes — desmarcar no client não apagava a linha em hierarchyOnHomogeneous.
+      await this.prisma.hierarchyOnHomogeneous.deleteMany({
+        where: {
+          homogeneousGroupId: id,
+          endDate: null,
+          deletedAt: null,
+          ...(nextHierarchyIds.length > 0
+            ? { hierarchyId: { notIn: nextHierarchyIds } }
+            : {}),
+        },
+      });
+
       const hierarchyOnHomogeneous = {};
       const foundHomogeneousGroups = await this.prisma.hierarchyOnHomogeneous.findMany({
         where: {
