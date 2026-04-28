@@ -15,6 +15,13 @@ export class FindRisksByCompanyService {
   ) {
     const companyId = user.targetCompanyId;
     const orderBy = resolveRiskListOrderBy(listSortBy, listSortOrder);
+    const synonymousRiskIds = search
+      ? await this.riskRepository.findIdsBySynonymousSearch({
+          companyId,
+          search,
+          mustHaveRiskData: true,
+        })
+      : [];
 
     const risks = await this.riskRepository.findCountNude(
       { skip, take },
@@ -28,7 +35,13 @@ export class FindRisksByCompanyService {
             },
           },
           ...(search && {
-            name: { contains: search, mode: 'insensitive' },
+            OR: [
+              { name: { contains: search, mode: 'insensitive' } },
+              { cas: { contains: search, mode: 'insensitive' } },
+              ...(synonymousRiskIds.length
+                ? [{ id: { in: synonymousRiskIds } }]
+                : []),
+            ],
           }),
         },
         select: {

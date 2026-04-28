@@ -12,7 +12,6 @@ import { RiskFactorsEntity } from '../../entities/risk.entity';
 import { IRiskRepository } from '../IRiskRepository.types';
 import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
 import { databaseFindChanges } from '../../../../shared/utils/databaseFindChanges';
-import { normalizeString } from '../../../../shared/utils/normalizeString';
 
 type RiskDocPresenceField = 'isPGR' | 'isPPP' | 'isPCMSO' | 'isAso';
 
@@ -94,6 +93,40 @@ function riskDocPresenceWhere(companyId: string, flag: RiskDocPresenceField): Pr
 @Injectable()
 export class RiskRepository implements IRiskRepository {
   constructor(private prisma: PrismaService) {}
+
+  async findIdsBySynonymousSearch({
+    companyId,
+    search,
+    mustHaveRiskData,
+  }: {
+    companyId: string;
+    search: string;
+    mustHaveRiskData?: boolean;
+  }) {
+    const likeTerm = `%${search}%`;
+    const withRiskDataClause = mustHaveRiskData
+      ? Prisma.sql`AND EXISTS (
+          SELECT 1
+          FROM "RiskFactorData" rfd
+          WHERE rfd."riskId" = rf."id" AND rfd."companyId" = ${companyId}
+        )`
+      : Prisma.empty;
+
+    const rows = await this.prisma.$queryRaw<{ id: string }[]>`
+      SELECT rf."id"
+      FROM "RiskFactors" rf
+      WHERE
+        (rf."companyId" = ${companyId} OR rf."system" = true)
+        AND EXISTS (
+          SELECT 1
+          FROM unnest(rf."synonymous") AS s
+          WHERE s ILIKE ${likeTerm}
+        )
+        ${withRiskDataClause}
+    `;
+
+    return rows.map((row) => row.id);
+  }
 
   async create({ recMed, generateSource, subTypesIds, activities, ...createRiskDto }: CreateRiskDto, system: boolean): Promise<RiskFactorsEntity> {
     const risk = await this.prisma.riskFactors.create({
@@ -422,11 +455,20 @@ export class RiskRepository implements IRiskRepository {
     });
 
     if ('search' in query && query.search) {
-      const OR = [];
-      OR.push({ search: { contains: normalizeString(query.search), mode: 'insensitive' } });
-      OR.push({ cas: { contains: query.search, mode: 'insensitive' } });
+      const synonymousRiskIds = await this.findIdsBySynonymousSearch({
+        companyId: String(query.companyId),
+        search: query.search,
+      });
 
-      (where.AND as any).push({ OR } as typeof options.where);
+      (where.AND as any).push({
+        OR: [
+          { name: { contains: query.search, mode: 'insensitive' } },
+          { cas: { contains: query.search, mode: 'insensitive' } },
+          ...(synonymousRiskIds.length
+            ? [{ id: { in: synonymousRiskIds } }]
+            : []),
+        ],
+      } as typeof options.where);
       delete query.search;
     }
 
