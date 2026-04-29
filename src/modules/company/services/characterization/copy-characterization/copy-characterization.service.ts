@@ -20,7 +20,15 @@ export class CopyCharacterizationService {
     private readonly prisma: PrismaService,
     private readonly homoGroupRepository: HomoGroupRepository,
   ) {}
-  async execute({ companyCopyFromId, workspaceId, characterizationIds }: CopyCharacterizationDto, user: UserPayloadDto) {
+  async execute(
+    {
+      companyCopyFromId,
+      workspaceId,
+      sourceWorkspaceId,
+      characterizationIds,
+    }: CopyCharacterizationDto,
+    user: UserPayloadDto,
+  ) {
     const companyId = user.targetCompanyId;
     const sameCompany = companyId === companyCopyFromId;
     const isMaster = user.isMaster;
@@ -50,6 +58,9 @@ export class CopyCharacterizationService {
 
     const homoGroups = await this.homoGroupRepository.findHomoGroupByCompany(companyCopyFromId, {
       where: {
+        ...(sourceWorkspaceId && {
+          workspaces: { some: { id: sourceWorkspaceId } },
+        }),
         characterization: {
           OR: [{ id: { in: characterizationIds } }, { profileParentId: { in: characterizationIds } }],
         },
@@ -121,9 +132,53 @@ export class CopyCharacterizationService {
             });
           };
 
-          const createRiskFactorData = async (_newHomoGroupId) => {
+          const createRiskFactorData = async (_newHomoGroupId: string) => {
             await Promise.all(
               group.riskFactorData.map(async (riskFactorFromData) => {
+                const sourceGenerateSourceIds =
+                  (riskFactorFromData.generateSources
+                    ?.map(({ id }) => id)
+                    .filter(Boolean) as string[]) || [];
+                const sourceAdmIds =
+                  (riskFactorFromData.adms
+                    ?.map(({ id }) => id)
+                    .filter(Boolean) as string[]) || [];
+                const sourceRecIds =
+                  (riskFactorFromData.recs
+                    ?.map((rec: any) => rec?.id || rec?.recMed?.id || rec?.rec_med_id)
+                    .filter(Boolean) as string[]) || [];
+
+                const [availableGenerateSources, availableAdms, availableRecs] =
+                  await Promise.all([
+                    sourceGenerateSourceIds.length
+                      ? this.prisma.generateSource.findMany({
+                          where: {
+                            companyId,
+                            id: { in: sourceGenerateSourceIds },
+                          },
+                          select: { id: true },
+                        })
+                      : Promise.resolve([]),
+                    sourceAdmIds.length
+                      ? this.prisma.recMed.findMany({
+                          where: {
+                            companyId,
+                            id: { in: sourceAdmIds },
+                          },
+                          select: { id: true },
+                        })
+                      : Promise.resolve([]),
+                    sourceRecIds.length
+                      ? this.prisma.recMed.findMany({
+                          where: {
+                            companyId,
+                            id: { in: sourceRecIds },
+                          },
+                          select: { id: true },
+                        })
+                      : Promise.resolve([]),
+                  ]);
+
                 const newRiskFactorData = await this.prisma.riskFactorData.create({
                   data: {
                     homogeneousGroupId: _newHomoGroupId,
@@ -136,25 +191,25 @@ export class CopyCharacterizationService {
                     // probabilityAfterCalc: {create:{chancesOfHappening:riskFactorFromData.probabilityAfter}}, //! missing this
                     companyId,
                     generateSources:
-                      riskFactorFromData.generateSources && riskFactorFromData.generateSources.length
+                      availableGenerateSources.length
                         ? {
-                            connect: riskFactorFromData.generateSources.map(({ id }) => ({
+                            connect: availableGenerateSources.map(({ id }) => ({
                               id,
                             })),
                           }
                         : undefined,
                     recs:
-                      riskFactorFromData.recs && riskFactorFromData.recs.length
+                      availableRecs.length
                         ? {
-                            create: riskFactorFromData.recs.map(({ id }) => ({
+                            create: availableRecs.map(({ id }) => ({
                               rec_med_id: id,
                             })),
                           }
                         : undefined,
                     adms:
-                      riskFactorFromData.adms && riskFactorFromData.adms.length
+                      availableAdms.length
                         ? {
-                            connect: riskFactorFromData.adms.map(({ id }) => ({
+                            connect: availableAdms.map(({ id }) => ({
                               id,
                             })),
                           }

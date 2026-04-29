@@ -162,6 +162,10 @@ export class CopyCharacterizationDto {
   @IsString()
   workspaceId: string;
 
+  @IsOptional()
+  @IsString()
+  sourceWorkspaceId?: string;
+
   @IsString({ each: true })
   characterizationIds: string[];
 }
