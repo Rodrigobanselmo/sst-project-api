@@ -6,7 +6,7 @@ import { ICepBrasilResponse } from '../../../../../modules/company/interfaces/ce
 @Injectable()
 export class FindCepService {
   async execute(cep: string) {
-    const cepString = cep.replace(/[ˆ\D ]/g, '');
+    const cepString = cep.replace(/[^\d]/g, '');
     let response: AxiosResponse<ICepBrasilResponse, any>;
     try {
       response = await axios.get<ICepBrasilResponse>(`https://brasilapi.com.br/api/cep/v1/${cepString}`);

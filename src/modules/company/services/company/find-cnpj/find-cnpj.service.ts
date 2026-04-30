@@ -5,12 +5,17 @@ import { ICnpjBrasilResponse } from '../../../../../modules/company/interfaces/c
 
 @Injectable()
 export class FindCnpjService {
-  async execute(cnpj: string) {
-    const cnpjString = cnpj.replace(/[ˆ\D ]/g, '');
+  async execute(cnpj: string): Promise<ICnpjResponse | null> {
+    const cnpjString = cnpj.replace(/[^\d]/g, '');
     let response: AxiosResponse<ICnpjBrasilResponse, any>;
     try {
       response = await axios.get<ICnpjBrasilResponse>(`https://brasilapi.com.br/api/cnpj/v1/${cnpjString}`);
     } catch (error) {
+      // If CNPJ not found (404), return null to allow the flow to continue
+      if (error.response?.status === 404) {
+        return null;
+      }
+
       if (error.code === 'ERR_BAD_REQUEST') throw new BadRequestException(error.response.data.message);
 
       throw new InternalServerErrorException(error.response.data.message);
@@ -54,7 +59,7 @@ export class FindCnpjService {
   }
 }
 // const { data } = await axios.get<ICnpjReceitaResponse>(
-//   `https://www.receitaws.com.br/v1/cnpj/${cnpj.replace(/[ˆ\D ]/g, '')}`,
+//   `https://www.receitaws.com.br/v1/cnpj/${cnpj.replace(/[^\d]/g, '')}`,
 // );
 
 // consultarCNPJ(cnpj);
