@@ -6,6 +6,7 @@ import { UserPayloadDto } from './../../../../../shared/dto/user-payload.dto';
 import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
 import { UpdateUserCompanyDto } from '../../../dto/update-user-company.dto';
 import { UsersCompanyRepository } from '../../../repositories/implementations/UsersCompanyRepository';
+import { PrismaService } from '../../../../../prisma/prisma.service';
 
 @Injectable()
 export class UpdatePermissionsRolesService {
@@ -13,6 +14,7 @@ export class UpdatePermissionsRolesService {
     private readonly usersCompanyRepository: UsersCompanyRepository,
     private readonly authGroupRepository: AuthGroupRepository,
     private readonly companyRepository: CompanyRepository,
+    private readonly prisma: PrismaService,
   ) {}
 
   async execute(updateUserCompanyDto: UpdateUserCompanyDto, userPayloadDto: UserPayloadDto) {
@@ -54,31 +56,84 @@ export class UpdatePermissionsRolesService {
       }
     }
 
-    const companyId = updateUserCompanyDto.companyId;
-    const companies = await this.companyRepository.findNude({
-      where: {
-        id: { in: updateUserCompanyDto?.companiesIds || [] },
-        OR: [
-          { id: companyId },
-          {
-            receivingServiceContracts: {
-              some: { applyingServiceCompanyId: companyId },
-            },
-          },
-        ],
-      },
-    });
+    /** Igual a FindAllCompaniesService (GET /company): escopo da listagem na edição do usuário. */
+    const listingScopeCompanyId = userPayloadDto.isMaster
+      ? ''
+      : userPayloadDto.companyId ?? updateUserCompanyDto.companyId;
 
-    if (companies && companies && companies.length > 0) {
-      await this.usersCompanyRepository.deleteAllFromConsultant(
+    if (isConsulting) {
+      const requestedCompanyIdsRaw = updateUserCompanyDto?.companiesIds || [];
+      const requestedCompanyIds = [...new Set(requestedCompanyIdsRaw)];
+
+      /** Vínculos atuais do usuário editado dentro do mesmo escopo GET /company + userId (remoção segura). */
+      const manageableExistingPage = await this.companyRepository.findAllRelatedByCompanyId(
+        listingScopeCompanyId || null,
+        {
+          userId: updateUserCompanyDto.userId,
+          findAll: true,
+        },
+        { skip: 0, take: 50_000 },
+      );
+      const manageableExistingCompanyIds = manageableExistingPage.data.map((row) => row.id);
+
+      /**
+       * Carteira atribuível pelo operador (CompaniesTable / picker): mesmo escopo sem filtrar pelo userId editado,
+       * para permitir ADICIONAR empresa que ainda não está vinculada ao usuário.
+       */
+      const assignablePortfolioPage = await this.companyRepository.findAllRelatedByCompanyId(
+        listingScopeCompanyId || null,
+        {
+          findAll: true,
+        },
+        { skip: 0, take: 50_000 },
+      );
+      const assignableCompanyIds = assignablePortfolioPage.data.map((row) => row.id);
+
+      const validatedDesiredIds = requestedCompanyIds.filter((id) => assignableCompanyIds.includes(id));
+      const requestedRejectedNotInAssignable = requestedCompanyIds.filter((id) => !assignableCompanyIds.includes(id));
+
+      if (requestedRejectedNotInAssignable.length > 0) {
+        throw new BadRequestException(
+          `Empresa(s) não permitida(s) neste contexto para vínculo: ${requestedRejectedNotInAssignable.join(', ')}`,
+        );
+      }
+
+      await this.usersCompanyRepository.deleteManageableUserCompanyLinksNotInCompaniesIds(
         updateUserCompanyDto.userId,
-        updateUserCompanyDto.companyId,
+        validatedDesiredIds,
+        manageableExistingCompanyIds,
       );
 
-      await this.usersCompanyRepository.upsertMany({
-        ...updateUserCompanyDto,
-        companiesIds: companies.map((company) => company.id),
+      const companiesRowsForUpsert = await this.prisma.company.findMany({
+        where: {
+          id: { in: validatedDesiredIds },
+          deleted_at: null,
+        },
+        select: { id: true },
       });
-    } else await this.usersCompanyRepository.update(updateUserCompanyDto);
+      const upsertOrderedCompanyIds = validatedDesiredIds.filter((id) =>
+        companiesRowsForUpsert.some((row) => row.id === id),
+      );
+      const idsRequestedButMissingCompanyRow = validatedDesiredIds.filter(
+        (id) => !companiesRowsForUpsert.some((row) => row.id === id),
+      );
+
+      if (idsRequestedButMissingCompanyRow.length > 0) {
+        throw new BadRequestException(
+          `Empresa(s) inválida(s) ou inexistente(s): ${idsRequestedButMissingCompanyRow.join(', ')}`,
+        );
+      }
+
+      if (upsertOrderedCompanyIds.length > 0) {
+        return await this.usersCompanyRepository.upsertMany({
+          ...updateUserCompanyDto,
+          companiesIds: upsertOrderedCompanyIds,
+        });
+      }
+
+      return await this.usersCompanyRepository.update(updateUserCompanyDto);
+    }
+
+    return await this.usersCompanyRepository.update(updateUserCompanyDto);
   }
 }

@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { UpdateUserCompanyDto } from '../../dto/update-user-company.dto';
@@ -43,20 +44,100 @@ export class UsersCompanyRepository implements IUsersCompanyRepository {
     return new UserCompanyEntity(UserCompany);
   }
 
-  async deleteAllFromConsultant(userId: number, companyId: string) {
-    await this.prisma.userCompany.deleteMany({
-      where: {
-        OR: [
-          { userId, companyId },
-          {
-            userId,
-            company: {
-              receivingServiceContracts: {
-                some: { applyingServiceCompanyId: companyId },
-              },
+  /** Alinha ao mesmo escopo do findNude em permissões (consultoria / contrato / clínica / grupo). */
+  private consultantScopedLinksWhere(userId: number, contextCompanyId: string): Prisma.UserCompanyWhereInput {
+    return {
+      userId,
+      OR: [
+        { companyId: contextCompanyId },
+        {
+          company: {
+            receivingServiceContracts: {
+              some: { applyingServiceCompanyId: contextCompanyId },
             },
           },
-        ],
+        },
+        {
+          company: {
+            applyingServiceContracts: {
+              some: { receivingServiceCompanyId: contextCompanyId },
+            },
+          },
+        },
+        {
+          company: {
+            companiesToClinicAvailable: {
+              some: { companyId: contextCompanyId },
+            },
+          },
+        },
+        {
+          company: {
+            group: {
+              companyId: contextCompanyId,
+            },
+          },
+        },
+      ],
+    };
+  }
+
+  /**
+   * Remove apenas vínculos elegíveis no escopo da consultoria cujo companyId não está em companiesIdsToKeep.
+   * companiesIdsToKeep vazio → remove todos os vínculos nesse escopo (substituição “zerada”).
+   */
+  async deleteConsultantScopedLinksNotInCompaniesIds(
+    userId: number,
+    contextCompanyId: string,
+    companiesIdsToKeep: string[],
+  ) {
+    const scoped = this.consultantScopedLinksWhere(userId, contextCompanyId);
+
+    if (!companiesIdsToKeep.length) {
+      return this.prisma.userCompany.deleteMany({ where: scoped });
+    }
+
+    return this.prisma.userCompany.deleteMany({
+      where: {
+        ...scoped,
+        companyId: { notIn: companiesIdsToKeep },
+      },
+    });
+  }
+
+  async deleteAllFromConsultant(userId: number, companyId: string) {
+    return this.deleteConsultantScopedLinksNotInCompaniesIds(userId, companyId, []);
+  }
+
+  /**
+   * Remove vínculos do usuário cujo companyId não está em companiesIdsToKeep,
+   * limitando ao conjunto gerenciável pela listagem da edição (ids retornados pelo mesmo escopo que GET /company).
+   */
+  async deleteManageableUserCompanyLinksNotInCompaniesIds(
+    userId: number,
+    companiesIdsToKeep: string[],
+    manageableCompanyIds: string[],
+  ) {
+    if (!manageableCompanyIds.length) {
+      return { count: 0 };
+    }
+
+    if (!companiesIdsToKeep.length) {
+      return this.prisma.userCompany.deleteMany({
+        where: {
+          userId,
+          companyId: { in: manageableCompanyIds },
+        },
+      });
+    }
+
+    return this.prisma.userCompany.deleteMany({
+      where: {
+        userId,
+        companyId: {
+          notIn: companiesIdsToKeep,
+          in: manageableCompanyIds,
+        },
       },
     });
   }
