@@ -55,6 +55,7 @@ export enum ErrorCompanyEnum {
   WORKSPACE_NOT_FOUND = 'O Estabelecimento (área de trabalho) informada não foi encontrada, verifique a sigla utilizada',
   CPF_CONFLICT = 'CPF já cadastrado',
   EMPLOYEE_NOT_FOUND = 'Empregado não encontrado',
+  GHO_WORKSPACE_UNLINK_CONFIRMATION_REQUIRED = 'Existem cargos vinculados ao(s) estabelecimento(s) removido(s) deste GSE. Confirme explicitamente para remover também esses vínculos.',
 }
 
 export enum ErrorInvitesEnum {

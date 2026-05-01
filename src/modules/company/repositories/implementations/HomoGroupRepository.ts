@@ -46,15 +46,24 @@ export class HomoGroupRepository {
     return this.getHomoGroupData(data);
   }
 
-  async update({ workspaceIds, companyId, id, hierarchies, endDate = null, startDate = null, ...updateHomoGroup }: UpdateHomoGroupDto): Promise<HomoGroupEntity> {
+  async update({
+    workspaceIds,
+    companyId,
+    id,
+    hierarchies,
+    endDate = null,
+    startDate = null,
+    confirmUnlinkWorkspaces: _confirmUnlinkWorkspaces,
+    ...updateHomoGroup
+  }: UpdateHomoGroupDto): Promise<HomoGroupEntity> {
     await this.updateHierarchyOnHomogeneousFromGHO({ id, hierarchies, endDate, startDate });
 
     const data = await this.prisma.homogeneousGroup.update({
       where: { id },
       include: { hierarchyOnHomogeneous: { include: { hierarchy: true } } },
       data: {
-        ...(workspaceIds?.length && {
-          workspaces: { connect: workspaceIds.map((id) => ({ id_companyId: { id, companyId } })) },
+        ...(workspaceIds && {
+          workspaces: { set: workspaceIds.map((id) => ({ id_companyId: { id, companyId } })) },
         }),
         ...updateHomoGroup,
       },

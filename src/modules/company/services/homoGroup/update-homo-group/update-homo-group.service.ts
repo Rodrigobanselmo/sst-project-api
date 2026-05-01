@@ -1,7 +1,7 @@
 import { HomoGroupEntity } from './../../../entities/homoGroup.entity';
 import { RoleEnum } from './../../../../../shared/constants/enum/authorization';
 import { EmployeePPPHistoryRepository } from './../../../repositories/implementations/EmployeePPPHistoryRepository';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
 import { UpdateHierarchyHomoGroupDto, UpdateHomoGroupDto } from '../../../../../modules/company/dto/homoGroup';
 import { HomoGroupRepository } from '../../../../../modules/company/repositories/implementations/HomoGroupRepository';
 import { ErrorCompanyEnum, ErrorMessageEnum } from '../../../../../shared/constants/enum/errorMessage';
@@ -18,6 +18,7 @@ export class UpdateHomoGroupService {
   ) {}
 
   async execute(homoGroup: UpdateHomoGroupDto, userPayloadDto: UserPayloadDto) {
+    let hierarchiesToUpdate = homoGroup.hierarchies;
     const inactivating = homoGroup.status == 'INACTIVE';
     const foundHomoGroup = await this.homoGroupRepository.findHomoGroupByCompanyAndId(
       homoGroup.id,
@@ -44,6 +45,61 @@ export class UpdateHomoGroupService {
 
     if (!foundHomoGroup?.id) throw new BadRequestException(ErrorCompanyEnum.GHO_NOT_FOUND);
 
+    const hasWorkspaceUpdate = Array.isArray(homoGroup.workspaceIds);
+    if (hasWorkspaceUpdate) {
+      const fullHomoGroup = await this.homoGroupRepository.findHomoGroupByCompanyAndId(
+        homoGroup.id,
+        userPayloadDto.targetCompanyId,
+        {
+          include: {
+            workspaces: { select: { id: true } },
+            hierarchyOnHomogeneous: {
+              where: { endDate: null, deletedAt: null },
+              include: {
+                hierarchy: {
+                  select: {
+                    id: true,
+                    workspaces: { select: { id: true } },
+                  },
+                },
+              },
+            },
+          },
+        },
+      );
+
+      const previousWorkspaceIds = new Set((fullHomoGroup.workspaces || []).map((w) => w.id));
+      const nextWorkspaceIds = new Set(homoGroup.workspaceIds || []);
+      const removedWorkspaceIds = [...previousWorkspaceIds].filter((id) => !nextWorkspaceIds.has(id));
+
+      if (removedWorkspaceIds.length > 0) {
+        const activeHierarchyLinks = (fullHomoGroup.hierarchyOnHomogeneous || []).filter((link) => !!link?.hierarchy?.id);
+
+        const linkedHierarchiesInRemovedWorkspaces = activeHierarchyLinks.filter((link) => {
+          const hierarchyWorkspaceIds = (link.hierarchy?.workspaces || []).map((w) => w.id);
+          return hierarchyWorkspaceIds.some((wid) => removedWorkspaceIds.includes(wid));
+        });
+
+        const missingConfirmation = !homoGroup.confirmUnlinkWorkspaces && linkedHierarchiesInRemovedWorkspaces.length > 0;
+        if (missingConfirmation) {
+          throw new ConflictException(
+            ErrorCompanyEnum.GHO_WORKSPACE_UNLINK_CONFIRMATION_REQUIRED,
+          );
+        }
+
+        // Reconcile hierarchy links when a workspace is removed with explicit confirmation:
+        // keep only hierarchies that still belong to at least one remaining workspace.
+        const keptHierarchyIds = activeHierarchyLinks
+          .filter((link) => {
+            const hierarchyWorkspaceIds = (link.hierarchy?.workspaces || []).map((w) => w.id);
+            return hierarchyWorkspaceIds.some((wid) => nextWorkspaceIds.has(wid));
+          })
+          .map((link) => link.hierarchyId);
+
+        hierarchiesToUpdate = keptHierarchyIds.map((id) => ({ id }));
+      }
+    }
+
     const forbidenInactivating = inactivating && foundHomoGroup.hierarchyOnHomogeneous[0]?.id;
     if (forbidenInactivating) {
       throw new BadRequestException(ErrorCompanyEnum.FORBIDEN_INACTIVATION);
@@ -58,10 +114,14 @@ export class UpdateHomoGroupService {
     await this.checkDeletion(foundHomoGroup, userPayloadDto, {
       endDate: homoGroup.endDate,
       startDate: homoGroup.startDate,
-      ids: homoGroup?.hierarchies?.map((i) => i.id) || [],
+      ids: hierarchiesToUpdate?.map((i) => i.id) || [],
     });
 
-    const homo = await this.homoGroupRepository.update({ ...homoGroup, companyId: userPayloadDto.targetCompanyId });
+    const homo = await this.homoGroupRepository.update({
+      ...homoGroup,
+      hierarchies: hierarchiesToUpdate,
+      companyId: userPayloadDto.targetCompanyId,
+    });
 
     this.employeePPPHistoryRepository.updateManyNude({
       data: { sendEvent: true },

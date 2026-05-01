@@ -2,7 +2,7 @@ import { QueryArray } from './../../../shared/transformers/query-array';
 import { PaginationQueryDto } from './../../../shared/dto/pagination.dto';
 import { HomoTypeEnum, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
-import { IsDate, IsEnum, IsInt, IsOptional, IsString, MaxLength, ValidateIf, ValidateNested } from 'class-validator';
+import { IsBoolean, IsDate, IsEnum, IsInt, IsOptional, IsString, MaxLength, ValidateIf, ValidateNested } from 'class-validator';
 
 import { StringCapitalizeParagraphTransform } from '../../../shared/transformers/string-capitalize-paragraph';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
@@ -120,6 +120,10 @@ export class UpdateHomoGroupDto {
   @IsOptional()
   @IsString({ each: true })
   workspaceIds?: string[];
+
+  @IsOptional()
+  @IsBoolean()
+  confirmUnlinkWorkspaces?: boolean;
 }
 
 export class UpdateHierarchyHomoGroupDto {
