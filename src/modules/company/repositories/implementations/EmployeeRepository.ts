@@ -599,6 +599,41 @@ export class EmployeeRepository {
         take: 3,
         orderBy: { doneDate: 'desc' },
       };
+      /** Estabelecimentos (workspaces) vinculados via lotações (subOffices). */
+      options.select.subOffices = {
+        select: {
+          id: true,
+          name: true,
+          refName: true,
+          workspaces: {
+            where: { deleted_at: null, status: 'ACTIVE' },
+            select: {
+              id: true,
+              name: true,
+              abbreviation: true,
+            },
+          },
+        },
+      };
+      /**
+       * Mesma origem funcional do organograma no cargo (OFFICE): funcionários aparecem por hierarchyId;
+       * estabelecimentos do cargo vêm de Hierarchy.workspaces, não só de subOffices.
+       */
+      options.select.hierarchy = {
+        select: {
+          id: true,
+          name: true,
+          companyId: true,
+          workspaces: {
+            where: { deleted_at: null, status: 'ACTIVE' },
+            select: {
+              id: true,
+              name: true,
+              abbreviation: true,
+            },
+          },
+        },
+      };
     }
 
     if ('getSector' in query) {
