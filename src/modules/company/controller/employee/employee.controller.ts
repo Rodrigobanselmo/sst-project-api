@@ -9,6 +9,7 @@ import { CreateEmployeeService } from '../../services/employee/create-employee/c
 import { DeleteSubOfficeEmployeeService } from '../../services/employee/delete-sub-office-employee/delete-sub-office-employee.service';
 import { FindAllAvailableEmployeesService } from '../../services/employee/find-all-available-employees/find-all-available-employees.service';
 import { FindEmployeeService } from '../../services/employee/find-employee/find-employee.service';
+import { SoftDeleteEmployeeService } from '../../services/employee/soft-delete-employee/soft-delete-employee.service';
 import { UpdateEmployeeService } from '../../services/employee/update-employee/update-employee.service';
 
 @Controller('employee')
@@ -19,6 +20,7 @@ export class EmployeeController {
     private readonly findEmployeeService: FindEmployeeService,
     private readonly findAllAvailableEmployeesService: FindAllAvailableEmployeesService,
     private readonly deleteSubOfficeEmployeeService: DeleteSubOfficeEmployeeService,
+    private readonly softDeleteEmployeeService: SoftDeleteEmployeeService,
   ) {}
 
   @Permissions({
@@ -49,6 +51,39 @@ export class EmployeeController {
       subOfficeId,
       companyId,
     });
+  }
+
+  /**
+   * Mesmo contexto de empresa que `GET /employee/:companyId` (`getCompanyId` → `targetCompanyId`).
+   * Sem `:companyId` na URL, o PATCH herdava só `user.companyId` do JWT e falhava com 404 na listagem por workspace.
+   */
+  @Permissions({
+    code: PermissionEnum.EMPLOYEE,
+    isContract: true,
+    isMember: true,
+    crud: true,
+  })
+  @Patch(':companyId/:employeeId/soft-delete')
+  softDeleteWithCompanyContext(
+    @Param('companyId') companyId: string,
+    @Param('employeeId') employeeId: string,
+  ) {
+    return this.softDeleteEmployeeService.execute(Number(employeeId), companyId);
+  }
+
+  /** Legado: só funciona se `companyId` vier em query/body (vide `getCompanyId`). Preferir rota com `:companyId`. */
+  @Permissions({
+    code: PermissionEnum.EMPLOYEE,
+    isContract: true,
+    isMember: true,
+    crud: true,
+  })
+  @Patch(':employeeId/soft-delete')
+  softDelete(
+    @User() userPayloadDto: UserPayloadDto,
+    @Param('employeeId') employeeId: string,
+  ) {
+    return this.softDeleteEmployeeService.execute(Number(employeeId), userPayloadDto.targetCompanyId);
   }
 
   @Permissions({

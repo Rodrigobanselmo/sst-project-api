@@ -411,6 +411,10 @@ export class EmployeeRepository {
       ],
     });
 
+    const employeeWhere = where as { AND?: object[] };
+    if (!Array.isArray(employeeWhere.AND)) employeeWhere.AND = [];
+    employeeWhere.AND.push({ deleted_at: null });
+
     if ('search' in query && query.search) {
       const OR = [];
       const CPF = onlyNumbers(query.search);
@@ -1120,6 +1124,48 @@ export class EmployeeRepository {
     });
 
     return new EmployeeEntity(employee);
+  }
+
+  /**
+   * Soft delete no escopo da empresa “em contexto” (JWT targetCompanyId).
+   * Deve espelhar `find()` com `'all' in query`: funcionário pode ter `companyId`
+   * da empresa receptora e ainda aparecer na listagem da prestadora via contrato.
+   */
+  async softDeleteById(employeeId: number, viewingCompanyId: string): Promise<{ count: number }> {
+    const scopedWhere: Prisma.EmployeeWhereInput = {
+      id: employeeId,
+      deleted_at: null,
+      OR: [
+        { companyId: viewingCompanyId },
+        {
+          company: {
+            receivingServiceContracts: {
+              some: { applyingServiceCompanyId: viewingCompanyId },
+            },
+          },
+        },
+      ],
+    };
+
+    const row = await this.prisma.employee.findFirst({
+      where: scopedWhere,
+      select: { id: true, companyId: true },
+    });
+
+    if (!row) {
+      return { count: 0 };
+    }
+
+    return this.prisma.employee.updateMany({
+      where: {
+        id: row.id,
+        companyId: row.companyId,
+        deleted_at: null,
+      },
+      data: {
+        deleted_at: new Date(),
+      },
+    });
   }
 
   private parentInclude() {

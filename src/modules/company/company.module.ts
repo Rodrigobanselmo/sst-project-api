@@ -118,6 +118,7 @@ import { UpdateEmployeeHierarchyHistoryService } from './services/employee/0-his
 import { UpsertEmployeeHierarchyHistoryService } from './services/employee/0-history/hierarchy/upsert/upsert.service';
 import { CreateEmployeeService } from './services/employee/create-employee/create-employee.service';
 import { DeleteSubOfficeEmployeeService } from './services/employee/delete-sub-office-employee/delete-sub-office-employee.service';
+import { SoftDeleteEmployeeService } from './services/employee/soft-delete-employee/soft-delete-employee.service';
 import { FindAllAvailableEmployeesService } from './services/employee/find-all-available-employees/find-all-available-employees.service';
 import { FindEmployeeService } from './services/employee/find-employee/find-employee.service';
 import { UpdateEmployeeService } from './services/employee/update-employee/update-employee.service';
@@ -271,6 +272,7 @@ import { PreviewDocumentCoverService } from './services/document-cover/preview-d
     CopyHomoGroupService,
     CreateSubHierarchyService,
     DeleteSubOfficeEmployeeService,
+    SoftDeleteEmployeeService,
     ContactRepository,
     UpdateContactsService,
     CreateContactsService,
