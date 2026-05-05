@@ -39,20 +39,22 @@ export class InviteUsersService {
 
     if (!isConsulting) inviteUserDto.companiesIds = [];
 
-    const addRoles: string[] = [...(inviteUserDto.roles || [])];
-    const addPermissions: string[] = [...(inviteUserDto.permissions || [])];
+    let addRoles: string[] = [...(inviteUserDto.roles || [])];
+    let addPermissions: string[] = [...(inviteUserDto.permissions || [])];
 
     if (inviteUserDto.groupId) {
-      const authGroup = await this.authGroupRepository.findById(inviteUserDto.groupId, userPayloadDto.companyId);
+      const companyIdForGroup =
+        userPayloadDto.targetCompanyId ?? userPayloadDto.companyId ?? inviteUserDto.companyId;
+      const authGroup = await this.authGroupRepository.findById(inviteUserDto.groupId, companyIdForGroup);
 
       if (!authGroup?.id) throw new BadRequestException(ErrorInvitesEnum.AUTH_GROUP_NOT_FOUND);
 
-      addPermissions.push(...authGroup.permissions);
-      addRoles.push(...authGroup.roles);
+      addRoles = [...authGroup.roles];
+      addPermissions = [...authGroup.permissions];
+      Object.assign(inviteUserDto, { roles: addRoles, permissions: addPermissions });
     }
 
     if (!userRoles.includes(RoleEnum.MASTER)) {
-      const hasAllRoles = addRoles.every((role) => userRoles.includes(role));
       const hasAllPermissions = addPermissions.every((addPermission) =>
         userPermissions.some(
           (userPermission) =>
@@ -60,7 +62,9 @@ export class InviteUsersService {
         ),
       );
 
-      if (!hasAllRoles || !hasAllPermissions) throw new ForbiddenException(ErrorInvitesEnum.FORBIDDEN_INSUFFICIENT_PERMISSIONS);
+      if (!hasAllPermissions) {
+        throw new ForbiddenException(ErrorInvitesEnum.FORBIDDEN_INSUFFICIENT_PERMISSIONS);
+      }
     }
 
     if (userToAdd) {

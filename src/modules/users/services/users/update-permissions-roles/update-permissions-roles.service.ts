@@ -26,20 +26,23 @@ export class UpdatePermissionsRolesService {
     const isConsulting = company.isConsulting;
     if (!isConsulting) updateUserCompanyDto.companiesIds = [];
 
-    const addRoles: string[] = [...(updateUserCompanyDto.roles || [])];
-    const addPermissions: string[] = [...(updateUserCompanyDto.permissions || [])];
+    const companyIdForGroup =
+      userPayloadDto.targetCompanyId ?? userPayloadDto.companyId ?? updateUserCompanyDto.companyId;
+
+    let addRoles: string[] = [...(updateUserCompanyDto.roles || [])];
+    let addPermissions: string[] = [...(updateUserCompanyDto.permissions || [])];
 
     if (updateUserCompanyDto.groupId) {
-      const authGroup = await this.authGroupRepository.findById(updateUserCompanyDto.groupId, userPayloadDto.companyId);
+      const authGroup = await this.authGroupRepository.findById(updateUserCompanyDto.groupId, companyIdForGroup);
 
       if (!authGroup?.id) throw new BadRequestException(ErrorInvitesEnum.AUTH_GROUP_NOT_FOUND);
 
-      addPermissions.push(...authGroup.permissions);
-      addRoles.push(...authGroup.roles);
+      addRoles = [...authGroup.roles];
+      addPermissions = [...authGroup.permissions];
+      Object.assign(updateUserCompanyDto, { roles: addRoles, permissions: addPermissions });
     }
 
     if (!userRoles.includes(RoleEnum.MASTER)) {
-      const doesUserHasAllRoles = addRoles.every((role) => userRoles.includes(role));
       const doesUserHasAllPermissions = addPermissions.every((addPermission) =>
         userPermissions.some((userPermission) => {
           return (
@@ -51,7 +54,7 @@ export class UpdatePermissionsRolesService {
         }),
       );
 
-      if (!doesUserHasAllRoles || !doesUserHasAllPermissions) {
+      if (!doesUserHasAllPermissions) {
         throw new ForbiddenException(ErrorInvitesEnum.FORBIDDEN_INSUFFICIENT_PERMISSIONS);
       }
     }

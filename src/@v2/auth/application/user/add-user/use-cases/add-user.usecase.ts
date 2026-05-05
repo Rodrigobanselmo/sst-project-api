@@ -49,7 +49,7 @@ export class AddUserUseCase {
     }
 
     const hasPermissions = this.checkPermissions(loggedUser, accessGroup);
-    if (!hasPermissions) throw new BadRequestException('Você não tem permissão para criar/editar um usuário com essas credênciais');
+    if (!hasPermissions) throw new BadRequestException('Você não tem permissão para criar/editar um usuário com essas credenciais');
 
     const profileEntity = new ProfileEntity({
       companyId: params.companyId,
@@ -99,10 +99,9 @@ export class AddUserUseCase {
 
   private checkPermissions = (loggedUser: UserContext, accessGroup: AccessGroupEntity) => {
     if (!loggedUser.isAdmin) {
-      const hasAllRoles = accessGroup.checkAllRoles(loggedUser.roles);
+      /** Papéis do grupo são organizacionais; escalonamento real é por permissions efetivas. */
       const hasAllPermissions = accessGroup.checkAllPermissions(loggedUser.permissions);
-
-      if (!hasAllRoles || !hasAllPermissions) return false;
+      if (!hasAllPermissions) return false;
     }
 
     return true;
