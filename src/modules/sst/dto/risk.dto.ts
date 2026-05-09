@@ -1,19 +1,7 @@
 import { PaginationQueryDto } from '../../../shared/dto/pagination.dto';
 import { GrauInsalubridade, RiskFactorsEnum, StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
-import {
-  IsArray,
-  IsBoolean,
-  IsEnum,
-  IsIn,
-  IsInt,
-  IsNumber,
-  IsOptional,
-  IsString,
-  Max,
-  Min,
-  ValidateNested,
-} from 'class-validator';
+import { IsArray, IsBoolean, IsEnum, IsIn, IsInt, IsNumber, IsOptional, IsString, Max, Min, ValidateIf, ValidateNested } from 'class-validator';
 import { QueryArray, QueryIntArray } from '../../../shared/transformers/query-array';
 import { StringCapitalizeParagraphTransform } from '../../../shared/transformers/string-capitalize-paragraph';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
@@ -187,7 +175,19 @@ export class CreateRiskDto {
   @IsOptional()
   otherAppendix?: string;
 
-  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @Transform(
+    ({ value }) => {
+      // Handle various null-like values
+      if (value === null || value === undefined || value === '' || value === 'null' || value === 'undefined') {
+        return null;
+      }
+      return value?.toString().toUpperCase();
+    },
+    { toClassOnly: true },
+  )
+  @ValidateIf((_o, value) => {
+    return value !== null && value !== undefined && value !== '' && value !== 'null' && value !== 'undefined';
+  })
   @IsOptional()
   @IsEnum(GrauInsalubridade, {
     message: `grauInsalubridade must be one of: ${KeysOfEnum(GrauInsalubridade)}`,
@@ -241,7 +241,19 @@ export class UpdateRiskDto {
   @IsOptional()
   otherAppendix?: string;
 
-  @Transform(StringUppercaseTransform, { toClassOnly: true })
+  @Transform(
+    ({ value }) => {
+      // Handle various null-like values
+      if (value === null || value === undefined || value === '' || value === 'null' || value === 'undefined') {
+        return null;
+      }
+      return value?.toString().toUpperCase();
+    },
+    { toClassOnly: true },
+  )
+  @ValidateIf((_o, value) => {
+    return value !== null && value !== undefined && value !== '' && value !== 'null' && value !== 'undefined';
+  })
   @IsOptional()
   @IsEnum(GrauInsalubridade, {
     message: `grauInsalubridade must be one of: ${KeysOfEnum(GrauInsalubridade)}`,
