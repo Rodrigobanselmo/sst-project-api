@@ -62,84 +62,150 @@ export class AiAnalyzeFormQuestionsRisksUseCase {
       throw new BadRequestException('No risk data found for analysis. Please ensure the form has responses and risks are properly configured.');
     }
 
-    console.log(`[AI Analysis] Processing ${hierarchyRiskData.length} hierarchy-risk combinations`);
+    // Filter only the pairs that are eligible to be analyzed by the AI.
+    // Skippable pairs (no questions, zero probability, missing risk metadata) used to
+    // create PROCESSING records that were never resolved — they would stay forever as
+    // PROCESSING. We now exclude them upfront so every PROCESSING record will reach a
+    // final state (DONE or FAILED).
+    const availableRisksMap = new Map(availableRisks.map((risk) => [risk.id, risk]));
+    const eligibleHierarchyRiskData = hierarchyRiskData.filter((item) => {
+      if (!availableRisksMap.has(item.riskId)) return false;
+      if (item.questions.length === 0) return false;
+      if (item.probability === 0) return false;
+      return true;
+    });
+    const skippedCount = hierarchyRiskData.length - eligibleHierarchyRiskData.length;
 
-    // Create processing records in database to track status
+    if (eligibleHierarchyRiskData.length === 0) {
+      console.warn('[AI Analysis] No eligible hierarchy-risk combinations to analyze', {
+        companyId: params.companyId,
+        formApplicationId: params.formApplicationId,
+        totalCombinations: hierarchyRiskData.length,
+      });
+      throw new BadRequestException('No eligible risk data for analysis. Ensure the form has answered questions with non-zero probability.');
+    }
+
+    console.log(`[AI Analysis] Eligible: ${eligibleHierarchyRiskData.length} / Skipped: ${skippedCount} / Total: ${hierarchyRiskData.length}`);
+
+    // Create processing records in database to track status — only for eligible pairs.
     try {
-      await this.createProcessingRecords(hierarchyRiskData, params);
-      console.log(`[AI Analysis] Created processing records for ${hierarchyRiskData.length} analyses`);
+      await this.createProcessingRecords(eligibleHierarchyRiskData, params);
+      console.log(`[AI Analysis] Created processing records for ${eligibleHierarchyRiskData.length} analyses`);
     } catch (error) {
       console.error('[AI Analysis] Failed to create processing records:', error);
-      // Continue with analysis even if processing records fail
+      throw new BadRequestException(`Failed to create processing records: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
 
-    // Process each hierarchy-risk combination using asyncBatch
-    const analyses = await asyncBatch({
-      items: hierarchyRiskData,
-      batchSize: 10, // Process 5 analyses in parallel
-      callback: async (hierarchyRisk, batchIndex, chunkIndex) => {
-        console.log(`[AI Analysis] Processing batch ${batchIndex}, chunk ${chunkIndex}: ${hierarchyRisk.hierarchyName} - ${hierarchyRisk.riskName}`);
-        try {
-          return await this.analyzeHierarchyRisk(hierarchyRisk, availableRisks, params);
-        } catch (error) {
-          console.error(`[AI Analysis] Failed to analyze ${hierarchyRisk.hierarchyName} - ${hierarchyRisk.riskName}:`, error);
-          return {
-            hierarchyId: hierarchyRisk.hierarchyId,
-            riskId: hierarchyRisk.riskId,
-            error: error instanceof Error ? error.message : 'Unknown error',
-            failed: true,
-          };
-        }
-      },
+    // Fire-and-forget: run the heavy AI batch in the background so the HTTP response
+    // returns immediately. The client polls FormAiAnalysis records by status and will
+    // pick up DONE/FAILED as the background work progresses.
+    void this.runAnalysesInBackground(eligibleHierarchyRiskData, availableRisks, params).catch((error) => {
+      console.error('[AI Analysis] Background runner unhandled rejection:', error);
     });
 
-    const successfulAnalyses = analyses.filter((analysis): analysis is IAiAnalyzeFormQuestionsRisksUseCase.HierarchyRiskAnalysis => analysis !== null && !('failed' in analysis));
-    const failedAnalysesData = analyses.filter((analysis) => analysis && 'failed' in analysis) as Array<{ hierarchyId: string; riskId: string; error: string }>;
-
-    if (failedAnalysesData.length > 0) {
-      console.warn(`[AI Analysis] ${failedAnalysesData.length} out of ${analyses.length} analyses failed`);
-    }
-
-    const processingTimeMs = Date.now() - startTime;
-
-    console.log(`[AI Analysis] Completed in ${processingTimeMs}ms. Successful: ${successfulAnalyses.length}, Failed: ${failedAnalysesData.length}`);
-
-    // Store successful analyses to database
-    if (successfulAnalyses.length > 0) {
-      try {
-        await this.storeAnalysesToDatabase(successfulAnalyses, params, processingTimeMs);
-        console.log(`[AI Analysis] Successfully stored ${successfulAnalyses.length} analyses to database`);
-      } catch (error) {
-        console.error('[AI Analysis] Failed to store analyses to database:', error);
-        // Don't throw error here to avoid breaking the response
-      }
-    }
-
-    // Store failed analyses to database
-    if (failedAnalysesData.length > 0) {
-      try {
-        await this.storeFailedAnalysesToDatabase(failedAnalysesData, params);
-        console.log(`[AI Analysis] Successfully stored ${failedAnalysesData.length} failed analyses to database`);
-      } catch (error) {
-        console.error('[AI Analysis] Failed to store failed analyses to database:', error);
-        // Don't throw error here to avoid breaking the response
-      }
-    }
-
     return {
-      analyses: successfulAnalyses,
-      totalHierarchies: new Set(hierarchyRiskData.map((hr) => hr.hierarchyId)).size,
-      totalRisks: new Set(hierarchyRiskData.map((hr) => hr.riskId)).size,
-      totalAnalyses: successfulAnalyses.length,
+      analyses: [],
+      totalHierarchies: new Set(eligibleHierarchyRiskData.map((hr) => hr.hierarchyId)).size,
+      totalRisks: new Set(eligibleHierarchyRiskData.map((hr) => hr.riskId)).size,
+      totalAnalyses: 0,
       metadata: {
         companyId: params.companyId,
         formApplicationId: params.formApplicationId,
         timestamp: new Date().toISOString(),
         model: params.model,
-        processingTimeMs,
-        failedAnalyses: failedAnalysesData.length,
+        processingTimeMs: Date.now() - startTime,
       },
     };
+  }
+
+  private async runAnalysesInBackground(
+    eligibleHierarchyRiskData: IAiAnalyzeFormQuestionsRisksUseCase.HierarchyRiskData[],
+    availableRisks: IAiAnalyzeFormQuestionsRisksUseCase.AvailableRiskData[],
+    params: IAiAnalyzeFormQuestionsRisksUseCase.Params,
+  ): Promise<void> {
+    const startTime = Date.now();
+
+    try {
+      const analyses = await asyncBatch({
+        items: eligibleHierarchyRiskData,
+        batchSize: 10,
+        callback: async (hierarchyRisk, batchIndex, chunkIndex) => {
+          console.log(`[AI Analysis] Processing batch ${batchIndex}, chunk ${chunkIndex}: ${hierarchyRisk.hierarchyName} - ${hierarchyRisk.riskName}`);
+          try {
+            return await this.analyzeHierarchyRisk(hierarchyRisk, availableRisks, params);
+          } catch (error) {
+            console.error(`[AI Analysis] Failed to analyze ${hierarchyRisk.hierarchyName} - ${hierarchyRisk.riskName}:`, error);
+            return {
+              hierarchyId: hierarchyRisk.hierarchyId,
+              riskId: hierarchyRisk.riskId,
+              error: error instanceof Error ? error.message : 'Unknown error',
+              failed: true as const,
+            };
+          }
+        },
+      });
+
+      const successfulAnalyses = analyses.filter((analysis): analysis is IAiAnalyzeFormQuestionsRisksUseCase.HierarchyRiskAnalysis => !!analysis && !('failed' in analysis));
+      const failedAnalysesData = analyses.filter((analysis): analysis is { hierarchyId: string; riskId: string; error: string; failed: true } => !!analysis && 'failed' in analysis);
+
+      const processingTimeMs = Date.now() - startTime;
+      console.log(`[AI Analysis] Background completed in ${processingTimeMs}ms. Successful: ${successfulAnalyses.length}, Failed: ${failedAnalysesData.length}`);
+
+      if (successfulAnalyses.length > 0) {
+        try {
+          await this.storeAnalysesToDatabase(successfulAnalyses, params, processingTimeMs);
+        } catch (error) {
+          console.error('[AI Analysis] Failed to store analyses to database:', error);
+        }
+      }
+
+      if (failedAnalysesData.length > 0) {
+        try {
+          await this.storeFailedAnalysesToDatabase(failedAnalysesData, params);
+        } catch (error) {
+          console.error('[AI Analysis] Failed to store failed analyses to database:', error);
+        }
+      }
+
+      // Safety net: ensure no PROCESSING record is left orphaned. Any eligible pair
+      // that did not produce a result is marked as FAILED so the UI/polling can stop.
+      const resolvedKeys = new Set<string>([
+        ...successfulAnalyses.map((a) => `${a.hierarchyId}:${a.riskId}`),
+        ...failedAnalysesData.map((a) => `${a.hierarchyId}:${a.riskId}`),
+      ]);
+      const orphanData = eligibleHierarchyRiskData.filter((hr) => !resolvedKeys.has(`${hr.hierarchyId}:${hr.riskId}`));
+      if (orphanData.length > 0) {
+        console.warn(`[AI Analysis] ${orphanData.length} orphan PROCESSING records detected, marking as FAILED`);
+        try {
+          await this.storeFailedAnalysesToDatabase(
+            orphanData.map((hr) => ({
+              hierarchyId: hr.hierarchyId,
+              riskId: hr.riskId,
+              error: 'Analysis returned no result',
+            })),
+            params,
+          );
+        } catch (error) {
+          console.error('[AI Analysis] Failed to mark orphan analyses as FAILED:', error);
+        }
+      }
+    } catch (error) {
+      // Catastrophic batch failure — mark every in-flight PROCESSING record as FAILED so
+      // the UI does not stay stuck in PROCESSING.
+      console.error('[AI Analysis] Catastrophic background error, marking all eligible records as FAILED:', error);
+      try {
+        await this.storeFailedAnalysesToDatabase(
+          eligibleHierarchyRiskData.map((hr) => ({
+            hierarchyId: hr.hierarchyId,
+            riskId: hr.riskId,
+            error: error instanceof Error ? error.message : 'Unknown background error',
+          })),
+          params,
+        );
+      } catch (storageError) {
+        console.error('[AI Analysis] Failed to mark records as FAILED after catastrophic error:', storageError);
+      }
+    }
   }
 
   private async storeAnalysesToDatabase(
@@ -340,25 +406,22 @@ export class AiAnalyzeFormQuestionsRisksUseCase {
     hierarchyRisk: IAiAnalyzeFormQuestionsRisksUseCase.HierarchyRiskData,
     availableRisks: IAiAnalyzeFormQuestionsRisksUseCase.AvailableRiskData[],
     params: IAiAnalyzeFormQuestionsRisksUseCase.Params,
-  ): Promise<IAiAnalyzeFormQuestionsRisksUseCase.HierarchyRiskAnalysis | null> {
+  ): Promise<IAiAnalyzeFormQuestionsRisksUseCase.HierarchyRiskAnalysis> {
     const analysisId = `${hierarchyRisk.hierarchyName}-${hierarchyRisk.riskName}`;
 
+    // Skippable cases are filtered upfront in execute(). These defensive throws ensure
+    // that if a skippable case ever reaches here, it is propagated as a FAILED record
+    // instead of producing a silent null that would leave a PROCESSING orphan.
     try {
       const riskData = availableRisks.find((risk) => risk.id === hierarchyRisk.riskId);
       if (!riskData) {
-        console.warn(`[AI Analysis] Risk data not found for risk ID: ${hierarchyRisk.riskId} in analysis: ${analysisId}`);
-        return null;
+        throw new Error(`Risk data not found for risk ID: ${hierarchyRisk.riskId}`);
       }
-
-      // Validate that the risk has sufficient data for analysis
       if (hierarchyRisk.questions.length === 0) {
-        console.warn(`[AI Analysis] No questions found for analysis: ${analysisId}`);
-        return null;
+        throw new Error(`No questions found for analysis: ${analysisId}`);
       }
-
       if (hierarchyRisk.probability === 0) {
-        console.warn(`[AI Analysis] Zero probability detected for analysis: ${analysisId}, skipping`);
-        return null;
+        throw new Error(`Zero probability for analysis: ${analysisId}`);
       }
 
       console.log(`[AI Analysis] Starting analysis for: ${analysisId} (probability: ${hierarchyRisk.probability})`);
@@ -422,7 +485,9 @@ export class AiAnalyzeFormQuestionsRisksUseCase {
         probability: hierarchyRisk.probability,
         questionsCount: hierarchyRisk.questions.length,
       });
-      return null;
+      // Re-throw so the asyncBatch callback can convert the failure into a FAILED record
+      // and the PROCESSING row is properly resolved.
+      throw error instanceof Error ? error : new Error(errorMessage);
     }
   }
 
