@@ -117,7 +117,6 @@ export class SendFormEmailUseCase {
         const linkWithEmployeeId = `${baseUrl}?encrypt=${participant.encryptedEmployeeId}`;
 
         const isResend = !!params.participantIds?.length;
-        const isFrps = formApplication.form.type === FormTypeEnum.PSYCHOSOCIAL;
 
         const emailPayload = this.buildEmailPayload({
           formApplication,
@@ -128,7 +127,6 @@ export class SendFormEmailUseCase {
           participantName: participant.name,
           email: participant.email,
           isResend,
-          isFrps,
           checkDuplicates: !isResend,
         });
 
@@ -168,7 +166,6 @@ export class SendFormEmailUseCase {
     participantName: string;
     email: string;
     isResend: boolean;
-    isFrps: boolean;
     checkDuplicates: boolean;
   }): ISendEmail {
     const { formApplication } = params;
@@ -192,16 +189,17 @@ export class SendFormEmailUseCase {
       checkDuplicates: params.checkDuplicates,
     };
 
-    if (params.isResend && params.isFrps) {
+    if (params.isResend) {
       const entity = formApplication.formApplication;
+      const isFrps = formApplication.form.type === FormTypeEnum.PSYCHOSOCIAL;
 
-      const introText = entity.bannerIntroText?.trim() || DEFAULT_FRPS_INTRO_TEXT;
-      const whyText = entity.bannerWhyText?.trim() || DEFAULT_FRPS_WHY_TEXT;
-      const contactText = entity.bannerContactText?.trim() || DEFAULT_FRPS_CONTACT_TEXT;
+      const introText = entity.bannerIntroText?.trim() || (isFrps ? DEFAULT_FRPS_INTRO_TEXT : DEFAULT_GENERIC_INTRO_TEXT);
+      const whyText = entity.bannerWhyText?.trim() || (isFrps ? DEFAULT_FRPS_WHY_TEXT : DEFAULT_GENERIC_WHY_TEXT);
+      const contactText = entity.bannerContactText?.trim() || DEFAULT_GENERIC_CONTACT_TEXT;
 
       return {
         ...basePayload,
-        type: 'FORM_INVITATION_FRPS_REMINDER',
+        type: 'FORM_INVITATION_REMINDER',
         banner: {
           introText: formatBannerText(introText),
           whyText: formatBannerText(whyText),
@@ -223,5 +221,11 @@ const DEFAULT_FRPS_INTRO_TEXT =
 const DEFAULT_FRPS_WHY_TEXT =
   'Estamos aplicando o Copenhagen Psychosocial Questionnaire (COPSOQ III), um instrumento internacionalmente reconhecido e desenvolvido pelo Danish National Institute for Occupational Health. O questionário é anônimo e individual, garantindo total sigilo nas respostas. Ele nos ajudará a compreender os desafios psicossociais no trabalho e a planejar soluções eficazes para promover saúde mental e bem-estar.';
 
-const DEFAULT_FRPS_CONTACT_TEXT =
+const DEFAULT_GENERIC_INTRO_TEXT =
+  'Você ainda pode responder ao formulário. Sua participação é muito importante para que possamos obter resultados representativos e confiáveis.';
+
+const DEFAULT_GENERIC_WHY_TEXT =
+  'O questionário é individual e suas respostas são tratadas com total sigilo. Ele nos ajudará a compreender melhor o cenário atual e a planejar ações eficazes de melhoria.';
+
+const DEFAULT_GENERIC_CONTACT_TEXT =
   'Entre em contato com o setor de RH da sua empresa ou diretamente com a SimpleSST: (51) 98348-5050';

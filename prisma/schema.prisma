@@ -1254,6 +1254,7 @@ model FormApplication {
   banner_intro_text   String?
   banner_why_text     String?
   banner_contact_text String?
+  reminder_count      Int        @default(0)
   created_at         DateTime   @default(now())
   updated_at         DateTime   @updatedAt
   deleted_at         DateTime?

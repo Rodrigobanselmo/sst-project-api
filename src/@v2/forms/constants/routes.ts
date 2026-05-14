@@ -29,6 +29,7 @@ export const FormRoutes = {
   FORM_PARTICIPANTS: {
     PATH: 'v2/companies/:companyId/forms/applications/:applicationId/participants/',
     SEND_EMAIL: 'v2/companies/:companyId/forms/applications/:applicationId/participants/send-email',
+    SEND_REMINDER: 'v2/companies/:companyId/forms/applications/:applicationId/participants/send-reminder',
   },
   /** Biblioteca de Perguntas Preliminares (templates; cópia na aplicação na fase seguinte). */
   FORM_PRELIMINARY_LIBRARY: {

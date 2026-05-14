@@ -94,6 +94,7 @@ export class FormApplicationReadModelMapper {
       bannerIntroText: prisma.banner_intro_text ?? null,
       bannerWhyText: prisma.banner_why_text ?? null,
       bannerContactText: prisma.banner_contact_text ?? null,
+      reminderCount: prisma.reminder_count ?? 0,
       participants: prisma.participants
         ? {
             hierarchies: prisma.participants.hierarchies.map((h) => ({

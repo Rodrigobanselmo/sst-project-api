@@ -46,6 +46,7 @@ export class FormApplicationAggregateRepository {
           banner_intro_text: params.formApplication.bannerIntroText,
           banner_why_text: params.formApplication.bannerWhyText,
           banner_contact_text: params.formApplication.bannerContactText,
+          reminder_count: params.formApplication.reminderCount,
           participants: {
             create: {
               hierarchies: params.participantsHierarchies.length
@@ -105,6 +106,7 @@ export class FormApplicationAggregateRepository {
           banner_intro_text: params.formApplication.bannerIntroText,
           banner_why_text: params.formApplication.bannerWhyText,
           banner_contact_text: params.formApplication.bannerContactText,
+          reminder_count: params.formApplication.reminderCount,
           participants: {
             update: {
               hierarchies: {

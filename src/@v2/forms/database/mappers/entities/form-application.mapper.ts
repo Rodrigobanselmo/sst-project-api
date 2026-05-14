@@ -22,6 +22,7 @@ export class FormApplicationEntityMapper {
       bannerIntroText: prisma.banner_intro_text,
       bannerWhyText: prisma.banner_why_text,
       bannerContactText: prisma.banner_contact_text,
+      reminderCount: prisma.reminder_count,
     });
   }
 

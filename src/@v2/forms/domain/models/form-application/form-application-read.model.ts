@@ -27,6 +27,7 @@ export type IFormApplicationReadModel = {
   bannerIntroText: string | null;
   bannerWhyText: string | null;
   bannerContactText: string | null;
+  reminderCount: number;
 };
 
 export class FormApplicationReadModel {
@@ -53,6 +54,7 @@ export class FormApplicationReadModel {
   bannerIntroText: string | null;
   bannerWhyText: string | null;
   bannerContactText: string | null;
+  reminderCount: number;
   questionIdentifierGroup: FormQuestionGroupReadModel;
 
   constructor(params: IFormApplicationReadModel) {
@@ -77,5 +79,6 @@ export class FormApplicationReadModel {
     this.bannerIntroText = params.bannerIntroText;
     this.bannerWhyText = params.bannerWhyText;
     this.bannerContactText = params.bannerContactText;
+    this.reminderCount = params.reminderCount;
   }
 }

@@ -58,6 +58,8 @@ import { BrowseFormParticipantsController } from './application/form-participant
 import { BrowseFormParticipantsUseCase } from './application/form-participants/browse-form-participants/use-cases/browse-form-participants.usecase';
 import { SendFormEmailController } from './application/form-participants/send-form-email/controllers/send-form-email.controller';
 import { SendFormEmailUseCase } from './application/form-participants/send-form-email/use-cases/send-form-email.usecase';
+import { SendFormReminderController } from './application/form-participants/send-form-reminder/controllers/send-form-reminder.controller';
+import { SendFormReminderUseCase } from './application/form-participants/send-form-reminder/use-cases/send-form-reminder.usecase';
 import { FormParticipantsDAO } from './database/dao/form-participants/form-participants.dao';
 import { AiAnalyzeFormQuestionsRisksController } from './application/form-questions-answers/ai-analyze-form-questions-risks/controllers/ai-analyze-form-questions-risks.controller';
 import { AiAnalyzeFormQuestionsRisksUseCase } from './application/form-questions-answers/ai-analyze-form-questions-risks/use-cases/ai-analyze-form-questions-risks.usecase';
@@ -108,6 +110,7 @@ import { DeleteHierarchyGroupUseCase } from './application/hierarchy-group/delet
     BrowseFormApplicationRiskLogController,
     BrowseFormParticipantsController,
     SendFormEmailController,
+    SendFormReminderController,
     AiAnalyzeFormQuestionsRisksController,
     BrowseFormQuestionsAnswersAnalysisController,
     EditFormQuestionsAnswersAnalysisController,
@@ -156,6 +159,7 @@ import { DeleteHierarchyGroupUseCase } from './application/hierarchy-group/delet
     BrowseFormApplicationRiskLogUseCase,
     BrowseFormParticipantsUseCase,
     SendFormEmailUseCase,
+    SendFormReminderUseCase,
     AiAnalyzeFormQuestionsRisksUseCase,
     BrowseFormQuestionsAnswersAnalysisUseCase,
     EditFormQuestionsAnswersAnalysisUseCase,

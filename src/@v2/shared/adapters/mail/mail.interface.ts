@@ -58,8 +58,8 @@ interface IFormInvitation extends IEmailType {
   checkDuplicates?: boolean;
 }
 
-interface IFormInvitationFrpsReminder extends IEmailType {
-  type: 'FORM_INVITATION_FRPS_REMINDER';
+interface IFormInvitationReminder extends IEmailType {
+  type: 'FORM_INVITATION_REMINDER';
   companyId: string;
   participantId: number;
   applicationId: string;
@@ -83,7 +83,7 @@ interface IFormInvitationFrpsReminder extends IEmailType {
   checkDuplicates?: boolean;
 }
 
-export type ISendEmail = IInviteUser | IActionPlanAllTasks | IActionPlanNewTasks | IFormInvitation | IFormInvitationFrpsReminder;
+export type ISendEmail = IInviteUser | IActionPlanAllTasks | IActionPlanNewTasks | IFormInvitation | IFormInvitationReminder;
 
 export interface MailAdapter {
   sendMail(data: MailAdapter.SendMailData): Promise<void>;

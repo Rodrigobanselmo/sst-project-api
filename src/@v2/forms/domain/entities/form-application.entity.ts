@@ -31,6 +31,7 @@ export type FormApplicationEntityConstructor = {
   bannerIntroText?: string | null;
   bannerWhyText?: string | null;
   bannerContactText?: string | null;
+  reminderCount?: number;
 };
 
 export class FormApplicationEntity {
@@ -48,6 +49,7 @@ export class FormApplicationEntity {
   bannerIntroText: string | null;
   bannerWhyText: string | null;
   bannerContactText: string | null;
+  reminderCount: number;
 
   private _status: FormStatusEnum;
 
@@ -67,6 +69,7 @@ export class FormApplicationEntity {
     this.bannerIntroText = params.bannerIntroText ?? null;
     this.bannerWhyText = params.bannerWhyText ?? null;
     this.bannerContactText = params.bannerContactText ?? null;
+    this.reminderCount = params.reminderCount ?? 0;
   }
 
   get status() {
