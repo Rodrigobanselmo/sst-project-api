@@ -43,6 +43,9 @@ export class FormApplicationAggregateRepository {
           participation_goal: params.formApplication.participationGoal,
           anonymous: params.formApplication.anonymous,
           shareable_link: params.formApplication.shareableLink,
+          banner_intro_text: params.formApplication.bannerIntroText,
+          banner_why_text: params.formApplication.bannerWhyText,
+          banner_contact_text: params.formApplication.bannerContactText,
           participants: {
             create: {
               hierarchies: params.participantsHierarchies.length
@@ -99,6 +102,9 @@ export class FormApplicationAggregateRepository {
           form_id: params.form.id,
           anonymous: params.formApplication.anonymous,
           shareable_link: params.formApplication.shareableLink,
+          banner_intro_text: params.formApplication.bannerIntroText,
+          banner_why_text: params.formApplication.bannerWhyText,
+          banner_contact_text: params.formApplication.bannerContactText,
           participants: {
             update: {
               hierarchies: {

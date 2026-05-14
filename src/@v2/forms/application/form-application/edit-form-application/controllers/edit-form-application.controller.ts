@@ -40,6 +40,9 @@ export class EditFormApplicationController {
       shareableLink: body.shareableLink,
       identifier: body.identifier,
       participationGoal: body.participationGoal,
+      bannerIntroText: body.bannerIntroText,
+      bannerWhyText: body.bannerWhyText,
+      bannerContactText: body.bannerContactText,
     });
 
     // Invalidate cache after successful update

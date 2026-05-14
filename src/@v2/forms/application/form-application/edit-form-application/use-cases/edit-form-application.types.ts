@@ -35,6 +35,9 @@ export namespace IEditFormApplicationUseCase {
     anonymous?: boolean;
     shareableLink?: boolean;
     participationGoal?: number;
+    bannerIntroText?: string;
+    bannerWhyText?: string;
+    bannerContactText?: string;
     identifier?: {
       name?: string;
       description?: string;

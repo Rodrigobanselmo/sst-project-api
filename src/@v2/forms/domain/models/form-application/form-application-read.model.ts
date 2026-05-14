@@ -24,6 +24,9 @@ export type IFormApplicationReadModel = {
   totalParticipants: number;
   totalAnswers: number;
   averageTimeSpent: number | null;
+  bannerIntroText: string | null;
+  bannerWhyText: string | null;
+  bannerContactText: string | null;
 };
 
 export class FormApplicationReadModel {
@@ -47,6 +50,9 @@ export class FormApplicationReadModel {
   totalAnswers: number;
   averageTimeSpent: number | null;
   participationGoal: number | null;
+  bannerIntroText: string | null;
+  bannerWhyText: string | null;
+  bannerContactText: string | null;
   questionIdentifierGroup: FormQuestionGroupReadModel;
 
   constructor(params: IFormApplicationReadModel) {
@@ -68,5 +74,8 @@ export class FormApplicationReadModel {
     this.totalAnswers = params.totalAnswers;
     this.participationGoal = params.participationGoal;
     this.averageTimeSpent = params.averageTimeSpent;
+    this.bannerIntroText = params.bannerIntroText;
+    this.bannerWhyText = params.bannerWhyText;
+    this.bannerContactText = params.bannerContactText;
   }
 }

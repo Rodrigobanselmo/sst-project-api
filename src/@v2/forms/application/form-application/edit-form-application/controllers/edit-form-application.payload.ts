@@ -119,4 +119,16 @@ export class EditFormApplicationPayload {
   @Min(0)
   @Max(100)
   participationGoal?: number;
+
+  @IsOptional()
+  @IsString()
+  bannerIntroText?: string;
+
+  @IsOptional()
+  @IsString()
+  bannerWhyText?: string;
+
+  @IsOptional()
+  @IsString()
+  bannerContactText?: string;
 }

@@ -19,6 +19,9 @@ export class FormApplicationEntityMapper {
       anonymous: prisma.anonymous ?? true,
       endedAt: prisma.ended_at,
       startAt: prisma.started_at,
+      bannerIntroText: prisma.banner_intro_text,
+      bannerWhyText: prisma.banner_why_text,
+      bannerContactText: prisma.banner_contact_text,
     });
   }
 

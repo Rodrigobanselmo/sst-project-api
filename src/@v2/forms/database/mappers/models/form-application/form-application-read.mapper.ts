@@ -91,6 +91,9 @@ export class FormApplicationReadModelMapper {
       totalParticipants: prisma.totalParticipants,
       totalAnswers: prisma.totalAnswers,
       averageTimeSpent: prisma.averageTimeSpent,
+      bannerIntroText: prisma.banner_intro_text ?? null,
+      bannerWhyText: prisma.banner_why_text ?? null,
+      bannerContactText: prisma.banner_contact_text ?? null,
       participants: prisma.participants
         ? {
             hierarchies: prisma.participants.hierarchies.map((h) => ({

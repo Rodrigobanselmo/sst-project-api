@@ -10,6 +10,9 @@ type IUpdatePrams = {
   anonymous?: boolean | null;
   shareableLink?: boolean | null;
   participationGoal?: number | null;
+  bannerIntroText?: string | null;
+  bannerWhyText?: string | null;
+  bannerContactText?: string | null;
 };
 
 export type FormApplicationEntityConstructor = {
@@ -25,6 +28,9 @@ export type FormApplicationEntityConstructor = {
   anonymous?: boolean | null;
   shareableLink?: boolean | null;
   participationGoal?: number | null;
+  bannerIntroText?: string | null;
+  bannerWhyText?: string | null;
+  bannerContactText?: string | null;
 };
 
 export class FormApplicationEntity {
@@ -39,6 +45,9 @@ export class FormApplicationEntity {
   anonymous: boolean | null;
   shareableLink: boolean | null;
   participationGoal: number | null;
+  bannerIntroText: string | null;
+  bannerWhyText: string | null;
+  bannerContactText: string | null;
 
   private _status: FormStatusEnum;
 
@@ -55,6 +64,9 @@ export class FormApplicationEntity {
     this.anonymous = params.anonymous ?? null;
     this.shareableLink = params.shareableLink ?? null;
     this.participationGoal = params.participationGoal ?? null;
+    this.bannerIntroText = params.bannerIntroText ?? null;
+    this.bannerWhyText = params.bannerWhyText ?? null;
+    this.bannerContactText = params.bannerContactText ?? null;
   }
 
   get status() {
@@ -100,6 +112,9 @@ export class FormApplicationEntity {
     this.anonymous = updateField(this.anonymous, data.anonymous);
     this.shareableLink = updateField(this.shareableLink, data.shareableLink);
     this.participationGoal = updateField(this.participationGoal, data.participationGoal);
+    this.bannerIntroText = updateField(this.bannerIntroText, data.bannerIntroText);
+    this.bannerWhyText = updateField(this.bannerWhyText, data.bannerWhyText);
+    this.bannerContactText = updateField(this.bannerContactText, data.bannerContactText);
   }
 
   canBeAnswered() {
