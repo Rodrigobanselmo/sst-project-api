@@ -8,12 +8,10 @@ import { Injectable, Logger } from '@nestjs/common';
 import { config } from '@/@v2/shared/constants/config';
 import { BrevoClient, BrevoError } from '@getbrevo/brevo';
 
-// Using Brevo SDK v4.x
-
 @Injectable()
 export class BrevoAdapter implements SendMailAdapter {
   private readonly logger = new Logger(BrevoAdapter.name);
-  private readonly whitelist = ['rodrigobanselmo@gmail.com', 'rodrigoanselmo.dev@gmail.com', 'rodrigoanselmo5555@hotmail.com'];
+  private readonly whitelist = ['rodrigobanselmo@gmail.com', 'rodrigoanselmo.dev@gmail.com', 'rodrigoanselmo5555@hotmail.com', 'alexcadastros@icloud.com', 'alexabreumarins@gmail.com'];
   private readonly brevoClient: BrevoClient | null = null;
   private readonly fromEmail: string;
   private readonly fromName: string;

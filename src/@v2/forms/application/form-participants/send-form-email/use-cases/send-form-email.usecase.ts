@@ -4,8 +4,11 @@ import { FormApplicationAggregateRepository } from '@/@v2/forms/database/reposit
 import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service';
 import { CryptoAdapter } from '@/@v2/shared/adapters/crypto/models/crypto.interface';
 import { SharedTokens } from '@/@v2/shared/constants/tokens';
-import { MailAdapter } from '@/@v2/shared/adapters/mail/mail.interface';
+import { MailAdapter, ISendEmail } from '@/@v2/shared/adapters/mail/mail.interface';
 import { config } from '@/@v2/shared/constants/config';
+import { FormTypeEnum } from '@/@v2/forms/domain/enums/form-type.enum';
+import { FormApplicationAggregate } from '@/@v2/forms/domain/aggregates/form-application.aggregate';
+import { formatBannerText } from '@/@v2/forms/utils/format-banner-text';
 import { ISendFormEmailUseCase } from './send-form-email.types';
 
 @Injectable()
@@ -110,32 +113,26 @@ export class SendFormEmailUseCase {
           continue;
         }
 
-        // Generate the form link with encrypted employee ID
         const baseUrl = `${config.SYSTEM.APP_HOST}/formulario/${params.applicationId}`;
         const linkWithEmployeeId = `${baseUrl}?encrypt=${participant.encryptedEmployeeId}`;
 
-        // Send email with form and application details
-        await this.mailAdapter.sendMail({
-          type: 'FORM_INVITATION',
-          email: participant.email,
+        const isResend = !!params.participantIds?.length;
+        const isFrps = formApplication.form.type === FormTypeEnum.PSYCHOSOCIAL;
+
+        const emailPayload = this.buildEmailPayload({
+          formApplication,
           companyId: params.companyId,
           participantId: participant.id,
           applicationId: params.applicationId,
           link: linkWithEmployeeId,
-          form: {
-            name: formApplication.form.name,
-            description: formApplication.form.description,
-          },
-          application: {
-            name: formApplication.formApplication.name,
-            description: formApplication.formApplication.description,
-          },
-          participant: {
-            name: participant.name,
-          },
-          // Flag to indicate if consumer should check for duplicates
-          checkDuplicates: !params.participantIds?.length, // true for bulk sends, false for specific participants
+          participantName: participant.name,
+          email: participant.email,
+          isResend,
+          isFrps,
+          checkDuplicates: !isResend,
         });
+
+        await this.mailAdapter.sendMail(emailPayload);
 
         results.push({
           id: participant.id,
@@ -161,4 +158,70 @@ export class SendFormEmailUseCase {
       participants: results,
     };
   }
+
+  private buildEmailPayload(params: {
+    formApplication: FormApplicationAggregate;
+    companyId: string;
+    participantId: number;
+    applicationId: string;
+    link: string;
+    participantName: string;
+    email: string;
+    isResend: boolean;
+    isFrps: boolean;
+    checkDuplicates: boolean;
+  }): ISendEmail {
+    const { formApplication } = params;
+    const basePayload = {
+      email: params.email,
+      companyId: params.companyId,
+      participantId: params.participantId,
+      applicationId: params.applicationId,
+      link: params.link,
+      form: {
+        name: formApplication.form.name,
+        description: formApplication.form.description,
+      },
+      application: {
+        name: formApplication.formApplication.name,
+        description: formApplication.formApplication.description,
+      },
+      participant: {
+        name: params.participantName,
+      },
+      checkDuplicates: params.checkDuplicates,
+    };
+
+    if (params.isResend && params.isFrps) {
+      const entity = formApplication.formApplication;
+
+      const introText = entity.bannerIntroText?.trim() || DEFAULT_FRPS_INTRO_TEXT;
+      const whyText = entity.bannerWhyText?.trim() || DEFAULT_FRPS_WHY_TEXT;
+      const contactText = entity.bannerContactText?.trim() || DEFAULT_FRPS_CONTACT_TEXT;
+
+      return {
+        ...basePayload,
+        type: 'FORM_INVITATION_FRPS_REMINDER',
+        banner: {
+          introText: formatBannerText(introText),
+          whyText: formatBannerText(whyText),
+          contactText: formatBannerText(contactText),
+        },
+      };
+    }
+
+    return {
+      ...basePayload,
+      type: 'FORM_INVITATION',
+    };
+  }
 }
+
+const DEFAULT_FRPS_INTRO_TEXT =
+  'O Programa de Gerenciamento de Riscos (PGR) está em andamento na sua empresa, com ações voltadas para identificar os Fatores de Riscos Psicossociais (FRPS) no ambiente laboral. Sua participação é fundamental.';
+
+const DEFAULT_FRPS_WHY_TEXT =
+  'Estamos aplicando o Copenhagen Psychosocial Questionnaire (COPSOQ III), um instrumento internacionalmente reconhecido e desenvolvido pelo Danish National Institute for Occupational Health. O questionário é anônimo e individual, garantindo total sigilo nas respostas. Ele nos ajudará a compreender os desafios psicossociais no trabalho e a planejar soluções eficazes para promover saúde mental e bem-estar.';
+
+const DEFAULT_FRPS_CONTACT_TEXT =
+  'Entre em contato com o setor de RH da sua empresa ou diretamente com a SimpleSST: (51) 98348-5050';

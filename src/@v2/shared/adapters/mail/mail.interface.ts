@@ -55,10 +55,35 @@ interface IFormInvitation extends IEmailType {
   participant: {
     name: string;
   };
-  checkDuplicates?: boolean; // Flag for consumer to check if email was already sent to this participant
+  checkDuplicates?: boolean;
 }
 
-export type ISendEmail = IInviteUser | IActionPlanAllTasks | IActionPlanNewTasks | IFormInvitation;
+interface IFormInvitationFrpsReminder extends IEmailType {
+  type: 'FORM_INVITATION_FRPS_REMINDER';
+  companyId: string;
+  participantId: number;
+  applicationId: string;
+  link: string;
+  form: {
+    name: string;
+    description?: string | null;
+  };
+  application: {
+    name: string;
+    description?: string | null;
+  };
+  participant: {
+    name: string;
+  };
+  banner: {
+    introText: string;
+    whyText: string;
+    contactText: string;
+  };
+  checkDuplicates?: boolean;
+}
+
+export type ISendEmail = IInviteUser | IActionPlanAllTasks | IActionPlanNewTasks | IFormInvitation | IFormInvitationFrpsReminder;
 
 export interface MailAdapter {
   sendMail(data: MailAdapter.SendMailData): Promise<void>;

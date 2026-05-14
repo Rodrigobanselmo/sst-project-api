@@ -9,7 +9,7 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class NodeMailerAdapter implements SendMailAdapter {
-  private readonly whitelist = ['rodrigobanselmo@gmail.com', 'rodrigoanselmo.dev@gmail.com', 'rodrigoanselmo5555@hotmail.com'];
+  private readonly whitelist = ['rodrigobanselmo@gmail.com', 'rodrigoanselmo.dev@gmail.com', 'rodrigoanselmo5555@hotmail.com', 'alexcadastros@icloud.com', 'alexabreumarins@gmail.com'];
 
   async sendMail({ to, type, variables, attachments }: SendMailAdapter.SendMailData): Promise<any> {
     try {
