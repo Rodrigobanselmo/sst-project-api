@@ -32,6 +32,8 @@ export type IFormParticipantsBrowseResultModelMapper = {
   email_sent: boolean;
   email_sent_at: Date | null;
   hierarchy_sort_name: string | null;
+  workspace_id: string | null;
+  workspace_name: string | null;
   created_at: Date;
   updated_at: Date;
 };
@@ -83,6 +85,8 @@ export class FormParticipantsBrowseResultModelMapper {
       hasResponded: prisma.has_responded,
       emailSent: prisma.email_sent,
       emailSentAt: prisma.email_sent_at,
+      workspaceId: prisma.workspace_id ?? null,
+      workspaceName: prisma.workspace_name ?? null,
       createdAt: prisma.created_at,
       updatedAt: prisma.updated_at,
       encryptedEmployeeId: cryptoAdapter.encryptNumber(prisma.id),
