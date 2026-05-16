@@ -31,6 +31,7 @@ export namespace IAiAnalyzeFormQuestionsRisksUseCase {
     id: string;
     name: string;
     type: RiskFactorsEnum;
+    severity: number;
     generateSources: Array<{
       id: string;
       name: string;

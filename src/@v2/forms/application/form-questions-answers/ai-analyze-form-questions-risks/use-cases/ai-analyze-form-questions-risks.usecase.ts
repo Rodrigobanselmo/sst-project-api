@@ -7,6 +7,7 @@ import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service';
 import { CacheProvider } from '@/shared/providers/CacheProvider/CacheProvider';
 import { CacheTtlEnum } from '@/shared/interfaces/cache.types';
 import { asyncBatch } from '@/@v2/shared/utils/helpers/async-batch';
+import { getMatrizRisk } from '@/@v2/shared/domain/functions/security/get-matrix-risk.func';
 import { IAiAnalyzeFormQuestionsRisksUseCase } from './ai-analyze-form-questions-risks.types';
 import { FormQuestionsAnswersRisksService } from '../../shared/services/form-questions-answers-risks.service';
 import { IFormQuestionsAnswersRisksService } from '../../shared/services/form-questions-answers-risks.types';
@@ -67,11 +68,21 @@ export class AiAnalyzeFormQuestionsRisksUseCase {
     // create PROCESSING records that were never resolved — they would stay forever as
     // PROCESSING. We now exclude them upfront so every PROCESSING record will reach a
     // final state (DONE or FAILED).
+    // NRO (Nível de Risco Ocupacional) thresholds — values returned by getMatrizRisk:
+    // 0=N/A, 1=MuitoBaixo, 2=Baixo, 3=Moderado, 4=Alto, 5=MuitoAlto, 6=Interromper.
+    // Pairs below this level are not worth the AI cost.
+    const MIN_OCCUPATIONAL_RISK_LEVEL = 3;
+
     const availableRisksMap = new Map(availableRisks.map((risk) => [risk.id, risk]));
     const eligibleHierarchyRiskData = hierarchyRiskData.filter((item) => {
-      if (!availableRisksMap.has(item.riskId)) return false;
+      const risk = availableRisksMap.get(item.riskId);
+      if (!risk) return false;
       if (item.questions.length === 0) return false;
       if (item.probability === 0) return false;
+
+      const nro = getMatrizRisk(risk.severity, item.probability);
+      if (nro < MIN_OCCUPATIONAL_RISK_LEVEL) return false;
+
       return true;
     });
     const skippedCount = hierarchyRiskData.length - eligibleHierarchyRiskData.length;
@@ -816,7 +827,7 @@ As sugestões da IA servem somente para identificar causas prováveis e medidas 
       ttlSeconds: CacheTtlEnum.MIN_10,
     });
 
-    const cacheKey = `available-risks-with-sources-${companyId}`;
+    const cacheKey = `available-risks-with-sources-v2-${companyId}`;
 
     return cache.funcResponse(async () => {
       const risks = await this.prisma.riskFactors.findMany({
@@ -864,6 +875,7 @@ As sugestões da IA servem somente para identificar causas prováveis e medidas 
           id: risk.id,
           name: risk.name,
           type: risk.type,
+          severity: risk.severity,
           generateSources: risk.generateSource || [],
           recommendations: [], // Not used anymore
           administrativeMeasures: administrativeMeasures.map((adm) => ({
