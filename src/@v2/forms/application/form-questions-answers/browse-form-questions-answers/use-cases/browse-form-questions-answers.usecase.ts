@@ -1,14 +1,18 @@
+import { FormParticipantStructuresDAO } from '@/@v2/forms/database/dao/form-participant-structures/form-participant-structures.dao';
 import { FormQuestionsAnswersDAO } from '@/@v2/forms/database/dao/form-questions-answers/form-questions-answers.dao';
 import { FormQuestionTypeEnum } from '@/@v2/forms/domain/enums/form-question-type.enum';
+import { FormQuestionsAnswersBrowseModel } from '@/@v2/forms/domain/models/form-questions-answers/form-questions-answers-browse.model';
 import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service';
 import { Injectable } from '@nestjs/common';
 import { HierarchyEnum } from '@prisma/client';
+import { buildParticipantStructuresForBrowse } from '../helpers/build-participant-structures-for-browse';
 import { IBrowseFormQuestionsAnswersUseCase } from './browse-form-questions-answers.types';
 
 @Injectable()
 export class BrowseFormQuestionsAnswersUseCase {
   constructor(
     private readonly formQuestionsAnswersDAO: FormQuestionsAnswersDAO,
+    private readonly formParticipantStructuresDAO: FormParticipantStructuresDAO,
     private readonly prisma: PrismaServiceV2,
   ) {}
 
@@ -48,6 +52,16 @@ export class BrowseFormQuestionsAnswersUseCase {
       });
     });
 
-    return questionsAnswers;
+    const participantStructures = await buildParticipantStructuresForBrowse({
+      groups: questionsAnswers.results,
+      companyId: params.companyId,
+      formApplicationId: params.formApplicationId,
+      structuresDao: this.formParticipantStructuresDAO,
+    });
+
+    return new FormQuestionsAnswersBrowseModel({
+      results: questionsAnswers.results,
+      participantStructures,
+    });
   }
 }

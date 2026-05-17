@@ -11,53 +11,13 @@ import { gerWhereRawPrisma } from '@/@v2/shared/utils/database/get-where-raw-pri
 import { getOrderByRawPrisma, IOrderByRawPrisma } from '@/@v2/shared/utils/database/get-order-by-raw-prisma';
 import { FormParticipantsBrowseModelMapper } from '../../mappers/models/form-participants/form-participants-browse.mapper';
 import { Prisma } from '@prisma/client';
+import { participantWorkspaceLateralJoin } from './participant-workspace-lateral.sql';
 
 function coerceSqlCount(value: unknown): number {
   if (value === undefined || value === null) return 0;
   if (typeof value === 'bigint') return Number(value);
   const n = Number(value);
   return Number.isFinite(n) ? n : 0;
-}
-
-/**
- * Estabelecimento (workspace) do participante no escopo da aplicação.
- * LATERAL garante uma linha por employee sem multiplicar o DISTINCT da listagem.
- *
- * Prioridade:
- * 1) Workspace explícito em FormParticipantsWorkspace com vínculo _HierarchyToWorkspace no cargo.
- * 2) Participação por hierarquia: workspace do cargo entre os workspaces da aplicação.
- *
- * Empate (vários workspaces): menor nome (pt-BR), depois menor id.
- */
-function participantWorkspaceLateralJoin(applicationId: string): Prisma.Sql {
-  return Prisma.sql`
-    LEFT JOIN LATERAL (
-      SELECT picked.workspace_id, picked.workspace_name
-      FROM (
-        SELECT ws.id AS workspace_id, ws.name AS workspace_name, 1 AS prio
-        FROM "FormParticipants" fp
-        INNER JOIN "FormParticipantsWorkspace" fpw ON fpw.form_participants_id = fp.id
-        INNER JOIN "_HierarchyToWorkspace" htw
-          ON htw."B" = fpw.workspace_id AND htw."A" = emp."hierarchyId"
-        INNER JOIN "Workspace" ws ON ws.id = fpw.workspace_id AND ws.deleted_at IS NULL
-        WHERE fp.form_application_id = ${applicationId}
-
-        UNION ALL
-
-        SELECT ws.id, ws.name, 2 AS prio
-        FROM "FormParticipants" fp
-        INNER JOIN "FormParticipantsHierarchy" fph
-          ON fph.form_participants_id = fp.id AND fph.hierarchy_id = emp."hierarchyId"
-        INNER JOIN "_HierarchyToWorkspace" htw ON htw."A" = emp."hierarchyId"
-        INNER JOIN "FormParticipantsWorkspace" fpw
-          ON fpw.form_participants_id = fp.id AND fpw.workspace_id = htw."B"
-        INNER JOIN "Workspace" ws ON ws.id = htw."B" AND ws.deleted_at IS NULL
-        WHERE fp.form_application_id = ${applicationId}
-      ) picked
-      ORDER BY picked.prio ASC, picked.workspace_name ASC, picked.workspace_id ASC
-      LIMIT 1
-    ) participant_ws ON TRUE
-  `;
 }
 
 function readFilterSummaryRow(rows: unknown[]): {

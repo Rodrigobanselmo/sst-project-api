@@ -29,6 +29,7 @@ import { DuplicateFormUseCase } from './application/form/duplicate-form/use-case
 import { FormApplicationDAO } from './database/dao/form-application/form-application.dao';
 import { FormDAO } from './database/dao/form/form.dao';
 import { RiskDAO } from './database/dao/risk/risk.dao';
+import { FormParticipantStructuresDAO } from './database/dao/form-participant-structures/form-participant-structures.dao';
 import { FormQuestionsAnswersDAO } from './database/dao/form-questions-answers/form-questions-answers.dao';
 import { FormApplicationAggregateRepository } from './database/repositories/form-application/form-application-aggregate.repository';
 import { FormQuestionGroupAggregateRepository } from './database/repositories/form-question-group/form-question-group-aggregate.repository';
@@ -126,6 +127,7 @@ import { DeleteHierarchyGroupUseCase } from './application/hierarchy-group/delet
     FormApplicationDAO,
     FormApplicationRiskLogDAO,
     FormQuestionsAnswersDAO,
+    FormParticipantStructuresDAO,
     FormParticipantsDAO,
     FormRepository,
     FormAggregateRepository,
