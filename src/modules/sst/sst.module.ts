@@ -55,6 +55,7 @@ import { DeleteSoftGenerateSourceService } from './services/generate-source/dele
 import { UpdateGenerateSourceService } from './services/generate-source/update-generate-source/update-generate-source.service';
 import { FindByIdDocumentsService } from './services/docVersion/find-by-id-documents/find-by-id-documents.service';
 import { FindDocumentsService } from './services/docVersion/find-documents/find-documents.service';
+import { DeleteDocumentVersionService } from './services/docVersion/delete-document-version/delete-document-version.service';
 import { CreateRecMedService } from './services/rec-med/create-rec-med/create-rec-med.service';
 import { DeleteSoftRecMedService } from './services/rec-med/delete-soft-rec-med/delete-soft-rec-med.service';
 import { SyncMissingDerivedMeasureAfterRecMedUpdateService } from './services/rec-med/sync-missing-derived-measure-after-rec-med-update/sync-missing-derived-measure-after-rec-med-update.service';
@@ -153,6 +154,7 @@ import { CacheModule } from '@nestjs/cache-manager';
     FindByIdService,
     FindChecklistDataService,
     FindDocumentsService,
+    DeleteDocumentVersionService,
     FindEpiService,
     FindExamService,
     FindExamToClinicService,

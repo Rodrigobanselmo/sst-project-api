@@ -66,6 +66,10 @@ export class DocumentDataPGRDto {
   @ToBoolean()
   @IsOptional()
   hasEmergencyPlan: boolean;
+
+  @IsOptional()
+  @IsString()
+  legalResponsibleBy?: string;
 }
 
 export class UpsertDocumentDataPGRDto extends UpsertDocumentDataDto {

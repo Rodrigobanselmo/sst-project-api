@@ -17,6 +17,7 @@ export type IDocumentBaseDataJson = {
   months_period_level_3?: number;
   months_period_level_4?: number;
   months_period_level_5?: number;
+  legalResponsibleBy?: string;
 };
 
 export class DocumentBaseDataMapper {
@@ -37,6 +38,7 @@ export class DocumentBaseDataMapper {
       monthsPeriodLevel_3: documentData?.months_period_level_3,
       monthsPeriodLevel_4: documentData?.months_period_level_4,
       monthsPeriodLevel_5: documentData?.months_period_level_5,
+      legalResponsibleBy: documentData?.legalResponsibleBy,
     });
   }
 }

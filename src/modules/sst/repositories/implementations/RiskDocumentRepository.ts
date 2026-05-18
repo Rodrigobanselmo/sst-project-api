@@ -122,4 +122,22 @@ export class RiskDocumentRepository {
 
     return new RiskDocumentEntity(riskDocumentEntity);
   }
+
+  async delete(id: string, companyId: string) {
+    const existing = await this.prisma.riskFactorDocument.findUnique({
+      where: { id_companyId: { id, companyId } },
+    });
+
+    if (!existing) return null;
+
+    await this.prisma.attachments.deleteMany({
+      where: { riskFactorDocumentId: id },
+    });
+
+    const riskFactorDocEntity = await this.prisma.riskFactorDocument.delete({
+      where: { id_companyId: { id, companyId } },
+    });
+
+    return new RiskDocumentEntity(riskFactorDocEntity);
+  }
 }

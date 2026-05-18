@@ -118,7 +118,13 @@ export class DocumentBuildPGR {
       [VariablesPGREnum.COMPANY_HAS_SST_CERTIFICATION]: this.document?.complementarySystems?.length > 0 ? 'true' : '',
       [VariablesPGREnum.DOCUMENT_COORDINATOR]: this.document?.coordinatorBy || '',
       [VariablesPGREnum.DOCUMENT_TITLE]: 'Criar variavel local "TITULO_DO_DOCUMENTO"',
-      ...companyVariables(this.company, this.workspace, this.workspace.address),
+      ...companyVariables(
+        this.company,
+        this.workspace,
+        this.workspace.address,
+        (this.document as { legalResponsibleBy?: string })?.legalResponsibleBy ||
+          (this.document?.json as { legalResponsibleBy?: string })?.legalResponsibleBy,
+      ),
       ...booleanVariables(this.company, this.workspace, this.hierarchy, this.document),
       ...docVariables,
     };

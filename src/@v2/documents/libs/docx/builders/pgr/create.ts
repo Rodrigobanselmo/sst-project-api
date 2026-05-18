@@ -52,6 +52,7 @@ export class DocumentBuildPGR {
         employeeCount: this.data.numOfEmployee,
         company: this.data.documentBase.company,
         workspace: this.data.documentBase.workspace,
+        legalResponsibleOverride: this.data.documentBase.data.legalResponsibleBy,
       }),
       ...booleanVariables(this.data),
       ...variables,
