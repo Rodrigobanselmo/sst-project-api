@@ -14,6 +14,7 @@ export type IDocumentBaseDataVO = {
   monthsPeriodLevel_3?: number;
   monthsPeriodLevel_4?: number;
   monthsPeriodLevel_5?: number;
+  legalResponsibleBy?: string;
 };
 
 export class DocumentBaseDataVO {
@@ -30,6 +31,7 @@ export class DocumentBaseDataVO {
   monthsPeriodLevel_3: number;
   monthsPeriodLevel_4: number;
   monthsPeriodLevel_5: number;
+  legalResponsibleBy?: string;
 
   constructor(params: IDocumentBaseDataVO) {
     this.isQ5 = params.isQ5 || false;
@@ -45,6 +47,7 @@ export class DocumentBaseDataVO {
     this.monthsPeriodLevel_3 = params.monthsPeriodLevel_3 || 12;
     this.monthsPeriodLevel_4 = params.monthsPeriodLevel_4 || 6;
     this.monthsPeriodLevel_5 = params.monthsPeriodLevel_5 || 3;
+    this.legalResponsibleBy = params.legalResponsibleBy?.trim() || undefined;
   }
 
   getMonthsPeriodLevel(level: number): number | null {

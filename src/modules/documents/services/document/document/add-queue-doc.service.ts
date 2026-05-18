@@ -21,6 +21,7 @@ export class AddQueueDocumentService {
     const riskDoc = await this.riskDocumentRepository.upsert({
       id: upsertPgrDto.id,
       name: upsertPgrDto.name,
+      description: upsertPgrDto.description,
       documentDataId: upsertPgrDto.documentDataId,
       version: upsertPgrDto.version,
       workspaceId: upsertPgrDto.workspaceId,

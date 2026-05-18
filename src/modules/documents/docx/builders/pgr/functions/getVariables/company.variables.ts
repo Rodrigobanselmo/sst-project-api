@@ -5,7 +5,12 @@ import { VariablesPGREnum } from '../../enums/variables.enum';
 import { formatCNPJ } from '@brazilian-utils/brazilian-utils';
 import { formatCnae, formatPhoneNumber } from '../../../../../../../shared/utils/formats';
 
-export const companyVariables = (company: CompanyEntity, workspace: WorkspaceEntity, address: AddressEntity) => {
+export const companyVariables = (
+  company: CompanyEntity,
+  workspace: WorkspaceEntity,
+  address: AddressEntity,
+  legalResponsibleOverride?: string,
+) => {
   const consultant = company.receivingServiceContracts[0]?.applyingServiceCompany;
 
   return {
@@ -34,7 +39,8 @@ export const companyVariables = (company: CompanyEntity, workspace: WorkspaceEnt
     [VariablesPGREnum.COMPANY_MISSION]: company?.mission || '',
     [VariablesPGREnum.COMPANY_VISION]: company?.vision || '',
     [VariablesPGREnum.COMPANY_VALUES]: company?.values || '',
-    [VariablesPGREnum.COMPANY_RESPONSIBLE]: company?.responsibleName || '',
+    [VariablesPGREnum.COMPANY_RESPONSIBLE]:
+      legalResponsibleOverride?.trim() || company?.responsibleName?.trim() || '',
     [VariablesPGREnum.WORKSPACE_CNPJ]: formatCNPJ(workspace?.cnpj) || formatCNPJ(company?.cnpj) || '',
     [VariablesPGREnum.IS_RS]: address?.state === 'RS' ? 'true' : '',
     [VariablesPGREnum.IS_AC]: address?.state == 'AC' ? 'true' : '',

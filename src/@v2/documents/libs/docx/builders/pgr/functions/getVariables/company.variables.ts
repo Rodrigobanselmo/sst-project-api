@@ -9,9 +9,17 @@ interface ICompanyVariables {
   company: CompanyModel;
   workspace: WorkspaceModel;
   employeeCount: number;
+  legalResponsibleOverride?: string;
 }
 
-export const companyVariables = ({ employeeCount, company, workspace }: ICompanyVariables) => {
+export const companyVariables = ({
+  employeeCount,
+  company,
+  workspace,
+  legalResponsibleOverride,
+}: ICompanyVariables) => {
+  const legalResponsible =
+    legalResponsibleOverride?.trim() || company?.responsibleName?.trim() || '';
   // const address = workspace.isOwner ? workspace?.address || company?.address : company?.address;
   const address = company?.address;
 
@@ -38,7 +46,7 @@ export const companyVariables = ({ employeeCount, company, workspace }: ICompany
     [VariablesPGREnum.COMPANY_MISSION]: company.mission || '',
     [VariablesPGREnum.COMPANY_VISION]: company.vision || '',
     [VariablesPGREnum.COMPANY_VALUES]: company.values || '',
-    [VariablesPGREnum.COMPANY_RESPONSIBLE]: company?.responsibleName || '',
+    [VariablesPGREnum.COMPANY_RESPONSIBLE]: legalResponsible,
     [VariablesPGREnum.WORKSPACE_CNPJ]: formatCnpj(workspace?.cnpj || company?.cnpj || ''),
     [VariablesPGREnum.IS_RS]: address?.state === 'RS' ? 'true' : '',
     [VariablesPGREnum.IS_AC]: address?.state == 'AC' ? 'true' : '',
