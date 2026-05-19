@@ -58,8 +58,27 @@ export class ExamRiskRepository {
 
     const { where } = prismaFilter(whereInit, {
       query,
-      skip: ['search', 'targetCompanyId'],
+      skip: ['search', 'targetCompanyId', 'workspaceId'],
     });
+
+    if ('workspaceId' in query && query.workspaceId) {
+      const companyIdFilter = query.targetCompanyId
+        ? query.targetCompanyId
+        : Array.isArray(query.companyId)
+          ? { in: query.companyId }
+          : query.companyId;
+
+      (where.AND as any).push({
+        risk: {
+          riskFactorData: {
+            some: {
+              companyId: companyIdFilter,
+              workspaceId: query.workspaceId,
+            },
+          },
+        },
+      } as typeof options.where);
+    }
 
     if ('search' in query && query.search) {
       (where.AND as any).push({

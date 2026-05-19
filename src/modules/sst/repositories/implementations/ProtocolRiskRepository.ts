@@ -86,8 +86,33 @@ export class ProtocolToRiskRepository {
 
     const { where } = prismaFilter(whereInit, {
       query,
-      skip: ['search'],
+      skip: ['search', 'workspaceId'],
     });
+
+    if ('workspaceId' in query && query.workspaceId) {
+      (where.AND as any).push({
+        OR: [
+          {
+            hierarchies: {
+              some: { workspaceId: query.workspaceId },
+            },
+          },
+          {
+            homoGroups: {
+              some: {
+                workspaces: { some: { id: query.workspaceId } },
+              },
+            },
+          },
+          {
+            AND: [
+              { hierarchies: { none: {} } },
+              { homoGroups: { none: {} } },
+            ],
+          },
+        ],
+      } as typeof options.where);
+    }
 
     if ('search' in query && query.search) {
       (where.AND as any).push({

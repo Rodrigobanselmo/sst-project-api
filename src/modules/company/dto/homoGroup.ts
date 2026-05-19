@@ -198,4 +198,8 @@ export class FindHomogeneousGroupDto extends PaginationQueryDto {
     message: `type must be one of: ${KeysOfEnum(HomoTypeEnum)}`,
   })
   type?: HomoTypeEnum[];
+
+  @IsString()
+  @IsOptional()
+  workspaceId?: string;
 }

@@ -64,4 +64,8 @@ export class FindProtocolToRiskDto extends PaginationQueryDto {
   @IsString()
   @IsOptional()
   companyId?: string;
+
+  @IsString()
+  @IsOptional()
+  workspaceId?: string;
 }

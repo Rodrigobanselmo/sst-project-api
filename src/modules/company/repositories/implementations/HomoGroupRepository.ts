@@ -315,8 +315,19 @@ export class HomoGroupRepository {
 
     const { where } = prismaFilter(whereInit, {
       query,
-      skip: ['search', 'type'],
+      skip: ['search', 'type', 'workspaceId'],
     });
+
+    if ('workspaceId' in query && query.workspaceId) {
+      const workspaceId = query.workspaceId;
+      (where.AND as any).push({
+        OR: [
+          { workspaces: { some: { id: workspaceId } } },
+          { characterization: { workspaceId } },
+          { environment: { workspaceId } },
+        ],
+      } as typeof options.where);
+    }
 
     if ('search' in query && query.search) {
       (where.AND as any).push({

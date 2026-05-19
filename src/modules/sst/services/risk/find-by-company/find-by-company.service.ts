@@ -23,17 +23,70 @@ export class FindRisksByCompanyService {
         })
       : [];
 
+    const workspaceId = query.workspaceId;
+
     const risks = await this.riskRepository.findCountNude(
       { skip, take },
       {
         orderBy,
         where: {
           representAll: false, // remove standard risk
-          riskFactorData: {
-            some: {
-              companyId,
-            },
-          },
+          ...(workspaceId
+            ? {
+                OR: [
+                  {
+                    riskFactorData: {
+                      some: {
+                        companyId,
+                        OR: [
+                          {
+                            homogeneousGroup: {
+                              workspaces: { some: { id: workspaceId } },
+                            },
+                          },
+                          {
+                            homogeneousGroup: {
+                              characterization: { workspaceId },
+                            },
+                          },
+                          {
+                            homogeneousGroup: {
+                              environment: { workspaceId },
+                            },
+                          },
+                          {
+                            hierarchy: {
+                              workspaces: { some: { id: workspaceId } },
+                            },
+                          },
+                        ],
+                      },
+                    },
+                  },
+                  {
+                    docInfo: {
+                      some: {
+                        companyId,
+                        OR: [
+                          { hierarchyId: null },
+                          {
+                            hierarchy: {
+                              workspaces: { some: { id: workspaceId } },
+                            },
+                          },
+                        ],
+                      },
+                    },
+                  },
+                ],
+              }
+            : {
+                riskFactorData: {
+                  some: {
+                    companyId,
+                  },
+                },
+              }),
           ...(search && {
             OR: [
               { name: { contains: search, mode: 'insensitive' } },

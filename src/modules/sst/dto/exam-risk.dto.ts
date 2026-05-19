@@ -133,4 +133,8 @@ export class FindExamRiskDto extends PaginationQueryDto {
   @IsString()
   @IsOptional()
   targetCompanyId?: string;
+
+  @IsString()
+  @IsOptional()
+  workspaceId?: string;
 }
