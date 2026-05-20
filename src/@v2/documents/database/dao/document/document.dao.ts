@@ -1,4 +1,6 @@
+import { isFrpsRisk } from '@/@v2/documents/domain/functions/is-frps-risk.func';
 import { DocumentPGRModel } from '@/@v2/documents/domain/models/document-pgr.model';
+import { HomogeneousGroupModel } from '@/@v2/documents/domain/models/homogeneous-group.model';
 import { Injectable } from '@nestjs/common';
 import { DocumentVersionDAO } from '../document-version/document-version.dao';
 import { ExamDAO } from '../exam/exam.dao';
@@ -40,5 +42,33 @@ export class DocumentDAO {
     });
 
     return documentModel;
+  }
+
+  async findDocumentFRPS(params: IDocumentDAO.FindByIdParams) {
+    const document = await this.findDocumentPGR(params);
+    if (!document) return null;
+
+    const homogeneousGroups = document.homogeneousGroups.map(
+      (group) =>
+        new HomogeneousGroupModel({
+          id: group.id,
+          name: group.name,
+          description: group.description,
+          type: group.type,
+          companyId: group.companyId,
+          hierarchies: group.hierarchies,
+          characterization: group.characterization,
+          risksData: group.allRiskData.filter((riskData) => isFrpsRisk(riskData.risk)),
+          frpsOnly: true,
+        }),
+    );
+
+    return new DocumentPGRModel({
+      documentVersion: document.documentVersion,
+      homogeneousGroups,
+      exams: document.exams,
+      hierarchies: document.hierarchies,
+      scopeOfSelectedGroupIds: document.scopeOfSelectedGroupIds,
+    });
   }
 }

@@ -150,4 +150,16 @@ export class DocumentsBaseController {
     upsertPgrDto.type = DocumentTypeEnum.INSALUBRIDADE;
     return this.addQueueDocumentService.execute(upsertPgrDto, userPayloadDto);
   }
+
+  @Permissions({
+    code: PermissionEnum.PGR,
+    isMember: true,
+    isContract: true,
+    crud: true,
+  })
+  @Post('/add-queue/frps')
+  async addFrpsQueueDoc(@User() userPayloadDto: UserPayloadDto, @Body() upsertPgrDto: UploadDocumentDto) {
+    upsertPgrDto.type = DocumentTypeEnum.FRPS;
+    return this.addQueueDocumentService.execute(upsertPgrDto, userPayloadDto);
+  }
 }

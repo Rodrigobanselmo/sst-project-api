@@ -21,6 +21,8 @@ import { CreatorDocumentLTCAT } from './factories/document/creators/document-ltc
 import { ProductDocumentLTCAT } from './factories/document/products/document-ltcat/document-ltcat.product';
 import { CreatorDocumentINSAL } from './factories/document/creators/document-insal/document-insal.creator';
 import { ProductDocumentINSAL } from './factories/document/products/document-insal/document-insal.product';
+import { CreatorDocumentFRPS } from './factories/document/creators/document-frps/document-frps.creator';
+import { ProductDocumentFRPS } from './factories/document/products/document-frps/document-frps.product';
 
 @Module({
   imports: [SharedModule],
@@ -34,6 +36,8 @@ import { ProductDocumentINSAL } from './factories/document/products/document-ins
     ProductDocumentLTCAT,
     CreatorDocumentINSAL,
     ProductDocumentINSAL,
+    CreatorDocumentFRPS,
+    ProductDocumentFRPS,
     CreatorDocumentPreview,
     ProductDocumentPreview,
     DocumentCreationService,
@@ -53,6 +57,7 @@ import { ProductDocumentINSAL } from './factories/document/products/document-ins
     CreatorDocumentPER,
     CreatorDocumentLTCAT,
     CreatorDocumentINSAL,
+    CreatorDocumentFRPS,
     CreatorDocumentPreview,
     DocumentDAO,
     DocumentVersionRepository,

@@ -19,6 +19,11 @@ export class RiskDAO {
           }]
         }
       },
+      subTypes: {
+        include: {
+          sub_type: true,
+        },
+      },
     } satisfies Prisma.RiskFactorsFindFirstArgs['include']
 
     return { include }

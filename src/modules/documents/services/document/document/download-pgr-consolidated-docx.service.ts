@@ -1,5 +1,6 @@
 import { DocumentDAO } from '@/@v2/documents/database/dao/document/document.dao';
 import { DocumentVersionRepository } from '@/@v2/documents/database/repositories/document-version/document-version.repository';
+import { ProductDocumentFRPS } from '@/@v2/documents/factories/document/products/document-frps/document-frps.product';
 import { ProductDocumentPGR } from '@/@v2/documents/factories/document/products/document-pgr/document-pgr.product';
 import { IProductDocumentPGR } from '@/@v2/documents/factories/document/products/document-pgr/document-pgr.types';
 import { createBaseDocument } from '@/@v2/documents/libs/docx/base/config/document';
@@ -34,8 +35,12 @@ export class DownloadPgrConsolidatedDocxService {
     }
 
     const docType = (riskDoc as { documentData?: { type?: DocumentTypeEnum } }).documentData?.type;
-    if (docType !== DocumentTypeEnum.PGR) {
-      throw new BadRequestException('Download consolidado disponível apenas para PGR');
+    const supportsConsolidated =
+      docType === DocumentTypeEnum.PGR || docType === DocumentTypeEnum.FRPS;
+    if (!supportsConsolidated) {
+      throw new BadRequestException(
+        'Download consolidado disponível apenas para PGR e FRPS',
+      );
     }
 
     const body: IProductDocumentPGR = {
@@ -43,7 +48,18 @@ export class DownloadPgrConsolidatedDocxService {
       homogeneousGroupsIds: undefined,
     };
 
-    const product = new ProductDocumentPGR(this.documentDAO, this.documentVersionRepository, this.downloadImageService);
+    const product =
+      docType === DocumentTypeEnum.FRPS
+        ? new ProductDocumentFRPS(
+            this.documentDAO,
+            this.documentVersionRepository,
+            this.downloadImageService,
+          )
+        : new ProductDocumentPGR(
+            this.documentDAO,
+            this.documentVersionRepository,
+            this.downloadImageService,
+          );
 
     try {
       const data = await product.getData(body);
@@ -60,7 +76,9 @@ export class DownloadPgrConsolidatedDocxService {
       const b64 = await Packer.toBase64String(Doc);
       const buffer = Buffer.from(b64, 'base64');
 
-      const fileName = product.getFileName(data, 'PGR-COMPLETO');
+      const consolidatedLabel =
+        docType === DocumentTypeEnum.FRPS ? 'FRPS-COMPLETO' : 'PGR-COMPLETO';
+      const fileName = product.getFileName(data, consolidatedLabel);
 
       return { buffer, fileName };
     } finally {

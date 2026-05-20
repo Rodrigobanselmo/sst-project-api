@@ -42,6 +42,7 @@ import { DocumentModule } from '@/@v2/documents/document.module';
 import { PerUploadService } from './services/document/document/upload-per-doc.service';
 import { LtcatUploadService } from './services/document/document/upload-ltcat-doc.service';
 import { InsalUploadService } from './services/document/document/upload-insal-doc.service';
+import { FrpsUploadService } from './services/document/document/upload-frps-doc.service';
 import { DownloadPgrConsolidatedDocxService } from './services/document/document/download-pgr-consolidated-docx.service';
 
 @Module({
@@ -54,6 +55,7 @@ import { DownloadPgrConsolidatedDocxService } from './services/document/document
     PerUploadService,
     LtcatUploadService,
     InsalUploadService,
+    FrpsUploadService,
     PgrDownloadTableService,
     DayJSProvider,
     AmazonStorageProvider,

@@ -26,10 +26,9 @@ export class ProductDocumentPGR implements IDocumentFactoryProduct<IProductDocum
   public type = 'PGR';
 
   constructor(
-    private readonly documentDAO: DocumentDAO,
-
-    private readonly documentVersionRepository: DocumentVersionRepository,
-    private readonly downloadImageService: DownloadImageService,
+    protected readonly documentDAO: DocumentDAO,
+    protected readonly documentVersionRepository: DocumentVersionRepository,
+    protected readonly downloadImageService: DownloadImageService,
   ) {}
 
   public async getData({ documentVersionId, homogeneousGroupsIds }: IProductDocumentPGR) {
@@ -264,7 +263,7 @@ export class ProductDocumentPGR implements IDocumentFactoryProduct<IProductDocum
     return getDocumentVersion(data.documentVersion);
   };
 
-  private async downloadImages(document: DocumentPGRModel) {
+  protected async downloadImages(document: DocumentPGRModel) {
     const images = document.model.images;
     const company = document.documentBase.company;
     const consultant = document.documentBase.company.consultant;
