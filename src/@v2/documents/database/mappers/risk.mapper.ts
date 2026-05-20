@@ -5,6 +5,12 @@ import { RiskModel } from '../../domain/models/risk.model';
 
 export type IRiskMapper = RiskFactors & {
   docInfo: RiskFactorsDocInfo[];
+  subTypes?: {
+    sub_type: {
+      id: number;
+      name: string;
+    };
+  }[];
 };
 
 export class RiskMapper {
@@ -43,6 +49,12 @@ export class RiskMapper {
       grauInsalubridade: data.grauInsalubridade,
       requirement: { document: documentRequirement },
       documentsRequirements: data.docInfo.map((doc) => new RiskDocumentsRequirementVO(doc)),
+      subTypes: data.subTypes?.map((subType) => ({
+        sub_type: {
+          id: subType.sub_type.id,
+          name: subType.sub_type.name,
+        },
+      })),
     });
   }
 

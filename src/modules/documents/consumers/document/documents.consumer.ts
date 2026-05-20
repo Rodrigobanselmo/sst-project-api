@@ -11,6 +11,7 @@ import { checkInternetConnectivity } from '../../../../shared/utils/isOnline';
 import { PerUploadService } from '../../services/document/document/upload-per-doc.service';
 import { LtcatUploadService } from '../../services/document/document/upload-ltcat-doc.service';
 import { InsalUploadService } from '../../services/document/document/upload-insal-doc.service';
+import { FrpsUploadService } from '../../services/document/document/upload-frps-doc.service';
 
 @Injectable()
 export class PgrConsumer implements OnModuleInit {
@@ -21,6 +22,7 @@ export class PgrConsumer implements OnModuleInit {
     private readonly perUploadService: PerUploadService,
     private readonly ltcatUploadService: LtcatUploadService,
     private readonly insalUploadService: InsalUploadService,
+    private readonly frpsUploadService: FrpsUploadService,
   ) {}
 
   async onModuleInit() {
@@ -68,6 +70,11 @@ export class PgrConsumer implements OnModuleInit {
       }
       if (body.type == DocumentTypeEnum.INSALUBRIDADE) {
         await this.insalUploadService.execute({
+          ...body,
+        });
+      }
+      if (body.type == DocumentTypeEnum.FRPS) {
+        await this.frpsUploadService.execute({
           ...body,
         });
       }

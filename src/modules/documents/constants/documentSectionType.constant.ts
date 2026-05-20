@@ -53,31 +53,31 @@ export const documentSectionTypeMap: IDocumentSectionTypeMap = {
   [DocumentSectionTypeEnum.ITERABLE_ENVIRONMENTS]: {
     label: 'Ambientes',
     type: DocumentSectionTypeEnum.ITERABLE_ENVIRONMENTS,
-    accept: [DocumentTypeEnum.PGR],
+    accept: [DocumentTypeEnum.PGR, DocumentTypeEnum.FRPS],
     order: fourthOrder,
   },
   [DocumentSectionTypeEnum.ITERABLE_CHARACTERIZATION]: {
     label: 'Postos de Trabalho / Atividades / Equipamentos',
     type: DocumentSectionTypeEnum.ITERABLE_CHARACTERIZATION,
-    accept: [DocumentTypeEnum.PGR],
+    accept: [DocumentTypeEnum.PGR, DocumentTypeEnum.FRPS],
     order: fourthOrder,
   },
   [DocumentSectionTypeEnum.APR]: {
     label: 'APR',
     type: DocumentSectionTypeEnum.APR,
-    accept: [DocumentTypeEnum.PGR],
+    accept: [DocumentTypeEnum.PGR, DocumentTypeEnum.FRPS],
     order: fourthOrder,
   },
   [DocumentSectionTypeEnum.APR_GROUP]: {
     label: 'APR por Grupo homogênio',
     type: DocumentSectionTypeEnum.APR_GROUP,
-    accept: [DocumentTypeEnum.PGR],
+    accept: [DocumentTypeEnum.PGR, DocumentTypeEnum.FRPS],
     order: fourthOrder,
   },
   [DocumentSectionTypeEnum.ACTION_PLAN]: {
     label: 'Plano de Ação',
     type: DocumentSectionTypeEnum.ACTION_PLAN,
-    accept: [DocumentTypeEnum.PGR],
+    accept: [DocumentTypeEnum.PGR, DocumentTypeEnum.FRPS],
     order: fourthOrder,
   },
 

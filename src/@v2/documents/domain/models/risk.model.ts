@@ -28,11 +28,19 @@ export enum RiskInsalubridadeEnum {
   AGENTES_BIOLOGICOS_14 = 'AGENTES_BIOLOGICOS_14',
 }
 
+export type IRiskSubType = {
+  sub_type: {
+    id: number;
+    name: string;
+  };
+};
+
 export type IRiskModel = {
   id: string;
   name: string;
   severity: number;
   type: RiskTypeEnum;
+  subTypes?: IRiskSubType[];
   isEmergency: boolean;
   isRepresentAll: boolean;
   unit: string | null;
@@ -61,6 +69,7 @@ export class RiskModel {
   name: string;
   severity: number;
   type: RiskTypeEnum;
+  subTypes: IRiskSubType[];
   isEmergency: boolean;
   isRepresentAll: boolean;
   unit: string | null;
@@ -88,6 +97,7 @@ export class RiskModel {
     this.name = params.name;
     this.severity = params.severity;
     this.type = params.type;
+    this.subTypes = params.subTypes ?? [];
     this.isEmergency = params.isEmergency;
     this.isRepresentAll = params.isRepresentAll;
     this.unit = params.unit;

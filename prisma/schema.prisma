@@ -2837,6 +2837,7 @@ enum DocumentTypeEnum {
   LTCAT
   PERICULOSIDADE
   INSALUBRIDADE
+  FRPS
   OTHER
 }
 

@@ -76,6 +76,17 @@ export class DocumentDataController {
     code: PermissionEnum.COMPANY,
     isContract: true,
     isMember: true,
+    crud: 'cu',
+  })
+  @Post('frps')
+  async upsertFrps(@Body() dto: UpsertDocumentDataPCMSODto, @User() user: UserPayloadDto) {
+    return await this.upsertDocumentDataService.execute({ ...dto, type: 'FRPS' }, user);
+  }
+
+  @Permissions({
+    code: PermissionEnum.COMPANY,
+    isContract: true,
+    isMember: true,
   })
   @Get()
   async findById(@Query() query: FindOneDocumentDataDto, @User() userPayloadDto: UserPayloadDto) {

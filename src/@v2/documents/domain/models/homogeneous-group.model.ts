@@ -6,6 +6,7 @@ import { getIsHomogeneousGroupHierarchy } from '@/@v2/shared/domain/functions/se
 import { IDocumentsRequirementKeys } from '@/@v2/shared/domain/types/document/document-types.type';
 import { CharacterizationModel } from './characterization.model';
 import { HierarchyGroupModel } from './hierarchy-groups.model';
+import { isFrpsRisk } from '../functions/is-frps-risk.func';
 import { RiskDataModel } from './risk-data.model';
 
 export type IHomogeneousGroupModel = {
@@ -18,6 +19,7 @@ export type IHomogeneousGroupModel = {
   hierarchies: HierarchyGroupModel[];
   characterization: CharacterizationModel | null;
   risksData: RiskDataModel[];
+  frpsOnly?: boolean;
 };
 
 export class HomogeneousGroupModel {
@@ -30,6 +32,7 @@ export class HomogeneousGroupModel {
   hierarchies: HierarchyGroupModel[];
   characterization: CharacterizationModel | null;
   _risksData: RiskDataModel[];
+  frpsOnly: boolean;
 
   constructor(params: IHomogeneousGroupModel) {
     this.id = params.id;
@@ -42,6 +45,7 @@ export class HomogeneousGroupModel {
     this.characterization = params.characterization;
 
     this._risksData = params.risksData;
+    this.frpsOnly = params.frpsOnly ?? false;
   }
 
   get isEnviroment() {
@@ -64,6 +68,9 @@ export class HomogeneousGroupModel {
 
   risksData({ documentType }: { documentType: IDocumentsRequirementKeys }) {
     return this._risksData.filter((riskData) => {
+      if (this.frpsOnly && !isFrpsRisk(riskData.risk)) return false;
+      if (this.frpsOnly) return true;
+
       const { checkIfExistAny } = getRiskDocumentsRequirements({ companyId: this.companyId, requirements: riskData.risk.documentsRequirements });
       return checkIfExistAny({ documentType });
     });
