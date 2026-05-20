@@ -4,6 +4,7 @@ import { AbsenteeismRepository } from '../../../repositories/implementations/Abs
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { DayJSProvider } from '../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
+import { calcAbsenteeismTimeSpent } from '../../../utils/absenteeism-time-spent.util';
 
 @Injectable()
 export class UpdateAbsenteeismsService {
@@ -27,7 +28,11 @@ export class UpdateAbsenteeismsService {
     UpsertAbsenteeismsDto.startDate = startDate.toDate();
     UpsertAbsenteeismsDto.endDate = endDate.toDate();
 
-    const timeSpent = startDate.diff(endDate, 'minutes');
+    const timeSpent = calcAbsenteeismTimeSpent(
+      startDate,
+      endDate,
+      UpsertAbsenteeismsDto.timeUnit,
+    );
 
     const absenteeism = await this.absenteeismRepository.update({
       ...UpsertAbsenteeismsDto,

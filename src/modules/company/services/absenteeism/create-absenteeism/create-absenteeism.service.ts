@@ -5,6 +5,7 @@ import { DayJSProvider } from '../../../../../shared/providers/DateProvider/impl
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { CreateAbsenteeismDto } from '../../../dto/absenteeism.dto';
 import { AbsenteeismRepository } from '../../../repositories/implementations/AbsenteeismRepository';
+import { calcAbsenteeismTimeSpent } from '../../../utils/absenteeism-time-spent.util';
 
 @Injectable()
 export class CreateAbsenteeismsService {
@@ -29,7 +30,11 @@ export class CreateAbsenteeismsService {
     UpsertAbsenteeismsDto.startDate = startDate.toDate();
     UpsertAbsenteeismsDto.endDate = endDate.toDate();
 
-    const timeSpent = startDate.diff(endDate, 'minutes');
+    const timeSpent = calcAbsenteeismTimeSpent(
+      startDate,
+      endDate,
+      UpsertAbsenteeismsDto.timeUnit,
+    );
 
     const absenteeism = await this.absenteeismRepository.create({
       ...UpsertAbsenteeismsDto,
