@@ -1,6 +1,6 @@
 import { IDocumentModelData } from './../types/document-mode.types';
 import { QueryArray } from './../../../shared/transformers/query-array';
-import { DocumentTypeEnum, StatusEnum } from '@prisma/client';
+import { DocumentModelClassificationEnum, DocumentTypeEnum, StatusEnum } from '@prisma/client';
 import { Transform } from 'class-transformer';
 import { IsEnum, IsOptional, IsString, IsInt, IsBoolean, IsDefined } from 'class-validator';
 import { PaginationQueryDto } from '../../../shared/dto/pagination.dto';
@@ -30,6 +30,14 @@ export class CreateDocumentModelDto {
     message: `type must be one of: ${KeysOfEnum(DocumentTypeEnum)}`,
   })
   type: DocumentTypeEnum;
+
+  @Transform(QueryArray, { toClassOnly: true })
+  @IsOptional()
+  @IsEnum(DocumentModelClassificationEnum, {
+    each: true,
+    message: `classifications must be one of: ${KeysOfEnum(DocumentModelClassificationEnum)}`,
+  })
+  classifications?: DocumentModelClassificationEnum[];
 }
 
 export class UpdateDocumentModelDto {
@@ -58,6 +66,14 @@ export class UpdateDocumentModelDto {
     message: `type must be one of: ${KeysOfEnum(StatusEnum)}`,
   })
   status?: StatusEnum;
+
+  @Transform(QueryArray, { toClassOnly: true })
+  @IsOptional()
+  @IsEnum(DocumentModelClassificationEnum, {
+    each: true,
+    message: `classifications must be one of: ${KeysOfEnum(DocumentModelClassificationEnum)}`,
+  })
+  classifications?: DocumentModelClassificationEnum[];
 }
 
 export class FindDocumentModelDto extends PaginationQueryDto {
@@ -96,6 +112,14 @@ export class FindDocumentModelDto extends PaginationQueryDto {
   @ToBoolean()
   @IsOptional()
   all?: boolean;
+
+  @Transform(QueryArray, { toClassOnly: true })
+  @IsOptional()
+  @IsEnum(DocumentModelClassificationEnum, {
+    each: true,
+    message: `classifications must be one of: ${KeysOfEnum(DocumentModelClassificationEnum)}`,
+  })
+  classifications?: DocumentModelClassificationEnum[];
 }
 
 export class IGetDocumentModelData {

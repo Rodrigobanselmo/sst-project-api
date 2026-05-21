@@ -22,6 +22,7 @@ export class FindOneDocumentModelService {
         created_at: true,
         updated_at: true,
         system: true,
+        classifications: true,
       },
     });
 
