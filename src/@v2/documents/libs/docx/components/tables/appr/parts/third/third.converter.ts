@@ -5,6 +5,7 @@ import { HierarchyMapData, IDocumentRiskGroupDataConverter, IGHODataConverter } 
 
 import { RiskDataModel } from '@/@v2/documents/domain/models/risk-data.model';
 import { shouldHideRecommendationInPgr } from '@/modules/documents/docx/utils/pgr-recommendation-document-visibility';
+import { getRiskTypeDisplayLabel } from '@/modules/documents/docx/utils/risk-type-display-label.util';
 import { getMatrizRisk } from '@/@v2/shared/domain/functions/security/get-matrix-risk.func';
 import { sortNumber } from '@/@v2/shared/utils/sorts/number.sort';
 import { sortString } from '@/@v2/shared/utils/sorts/string.sort';
@@ -14,6 +15,10 @@ import { riskMap } from '../../../../../constants/risks-map';
 import { bodyTableProps, borderNoneStyle } from '../../elements/body';
 import { whiteBorder, whiteColumnBorder } from '../../elements/header';
 import { ThirdRiskInventoryColumnEnum } from './third.constant';
+import {
+  thirdRiskInventoryColumnWidth,
+  thirdRiskInventoryVerticalColumns,
+} from '@/modules/documents/docx/components/tables/appr/parts/third/third.constant';
 
 export function isRiskValidForHierarchyData({
   hierarchyData,
@@ -87,10 +92,16 @@ export const dataConverter = (
         if (hierarchy) origin = `${hierarchy.name}\n(${originRiskMap[hierarchy.typeEnum].name})`;
       }
 
+      const colWidth = (column: ThirdRiskInventoryColumnEnum) =>
+        thirdRiskInventoryColumnWidth[column];
+      const isVerticalCol = (column: ThirdRiskInventoryColumnEnum) =>
+        thirdRiskInventoryVerticalColumns.has(column);
+
       cells[ThirdRiskInventoryColumnEnum.TYPE] = {
-        text: riskMap[riskData.risk.type]?.label || '',
+        text: getRiskTypeDisplayLabel(riskData.risk),
         bold: true,
-        size: 4,
+        size: colWidth(ThirdRiskInventoryColumnEnum.TYPE),
+        isVertical: isVerticalCol(ThirdRiskInventoryColumnEnum.TYPE),
         ...base,
         ...fill,
       };
@@ -99,58 +110,58 @@ export const dataConverter = (
         cells[ThirdRiskInventoryColumnEnum.ORIGIN] = {
           text: origin || '',
           bold: true,
-          size: 6,
+          size: colWidth(ThirdRiskInventoryColumnEnum.ORIGIN),
           ...base,
           ...fill,
         };
 
       cells[ThirdRiskInventoryColumnEnum.RISK_FACTOR] = {
         text: riskData.risk.name,
-        size: 10,
+        size: colWidth(ThirdRiskInventoryColumnEnum.RISK_FACTOR),
         ...base,
       };
 
       cells[ThirdRiskInventoryColumnEnum.RISK] = {
         text: riskData.risk.healthRisk || '',
-        size: 7,
+        size: colWidth(ThirdRiskInventoryColumnEnum.RISK),
         ...base,
       };
 
       cells[ThirdRiskInventoryColumnEnum.SOURCE] = {
         text: riskData.generateSources.map((gs) => gs.name).join('\n'),
-        size: 10,
+        size: colWidth(ThirdRiskInventoryColumnEnum.SOURCE),
         ...base,
       };
 
       cells[ThirdRiskInventoryColumnEnum.EPI] = {
         //! EPI CA
         text: riskData.epis.map((epi) => (options.isHideCA ? epi.equipment : epi.name) || '').join('\n'),
-        size: 7,
+        size: colWidth(ThirdRiskInventoryColumnEnum.EPI),
         ...base,
       };
 
       cells[ThirdRiskInventoryColumnEnum.ENG] = {
         text: riskData.engineeringMeasures.map((eng) => eng.name).join('\n'),
-        size: 7,
+        size: colWidth(ThirdRiskInventoryColumnEnum.ENG),
         ...base,
       };
 
       cells[ThirdRiskInventoryColumnEnum.ADM] = {
         text: riskData.administrativeMeasures.map((adm) => adm.name).join('\n'),
-        size: 7,
+        size: colWidth(ThirdRiskInventoryColumnEnum.ADM),
         ...base,
       };
 
       cells[ThirdRiskInventoryColumnEnum.SEVERITY] = {
         text: String(riskData.risk.severity),
-        size: 1,
+        size: colWidth(ThirdRiskInventoryColumnEnum.SEVERITY),
         ...base,
         ...fill,
       };
 
       cells[ThirdRiskInventoryColumnEnum.PROBABILITY] = {
         text: String(riskData.probability || '-'),
-        size: 1,
+        size: colWidth(ThirdRiskInventoryColumnEnum.PROBABILITY),
         ...base,
         ...fill,
       };
@@ -164,7 +175,8 @@ export const dataConverter = (
           right: whiteBorder,
           top: whiteColumnBorder,
         },
-        size: 3,
+        size: colWidth(ThirdRiskInventoryColumnEnum.RISK_OCCUPATIONAL),
+        isVertical: isVerticalCol(ThirdRiskInventoryColumnEnum.RISK_OCCUPATIONAL),
         ...fill,
       };
 
@@ -173,20 +185,20 @@ export const dataConverter = (
           .filter((rec) => !shouldHideRecommendationInPgr(riskData.recommendationsData, rec.id))
           .map((rec) => rec.name)
           .join('\n'),
-        size: 7,
+        size: colWidth(ThirdRiskInventoryColumnEnum.RECOMMENDATIONS),
         ...base,
       };
 
       cells[ThirdRiskInventoryColumnEnum.SEVERITY_AFTER] = {
         text: String(riskData.risk.severity),
-        size: 1,
+        size: colWidth(ThirdRiskInventoryColumnEnum.SEVERITY_AFTER),
         ...base,
         ...fill,
       };
 
       cells[ThirdRiskInventoryColumnEnum.PROBABILITY_AFTER] = {
         text: String(riskData.probabilityAfter || riskData.probability || '-'),
-        size: 1,
+        size: colWidth(ThirdRiskInventoryColumnEnum.PROBABILITY_AFTER),
         ...base,
         ...fill,
       };
@@ -196,7 +208,8 @@ export const dataConverter = (
         ...base,
         ...(riskOccupationalAfter.level > 3 ? attention : {}),
         borders: { ...borderNoneStyle, top: whiteColumnBorder },
-        size: 3,
+        size: colWidth(ThirdRiskInventoryColumnEnum.RISK_OCCUPATIONAL_AFTER),
+        isVertical: isVerticalCol(ThirdRiskInventoryColumnEnum.RISK_OCCUPATIONAL_AFTER),
         ...fill,
       };
 

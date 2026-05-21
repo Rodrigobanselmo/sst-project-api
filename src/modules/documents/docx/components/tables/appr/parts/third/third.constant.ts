@@ -26,6 +26,32 @@ export enum ThirdRiskInventoryColumnEnum {
   RISK_OCCUPATIONAL_AFTER,
 }
 
+/** Larguras percentuais — inventário de risco (função e GSE). */
+export const thirdRiskInventoryColumnWidth = {
+  [ThirdRiskInventoryColumnEnum.TYPE]: 2,
+  [ThirdRiskInventoryColumnEnum.ORIGIN]: 6,
+  [ThirdRiskInventoryColumnEnum.RISK_FACTOR]: 7,
+  [ThirdRiskInventoryColumnEnum.RISK]: 14,
+  [ThirdRiskInventoryColumnEnum.SOURCE]: 7,
+  [ThirdRiskInventoryColumnEnum.EPI]: 5,
+  [ThirdRiskInventoryColumnEnum.ENG]: 7,
+  [ThirdRiskInventoryColumnEnum.ADM]: 7,
+  [ThirdRiskInventoryColumnEnum.SEVERITY]: 1,
+  [ThirdRiskInventoryColumnEnum.PROBABILITY]: 1,
+  [ThirdRiskInventoryColumnEnum.RISK_OCCUPATIONAL]: 2,
+  [ThirdRiskInventoryColumnEnum.RECOMMENDATIONS]: 8,
+  [ThirdRiskInventoryColumnEnum.SEVERITY_AFTER]: 1,
+  [ThirdRiskInventoryColumnEnum.PROBABILITY_AFTER]: 1,
+  [ThirdRiskInventoryColumnEnum.RISK_OCCUPATIONAL_AFTER]: 2,
+} as const;
+
+/** Colunas com rótulo/conteúdo curto exibidos na vertical para liberar largura. */
+export const thirdRiskInventoryVerticalColumns = new Set<ThirdRiskInventoryColumnEnum>([
+  ThirdRiskInventoryColumnEnum.TYPE,
+  ThirdRiskInventoryColumnEnum.RISK_OCCUPATIONAL,
+  ThirdRiskInventoryColumnEnum.RISK_OCCUPATIONAL_AFTER,
+]);
+
 const ThirdRiskInventoryHeader = (): bodyTableProps[] => {
   const header: bodyTableProps[] = [];
 
@@ -60,92 +86,95 @@ const ThirdRiskInventoryColumnsHeader = (): bodyTableProps[] => {
     text: 'Tipo',
     bold: true,
     borders: { ...borderNoneStyle, right: whiteColumnBorder },
-    size: 4,
+    size: thirdRiskInventoryColumnWidth[ThirdRiskInventoryColumnEnum.TYPE],
+    isVertical: true,
     margins: { top: 100, bottom: 100 },
   };
   header[ThirdRiskInventoryColumnEnum.ORIGIN] = {
     text: 'Origem',
     bold: true,
     borders: { ...borderNoneStyle, right: whiteColumnBorder },
-    size: 6,
+    size: thirdRiskInventoryColumnWidth[ThirdRiskInventoryColumnEnum.ORIGIN],
     margins: { top: 100, bottom: 100 },
   };
   header[ThirdRiskInventoryColumnEnum.RISK_FACTOR] = {
     text: 'PERIGOS | FATORES DE RISCO',
     borders: { ...borderNoneStyle, right: whiteColumnBorder },
-    size: 10,
+    size: thirdRiskInventoryColumnWidth[ThirdRiskInventoryColumnEnum.RISK_FACTOR],
     margins: { top: 100, bottom: 100 },
   };
   header[ThirdRiskInventoryColumnEnum.RISK] = {
     text: 'Risco',
     borders: { ...borderNoneStyle, right: whiteColumnBorder },
-    size: 7,
+    size: thirdRiskInventoryColumnWidth[ThirdRiskInventoryColumnEnum.RISK],
     margins: { top: 100, bottom: 100 },
   };
   header[ThirdRiskInventoryColumnEnum.SOURCE] = {
     text: 'Fonte Geradora ou Circunstância de Risco',
     borders: { ...borderNoneStyle, right: whiteColumnBorder },
-    size: 10,
+    size: thirdRiskInventoryColumnWidth[ThirdRiskInventoryColumnEnum.SOURCE],
     margins: { top: 100, bottom: 100 },
   };
   header[ThirdRiskInventoryColumnEnum.EPI] = {
     text: 'EPI Específico',
     borders: { ...borderNoneStyle, right: whiteColumnBorder },
-    size: 7,
+    size: thirdRiskInventoryColumnWidth[ThirdRiskInventoryColumnEnum.EPI],
     margins: { top: 100, bottom: 100 },
   };
   header[ThirdRiskInventoryColumnEnum.ENG] = {
     text: 'EPC/ENG.',
     borders: { ...borderNoneStyle, right: whiteColumnBorder },
-    size: 7,
+    size: thirdRiskInventoryColumnWidth[ThirdRiskInventoryColumnEnum.ENG],
     margins: { top: 100, bottom: 100 },
   };
   header[ThirdRiskInventoryColumnEnum.ADM] = {
     text: 'ADM',
     borders: { ...borderNoneStyle, right: whiteColumnBorder },
-    size: 7,
+    size: thirdRiskInventoryColumnWidth[ThirdRiskInventoryColumnEnum.ADM],
     margins: { top: 100, bottom: 100 },
   };
   header[ThirdRiskInventoryColumnEnum.SEVERITY] = {
     text: 'S',
     borders: { ...borderNoneStyle, right: whiteColumnBorder },
-    size: 1,
+    size: thirdRiskInventoryColumnWidth[ThirdRiskInventoryColumnEnum.SEVERITY],
     margins: { top: 100, bottom: 100 },
   };
   header[ThirdRiskInventoryColumnEnum.PROBABILITY] = {
     text: 'P',
     borders: { ...borderNoneStyle, right: whiteColumnBorder },
-    size: 1,
+    size: thirdRiskInventoryColumnWidth[ThirdRiskInventoryColumnEnum.PROBABILITY],
     margins: { top: 100, bottom: 100 },
   };
   header[ThirdRiskInventoryColumnEnum.RISK_OCCUPATIONAL] = {
     text: 'RO',
     borders: borderRightStyle,
-    size: 3,
+    size: thirdRiskInventoryColumnWidth[ThirdRiskInventoryColumnEnum.RISK_OCCUPATIONAL],
+    isVertical: true,
     margins: { top: 100, bottom: 100 },
   };
   header[ThirdRiskInventoryColumnEnum.RECOMMENDATIONS] = {
     text: 'Recomendações',
     borders: { ...borderNoneStyle, right: whiteColumnBorder },
-    size: 5,
+    size: thirdRiskInventoryColumnWidth[ThirdRiskInventoryColumnEnum.RECOMMENDATIONS],
     margins: { top: 100, bottom: 100 },
   };
   header[ThirdRiskInventoryColumnEnum.SEVERITY_AFTER] = {
     text: 'S',
     borders: { ...borderNoneStyle, right: whiteColumnBorder },
-    size: 1,
+    size: thirdRiskInventoryColumnWidth[ThirdRiskInventoryColumnEnum.SEVERITY_AFTER],
     margins: { top: 100, bottom: 100 },
   };
   header[ThirdRiskInventoryColumnEnum.PROBABILITY_AFTER] = {
     text: 'P',
     borders: { ...borderNoneStyle, right: whiteColumnBorder },
-    size: 1,
+    size: thirdRiskInventoryColumnWidth[ThirdRiskInventoryColumnEnum.PROBABILITY_AFTER],
     margins: { top: 100, bottom: 100 },
   };
   header[ThirdRiskInventoryColumnEnum.RISK_OCCUPATIONAL_AFTER] = {
     text: 'RO',
     borders: { ...borderNoneStyle },
-    size: 3,
+    size: thirdRiskInventoryColumnWidth[ThirdRiskInventoryColumnEnum.RISK_OCCUPATIONAL_AFTER],
+    isVertical: true,
     margins: { top: 100, bottom: 100 },
   };
 

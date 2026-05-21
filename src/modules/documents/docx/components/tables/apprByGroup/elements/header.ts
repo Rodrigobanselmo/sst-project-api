@@ -5,6 +5,7 @@ import {
   Paragraph,
   TableCell,
   TableRow,
+  TextDirection,
   TextRun,
   VerticalAlign,
   WidthType,
@@ -17,6 +18,7 @@ export interface headerTableProps extends Partial<ITableCellOptions> {
   borderBottom?: boolean;
   position?: number;
   columnSpan?: number;
+  isVertical?: boolean;
 }
 
 export const whiteBorder = {
@@ -92,7 +94,7 @@ export class TableHeaderElements {
     });
   }
 
-  headerCell({ text = '', size = 10, ...rest }: headerTableProps) {
+  headerCell({ text = '', size = 10, isVertical = false, ...rest }: headerTableProps) {
     return new TableCell({
       children: [
         ...text.split('\n').map(
@@ -115,6 +117,7 @@ export class TableHeaderElements {
         ),
       ],
       shading: { fill: palette.table.header.string },
+      textDirection: isVertical ? TextDirection.BOTTOM_TO_TOP_LEFT_TO_RIGHT : undefined,
       verticalAlign: VerticalAlign.CENTER,
       width: { size, type: WidthType.PERCENTAGE },
       margins: { top: 60, bottom: 60 },
