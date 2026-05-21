@@ -4,6 +4,10 @@ import { StatusEnum } from '@prisma/client';
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { UpdateDocumentModelDto } from '../../../dto/document-model.dto';
 import { DocumentModelRepository } from '../../../repositories/implementations/DocumentModelRepository';
+import {
+  assertValidDocumentModelClassifications,
+  normalizeDocumentModelClassifications,
+} from '../../../utils/document-model-classifications.util';
 
 @Injectable()
 export class UpdateDocumentModelService {
@@ -35,9 +39,17 @@ export class UpdateDocumentModelService {
       }
     }
 
+    const updatePayload = { ...body };
+
+    if ('classifications' in body) {
+      const normalized = normalizeDocumentModelClassifications(body.classifications);
+      assertValidDocumentModelClassifications(normalized);
+      updatePayload.classifications = normalized;
+    }
+
     const model = await this.documentModelRepository.update({
       companyId,
-      ...body,
+      ...updatePayload,
     });
 
     return model;

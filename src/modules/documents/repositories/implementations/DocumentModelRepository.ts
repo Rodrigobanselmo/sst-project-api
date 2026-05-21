@@ -21,7 +21,7 @@ export class DocumentModelRepository {
     return new DocumentModelEntity(document);
   }
 
-  async update({ id, data, ...props }: UpdateDocumentModelDto) {
+  async update({ id, data, companyId: _companyId, ...props }: UpdateDocumentModelDto) {
     let buffer = undefined;
     if (data) {
       buffer = Buffer.from(JSON.stringify(data), 'utf8');
@@ -64,7 +64,7 @@ export class DocumentModelRepository {
 
     const { where } = prismaFilter(whereInit, {
       query,
-      skip: ['showInactive', 'companyId', 'all', 'search'],
+      skip: ['showInactive', 'companyId', 'all', 'search', 'classifications'],
     });
 
     if (!options.select)
@@ -75,6 +75,7 @@ export class DocumentModelRepository {
         description: true,
         name: true,
         type: true,
+        classifications: true,
         created_at: true,
       };
 
@@ -92,7 +93,12 @@ export class DocumentModelRepository {
       (where.AND as any).push({
         status: 'ACTIVE',
       } as typeof options.where);
-      delete query.search;
+    }
+
+    if (query.classifications?.length) {
+      (where.AND as any).push({
+        classifications: { hasEvery: query.classifications },
+      } as typeof options.where);
     }
 
     const response = await this.prisma.$transaction([

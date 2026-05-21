@@ -765,19 +765,33 @@ model DocumentData {
   @@unique([type, workspaceId, companyId])
 }
 
+enum DocumentModelClassificationEnum {
+  GRO_PGR
+  SOMENTE_PGR
+  COM_FRPS
+  SEM_FRPS
+  COPSOQ_III
+  NAO_COPSOQ_III
+  NR18
+  TERCEIROS
+  SIMPLIFICADO
+  BACKUP
+}
+
 model DocumentModel {
-  id          Int              @id @default(autoincrement())
-  name        String
-  description String?
-  companyId   String
-  system      Boolean          @default(false)
-  status      StatusEnum       @default(ACTIVE)
-  created_at  DateTime         @default(now())
-  updated_at  DateTime         @updatedAt
-  company     Company          @relation(fields: [companyId], references: [id])
-  type        DocumentTypeEnum
-  data        Bytes
-  documents   DocumentData[]
+  id               Int                                @id @default(autoincrement())
+  name             String
+  description      String?
+  companyId        String
+  system           Boolean                            @default(false)
+  status           StatusEnum                         @default(ACTIVE)
+  classifications  DocumentModelClassificationEnum[] @default([])
+  created_at       DateTime                           @default(now())
+  updated_at       DateTime                           @updatedAt
+  company          Company                            @relation(fields: [companyId], references: [id])
+  type             DocumentTypeEnum
+  data             Bytes
+  documents        DocumentData[]
 
   @@unique([id, companyId])
 }

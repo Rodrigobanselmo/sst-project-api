@@ -7,14 +7,21 @@ import { CreateDocumentModelDto } from '../../../dto/document-model.dto';
 import { IDocumentModelData } from '../../../../../modules/documents/types/document-mode.types';
 import { StatusEnum } from '@prisma/client';
 import { v4 } from 'uuid';
+import {
+  assertValidDocumentModelClassifications,
+  normalizeDocumentModelClassifications,
+} from '../../../utils/document-model-classifications.util';
 
 @Injectable()
 export class CreateDocumentModelService {
   constructor(private readonly documentModelRepository: DocumentModelRepository) {}
 
-  async execute({ copyFromId, ...body }: CreateDocumentModelDto, user: UserPayloadDto) {
+  async execute({ copyFromId, classifications, ...body }: CreateDocumentModelDto, user: UserPayloadDto) {
     const companyId = user.targetCompanyId;
     const system = user.isSystem;
+
+    const normalizedClassifications = normalizeDocumentModelClassifications(classifications);
+    assertValidDocumentModelClassifications(normalizedClassifications);
 
     const found = await this.documentModelRepository.find(
       { name: body.name, showInactive: true, companyId: user.targetCompanyId, all: true },
@@ -42,7 +49,7 @@ export class CreateDocumentModelService {
     };
     if (copyFromId) {
       const copyDataModel = await this.documentModelRepository.find(
-        { showInactive: true, companyId: user.targetCompanyId, all: true, id: [copyFromId] },
+        { companyId: user.targetCompanyId, all: true, id: [copyFromId] },
         { skip: 0, take: 1 },
         { select: { data: true } },
       );
@@ -55,6 +62,7 @@ export class CreateDocumentModelService {
       data: baseModel,
       system,
       companyId,
+      classifications: normalizedClassifications,
       ...body,
     });
 
