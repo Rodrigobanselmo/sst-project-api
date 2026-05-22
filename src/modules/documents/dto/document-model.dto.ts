@@ -59,11 +59,17 @@ export class UpdateDocumentModelDto {
   @IsOptional()
   description?: string;
 
+  @IsOptional()
+  @IsEnum(DocumentTypeEnum, {
+    message: `type must be one of: ${KeysOfEnum(DocumentTypeEnum)}`,
+  })
+  type?: DocumentTypeEnum;
+
   @Transform(StringUppercaseTransform, { toClassOnly: true })
   @IsOptional()
   @IsString()
   @IsEnum(StatusEnum, {
-    message: `type must be one of: ${KeysOfEnum(StatusEnum)}`,
+    message: `status must be one of: ${KeysOfEnum(StatusEnum)}`,
   })
   status?: StatusEnum;
 
