@@ -7,6 +7,9 @@ import { FindActionPlanInfoController } from './application/action-plan-info/rea
 import { ReadActionPlanInfoUseCase } from './application/action-plan-info/read-action-plan-info/use-cases/find-action-plan-info.usecase';
 import { BrowseActionPlanController } from './application/action-plan/browse-action-plan/controllers/browse-action-plan.controller';
 import { BrowseActionPlanUseCase } from './application/action-plan/browse-action-plan/use-cases/browse-action-plan.usecase';
+import { ExportActionPlanController } from './application/action-plan/export-action-plan/controllers/export-action-plan.controller';
+import { ExportActionPlanUseCase } from './application/action-plan/export-action-plan/use-cases/export-action-plan.usecase';
+import { ExcelProvider } from '@/shared/providers/ExcelProvider/implementations/ExcelProvider';
 import { EditActionPlanController } from './application/action-plan/edit-action-plan/controllers/edit-action-plan.controller';
 import { EditActionPlanUseCase } from './application/action-plan/edit-action-plan/use-cases/edit-action-plan.usecase';
 import { EditManyActionPlanController } from './application/action-plan/edit-many-action-plan/controllers/edit-many-action-plan.controller';
@@ -55,6 +58,7 @@ import { ActionPlanRuleAggregateRepository } from './database/repositories/actio
   imports: [SharedModule],
   controllers: [
     BrowseActionPlanController,
+    ExportActionPlanController,
     EditActionPlanController,
     EditManyActionPlanController,
     FindActionPlanInfoController,
@@ -93,6 +97,8 @@ import { ActionPlanRuleAggregateRepository } from './database/repositories/actio
 
     // Use Cases
     BrowseActionPlanUseCase,
+    ExportActionPlanUseCase,
+    ExcelProvider,
     EditManyActionPlanUseCase,
     EditActionPlanUseCase,
     EditManyCommentsUseCase,
