@@ -20,10 +20,12 @@ export class UpdateDocumentModelService {
     const foundActual = await this.documentModelRepository.find(
       { id: [body.id], companyId, all: true, showInactive: true, ...(!isSystem && { system: false }) },
       { skip: 0, take: 1 },
-      { select: { id: true, name: true } },
+      { select: { id: true, name: true, type: true } },
     );
 
     if (!foundActual.data[0]?.id) throw new BadRequestException('Você não tem premissão para editar esse modelo');
+
+    const documentType = body.type ?? foundActual.data[0].type;
 
     if (body.name && body.name != foundActual.data[0].name) {
       const found = await this.documentModelRepository.find(
@@ -43,7 +45,7 @@ export class UpdateDocumentModelService {
 
     if ('classifications' in body) {
       const normalized = normalizeDocumentModelClassifications(body.classifications);
-      assertValidDocumentModelClassifications(normalized);
+      assertValidDocumentModelClassifications(normalized, documentType);
       updatePayload.classifications = normalized;
     }
 

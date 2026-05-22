@@ -21,7 +21,7 @@ export class CreateDocumentModelService {
     const system = user.isSystem;
 
     const normalizedClassifications = normalizeDocumentModelClassifications(classifications);
-    assertValidDocumentModelClassifications(normalizedClassifications);
+    assertValidDocumentModelClassifications(normalizedClassifications, body.type);
 
     const found = await this.documentModelRepository.find(
       { name: body.name, showInactive: true, companyId: user.targetCompanyId, all: true },

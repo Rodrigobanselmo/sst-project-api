@@ -1,5 +1,10 @@
 import { BadRequestException } from '@nestjs/common';
-import { DocumentModelClassificationEnum } from '@prisma/client';
+import { DocumentModelClassificationEnum, DocumentTypeEnum } from '@prisma/client';
+
+import {
+  filterClassificationsForDocumentType,
+  isClassificationApplicableToDocumentType,
+} from '../constants/document-model-classification-applicability';
 
 const MUTUALLY_EXCLUSIVE_PAIRS: [DocumentModelClassificationEnum, DocumentModelClassificationEnum][] = [
   [DocumentModelClassificationEnum.GRO_PGR, DocumentModelClassificationEnum.SOMENTE_PGR],
@@ -16,9 +21,20 @@ export function normalizeDocumentModelClassifications(
 
 export function assertValidDocumentModelClassifications(
   classifications?: DocumentModelClassificationEnum[] | null,
+  documentType?: DocumentTypeEnum,
 ): void {
   const normalized = normalizeDocumentModelClassifications(classifications);
   const set = new Set(normalized);
+
+  if (documentType) {
+    for (const classification of normalized) {
+      if (!isClassificationApplicableToDocumentType(classification, documentType)) {
+        throw new BadRequestException(
+          `Classificação ${classification} não é válida para o tipo de documento ${documentType}.`,
+        );
+      }
+    }
+  }
 
   for (const [a, b] of MUTUALLY_EXCLUSIVE_PAIRS) {
     if (set.has(a) && set.has(b)) {
@@ -27,4 +43,14 @@ export function assertValidDocumentModelClassifications(
       );
     }
   }
+}
+
+export function normalizeClassificationsForDocumentType(
+  classifications: DocumentModelClassificationEnum[] | undefined | null,
+  documentType: DocumentTypeEnum,
+): DocumentModelClassificationEnum[] {
+  return filterClassificationsForDocumentType(
+    normalizeDocumentModelClassifications(classifications),
+    documentType,
+  );
 }
