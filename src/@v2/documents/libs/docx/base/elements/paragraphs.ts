@@ -3,6 +3,7 @@ import { IEntityRange, IInlineStyleRange } from '../../../../domain/types/elemen
 import { InlineStyleTypeEnum } from '@/@v2/documents/domain/enums/inline-style-type.enum';
 import { rgbToHex } from '../../helpers/rgb-to-regex';
 import { isOdd } from '@/@v2/shared/utils/helpers/is-odd';
+import { lineHeightToDocxLineSpacing } from '@/modules/documents/docx/base/utils/line-height-docx.util';
 
 interface ParagraphProps extends IParagraphOptions {
   break?: boolean;
@@ -13,6 +14,8 @@ interface ParagraphProps extends IParagraphOptions {
   isSuper?: boolean;
   isBreak?: boolean;
   color?: string;
+  lineHeight?: number;
+  lineHeightBlock?: number[];
   inlineStyleRangeBlock?: IInlineStyleRange[][];
   entityRangeBlock?: IEntityRange[][];
 }
@@ -85,9 +88,23 @@ export const getParagraphNormal = (text: string) =>
     })
     .reduce((acc, curr) => [...acc, ...curr], []);
 
-export const paragraphNewNormal = (text: string, { children, color, ...options } = {} as ParagraphProps) => {
+export const paragraphNewNormal = (
+  text: string,
+  {
+    children,
+    color,
+    lineHeight,
+    lineHeightBlock,
+    spacing: spacingOption,
+    ...options
+  } = {} as ParagraphProps,
+) => {
   let hasBreakLine = false;
   const alignment = options?.align || AlignmentType.JUSTIFIED;
+  const spacing = {
+    ...spacingOption,
+    line: lineHeightToDocxLineSpacing(lineHeight, lineHeightBlock),
+  };
 
   return new Paragraph({
     children: [
@@ -205,7 +222,7 @@ export const paragraphNewNormal = (text: string, { children, color, ...options }
         })
         .flat(1),
     ],
-    spacing: { line: 350 },
+    spacing,
     alignment: hasBreakLine && alignment == AlignmentType.JUSTIFIED ? AlignmentType.START : alignment,
     ...options,
   });
