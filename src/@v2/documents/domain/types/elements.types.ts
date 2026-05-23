@@ -36,6 +36,8 @@ export type IBullet = Omit<IParagraphOptions, 'text'> & {
   text: string;
   level?: OptionsLevel;
   size?: number;
+  lineHeight?: number;
+  lineHeightBlock?: number[];
 } & IBaseDocumentModel;
 
 export type IParagraph = Omit<IParagraphOptions, 'text'> & {
@@ -44,6 +46,8 @@ export type IParagraph = Omit<IParagraphOptions, 'text'> & {
   size?: number;
   color?: string;
   align?: (typeof AlignmentType)[keyof typeof AlignmentType];
+  lineHeight?: number;
+  lineHeightBlock?: number[];
   inlineStyleRangeBlock?: IInlineStyleRange[][];
   entityRangeBlock?: IEntityRange[][];
 } & IBaseDocumentModel;
@@ -62,6 +66,8 @@ export type ILegend = Omit<IParagraphOptions, 'text'> & {
   color?: string;
   size?: number;
   align?: (typeof AlignmentType)[keyof typeof AlignmentType];
+  lineHeight?: number;
+  lineHeightBlock?: number[];
   inlineStyleRangeBlock?: IInlineStyleRange[][];
   entityRangeBlock?: IEntityRange[][];
 } & IBaseDocumentModel;
