@@ -29,12 +29,13 @@ export class CreateDocumentModelService {
       { select: { id: true, status: true } },
     );
 
-    if (found.data[0]?.id)
+    if (found.data[0]?.id) {
+      const inactiveSuffix =
+        found.data[0].status === StatusEnum.INACTIVE ? ' inativado' : '';
       throw new BadRequestException(
-        'Modelo de documento com esse nome já existe' + found.data[0].status === StatusEnum.INACTIVE
-          ? ' inativado'
-          : '',
+        `Modelo de documento com esse nome já existe${inactiveSuffix}`,
       );
+    }
 
     let baseModel: IDocumentModelData = {
       variables: {},
