@@ -18,6 +18,7 @@ export class WorkspaceMapper {
       customSectionHTML: json.useCustomSection ? json.customSectionHTML || null : null,
 
       cnpj: data.cnpj,
+      abbreviation: data.abbreviation || null,
       razaoSocial: json.name || null,
       riskDegree: json.primaryActivity?.riskDegree || null,
       cnaeLabel: json.primaryActivity?.name || null,

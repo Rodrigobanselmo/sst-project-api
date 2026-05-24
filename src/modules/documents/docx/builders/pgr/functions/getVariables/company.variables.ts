@@ -5,6 +5,8 @@ import { VariablesPGREnum } from '../../enums/variables.enum';
 import { formatCNPJ } from '@brazilian-utils/brazilian-utils';
 import { formatCnae, formatPhoneNumber } from '../../../../../../../shared/utils/formats';
 
+import { workspaceVariables } from './workspace.variables';
+
 export const companyVariables = (
   company: CompanyEntity,
   workspace: WorkspaceEntity,
@@ -41,7 +43,7 @@ export const companyVariables = (
     [VariablesPGREnum.COMPANY_VALUES]: company?.values || '',
     [VariablesPGREnum.COMPANY_RESPONSIBLE]:
       legalResponsibleOverride?.trim() || company?.responsibleName?.trim() || '',
-    [VariablesPGREnum.WORKSPACE_CNPJ]: formatCNPJ(workspace?.cnpj) || formatCNPJ(company?.cnpj) || '',
+    ...workspaceVariables(workspace, company),
     [VariablesPGREnum.IS_RS]: address?.state === 'RS' ? 'true' : '',
     [VariablesPGREnum.IS_AC]: address?.state == 'AC' ? 'true' : '',
     [VariablesPGREnum.IS_AL]: address?.state == 'AL' ? 'true' : '',

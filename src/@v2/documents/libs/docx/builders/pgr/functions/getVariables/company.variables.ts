@@ -5,6 +5,8 @@ import { formatCnpj } from '@/@v2/shared/utils/helpers/formats-cnpj';
 import { formatPhoneNumber } from '@/@v2/shared/utils/helpers/formats-phone';
 import { dateUtils } from '@/@v2/shared/utils/helpers/date-utils';
 
+import { workspaceVariables } from './workspace.variables';
+
 interface ICompanyVariables {
   company: CompanyModel;
   workspace: WorkspaceModel;
@@ -47,7 +49,7 @@ export const companyVariables = ({
     [VariablesPGREnum.COMPANY_VISION]: company.vision || '',
     [VariablesPGREnum.COMPANY_VALUES]: company.values || '',
     [VariablesPGREnum.COMPANY_RESPONSIBLE]: legalResponsible,
-    [VariablesPGREnum.WORKSPACE_CNPJ]: formatCnpj(workspace?.cnpj || company?.cnpj || ''),
+    ...workspaceVariables(workspace, company),
     [VariablesPGREnum.IS_RS]: address?.state === 'RS' ? 'true' : '',
     [VariablesPGREnum.IS_AC]: address?.state == 'AC' ? 'true' : '',
     [VariablesPGREnum.IS_AL]: address?.state == 'AL' ? 'true' : '',

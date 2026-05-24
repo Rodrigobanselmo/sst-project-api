@@ -401,8 +401,68 @@ export const variableMap: IVariableMap = {
 
   [VariablesPGREnum.WORKSPACE_CNPJ]: {
     type: VariablesPGREnum.WORKSPACE_CNPJ,
-    label: '',
-    accept: [DocumentTypeEnum.PGR, DocumentTypeEnum.FRPS],
+    label: 'CNPJ (ESTABELECIMENTO SELECIONADO)',
+    accept: [DocumentTypeEnum.OTHER, DocumentTypeEnum.PGR, DocumentTypeEnum.FRPS],
+  },
+  [VariablesPGREnum.WORKSPACE_NAME]: {
+    type: VariablesPGREnum.WORKSPACE_NAME,
+    label: 'NOME (ESTABELECIMENTO SELECIONADO)',
+    accept: [DocumentTypeEnum.OTHER, DocumentTypeEnum.PGR, DocumentTypeEnum.FRPS],
+  },
+  [VariablesPGREnum.WORKSPACE_LEGAL_NAME]: {
+    type: VariablesPGREnum.WORKSPACE_LEGAL_NAME,
+    label: 'RAZÃO SOCIAL (ESTABELECIMENTO SELECIONADO)',
+    accept: [DocumentTypeEnum.OTHER, DocumentTypeEnum.PGR, DocumentTypeEnum.FRPS],
+  },
+  [VariablesPGREnum.WORKSPACE_STREET]: {
+    type: VariablesPGREnum.WORKSPACE_STREET,
+    label: 'LOGRADOURO (ESTABELECIMENTO SELECIONADO)',
+    accept: [DocumentTypeEnum.OTHER, DocumentTypeEnum.PGR, DocumentTypeEnum.FRPS],
+  },
+  [VariablesPGREnum.WORKSPACE_NUMBER]: {
+    type: VariablesPGREnum.WORKSPACE_NUMBER,
+    label: 'NÚMERO (ESTABELECIMENTO SELECIONADO)',
+    accept: [DocumentTypeEnum.OTHER, DocumentTypeEnum.PGR, DocumentTypeEnum.FRPS],
+  },
+  [VariablesPGREnum.WORKSPACE_NEIGHBOR]: {
+    type: VariablesPGREnum.WORKSPACE_NEIGHBOR,
+    label: 'BAIRRO (ESTABELECIMENTO SELECIONADO)',
+    accept: [DocumentTypeEnum.OTHER, DocumentTypeEnum.PGR, DocumentTypeEnum.FRPS],
+  },
+  [VariablesPGREnum.WORKSPACE_CITY]: {
+    type: VariablesPGREnum.WORKSPACE_CITY,
+    label: 'CIDADE (ESTABELECIMENTO SELECIONADO)',
+    accept: [DocumentTypeEnum.OTHER, DocumentTypeEnum.PGR, DocumentTypeEnum.FRPS],
+  },
+  [VariablesPGREnum.WORKSPACE_STATE]: {
+    type: VariablesPGREnum.WORKSPACE_STATE,
+    label: 'UF (ESTABELECIMENTO SELECIONADO)',
+    accept: [DocumentTypeEnum.OTHER, DocumentTypeEnum.PGR, DocumentTypeEnum.FRPS],
+  },
+  [VariablesPGREnum.WORKSPACE_CEP]: {
+    type: VariablesPGREnum.WORKSPACE_CEP,
+    label: 'CEP (ESTABELECIMENTO SELECIONADO)',
+    accept: [DocumentTypeEnum.OTHER, DocumentTypeEnum.PGR, DocumentTypeEnum.FRPS],
+  },
+  [VariablesPGREnum.WORKSPACE_INITIAL]: {
+    type: VariablesPGREnum.WORKSPACE_INITIAL,
+    label: 'SIGLA (ESTABELECIMENTO SELECIONADO)',
+    accept: [DocumentTypeEnum.OTHER, DocumentTypeEnum.PGR, DocumentTypeEnum.FRPS],
+  },
+  [VariablesPGREnum.WORKSPACE_CNAE]: {
+    type: VariablesPGREnum.WORKSPACE_CNAE,
+    label: 'CNAE (ESTABELECIMENTO SELECIONADO)',
+    accept: [DocumentTypeEnum.OTHER, DocumentTypeEnum.PGR, DocumentTypeEnum.FRPS],
+  },
+  [VariablesPGREnum.WORKSPACE_RISK_DEGREE]: {
+    type: VariablesPGREnum.WORKSPACE_RISK_DEGREE,
+    label: 'GRAU DE RISCO (ESTABELECIMENTO SELECIONADO)',
+    accept: [DocumentTypeEnum.OTHER, DocumentTypeEnum.PGR, DocumentTypeEnum.FRPS],
+  },
+  [VariablesPGREnum.WORKSPACE_WORK_TIME]: {
+    type: VariablesPGREnum.WORKSPACE_WORK_TIME,
+    label: 'HORÁRIO DE TRABALHO (ESTABELECIMENTO SELECIONADO)',
+    accept: [DocumentTypeEnum.OTHER, DocumentTypeEnum.PGR, DocumentTypeEnum.FRPS],
   },
   [VariablesPGREnum.ENVIRONMENT_DESCRIPTION]: {
     type: VariablesPGREnum.ENVIRONMENT_DESCRIPTION,

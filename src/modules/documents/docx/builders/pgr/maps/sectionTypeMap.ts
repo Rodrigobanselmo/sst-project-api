@@ -3,6 +3,8 @@ import { DocumentDataEntity } from './../../../../../sst/entities/documentData.e
 import { DocumentDataPGRDto } from './../../../../../sst/dto/document-data-pgr.dto';
 import { DocumentCoverEntity } from './../../../../../company/entities/document-cover.entity';
 import { CompanyEntity } from './../../../../../company/entities/company.entity';
+import { WorkspaceEntity } from './../../../../../company/entities/workspace.entity';
+import { formatCoverCompanyName } from '@/@v2/documents/libs/docx/helpers/format-cover-company-name';
 import { CharacterizationEntity } from './../../../../../company/entities/characterization.entity';
 import { ISectionOptions } from 'docx';
 
@@ -47,6 +49,7 @@ type IDocumentClassType = {
   characterizations: CharacterizationEntity[];
   environments: CharacterizationEntity[];
   company: CompanyEntity;
+  workspace: WorkspaceEntity;
   hierarchyTree: IHierarchyMap;
   hierarchyHighLevelsData: Map<string, HierarchyMapData>;
   exams?: IExamOrigins[];
@@ -69,12 +72,14 @@ export class SectionsMapClass {
   private hierarchyHighLevelsData: Map<string, HierarchyMapData>;
   private hierarchyTree: IHierarchyMap;
   private company: CompanyEntity;
+  private workspace: WorkspaceEntity;
   private exams?: IExamOrigins[];
 
   constructor({
     variables,
     cover,
     company,
+    workspace,
     version,
     logoImagePath,
     elementsMap,
@@ -99,6 +104,7 @@ export class SectionsMapClass {
     this.environments = environments;
     this.characterizations = characterizations;
     this.company = company;
+    this.workspace = workspace;
     this.cover = cover;
     this.hierarchyTree = hierarchyTree;
     this.hierarchyHighLevelsData = hierarchyHighLevelsData;
@@ -112,7 +118,19 @@ export class SectionsMapClass {
         imgPath: this.logoPath,
         version: this.version,
         title: replaceAllVariables(`??${VariablesPGREnum.DOCUMENT_TITLE}??`, this.variables),
-        companyName: `${this.company.name} ${this.company.initials ? `(${this.company.initials})` : ''}`,
+        companyName: formatCoverCompanyName(
+          {
+            name: this.company.name,
+            initials: this.company.initials,
+          },
+          {
+            isOwner: this.workspace.isOwner,
+            name: this.workspace.name,
+            abbreviation: this.workspace.abbreviation,
+            razaoSocial: null,
+            companyJsonName: ((this.workspace.companyJson as any) || {}).name || null,
+          },
+        ),
         ...(this.cover && (this.cover.json as any)),
       }),
     [DocumentSectionTypeEnum.CHAPTER]: ({ text }: IChapter) => {

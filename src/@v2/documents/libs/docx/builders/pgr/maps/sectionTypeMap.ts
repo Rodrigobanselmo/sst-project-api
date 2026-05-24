@@ -21,6 +21,7 @@ import { replaceAllVariables } from '../functions/replaceAllVariables';
 import { IDocVariables } from '../types/documet-section-groups.types';
 import { IMapElementDocumentType } from './elementTypeMap';
 import { CoverTypeEnum } from '@/@v2/shared/domain/enum/company/cover-type.enum';
+import { formatCoverCompanyName } from '../../../helpers/format-cover-company-name';
 import { activitiesPericulosidadeSections } from '../../../components/iterables/activities-periculosidade/activities-periculosidade.sections';
 import { activitiesInsalubridadeSections } from '../../../components/iterables/activities-insalubridade/activities-insalubridade.sections';
 
@@ -57,7 +58,13 @@ export class SectionsMapClass {
         imgPath: logoPath,
         version: this.version,
         title: replaceAllVariables(`??${VariablesPGREnum.DOCUMENT_TITLE}??`, this.variables),
-        companyName: `${this.data.documentBase.company.name} ${this.data.documentBase.company.initials ? `(${this.data.documentBase.company.initials})` : ''}`,
+        companyName: formatCoverCompanyName(
+          {
+            name: this.data.documentBase.company.name,
+            initials: this.data.documentBase.company.initials,
+          },
+          this.data.documentBase.workspace,
+        ),
         coverProps,
       });
     },
