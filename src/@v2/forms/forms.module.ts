@@ -88,6 +88,7 @@ import { HierarchyGroupController } from './application/hierarchy-group/hierarch
 import { BrowseHierarchyGroupsUseCase } from './application/hierarchy-group/browse-hierarchy-groups/use-cases/browse-hierarchy-groups.usecase';
 import { UpsertHierarchyGroupsUseCase } from './application/hierarchy-group/upsert-hierarchy-groups/use-cases/upsert-hierarchy-groups.usecase';
 import { DeleteHierarchyGroupUseCase } from './application/hierarchy-group/delete-hierarchy-group/use-cases/delete-hierarchy-group.usecase';
+import { FormApplicationScopeService } from './application/shared/services/form-application-scope.service';
 
 @Module({
   imports: [SharedModule, SSTModule, CacheModule.register()],
@@ -168,6 +169,7 @@ import { DeleteHierarchyGroupUseCase } from './application/hierarchy-group/delet
     PublicFormParticipantLoginUseCase,
     // Services
     FormApplicationCacheService,
+    FormApplicationScopeService,
     FormQuestionsAnswersRisksService,
     FormPreliminaryLibraryDAO,
     BrowseFormPreliminaryLibraryQuestionsUseCase,

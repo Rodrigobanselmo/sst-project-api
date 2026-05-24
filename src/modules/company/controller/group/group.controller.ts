@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { FindCompanyGroupDto, UpsertCompanyGroupDto } from '../../dto/company-group.dto';
 import { FindAvailableCompanyGroupsService } from '../../services/group/find-company-groups-group/find-company-groups-group.service';
 import { UpsertCompanyGroupsService } from '../../services/group/upsert-company-group/upsert-company-group.service';
@@ -17,8 +17,12 @@ export class CompanyGroupController {
 
   @Roles(RoleEnum.COMPANY, RoleEnum.CONTRACTS, RoleEnum.USER)
   @Get()
-  find(@User() userPayloadDto: UserPayloadDto, @Query() query: FindCompanyGroupDto) {
-    return this.findAvailableCompanyGroupsService.execute(query, userPayloadDto);
+  find(
+    @Param('companyId') companyId: string,
+    @User() userPayloadDto: UserPayloadDto,
+    @Query() query: FindCompanyGroupDto,
+  ) {
+    return this.findAvailableCompanyGroupsService.execute(query, userPayloadDto, companyId);
   }
 
   @Permissions({

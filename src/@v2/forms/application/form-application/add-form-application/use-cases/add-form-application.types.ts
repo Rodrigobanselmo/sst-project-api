@@ -1,3 +1,4 @@
+import { FormApplicationScopeTypeEnum } from '@/@v2/forms/domain/enums/form-application-scope-type.enum';
 import { FormIdentifierTypeEnum } from '@/@v2/forms/domain/enums/form-identifier-type.enum';
 import { FormQuestionTypeEnum } from '@/@v2/forms/domain/enums/form-question-type.enum';
 
@@ -25,6 +26,9 @@ export namespace IAddFormApplicationUseCase {
     formId: string;
     workspaceIds: string[];
     hierarchyIds: string[];
+    scopeType?: FormApplicationScopeTypeEnum;
+    companyGroupId?: number;
+    companyIds?: string[];
     anonymous?: boolean;
     shareableLink?: boolean;
     participationGoal?: number;

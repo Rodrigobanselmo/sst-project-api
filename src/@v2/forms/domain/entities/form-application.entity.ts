@@ -3,6 +3,7 @@ import { FormStatusEnum } from '../enums/form-status.enum';
 import { DomainResponse } from '@/@v2/shared/domain/types/shared/domain-response';
 import { errorCantChangeToPendingForm } from '../errors/domain.errors';
 import { generateCuid } from '@/@v2/shared/utils/helpers/generate-cuid';
+import { FormApplicationScopeTypeEnum } from '../enums/form-application-scope-type.enum';
 
 type IUpdatePrams = {
   name?: string;
@@ -32,6 +33,8 @@ export type FormApplicationEntityConstructor = {
   bannerWhyText?: string | null;
   bannerContactText?: string | null;
   reminderCount?: number;
+  scopeType?: FormApplicationScopeTypeEnum;
+  companyGroupId?: number | null;
 };
 
 export class FormApplicationEntity {
@@ -50,6 +53,8 @@ export class FormApplicationEntity {
   bannerWhyText: string | null;
   bannerContactText: string | null;
   reminderCount: number;
+  scopeType: FormApplicationScopeTypeEnum;
+  companyGroupId: number | null;
 
   private _status: FormStatusEnum;
 
@@ -70,6 +75,9 @@ export class FormApplicationEntity {
     this.bannerWhyText = params.bannerWhyText ?? null;
     this.bannerContactText = params.bannerContactText ?? null;
     this.reminderCount = params.reminderCount ?? 0;
+    this.scopeType =
+      params.scopeType ?? FormApplicationScopeTypeEnum.COMPANY_WORKSPACES;
+    this.companyGroupId = params.companyGroupId ?? null;
   }
 
   get status() {

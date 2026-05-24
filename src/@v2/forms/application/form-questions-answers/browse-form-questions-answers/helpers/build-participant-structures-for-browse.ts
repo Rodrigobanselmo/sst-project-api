@@ -86,6 +86,8 @@ export async function buildParticipantStructuresForBrowse(params: {
         submissionId,
         new FormParticipantStructureBrowseModel({
           participantsAnswersId: submissionId,
+          companyId: existing?.companyId ?? null,
+          companyName: existing?.companyName ?? null,
           workspaceId: existing?.workspaceId ?? null,
           workspaceName: existing?.workspaceName ?? null,
           hierarchies,
@@ -100,6 +102,8 @@ export async function buildParticipantStructuresForBrowse(params: {
       existing ??
       new FormParticipantStructureBrowseModel({
         participantsAnswersId: id,
+        companyId: null,
+        companyName: null,
         workspaceId: null,
         workspaceName: null,
         hierarchies: [],

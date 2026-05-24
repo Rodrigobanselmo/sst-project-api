@@ -360,6 +360,7 @@ model Company {
   SystemFile                 SystemFile[]
   DocumentControlFile        DocumentControlFile[]
   FormApplication            FormApplication[]
+  formApplicationCompanies   FormApplicationCompany[]
   Form                       Form[]
   FormQuestionDetails        FormQuestionDetails[]
   TaskProject                TaskProject[]
@@ -427,6 +428,7 @@ model CompanyGroup {
   company              Company              @relation("company", fields: [companyId], references: [id])
   doctorResponsible    ProfessionalCouncil? @relation("doctors_council_group_responsibles", fields: [doctorResponsibleId], references: [id], onDelete: Restrict)
   tecResponsible       ProfessionalCouncil? @relation("tec_council_group_responsibles", fields: [tecResponsibleId], references: [id], onDelete: Restrict)
+  formApplications     FormApplication[]
 
   @@unique([id, companyId])
 }
@@ -1257,6 +1259,11 @@ model Form {
   @@index([company_id])
 }
 
+enum FormApplicationScopeTypeEnum {
+  COMPANY_WORKSPACES
+  BUSINESS_GROUP_COMPANIES
+}
+
 model FormApplication {
   id                 String     @id @default(cuid())
   name               String
@@ -1269,6 +1276,8 @@ model FormApplication {
   banner_why_text     String?
   banner_contact_text String?
   reminder_count      Int        @default(0)
+  scope_type          FormApplicationScopeTypeEnum @default(COMPANY_WORKSPACES)
+  company_group_id    Int?
   created_at         DateTime   @default(now())
   updated_at         DateTime   @updatedAt
   deleted_at         DateTime?
@@ -1281,6 +1290,8 @@ model FormApplication {
   form_id String
   form    Form   @relation(fields: [form_id], references: [id])
 
+  companyGroup          CompanyGroup?           @relation(fields: [company_group_id], references: [id], onDelete: SetNull)
+  applicationCompanies  FormApplicationCompany[]
   participants              FormParticipants?
   participants_answers      FormParticipantsAnswers[]
   question_identifier_group FormQuestionGroup[]
@@ -1289,6 +1300,21 @@ model FormApplication {
   hierarchyGroups           FormApplicationHierarchyGroup[]
 
   @@unique([id, company_id])
+  @@index([company_id])
+  @@index([company_group_id])
+}
+
+model FormApplicationCompany {
+  id                  String   @id @default(cuid())
+  form_application_id String
+  company_id          String
+  created_at          DateTime @default(now())
+
+  form_application FormApplication @relation(fields: [form_application_id], references: [id], onDelete: Cascade)
+  company          Company         @relation(fields: [company_id], references: [id], onDelete: Cascade)
+
+  @@unique([form_application_id, company_id])
+  @@index([form_application_id])
   @@index([company_id])
 }
 

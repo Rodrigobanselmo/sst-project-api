@@ -1,3 +1,4 @@
+import { FormApplicationScopeTypeEnum } from '@/@v2/forms/domain/enums/form-application-scope-type.enum';
 import { FormIdentifierTypeEnum } from '@/@v2/forms/domain/enums/form-identifier-type.enum';
 import { Type } from 'class-transformer';
 import { ArrayMinSize, IsArray, IsBoolean, IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, ValidateNested, Min, Max } from 'class-validator';
@@ -90,6 +91,19 @@ export class AddFormApplicationPayload {
   @IsOptional()
   @IsString({ each: true })
   hierarchyIds?: string[];
+
+  @IsOptional()
+  @IsEnum(FormApplicationScopeTypeEnum)
+  scopeType?: FormApplicationScopeTypeEnum;
+
+  @IsOptional()
+  @IsInt()
+  companyGroupId?: number;
+
+  @IsArray()
+  @IsOptional()
+  @IsString({ each: true })
+  companyIds?: string[];
 
   @IsOptional()
   @IsBoolean()

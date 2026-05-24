@@ -11,10 +11,15 @@ import { Prisma } from '@prisma/client';
 import { FormApplicationReadModelMapper } from '../../mappers/models/form-application/form-application-read.mapper';
 import { FormApplicationReadPublicModelMapper } from '../../mappers/models/form-application/form-application-read-public.mapper';
 import { FormStatusEnum } from '@/@v2/forms/domain/enums/form-status.enum';
+import { FormApplicationScopeTypeEnum } from '@/@v2/forms/domain/enums/form-application-scope-type.enum';
+import { FormApplicationScopeService } from '@/@v2/forms/application/shared/services/form-application-scope.service';
 
 @Injectable()
 export class FormApplicationDAO {
-  constructor(private readonly prisma: PrismaServiceV2) {}
+  constructor(
+    private readonly prisma: PrismaServiceV2,
+    private readonly formApplicationScopeService: FormApplicationScopeService,
+  ) {}
 
   async read(params: IFormApplicationDAO.ReadParams) {
     const formApplication = await this.prisma.formApplication.findFirst({
@@ -45,6 +50,16 @@ export class FormApplicationDAO {
                     name: true,
                   },
                 },
+              },
+            },
+          },
+        },
+        applicationCompanies: {
+          include: {
+            company: {
+              select: {
+                id: true,
+                name: true,
               },
             },
           },
@@ -91,20 +106,37 @@ export class FormApplicationDAO {
 
     if (!formApplication?.id) return null;
 
-    const totalParticipantsPromise = this.prisma.employee.count({
-      where: {
-        companyId: params.companyId,
-        hierarchy: {
-          workspaces: {
-            some: {
-              id: {
-                in: formApplication.participants?.workspaces.map((workspace) => workspace.workspace_id) || [],
+    const scope = await this.formApplicationScopeService.resolve({
+      formApplicationId: params.id,
+      anchorCompanyId: params.companyId,
+    });
+
+    const totalParticipantsPromise =
+      scope.scopeType === FormApplicationScopeTypeEnum.BUSINESS_GROUP_COMPANIES
+        ? this.prisma.employee.count({
+            where: {
+              companyId: { in: scope.participantCompanyIds },
+              status: 'ACTIVE',
+            },
+          })
+        : this.prisma.employee.count({
+            where: {
+              companyId: params.companyId,
+              status: 'ACTIVE',
+              hierarchy: {
+                workspaces: {
+                  some: {
+                    id: {
+                      in:
+                        formApplication.participants?.workspaces.map(
+                          (workspace) => workspace.workspace_id,
+                        ) || [],
+                    },
+                  },
+                },
               },
             },
-          },
-        },
-      },
-    });
+          });
 
     const totalAnswersPromise = this.prisma.formParticipantsAnswers.count({
       where: {

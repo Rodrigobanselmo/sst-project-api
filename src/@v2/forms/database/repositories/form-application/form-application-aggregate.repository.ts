@@ -1,3 +1,4 @@
+import { FormApplicationScopeTypeEnum } from '@/@v2/forms/domain/enums/form-application-scope-type.enum';
 import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service';
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
@@ -47,6 +48,18 @@ export class FormApplicationAggregateRepository {
           banner_why_text: params.formApplication.bannerWhyText,
           banner_contact_text: params.formApplication.bannerContactText,
           reminder_count: params.formApplication.reminderCount,
+          scope_type: params.formApplication.scopeType,
+          company_group_id: params.formApplication.companyGroupId,
+          applicationCompanies: params.applicationCompanies.length
+            ? {
+                createMany: {
+                  data: params.applicationCompanies.map((company) => ({
+                    id: company.id,
+                    company_id: company.companyId,
+                  })),
+                },
+              }
+            : undefined,
           participants: {
             create: {
               hierarchies: params.participantsHierarchies.length
@@ -87,6 +100,7 @@ export class FormApplicationAggregateRepository {
     const formApplication = await this.prisma.$transaction(async (tx) => {
       const listCreateHierarchyParticipants = params.participantsHierarchies.filter((participant) => participant.isNew);
       const listCreateWorkspaceParticipants = params.participantsWorkspaces.filter((participant) => participant.isNew);
+      const listCreateApplicationCompanies = params.applicationCompanies.filter((company) => company.isNew);
 
       const formApplication = await tx.formApplication.update({
         where: {
@@ -107,6 +121,27 @@ export class FormApplicationAggregateRepository {
           banner_why_text: params.formApplication.bannerWhyText,
           banner_contact_text: params.formApplication.bannerContactText,
           reminder_count: params.formApplication.reminderCount,
+          scope_type: params.formApplication.scopeType,
+          company_group_id: params.formApplication.companyGroupId,
+          applicationCompanies:
+            params.formApplication.scopeType ===
+              FormApplicationScopeTypeEnum.BUSINESS_GROUP_COMPANIES
+              ? {
+                  deleteMany: {
+                    company_id: {
+                      notIn: params.applicationCompanies.map((company) => company.companyId),
+                    },
+                  },
+                  createMany: listCreateApplicationCompanies.length
+                    ? {
+                        data: listCreateApplicationCompanies.map((company) => ({
+                          id: company.id,
+                          company_id: company.companyId,
+                        })),
+                      }
+                    : undefined,
+                }
+              : undefined,
           participants: {
             update: {
               hierarchies: {
