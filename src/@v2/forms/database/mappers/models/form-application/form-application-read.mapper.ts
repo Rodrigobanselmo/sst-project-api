@@ -15,6 +15,7 @@ import {
   FormIdentifierTypeEnum as PrismaFormIdentifierTypeEnum,
 } from '@prisma/client';
 import { FormIdentifierTypeEnum } from '@/@v2/forms/domain/enums/form-identifier-type.enum';
+import { FormApplicationScopeTypeEnum } from '@/@v2/forms/domain/enums/form-application-scope-type.enum';
 import { FormTypeEnum } from '@/@v2/forms/domain/enums/form-type.enum';
 
 export type IFormApplicationReadModelMapper = PrismaFormApplication & {
@@ -22,6 +23,10 @@ export type IFormApplicationReadModelMapper = PrismaFormApplication & {
   totalParticipants: number;
   totalAnswers: number;
   averageTimeSpent: number | null;
+  applicationCompanies: {
+    company_id: string;
+    company: { id: string; name: string };
+  }[];
   participants:
     | (PrismaFormParticipants & {
         hierarchies: (PrismaFormParticipantsHierarchy & { hierarchy: { id: string; name: string } })[];
@@ -95,6 +100,11 @@ export class FormApplicationReadModelMapper {
       bannerWhyText: prisma.banner_why_text ?? null,
       bannerContactText: prisma.banner_contact_text ?? null,
       reminderCount: prisma.reminder_count ?? 0,
+      scopeType:
+        FormApplicationScopeTypeEnum[
+          prisma.scope_type as keyof typeof FormApplicationScopeTypeEnum
+        ] ?? FormApplicationScopeTypeEnum.COMPANY_WORKSPACES,
+      companyGroupId: prisma.company_group_id ?? null,
       participants: prisma.participants
         ? {
             hierarchies: prisma.participants.hierarchies.map((h) => ({
@@ -105,10 +115,18 @@ export class FormApplicationReadModelMapper {
               id: w.workspaces.id,
               name: w.workspaces.name,
             })),
+            companies: prisma.applicationCompanies.map((companyRow) => ({
+              id: companyRow.company.id,
+              name: companyRow.company.name,
+            })),
           }
         : {
             hierarchies: [],
             workspaces: [],
+            companies: prisma.applicationCompanies.map((companyRow) => ({
+              id: companyRow.company.id,
+              name: companyRow.company.name,
+            })),
           },
       questionIdentifierGroup: new FormQuestionGroupReadModel({
         id: prisma.question_identifier_group[0].id,

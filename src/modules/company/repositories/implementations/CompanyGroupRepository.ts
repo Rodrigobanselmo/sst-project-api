@@ -149,7 +149,11 @@ export class CompanyGroupRepository {
     options: Prisma.CompanyGroupFindManyArgs = {},
   ) {
     const where = {
-      AND: [{ companyId }],
+      AND: [
+        {
+          OR: [{ companyId }, { companies: { some: { id: companyId } } }],
+        },
+      ],
     } as typeof options.where;
 
     options.select = {

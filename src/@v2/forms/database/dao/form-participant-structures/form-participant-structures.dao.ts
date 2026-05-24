@@ -29,6 +29,8 @@ export class FormParticipantStructuresDAO {
     >`
       SELECT
         fpa."id" AS participants_answers_id,
+        emp."companyId" AS company_id,
+        comp."name" AS company_name,
         participant_ws.workspace_id,
         participant_ws.workspace_name,
         hier."id" AS hierarchy_id,
@@ -50,9 +52,8 @@ export class FormParticipantStructuresDAO {
         h_parent_5."name" AS h_parent_5_name,
         h_parent_5."type" AS h_parent_5_type
       FROM "FormParticipantsAnswers" fpa
-      LEFT JOIN "Employee" emp
-        ON emp."id" = fpa."employee_id"
-        AND emp."companyId" = ${companyId}
+      LEFT JOIN "Employee" emp ON emp."id" = fpa."employee_id"
+      LEFT JOIN "Company" comp ON comp."id" = emp."companyId"
       LEFT JOIN "Hierarchy" hier ON hier."id" = emp."hierarchyId"
       LEFT JOIN "Hierarchy" h_parent_1 ON h_parent_1."id" = hier."parentId"
       LEFT JOIN "Hierarchy" h_parent_2 ON h_parent_2."id" = h_parent_1."parentId"

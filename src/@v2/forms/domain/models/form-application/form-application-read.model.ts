@@ -1,3 +1,4 @@
+import { FormApplicationScopeTypeEnum } from '../../enums/form-application-scope-type.enum';
 import { FormTypeEnum } from '../../enums/form-type.enum';
 import { FormStatusEnum } from '../../enums/form-status.enum';
 import { FormQuestionGroupReadModel } from '../shared/form-question-group-read.model';
@@ -13,9 +14,12 @@ export type IFormApplicationReadModel = {
   endedAt: Date | null;
   form: { id: string; name: string; type: FormTypeEnum };
   status: FormStatusEnum;
+  scopeType: FormApplicationScopeTypeEnum;
+  companyGroupId: number | null;
   participants: {
     hierarchies: { id: string; name: string }[];
     workspaces: { id: string; name: string }[];
+    companies: { id: string; name: string }[];
   };
   questionIdentifierGroup: FormQuestionGroupReadModel;
   isShareableLink: boolean;
@@ -43,9 +47,12 @@ export class FormApplicationReadModel {
   form: { id: string; name: string; type: FormTypeEnum };
   isShareableLink: boolean;
   isAnonymous: boolean;
+  scopeType: FormApplicationScopeTypeEnum;
+  companyGroupId: number | null;
   participants: {
     hierarchies: { id: string; name: string }[];
     workspaces: { id: string; name: string }[];
+    companies: { id: string; name: string }[];
   };
   totalParticipants: number;
   totalAnswers: number;
@@ -69,6 +76,8 @@ export class FormApplicationReadModel {
     this.endedAt = params.endedAt;
     this.form = params.form;
     this.participants = params.participants;
+    this.scopeType = params.scopeType;
+    this.companyGroupId = params.companyGroupId;
     this.isAnonymous = params.isAnonymous;
     this.isShareableLink = params.isShareableLink;
     this.questionIdentifierGroup = params.questionIdentifierGroup;

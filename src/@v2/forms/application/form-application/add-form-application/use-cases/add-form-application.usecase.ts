@@ -16,6 +16,10 @@ import { asyncBatch } from '@/@v2/shared/utils/helpers/async-batch';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { IAddFormApplicationUseCase } from './add-form-application.types';
 import { FormQuestionOptionEntity } from '@/@v2/forms/domain/entities/form-question-option.entity';
+import { FormApplicationScopeTypeEnum } from '@/@v2/forms/domain/enums/form-application-scope-type.enum';
+import { FormApplicationCompanyEntity } from '@/@v2/forms/domain/entities/form-application-company.entity';
+import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service';
+import { validateFormApplicationCompanies } from '../../shared/validate-form-application-companies.helper';
 
 @Injectable()
 export class AddFormApplicationUseCase {
@@ -23,15 +27,24 @@ export class AddFormApplicationUseCase {
     private readonly formApplicationAggregateRepository: FormApplicationAggregateRepository,
     private readonly formQuestionIdentifierEntityRepository: FormQuestionIdentifierEntityRepository,
     private readonly formRepository: FormRepository,
+    private readonly prisma: PrismaServiceV2,
   ) {}
 
   async execute(params: IAddFormApplicationUseCase.Params) {
     const form = await this.formRepository.find({ id: params.formId, companyId: params.companyId });
     if (!form) throw new BadRequestException('Formulário não encontrado');
 
-    if (params.hierarchyIds.length === 0 && params.workspaceIds.length === 0) {
-      throw new BadRequestException('É necessário informar pelo menos um estabelecimento ou setor');
-    }
+    const scopeType =
+      params.scopeType ?? FormApplicationScopeTypeEnum.COMPANY_WORKSPACES;
+
+    await validateFormApplicationCompanies({
+      prisma: this.prisma,
+      scopeType,
+      companyGroupId: params.companyGroupId,
+      companyIds: params.companyIds,
+      workspaceIds: params.workspaceIds,
+      hierarchyIds: params.hierarchyIds,
+    });
 
     const formApplication = new FormApplicationEntity({
       name: params.name,
@@ -40,6 +53,11 @@ export class AddFormApplicationUseCase {
       anonymous: params.anonymous,
       shareableLink: params.shareableLink,
       participationGoal: params.participationGoal,
+      scopeType,
+      companyGroupId:
+        scopeType === FormApplicationScopeTypeEnum.BUSINESS_GROUP_COMPANIES
+          ? params.companyGroupId ?? null
+          : null,
     });
 
     const participantsHierarchies = params.hierarchyIds.map((hierarchyId) => {
@@ -116,11 +134,19 @@ export class AddFormApplicationUseCase {
       participantsWorkspaces,
     });
 
+    const applicationCompanies =
+      scopeType === FormApplicationScopeTypeEnum.BUSINESS_GROUP_COMPANIES
+        ? (params.companyIds ?? []).map(
+            (companyId) => new FormApplicationCompanyEntity({ companyId }),
+          )
+        : [];
+
     const formApplicationAggregate = new FormApplicationAggregate({
       form,
       formApplication,
       participants: participantsAggregate,
       identifier: questionIdentifierGroup,
+      applicationCompanies,
     });
 
     await this.formApplicationAggregateRepository.create(formApplicationAggregate);

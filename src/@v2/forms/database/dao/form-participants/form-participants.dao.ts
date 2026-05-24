@@ -12,6 +12,8 @@ import { getOrderByRawPrisma, IOrderByRawPrisma } from '@/@v2/shared/utils/datab
 import { FormParticipantsBrowseModelMapper } from '../../mappers/models/form-participants/form-participants-browse.mapper';
 import { Prisma } from '@prisma/client';
 import { participantWorkspaceLateralJoin } from './participant-workspace-lateral.sql';
+import { FormApplicationScopeTypeEnum } from '@/@v2/forms/domain/enums/form-application-scope-type.enum';
+import { FormApplicationScopeService } from '@/@v2/forms/application/shared/services/form-application-scope.service';
 
 function coerceSqlCount(value: unknown): number {
   if (value === undefined || value === null) return 0;
@@ -36,12 +38,20 @@ function readFilterSummaryRow(rows: unknown[]): {
 
 @Injectable()
 export class FormParticipantsDAO {
-  constructor(private readonly prisma: PrismaServiceV2) {}
+  constructor(
+    private readonly prisma: PrismaServiceV2,
+    private readonly formApplicationScopeService: FormApplicationScopeService,
+  ) {}
 
   async browse({ limit, page, orderBy, filters, cryptoAdapter }: IFormParticipantsDAO.BrowseParams) {
     const pagination = getPagination(page, limit, FORM_PARTICIPANTS_BROWSE_MAX_LIMIT);
 
-    const browseWhereParams = this.browseWhere(filters);
+    const scope = await this.formApplicationScopeService.resolve({
+      formApplicationId: filters.applicationId,
+      anchorCompanyId: filters.companyId,
+    });
+
+    const browseWhereParams = this.browseWhere(filters, scope);
     const filterWhereParams = this.filterWhere(filters);
     const orderByParams = this.browseOrderBy(orderBy);
 
@@ -182,15 +192,23 @@ export class FormParticipantsDAO {
     });
   }
 
-  private browseWhere(filters: IFormParticipantsDAO.BrowseParams['filters']) {
-    const where = [
-      Prisma.sql`emp."companyId" = ${filters.companyId}`,
-      Prisma.sql`emp."status" = 'ACTIVE'`,
-      Prisma.sql`(
+  private browseWhere(
+    filters: IFormParticipantsDAO.BrowseParams['filters'],
+    scope: Awaited<ReturnType<FormApplicationScopeService['resolve']>>,
+  ) {
+    const where = [Prisma.sql`emp."status" = 'ACTIVE'`];
+
+    if (scope.scopeType === FormApplicationScopeTypeEnum.BUSINESS_GROUP_COMPANIES) {
+      where.push(
+        Prisma.sql`emp."companyId" IN (${Prisma.join(scope.participantCompanyIds)})`,
+      );
+    } else {
+      where.push(Prisma.sql`emp."companyId" = ${filters.companyId}`);
+      where.push(Prisma.sql`(
         emp."hierarchyId" = form_part_hier."hierarchy_id"
         OR emp."hierarchyId" = h_t_w."A" AND h_t_w."B" = form_part_ws."workspace_id"
-      )`,
-    ];
+      )`);
+    }
 
     // Add email filter if requested
     if (filters.onlyWithEmail) {

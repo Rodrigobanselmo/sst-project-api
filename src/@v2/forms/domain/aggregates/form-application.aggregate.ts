@@ -12,6 +12,7 @@ import { FormQuestionEntity } from '../entities/form-question.entity';
 import { FormQuestionOptionEntity } from '../entities/form-question-option.entity';
 import { FormQuestionIdentifierEntity } from '../entities/form-question-identifier.entity';
 import { FormParticipantsAggregate } from './form-participants.aggregate';
+import { FormApplicationCompanyEntity } from '../entities/form-application-company.entity';
 import { FormIdentifierTypeEnum } from '../enums/form-identifier-type.enum';
 import { FormQuestionDetailsFactory } from '../factories/form-question-details.factory';
 
@@ -20,6 +21,7 @@ export type IFormApplicationAggregate = {
   form: FormEntity;
   participants: FormParticipantsAggregate | null;
   identifier: FormQuestionIdentifierGroupAggregate | null;
+  applicationCompanies?: FormApplicationCompanyEntity[];
 };
 
 export interface IIdentifierQuestionInput {
@@ -51,6 +53,7 @@ interface IUpdateIdentifierParams {
 export class FormApplicationAggregate {
   formApplication: FormApplicationEntity;
   identifier: FormQuestionIdentifierGroupAggregate;
+  applicationCompanies: FormApplicationCompanyEntity[];
   private _form: FormEntity;
   private _participants: FormParticipantsAggregate | null;
 
@@ -59,6 +62,7 @@ export class FormApplicationAggregate {
     this._form = params.form;
     this.identifier = params.identifier;
     this._participants = params.participants;
+    this.applicationCompanies = params.applicationCompanies ?? [];
   }
 
   get form() {
