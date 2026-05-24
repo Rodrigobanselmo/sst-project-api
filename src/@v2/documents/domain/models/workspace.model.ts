@@ -7,6 +7,7 @@ export type IWorkspaceModel = {
   address: AddressModel | null;
 
   cnpj: string | null;
+  abbreviation: string | null;
   razaoSocial: string | null;
   riskDegree: number | null;
   cnaeLabel: string | null;
@@ -24,6 +25,7 @@ export class WorkspaceModel {
   address: AddressModel | null;
 
   cnpj: string | null;
+  abbreviation: string | null;
   razaoSocial: string | null;
   riskDegree: number | null;
   cnaeLabel: string | null;
@@ -41,6 +43,7 @@ export class WorkspaceModel {
     this.address = params.address;
 
     this.cnpj = params.cnpj;
+    this.abbreviation = params.abbreviation;
     this.razaoSocial = params.razaoSocial;
     this.riskDegree = params.riskDegree;
     this.cnaeLabel = params.cnaeLabel;

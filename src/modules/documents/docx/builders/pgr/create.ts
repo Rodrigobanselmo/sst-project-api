@@ -163,6 +163,7 @@ export class DocumentBuildPGR {
       environments: this.environments ?? [],
       characterizations: this.characterizations ?? [],
       company: this.company,
+      workspace: this.workspace,
       cover: this.cover,
       hierarchyTree: this.hierarchyTree,
       hierarchyHighLevelsData: this.hierarchyHighLevelsData,
