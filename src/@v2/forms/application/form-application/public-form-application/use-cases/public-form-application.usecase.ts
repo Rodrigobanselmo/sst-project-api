@@ -87,6 +87,8 @@ export class PublicFormApplicationUseCase {
       return [];
     }
 
+    const allowedCompanyIds = this.getAllowedCompanyIds(formApplication);
+
     const hierarchies = await this.prisma.hierarchy.findMany({
       select: {
         id: true,
@@ -102,7 +104,9 @@ export class PublicFormApplicationUseCase {
             },
           },
         },
-        companyId: formApplication.formApplication.companyId,
+        companyId: {
+          in: allowedCompanyIds,
+        },
         deletedAt: null,
         status: 'ACTIVE',
         type: {
@@ -115,15 +119,23 @@ export class PublicFormApplicationUseCase {
   }
 
   private async validateEmployeeEligibility(employeeId: number, formApplication: FormApplicationAggregate) {
-    // Check if employee exists and is active
+    // Build list of allowed company IDs based on form application scope
+    const allowedCompanyIds = this.getAllowedCompanyIds(formApplication);
+
+    console.log(`[validateEmployeeEligibility] Checking employee ${employeeId} against companies:`, allowedCompanyIds);
+
+    // Check if employee exists and is active in any of the allowed companies
     const employee = await this.prisma.employee.findFirst({
       where: {
         id: employeeId,
-        companyId: formApplication.formApplication.companyId,
+        companyId: {
+          in: allowedCompanyIds,
+        },
         status: 'ACTIVE',
       },
       select: {
         id: true,
+        companyId: true,
         hierarchy: {
           select: {
             id: true,
@@ -145,18 +157,40 @@ export class PublicFormApplicationUseCase {
       },
     });
 
-    // get SECTOR
-
     if (!employee?.hierarchy) {
+      console.error(`[validateEmployeeEligibility] Employee ${employeeId} not found or has no hierarchy`);
       throw new BadRequestException('Funcionário não encontrado ou inativo');
     }
 
-    const sector = employee.hierarchy.parent.type == 'SECTOR' ? employee.hierarchy?.parent : employee.hierarchy.parent?.parent;
+    console.log(`[validateEmployeeEligibility] Found employee ${employeeId} in company ${employee.companyId}`);
+
+    // Get SECTOR from hierarchy chain
+    const sector = employee.hierarchy.parent?.type == 'SECTOR' ? employee.hierarchy?.parent : employee.hierarchy.parent?.parent;
 
     if (!sector?.id) {
-      throw new BadRequestException('Funcionário não encontrado ou inativo');
+      console.error(`[validateEmployeeEligibility] SECTOR not found for employee ${employeeId}. Hierarchy chain:`, {
+        current: employee.hierarchy.type,
+        parent: employee.hierarchy.parent?.type,
+        grandparent: employee.hierarchy.parent?.parent?.type,
+      });
+      throw new BadRequestException('Setor do funcionário não encontrado');
     }
 
+    console.log(`[validateEmployeeEligibility] Found SECTOR ${sector.id} for employee ${employeeId}`);
     return { hierarchyId: sector.id };
+  }
+
+  /**
+   * Returns list of company IDs that are allowed to participate in this form application
+   * based on the scope type (single company workspaces or business group companies)
+   */
+  private getAllowedCompanyIds(formApplication: FormApplicationAggregate): string[] {
+    // If it's a business group scope, include all companies in the application
+    if (formApplication.applicationCompanies.length > 0) {
+      return formApplication.applicationCompanies.map((ac) => ac.companyId);
+    }
+
+    // Otherwise, just the main company
+    return [formApplication.formApplication.companyId];
   }
 }
