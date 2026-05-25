@@ -1,4 +1,5 @@
 import { FormApplicationCacheService } from '@/@v2/forms/services/form-application-cache.service';
+import { formApplicationAccessWhere } from '@/@v2/forms/application/shared/helpers/form-application-access.helper';
 import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { StatusEnum } from '@prisma/client';
@@ -12,11 +13,10 @@ export class SoftDeleteFormApplicationUseCase {
 
   async execute(params: { applicationId: string; companyId: string }): Promise<void> {
     const row = await this.prisma.formApplication.findFirst({
-      where: {
-        id: params.applicationId,
-        company_id: params.companyId,
-        deleted_at: null,
-      },
+      where: formApplicationAccessWhere({
+        formApplicationId: params.applicationId,
+        accessCompanyId: params.companyId,
+      }),
       select: { id: true, status: true },
     });
 

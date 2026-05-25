@@ -3230,3 +3230,21 @@ enum FormCOPSOQDimensionEnum {
   CONFIANCA_VERTICAL
   JUSTICA_E_RESPEITO_ORGANIZACIONAL
 }
+
+model WorkspaceToCompanyConversionLog {
+  id                  String   @id @default(cuid())
+  created_at          DateTime @default(now())
+  status              String
+  executed_by_user_id Int
+  source_company_id   String
+  source_workspace_id String
+  target_company_id   String?
+  target_workspace_id String?
+  company_group_id    Int
+  summary             Json?
+  error_message       String?
+
+  @@index([source_company_id])
+  @@index([source_workspace_id])
+  @@index([created_at])
+}

@@ -22,5 +22,6 @@ export namespace IBrowseFormQuestionsAnswersRisksUseCase {
     groupedEntityRiskMap: Record<string, Record<string, { values: number[]; probability: number }>>;
     groupedEntityMap: Record<string, { id: string; name: string; type: string }>;
     hierarchyGroups: Array<{ id: string; name: string; hierarchyIds: string[] }>;
+    entityEstablishmentMap: Record<string, string>;
   };
 }

@@ -7,6 +7,8 @@ import { Prisma } from '@prisma/client';
  * Prioridade:
  * 1) Workspace explícito em FormParticipantsWorkspace com vínculo _HierarchyToWorkspace no cargo.
  * 2) Participação por hierarquia: workspace do cargo entre os workspaces da aplicação.
+ * 3) Empresa participante (FormApplicationCompany, inclusive matriz âncora): workspace do cargo na empresa.
+ * 4) Empresa participante: workspace owner/principal (isOwner) da empresa.
  *
  * Empate (vários workspaces): menor nome (pt-BR), depois menor id.
  *
@@ -40,6 +42,30 @@ export function participantWorkspaceLateralJoin(
           ON fpw.form_participants_id = fp.id AND fpw.workspace_id = htw."B"
         INNER JOIN "Workspace" ws ON ws.id = htw."B" AND ws.deleted_at IS NULL
         WHERE fp.form_application_id = ${applicationId}
+
+        UNION ALL
+
+        SELECT ws.id AS workspace_id, ws.name AS workspace_name, 3 AS prio
+        FROM "FormApplicationCompany" fac
+        INNER JOIN "_HierarchyToWorkspace" htw ON htw."A" = ${emp}."hierarchyId"
+        INNER JOIN "Workspace" ws
+          ON ws.id = htw."B"
+          AND ws.deleted_at IS NULL
+          AND ws."companyId" = fac.company_id
+        WHERE fac.form_application_id = ${applicationId}
+          AND fac.company_id = ${emp}."companyId"
+
+        UNION ALL
+
+        SELECT ws.id AS workspace_id, ws.name AS workspace_name, 4 AS prio
+        FROM "FormApplicationCompany" fac
+        INNER JOIN "Workspace" ws
+          ON ws."companyId" = fac.company_id
+          AND ws.deleted_at IS NULL
+          AND ws.status = 'ACTIVE'
+          AND ws."isOwner" = true
+        WHERE fac.form_application_id = ${applicationId}
+          AND fac.company_id = ${emp}."companyId"
       ) picked
       ORDER BY picked.prio ASC, picked.workspace_name ASC, picked.workspace_id ASC
       LIMIT 1

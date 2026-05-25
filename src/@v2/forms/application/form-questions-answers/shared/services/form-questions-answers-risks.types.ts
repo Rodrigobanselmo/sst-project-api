@@ -18,6 +18,8 @@ export namespace IFormQuestionsAnswersRisksService {
     id: string;
     name: string;
     type: HierarchyEnum;
+    /** Empresa operacional do setor (matriz ou convertida). */
+    companyId: string;
   };
 
   export type OptionData = {
@@ -89,5 +91,7 @@ export namespace IFormQuestionsAnswersRisksService {
     groupedEntityRiskMap: Record<string, Record<string, { values: number[]; probability: number }>>;
     groupedEntityMap: Record<string, GroupedEntityData>;
     hierarchyGroups: HierarchyGroupData[];
+    /** hierarchyId (setor) → nome do estabelecimento (workspace), incluindo empresas convertidas. */
+    entityEstablishmentMap: Record<string, string>;
   };
 }

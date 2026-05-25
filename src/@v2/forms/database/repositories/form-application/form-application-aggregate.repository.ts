@@ -1,4 +1,5 @@
 import { FormApplicationScopeTypeEnum } from '@/@v2/forms/domain/enums/form-application-scope-type.enum';
+import { formApplicationAccessWhere } from '@/@v2/forms/application/shared/helpers/form-application-access.helper';
 import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service';
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
@@ -190,11 +191,16 @@ export class FormApplicationAggregateRepository {
 
   async find(params: IFormApplicationAggregateRepository.FindParams): IFormApplicationAggregateRepository.FindReturn {
     const formApplication = await this.prisma.formApplication.findFirst({
-      where: {
-        id: params.id,
-        deleted_at: null,
-        ...(params.companyId != null ? { company_id: params.companyId } : {}),
-      },
+      where:
+        params.companyId != null
+          ? formApplicationAccessWhere({
+              formApplicationId: params.id,
+              accessCompanyId: params.companyId,
+            })
+          : {
+              id: params.id,
+              deleted_at: null,
+            },
       ...FormApplicationAggregateRepository.selectOptions(),
     });
 

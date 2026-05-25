@@ -1,13 +1,26 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException, Inject } from '@nestjs/common';
 import { FormStatusEnum } from '@/@v2/forms/domain/enums/form-status.enum';
 import { getParticiantAnswersStatus } from '@/@v2/forms/domain/utils/get-particiant-answers-status';
 import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service';
 import { FormIdentifierTypeEnum, HierarchyEnum, Prisma } from '@prisma/client';
 import { IFormQuestionsAnswersRisksService } from './form-questions-answers-risks.types';
+import { formApplicationAccessWhere } from '@/@v2/forms/application/shared/helpers/form-application-access.helper';
+import { FormApplicationScopeService } from '@/@v2/forms/application/shared/services/form-application-scope.service';
+import { participantWorkspaceLateralJoin } from '@/@v2/forms/database/dao/form-participants/participant-workspace-lateral.sql';
+import { FormParticipantsDAO } from '@/@v2/forms/database/dao/form-participants/form-participants.dao';
+import { CryptoAdapter } from '@/@v2/shared/adapters/crypto/models/crypto.interface';
+import { SharedTokens } from '@/@v2/shared/constants/tokens';
+
+const RISKS_SCOPE_PARTICIPANTS_MAX = 10_000;
 
 @Injectable()
 export class FormQuestionsAnswersRisksService {
-  constructor(private readonly prisma: PrismaServiceV2) {}
+  constructor(
+    private readonly prisma: PrismaServiceV2,
+    private readonly formApplicationScopeService: FormApplicationScopeService,
+    private readonly formParticipantsDAO: FormParticipantsDAO,
+    @Inject(SharedTokens.Crypto) private readonly cryptoAdapter: CryptoAdapter,
+  ) {}
 
   private readonly questionSelect = {
     select: {
@@ -83,20 +96,26 @@ export class FormQuestionsAnswersRisksService {
   async getFormQuestionsAnswersRisks(params: IFormQuestionsAnswersRisksService.Params): Promise<IFormQuestionsAnswersRisksService.Result> {
     const formApplication = await this.prisma.formApplication.findFirst({
       select: { status: true },
-      where: {
-        id: params.formApplicationId,
-        company_id: params.companyId,
-        deleted_at: null,
-      },
+      where: formApplicationAccessWhere({
+        formApplicationId: params.formApplicationId,
+        accessCompanyId: params.companyId,
+      }),
     });
     if (!formApplication) throw new NotFoundException('Formulário não encontrado');
 
+    const scope = await this.formApplicationScopeService.resolve({
+      formApplicationId: params.formApplicationId,
+      accessCompanyId: params.companyId,
+    });
+
+    const participantCompanyIds =
+      this.formApplicationScopeService.participantCompanyIdsForScope(scope);
+
     const questionsAnswers = await this.prisma.formApplication.findFirst({
-      where: {
-        id: params.formApplicationId,
-        company_id: params.companyId,
-        deleted_at: null,
-      },
+      where: formApplicationAccessWhere({
+        formApplicationId: params.formApplicationId,
+        accessCompanyId: params.companyId,
+      }),
       select: {
         form: {
           select: {
@@ -113,6 +132,7 @@ export class FormQuestionsAnswersRisksService {
           },
           select: {
             id: true,
+            employee_id: true,
             answers: {
               select: {
                 value: true,
@@ -135,6 +155,30 @@ export class FormQuestionsAnswersRisksService {
     });
 
     if (!questionsAnswers) throw new NotFoundException('Formulário não encontrado');
+
+    const scopedParticipants = await this.formParticipantsDAO.browse({
+      page: 1,
+      limit: RISKS_SCOPE_PARTICIPANTS_MAX,
+      filters: {
+        companyId: params.companyId,
+        applicationId: params.formApplicationId,
+      },
+      cryptoAdapter: this.cryptoAdapter,
+    });
+    const scopedEmployeeIds = new Set(scopedParticipants.results.map((participant) => participant.id));
+
+    const participantsAnswersInScope = questionsAnswers.participants_answers.filter(
+      (participantAnswer) =>
+        participantAnswer.employee_id == null ||
+        scopedEmployeeIds.has(participantAnswer.employee_id),
+    );
+
+    const submissionWorkspaceMap = await this.loadSubmissionWorkspaces(
+      participantsAnswersInScope.map((row) => row.id),
+      params.formApplicationId,
+    );
+
+    const entityEstablishmentMap: Record<string, string> = {};
 
     const questionMap = new Map<string, IFormQuestionsAnswersRisksService.QuestionData>();
     const optionMap = new Map<string, IFormQuestionsAnswersRisksService.OptionData>();
@@ -166,13 +210,14 @@ export class FormQuestionsAnswersRisksService {
 
     const hierarchy = await this.prisma.hierarchy.findMany({
       where: {
-        companyId: params.companyId,
+        companyId: { in: participantCompanyIds },
         type: hierarchyType,
       },
       select: {
         id: true,
         name: true,
         type: true,
+        companyId: true,
       },
     });
 
@@ -212,7 +257,7 @@ export class FormQuestionsAnswersRisksService {
     // Process participant answers with detailed question information
     const participantAnswersMap = new Map<string, IFormQuestionsAnswersRisksService.ParticipantAnswerData>();
 
-    questionsAnswers.participants_answers.forEach((participantAnswer) => {
+    participantsAnswersInScope.forEach((participantAnswer) => {
       // Find hierarchy from any answer that has a hierarchy value
       let participantHierarchy: IFormQuestionsAnswersRisksService.HierarchyData | undefined;
 
@@ -226,6 +271,11 @@ export class FormQuestionsAnswersRisksService {
       });
 
       if (!participantHierarchy) return;
+
+      const workspace = submissionWorkspaceMap.get(participantAnswer.id);
+      if (workspace?.workspaceName) {
+        entityEstablishmentMap[participantHierarchy.id] = workspace.workspaceName;
+      }
 
       const questionAnswersMap = new Map<string, IFormQuestionsAnswersRisksService.QuestionAnswerData>();
 
@@ -445,6 +495,37 @@ export class FormQuestionsAnswersRisksService {
       ),
       groupedEntityMap,
       hierarchyGroups: hierarchyGroupsResult,
+      entityEstablishmentMap,
     };
+  }
+
+  private async loadSubmissionWorkspaces(
+    submissionIds: string[],
+    formApplicationId: string,
+  ): Promise<Map<string, { workspaceId: string | null; workspaceName: string | null }>> {
+    const result = new Map<string, { workspaceId: string | null; workspaceName: string | null }>();
+    if (submissionIds.length === 0) return result;
+
+    const rows = await this.prisma.$queryRaw<
+      { submission_id: string; workspace_id: string | null; workspace_name: string | null }[]
+    >`
+      SELECT
+        fpa."id" AS submission_id,
+        participant_ws.workspace_id,
+        participant_ws.workspace_name
+      FROM "FormParticipantsAnswers" fpa
+      LEFT JOIN "Employee" emp ON emp."id" = fpa."employee_id"
+      ${participantWorkspaceLateralJoin(formApplicationId)}
+      WHERE fpa."id" IN (${Prisma.join(submissionIds)})
+    `;
+
+    rows.forEach((row) => {
+      result.set(row.submission_id, {
+        workspaceId: row.workspace_id,
+        workspaceName: row.workspace_name,
+      });
+    });
+
+    return result;
   }
 }

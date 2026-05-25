@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { FormParticipantsAggregateMapper } from '../../mappers/aggregates/form-participants-aggregate.mapper';
 import { IFormParticipantsAggregateRepository } from './form-participants-aggregate.repository.types';
+import { formApplicationNestedAccessWhere } from '@/@v2/forms/application/shared/helpers/form-application-access.helper';
 
 @Injectable()
 export class FormParticipantsAggregateRepository {
@@ -21,9 +22,7 @@ export class FormParticipantsAggregateRepository {
     const formParticipants = await this.prisma.formParticipants.findFirst({
       where: {
         id: params.id,
-        form_application: {
-          company_id: params.companyId,
-        },
+        form_application: formApplicationNestedAccessWhere(params.companyId),
       },
       ...FormParticipantsAggregateRepository.selectOptions(),
     });
@@ -36,9 +35,7 @@ export class FormParticipantsAggregateRepository {
       where: {
         form_application_id: params.formApplicationId,
         form_application: params.companyId
-          ? {
-              company_id: params.companyId,
-            }
+          ? formApplicationNestedAccessWhere(params.companyId)
           : undefined,
       },
       ...FormParticipantsAggregateRepository.selectOptions(),

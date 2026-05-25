@@ -28,7 +28,7 @@ export class ResponsibleDAO {
       FROM (
         SELECT
           u."id" AS user_id,
-          unaccent(upper(u."name")) AS row_name,
+          upper(u."name") AS row_name,
           u."email" AS row_email,
           NULL AS employee_id
         FROM
@@ -41,7 +41,7 @@ export class ResponsibleDAO {
 
         SELECT
           NULL AS user_id,
-          unaccent(upper(employee."name")) AS row_name,
+          upper(employee."name") AS row_name,
           employee."email" AS row_email,
           employee."id" AS employee_id
         FROM
@@ -87,9 +87,11 @@ export class ResponsibleDAO {
 
     const [users, totalUsers] = await Promise.all([usersPromise, totalUsersPromise]);
 
+    const total = totalUsers[0]?.total != null ? Number(totalUsers[0].total) : 0;
+
     return ResponsibleBrowseModelMapper.toModel({
       results: users,
-      pagination: { limit: pagination.limit, page: pagination.page, total: Number(totalUsers[0].total) },
+      pagination: { limit: pagination.limit, page: pagination.page, total },
     });
   }
 
@@ -111,7 +113,7 @@ export class ResponsibleDAO {
     if (filters.search) {
       const search = `%${filters.search}%`;
       where.push(Prisma.sql`
-        unaccent(lower(u."name")) ILIKE unaccent(lower(${search}))
+        lower(u."name") ILIKE lower(${search})
       `);
     }
 
@@ -124,7 +126,7 @@ export class ResponsibleDAO {
     if (filters.search) {
       const search = `%${filters.search}%`;
       where.push(Prisma.sql`
-        unaccent(lower(employee."name")) ILIKE unaccent(lower(${search}))
+        lower(employee."name") ILIKE lower(${search})
       `);
     }
 

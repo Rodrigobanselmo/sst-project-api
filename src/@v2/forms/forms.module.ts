@@ -52,6 +52,8 @@ import { BrowseFormQuestionsAnswersRisksUseCase } from './application/form-quest
 import { BrowseFormQuestionsAnswersRisksController } from './application/form-questions-answers/browse-form-questions-answers-risks/controllers/browse-form-questions-answers-risks.controller';
 import { AssignRisksFormApplicationController } from './application/form-application/assign-risks-form-application/controllers/assign-risks-form-application.controller';
 import { AssignRisksFormApplicationUseCase } from './application/form-application/assign-risks-form-application/use-cases/assign-risks-form-application.usecase';
+import { ApplyAiAnalysisAsRiskDataController } from './application/form-application/apply-ai-analysis-as-risk-data/controllers/apply-ai-analysis-as-risk-data.controller';
+import { ApplyAiAnalysisAsRiskDataUseCase } from './application/form-application/apply-ai-analysis-as-risk-data/use-cases/apply-ai-analysis-as-risk-data.usecase';
 import { BrowseFormApplicationRiskLogController } from './application/form-application-risk-log/browse-form-application-risk-log/controllers/browse-form-application-risk-log.controller';
 import { BrowseFormApplicationRiskLogUseCase } from './application/form-application-risk-log/browse-form-application-risk-log/use-cases/browse-form-application-risk-log.usecase';
 import { FormApplicationRiskLogDAO } from './database/dao/form-application-risk-log/form-application-risk-log.dao';
@@ -109,6 +111,7 @@ import { FormApplicationScopeService } from './application/shared/services/form-
     BrowseHierarchiesController,
     BrowseFormQuestionsAnswersRisksController,
     AssignRisksFormApplicationController,
+    ApplyAiAnalysisAsRiskDataController,
     BrowseFormApplicationRiskLogController,
     BrowseFormParticipantsController,
     SendFormEmailController,
@@ -159,6 +162,7 @@ import { FormApplicationScopeService } from './application/shared/services/form-
     BrowseHierarchiesUseCase,
     BrowseFormQuestionsAnswersRisksUseCase,
     AssignRisksFormApplicationUseCase,
+    ApplyAiAnalysisAsRiskDataUseCase,
     BrowseFormApplicationRiskLogUseCase,
     BrowseFormParticipantsUseCase,
     SendFormEmailUseCase,

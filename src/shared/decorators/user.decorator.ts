@@ -7,8 +7,20 @@ export const User = createParamDecorator((data: unknown, ctx: ExecutionContext) 
   const request = ctx.switchToHttp().getRequest();
 
   const companyId = getCompanyId(request);
-  const authInformation = isMaster(request.user, companyId);
-  const user = { ...request.user, ...authInformation, ip: getIp(request) };
+  const rawUser = request.user;
+  const userId =
+    rawUser?.userId != null
+      ? Number(rawUser.userId)
+      : rawUser?.id != null
+        ? Number(rawUser.id)
+        : undefined;
+  const authInformation = isMaster(rawUser, companyId);
+  const user = {
+    ...rawUser,
+    ...(userId != null ? { userId } : {}),
+    ...authInformation,
+    ip: getIp(request),
+  };
 
   request.user = user;
 

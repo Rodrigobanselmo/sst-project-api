@@ -13,6 +13,7 @@ import { FormApplicationReadPublicModelMapper } from '../../mappers/models/form-
 import { FormStatusEnum } from '@/@v2/forms/domain/enums/form-status.enum';
 import { FormApplicationScopeTypeEnum } from '@/@v2/forms/domain/enums/form-application-scope-type.enum';
 import { FormApplicationScopeService } from '@/@v2/forms/application/shared/services/form-application-scope.service';
+import { formApplicationAccessWhere } from '@/@v2/forms/application/shared/helpers/form-application-access.helper';
 
 @Injectable()
 export class FormApplicationDAO {
@@ -23,11 +24,10 @@ export class FormApplicationDAO {
 
   async read(params: IFormApplicationDAO.ReadParams) {
     const formApplication = await this.prisma.formApplication.findFirst({
-      where: {
-        id: params.id,
-        company_id: params.companyId,
-        deleted_at: null,
-      },
+      where: formApplicationAccessWhere({
+        formApplicationId: params.id,
+        accessCompanyId: params.companyId,
+      }),
       include: {
         form: true,
         participants: {
@@ -108,35 +108,65 @@ export class FormApplicationDAO {
 
     const scope = await this.formApplicationScopeService.resolve({
       formApplicationId: params.id,
-      anchorCompanyId: params.companyId,
+      accessCompanyId: params.companyId,
     });
 
-    const totalParticipantsPromise =
+    const workspaceIds =
+      formApplication.participants?.workspaces.map(
+        (workspace) => workspace.workspace_id,
+      ) || [];
+
+    const consolidatedParticipantCompanyIds =
       scope.scopeType === FormApplicationScopeTypeEnum.BUSINESS_GROUP_COMPANIES
-        ? this.prisma.employee.count({
-            where: {
-              companyId: { in: scope.participantCompanyIds },
-              status: 'ACTIVE',
-            },
-          })
+        ? scope.participantCompanyIds
+        : this.formApplicationScopeService.usesConsolidatedApplicationCompaniesParticipantScope(
+              scope,
+            )
+          ? this.formApplicationScopeService.participantCompanyIdsForScope(
+              scope,
+            )
+          : null;
+
+    const totalParticipantsPromise = consolidatedParticipantCompanyIds
+      ? this.prisma.employee.count({
+          where: {
+            companyId: { in: consolidatedParticipantCompanyIds },
+            status: 'ACTIVE',
+          },
+        })
+      : this.formApplicationScopeService.hasConvertedCompanies(scope)
+        ? Promise.all([
+            this.prisma.employee.count({
+              where: {
+                companyId: scope.anchorCompanyId,
+                status: 'ACTIVE',
+                hierarchy: {
+                  workspaces: {
+                    some: { id: { in: workspaceIds } },
+                  },
+                },
+              },
+            }),
+            this.prisma.employee.count({
+              where: {
+                companyId: { in: scope.convertedCompanyIds },
+                status: 'ACTIVE',
+              },
+            }),
+          ]).then(([anchorCount, convertedCount]) => anchorCount + convertedCount)
         : this.prisma.employee.count({
-            where: {
-              companyId: params.companyId,
-              status: 'ACTIVE',
-              hierarchy: {
-                workspaces: {
-                  some: {
-                    id: {
-                      in:
-                        formApplication.participants?.workspaces.map(
-                          (workspace) => workspace.workspace_id,
-                        ) || [],
+              where: {
+                companyId: params.companyId,
+                status: 'ACTIVE',
+                hierarchy: {
+                  workspaces: {
+                    some: {
+                      id: { in: workspaceIds },
                     },
                   },
                 },
               },
-            },
-          });
+            });
 
     const totalAnswersPromise = this.prisma.formParticipantsAnswers.count({
       where: {
@@ -321,7 +351,18 @@ export class FormApplicationDAO {
   }
 
   private browseWhere(filters: IFormApplicationDAO.BrowseParams['filters']) {
-    const where = [Prisma.sql`form_ap."company_id" = ${filters.companyId}`, Prisma.sql`form_ap."deleted_at" IS NULL`];
+    const where = [
+      Prisma.sql`form_ap."deleted_at" IS NULL`,
+      Prisma.sql`(
+        form_ap."company_id" = ${filters.companyId}
+        OR EXISTS (
+          SELECT 1
+          FROM "FormApplicationCompany" fac
+          WHERE fac."form_application_id" = form_ap."id"
+            AND fac."company_id" = ${filters.companyId}
+        )
+      )`,
+    ];
 
     return where;
   }

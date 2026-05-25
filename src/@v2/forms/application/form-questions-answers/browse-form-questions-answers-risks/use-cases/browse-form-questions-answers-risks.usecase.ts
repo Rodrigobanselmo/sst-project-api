@@ -19,6 +19,7 @@ export class BrowseFormQuestionsAnswersRisksUseCase {
       groupedEntityRiskMap: result.groupedEntityRiskMap,
       groupedEntityMap: result.groupedEntityMap,
       hierarchyGroups: result.hierarchyGroups,
+      entityEstablishmentMap: result.entityEstablishmentMap,
     };
   }
 }

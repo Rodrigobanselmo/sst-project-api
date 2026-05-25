@@ -5,6 +5,7 @@ import { IFormApplicationRepository } from './form-application.types';
 import { FormApplicationEntityMapper } from '../../mappers/entities/form-application.mapper';
 import { FormStatusEnum } from '@/@v2/forms/domain/enums/form-status.enum';
 import { FormApplicationEntity } from '@/@v2/forms/domain/entities/form-application.entity';
+import { formApplicationAccessWhere } from '@/@v2/forms/application/shared/helpers/form-application-access.helper';
 
 @Injectable()
 export class FormApplicationRepository {
@@ -18,21 +19,30 @@ export class FormApplicationRepository {
 
   async find(params: IFormApplicationRepository.FindParams): IFormApplicationRepository.FindReturn {
     const formApplicationEntity = await this.prisma.formApplication.findFirst({
-      where: {
-        id: params.id,
-        company_id: params.companyId,
-        deleted_at: null,
-      },
+      where: formApplicationAccessWhere({
+        formApplicationId: params.id,
+        accessCompanyId: params.companyId,
+      }),
     });
 
     return formApplicationEntity ? FormApplicationEntityMapper.toEntity(formApplicationEntity) : null;
   }
 
   async delete(params: IFormApplicationRepository.DeleteParams): Promise<boolean> {
+    const existing = await this.prisma.formApplication.findFirst({
+      where: formApplicationAccessWhere({
+        formApplicationId: params.id,
+        accessCompanyId: params.companyId,
+      }),
+      select: { id: true, company_id: true },
+    });
+
+    if (!existing) return false;
+
     const deleted = await this.prisma.formApplication.update({
       where: {
-        id: params.id,
-        company_id: params.companyId,
+        id: existing.id,
+        company_id: existing.company_id,
       },
       data: {
         deleted_at: new Date(),
