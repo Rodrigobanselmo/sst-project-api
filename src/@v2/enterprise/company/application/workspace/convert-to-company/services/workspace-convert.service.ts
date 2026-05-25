@@ -565,7 +565,7 @@ export class WorkspaceConvertService {
       tx.riskFactorData.count({
         where: this.workspaceRiskDataWhere(companyId, workspaceId),
       }),
-      this.operationalCloneService.countActionPlanMeasuresForPreview(
+      this.operationalCloneService.countRiskFactorDataRecForPreview(
         companyId,
         workspaceId,
         tx,

@@ -19,8 +19,52 @@ type CloneParams = {
   hierarchyMap: Map<string, string>;
 };
 
+/**
+ * Clone operacional na conversão workspace → empresa.
+ * Regra: nunca restaurar, recriar nem copiar registro soft-deleted; ignorar vínculos cujo alvo está excluído.
+ */
 @Injectable()
 export class WorkspaceOperationalDataCloneService {
+  private static readonly activeRecMedWhere = { deleted_at: null } satisfies Prisma.RecMedWhereInput;
+
+  private static readonly activeGenerateSourceWhere = {
+    deleted_at: null,
+  } satisfies Prisma.GenerateSourceWhereInput;
+
+  private static readonly activeCharacterizationWhere = {
+    deleted_at: null,
+  } satisfies Prisma.CompanyCharacterizationWhereInput;
+
+  private static readonly activeEnvironmentWhere = {
+    deleted_at: null,
+  } satisfies Prisma.CompanyEnvironmentWhereInput;
+
+  private static readonly activeCharacterizationPhotoWhere = {
+    deleted_at: null,
+  } satisfies Prisma.CompanyCharacterizationPhotoWhereInput;
+
+  private static readonly activeEnvironmentPhotoWhere = {
+    deleted_at: null,
+  } satisfies Prisma.CompanyEnvironmentPhotoWhereInput;
+
+  private static readonly activeEpiWhere = {
+    deleted_at: null,
+  } satisfies Prisma.EpiWhereInput;
+
+  private static readonly activeExamWhere = {
+    deleted_at: null,
+  } satisfies Prisma.ExamWhereInput;
+
+  /** Vínculo EPI/engenharia ainda vigente (sem data de encerramento). */
+  private static readonly activeRiskLinkEndDateWhere = {
+    endDate: null,
+  };
+
+  private static readonly activeHierarchyOnHomogeneousWhere = {
+    deletedAt: null,
+    endDate: null,
+  } satisfies Prisma.HierarchyOnHomogeneousWhereInput;
+
   constructor(private readonly prisma: PrismaServiceV2) {}
 
   async execute(params: CloneParams): Promise<OperationalCloneResult> {
@@ -133,6 +177,7 @@ export class WorkspaceOperationalDataCloneService {
     return tx.recMedOnRiskData.count({
       where: {
         riskData: this.workspaceRiskDataWhere(sourceCompanyId, sourceWorkspaceId),
+        recMed: WorkspaceOperationalDataCloneService.activeRecMedWhere,
       },
     });
   }
@@ -145,19 +190,25 @@ export class WorkspaceOperationalDataCloneService {
     sourceWorkspaceId: string,
     tx: Prisma.TransactionClient = this.prisma,
   ): Promise<number> {
-    const riskDataWhere = this.workspaceRiskDataWhere(
-      sourceCompanyId,
-      sourceWorkspaceId,
-    );
-
     return tx.riskFactorDataRecDerivedMeasure.count({
-      where: {
-        companyId: sourceCompanyId,
-        OR: [
-          { workspaceId: sourceWorkspaceId },
-          { riskFactorData: riskDataWhere },
-        ],
-      },
+      where: this.activeWorkspaceDerivedMeasureWhere(
+        sourceCompanyId,
+        sourceWorkspaceId,
+      ),
+    });
+  }
+
+  /** Itens de plano de ação (RiskFactorDataRec) copiáveis — mesmo critério de countExpected/stageC. */
+  async countRiskFactorDataRecForPreview(
+    sourceCompanyId: string,
+    sourceWorkspaceId: string,
+    tx: Prisma.TransactionClient = this.prisma,
+  ): Promise<number> {
+    return tx.riskFactorDataRec.count({
+      where: this.activeWorkspaceRiskFactorDataRecWhere(
+        sourceCompanyId,
+        sourceWorkspaceId,
+      ),
     });
   }
 
@@ -185,29 +236,40 @@ export class WorkspaceOperationalDataCloneService {
     };
   }
 
-  private workspaceRiskFactorDataRecWhere(
+  /**
+   * Itens de plano de ação: apenas RecMed ativo + RiskFactorData ativo no recorte (exclui riscos soft-deleted).
+   */
+  private activeWorkspaceRiskFactorDataRecWhere(
     sourceCompanyId: string,
     sourceWorkspaceId: string,
   ): Prisma.RiskFactorDataRecWhereInput {
     return {
       companyId: sourceCompanyId,
-      OR: [
-        { workspaceId: sourceWorkspaceId },
-        { riskFactorData: this.workspaceRiskDataWhere(sourceCompanyId, sourceWorkspaceId) },
-      ],
+      recMed: WorkspaceOperationalDataCloneService.activeRecMedWhere,
+      riskFactorData: this.workspaceRiskDataWhere(
+        sourceCompanyId,
+        sourceWorkspaceId,
+      ),
     };
   }
 
-  private workspaceDerivedMeasureWhere(
+  private activeWorkspaceDerivedMeasureWhere(
     sourceCompanyId: string,
     sourceWorkspaceId: string,
   ): Prisma.RiskFactorDataRecDerivedMeasureWhereInput {
+    const activeRisk = this.workspaceRiskDataWhere(
+      sourceCompanyId,
+      sourceWorkspaceId,
+    );
     return {
       companyId: sourceCompanyId,
-      OR: [
-        { workspaceId: sourceWorkspaceId },
-        { riskFactorData: this.workspaceRiskDataWhere(sourceCompanyId, sourceWorkspaceId) },
-      ],
+      sourceRecMed: WorkspaceOperationalDataCloneService.activeRecMedWhere,
+      derivedRecMed: WorkspaceOperationalDataCloneService.activeRecMedWhere,
+      riskFactorData: activeRisk,
+      riskFactorDataRec: {
+        recMed: WorkspaceOperationalDataCloneService.activeRecMedWhere,
+        riskFactorData: activeRisk,
+      },
     };
   }
 
@@ -281,7 +343,10 @@ export class WorkspaceOperationalDataCloneService {
     const riskDataIds = riskDataList.map((r) => r.id);
     if (riskDataIds.length > 0) {
       const links = await tx.recMedOnRiskData.findMany({
-        where: { risk_data_id: { in: riskDataIds } },
+        where: {
+          risk_data_id: { in: riskDataIds },
+          recMed: WorkspaceOperationalDataCloneService.activeRecMedWhere,
+        },
         select: { rec_med_id: true, risk_data_id: true },
       });
       for (const link of links) {
@@ -295,7 +360,10 @@ export class WorkspaceOperationalDataCloneService {
     }
 
     const planRecs = await tx.riskFactorDataRec.findMany({
-      where: this.workspaceRiskFactorDataRecWhere(sourceCompanyId, sourceWorkspaceId),
+      where: this.activeWorkspaceRiskFactorDataRecWhere(
+        sourceCompanyId,
+        sourceWorkspaceId,
+      ),
       select: { id: true, recMedId: true, riskFactorDataId: true, workspaceId: true },
     });
     for (const planRec of planRecs) {
@@ -308,7 +376,10 @@ export class WorkspaceOperationalDataCloneService {
     }
 
     const derivedRows = await tx.riskFactorDataRecDerivedMeasure.findMany({
-      where: this.workspaceDerivedMeasureWhere(sourceCompanyId, sourceWorkspaceId),
+      where: this.activeWorkspaceDerivedMeasureWhere(
+        sourceCompanyId,
+        sourceWorkspaceId,
+      ),
       select: {
         id: true,
         sourceRecMedId: true,
@@ -370,13 +441,13 @@ export class WorkspaceOperationalDataCloneService {
         where: this.workspaceRiskDataWhere(sourceCompanyId, sourceWorkspaceId),
       }),
       tx.riskFactorDataRec.count({
-        where: this.workspaceRiskFactorDataRecWhere(
+        where: this.activeWorkspaceRiskFactorDataRecWhere(
           sourceCompanyId,
           sourceWorkspaceId,
         ),
       }),
       tx.riskFactorDataRecDerivedMeasure.count({
-        where: this.workspaceDerivedMeasureWhere(
+        where: this.activeWorkspaceDerivedMeasureWhere(
           sourceCompanyId,
           sourceWorkspaceId,
         ),
@@ -491,18 +562,25 @@ export class WorkspaceOperationalDataCloneService {
       ),
       include: {
         characterization: {
+          where: WorkspaceOperationalDataCloneService.activeCharacterizationWhere,
           include: {
-            photos: { where: { deleted_at: null } },
+            photos: {
+              where:
+                WorkspaceOperationalDataCloneService.activeCharacterizationPhotoWhere,
+            },
             profiles: true,
           },
         },
         environment: {
+          where: WorkspaceOperationalDataCloneService.activeEnvironmentWhere,
           include: {
-            photos: { where: { deleted_at: null } },
+            photos: {
+              where: WorkspaceOperationalDataCloneService.activeEnvironmentPhotoWhere,
+            },
           },
         },
         hierarchyOnHomogeneous: {
-          where: { deletedAt: null },
+          where: WorkspaceOperationalDataCloneService.activeHierarchyOnHomogeneousWhere,
         },
       },
     });
@@ -674,12 +752,15 @@ export class WorkspaceOperationalDataCloneService {
     }
   }
 
+  /**
+   * Garante GenerateSource copiável/conectável. Retorna null se soft-deleted (vínculo ignorado).
+   */
   private async ensureGenerateSource(
     params: CloneParams,
     maps: OperationalCloneMaps,
     counts: OperationalCloneCounts,
     sourceId: string,
-  ) {
+  ): Promise<string | null> {
     if (maps.generateSourceMap.has(sourceId)) {
       return maps.generateSourceMap.get(sourceId)!;
     }
@@ -693,9 +774,7 @@ export class WorkspaceOperationalDataCloneService {
       );
     }
     if (source.deleted_at) {
-      throw new BadRequestException(
-        `GenerateSource ${sourceId} está excluído. Etapa: stageB.`,
-      );
+      return null;
     }
     if (source.system) {
       maps.generateSourceMap.set(sourceId, sourceId);
@@ -720,13 +799,16 @@ export class WorkspaceOperationalDataCloneService {
     return newId;
   }
 
+  /**
+   * Garante RecMed copiável/conectável. Retorna null se soft-deleted (vínculo ignorado).
+   */
   private async ensureRecMed(
     params: CloneParams,
     maps: OperationalCloneMaps,
     counts: OperationalCloneCounts,
     sourceId: string,
     origins: string[] = [],
-  ) {
+  ): Promise<string | null> {
     if (!sourceId) {
       const refs = origins.length ? origins.join('; ') : 'não rastreado';
       throw new BadRequestException(
@@ -747,10 +829,7 @@ export class WorkspaceOperationalDataCloneService {
       );
     }
     if (source.deleted_at) {
-      const refs = origins.join('; ');
-      throw new BadRequestException(
-        `RecMed ${sourceId} está excluído (deleted_at). Referências: ${refs}. Etapa: stageB.`,
-      );
+      return null;
     }
 
     if (source.system) {
@@ -769,12 +848,15 @@ export class WorkspaceOperationalDataCloneService {
 
     let generateSourceId: string | undefined;
     if (source.generateSourceId) {
-      generateSourceId = await this.ensureGenerateSource(
+      const mappedGs = await this.ensureGenerateSource(
         params,
         maps,
         counts,
         source.generateSourceId,
       );
+      if (mappedGs) {
+        generateSourceId = mappedGs;
+      }
     }
 
     const newId = uuidV4();
@@ -837,15 +919,36 @@ export class WorkspaceOperationalDataCloneService {
         params.sourceWorkspaceId,
       ),
       include: {
-        generateSources: true,
-        adms: true,
-        recs: true,
-        epiToRiskFactorData: true,
-        engsToRiskFactorData: true,
-        examsToRiskFactorData: true,
+        generateSources: {
+          where: WorkspaceOperationalDataCloneService.activeGenerateSourceWhere,
+        },
+        adms: { where: WorkspaceOperationalDataCloneService.activeRecMedWhere },
+        recs: {
+          where: { recMed: WorkspaceOperationalDataCloneService.activeRecMedWhere },
+        },
+        epiToRiskFactorData: {
+          where: {
+            ...WorkspaceOperationalDataCloneService.activeRiskLinkEndDateWhere,
+            epi: WorkspaceOperationalDataCloneService.activeEpiWhere,
+          },
+        },
+        engsToRiskFactorData: {
+          where: {
+            ...WorkspaceOperationalDataCloneService.activeRiskLinkEndDateWhere,
+            recMed: WorkspaceOperationalDataCloneService.activeRecMedWhere,
+          },
+        },
+        examsToRiskFactorData: {
+          where: { exam: WorkspaceOperationalDataCloneService.activeExamWhere },
+        },
         probabilityCalc: true,
         probabilityAfterCalc: true,
-        CharacterizationPhotoRecommendation: true,
+        CharacterizationPhotoRecommendation: {
+          where: {
+            recommendation: WorkspaceOperationalDataCloneService.activeRecMedWhere,
+            photo: WorkspaceOperationalDataCloneService.activeCharacterizationPhotoWhere,
+          },
+        },
       },
     });
 
@@ -893,6 +996,51 @@ export class WorkspaceOperationalDataCloneService {
       await this.ensureGenerateSource(params, maps, counts, gsId);
     }
 
+    const generateSourceConnects = (risk: (typeof riskDataList)[number]) =>
+      risk.generateSources
+        .filter((g) => maps.generateSourceMap.has(g.id))
+        .map((g) => ({
+          id_companyId: this.generateSourceConnectKey(maps, g.id),
+        }));
+
+    const recMedConnects = (risk: (typeof riskDataList)[number]) =>
+      risk.adms
+        .filter((a) => maps.recMedMap.has(a.id))
+        .map((a) => ({
+          id_companyId: this.recMedConnectKey(maps, a.id),
+        }));
+
+    const recMedOnRiskCreates = (risk: (typeof riskDataList)[number]) =>
+      risk.recs
+        .map((r) => {
+          const mappedRecMedId = maps.recMedMap.get(r.rec_med_id);
+          if (!mappedRecMedId) return null;
+          return {
+            rec_med_id: mappedRecMedId,
+            sequential_id: r.sequential_id,
+          };
+        })
+        .filter(Boolean) as { rec_med_id: string; sequential_id: number | null }[];
+
+    const engCreates = (risk: (typeof riskDataList)[number]) =>
+      risk.engsToRiskFactorData
+        .map((row) => {
+          const mappedRecMedId = maps.recMedMap.get(row.recMedId);
+          if (!mappedRecMedId) return null;
+          return {
+            recMedId: mappedRecMedId,
+            efficientlyCheck: row.efficientlyCheck,
+            endDate: row.endDate,
+            startDate: row.startDate,
+          };
+        })
+        .filter(Boolean) as {
+        recMedId: string;
+        efficientlyCheck: boolean | null;
+        endDate: Date | null;
+        startDate: Date | null;
+      }[];
+
     for (const risk of riskDataList) {
       const newRiskId = uuidV4();
       const newGroupId = maps.riskFactorGroupDataMap.get(
@@ -922,6 +1070,10 @@ export class WorkspaceOperationalDataCloneService {
         );
       }
 
+      const gsConnects = generateSourceConnects(risk);
+      const admConnects = recMedConnects(risk);
+      const recCreates = recMedOnRiskCreates(risk);
+
       await params.tx.riskFactorData.create({
         data: {
           id: newRiskId,
@@ -939,28 +1091,11 @@ export class WorkspaceOperationalDataCloneService {
           standardExams: risk.standardExams,
           startDate: risk.startDate,
           endDate: risk.endDate,
-          generateSources: risk.generateSources.length
-            ? {
-                connect: risk.generateSources.map((g) => ({
-                  id_companyId: this.generateSourceConnectKey(maps, g.id),
-                })),
-              }
+          generateSources: gsConnects.length
+            ? { connect: gsConnects }
             : undefined,
-          adms: risk.adms.length
-            ? {
-                connect: risk.adms.map((a) => ({
-                  id_companyId: this.recMedConnectKey(maps, a.id),
-                })),
-              }
-            : undefined,
-          recs: risk.recs.length
-            ? {
-                create: risk.recs.map((r) => ({
-                  rec_med_id: maps.recMedMap.get(r.rec_med_id)!,
-                  sequential_id: r.sequential_id,
-                })),
-              }
-            : undefined,
+          adms: admConnects.length ? { connect: admConnects } : undefined,
+          recs: recCreates.length ? { create: recCreates } : undefined,
         },
       });
 
@@ -1007,9 +1142,10 @@ export class WorkspaceOperationalDataCloneService {
         });
       }
 
-      if (risk.epiToRiskFactorData.length) {
+      const epiRows = risk.epiToRiskFactorData;
+      if (epiRows.length) {
         await params.tx.epiToRiskFactorData.createMany({
-          data: risk.epiToRiskFactorData.map((row) => ({
+          data: epiRows.map((row) => ({
             epiId: row.epiId,
             riskFactorDataId: newRiskId,
             efficientlyCheck: row.efficientlyCheck,
@@ -1028,16 +1164,12 @@ export class WorkspaceOperationalDataCloneService {
         });
       }
 
-      if (risk.engsToRiskFactorData.length) {
-        await params.tx.engsToRiskFactorData.createMany({
-          data: risk.engsToRiskFactorData.map((row) => ({
-            recMedId: maps.recMedMap.get(row.recMedId)!,
-            riskFactorDataId: newRiskId,
-            efficientlyCheck: row.efficientlyCheck,
-            endDate: row.endDate,
-            startDate: row.startDate,
-          })),
-        });
+      const engRows = engCreates(risk).map((row) => ({
+        ...row,
+        riskFactorDataId: newRiskId,
+      }));
+      if (engRows.length) {
+        await params.tx.engsToRiskFactorData.createMany({ data: engRows });
       }
 
       if (risk.examsToRiskFactorData.length) {
@@ -1070,9 +1202,7 @@ export class WorkspaceOperationalDataCloneService {
           );
         }
         if (!mappedRec) {
-          throw new BadRequestException(
-            `CharacterizationPhotoRecommendation (riskFactorDataId=${newRiskId}, recMedId=${rec.recommendation_id}): RecMed não mapeado. Etapa: stageB.`,
-          );
+          continue;
         }
 
         await params.tx.characterizationPhotoRecommendation.create({
@@ -1171,13 +1301,16 @@ export class WorkspaceOperationalDataCloneService {
     warnings: string[],
   ) {
     const recs = await params.tx.riskFactorDataRec.findMany({
-      where: this.workspaceRiskFactorDataRecWhere(
+      where: this.activeWorkspaceRiskFactorDataRecWhere(
         params.sourceCompanyId,
         params.sourceWorkspaceId,
       ),
       include: {
         comments: true,
-        photos: { include: { file: true } },
+        photos: {
+          where: { deleted_at: null },
+          include: { file: true },
+        },
         derivedMeasure: true,
       },
     });
@@ -1185,15 +1318,8 @@ export class WorkspaceOperationalDataCloneService {
     for (const rec of recs) {
       const mappedRiskId = maps.riskFactorDataMap.get(rec.riskFactorDataId);
       const mappedRecMedId = maps.recMedMap.get(rec.recMedId);
-      if (!mappedRiskId) {
-        throw new BadRequestException(
-          `RiskFactorDataRec ${rec.id} (riskFactorDataId=${rec.riskFactorDataId}, recMedId=${rec.recMedId}): RiskFactorData não mapeado. Etapa: stageC.`,
-        );
-      }
-      if (!mappedRecMedId) {
-        throw new BadRequestException(
-          `RiskFactorDataRec ${rec.id} (riskFactorDataId=${rec.riskFactorDataId}, recMedId=${rec.recMedId}): RecMed não mapeado. Etapa: stageC.`,
-        );
+      if (!mappedRiskId || !mappedRecMedId) {
+        continue;
       }
 
       const newRecId = uuidV4();
@@ -1272,15 +1398,8 @@ export class WorkspaceOperationalDataCloneService {
         const dm = rec.derivedMeasure;
         const mappedSourceRecMedId = maps.recMedMap.get(dm.sourceRecMedId);
         const mappedDerivedRecMedId = maps.recMedMap.get(dm.derivedRecMedId);
-        if (!mappedSourceRecMedId) {
-          throw new BadRequestException(
-            `RiskFactorDataRecDerivedMeasure (riskFactorDataRecId=${rec.id}, sourceRecMedId=${dm.sourceRecMedId}): RecMed origem não mapeado. Etapa: stageC.`,
-          );
-        }
-        if (!mappedDerivedRecMedId) {
-          throw new BadRequestException(
-            `RiskFactorDataRecDerivedMeasure (riskFactorDataRecId=${rec.id}, derivedRecMedId=${dm.derivedRecMedId}): RecMed derivado não mapeado. Etapa: stageC.`,
-          );
+        if (!mappedSourceRecMedId || !mappedDerivedRecMedId) {
+          continue;
         }
         await params.tx.riskFactorDataRecDerivedMeasure.create({
           data: {
