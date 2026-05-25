@@ -25,6 +25,7 @@ export class FormApplicationAggregateRepository {
           workspaces: true,
         },
       },
+      applicationCompanies: true,
     } satisfies Prisma.FormApplicationFindFirstArgs['include'];
 
     return { include };

@@ -122,8 +122,6 @@ export class PublicFormApplicationUseCase {
     // Build list of allowed company IDs based on form application scope
     const allowedCompanyIds = this.getAllowedCompanyIds(formApplication);
 
-    console.log(`[validateEmployeeEligibility] Checking employee ${employeeId} against companies:`, allowedCompanyIds);
-
     // Check if employee exists and is active in any of the allowed companies
     const employee = await this.prisma.employee.findFirst({
       where: {
@@ -158,25 +156,16 @@ export class PublicFormApplicationUseCase {
     });
 
     if (!employee?.hierarchy) {
-      console.error(`[validateEmployeeEligibility] Employee ${employeeId} not found or has no hierarchy`);
       throw new BadRequestException('Funcionário não encontrado ou inativo');
     }
-
-    console.log(`[validateEmployeeEligibility] Found employee ${employeeId} in company ${employee.companyId}`);
 
     // Get SECTOR from hierarchy chain
     const sector = employee.hierarchy.parent?.type == 'SECTOR' ? employee.hierarchy?.parent : employee.hierarchy.parent?.parent;
 
     if (!sector?.id) {
-      console.error(`[validateEmployeeEligibility] SECTOR not found for employee ${employeeId}. Hierarchy chain:`, {
-        current: employee.hierarchy.type,
-        parent: employee.hierarchy.parent?.type,
-        grandparent: employee.hierarchy.parent?.parent?.type,
-      });
       throw new BadRequestException('Setor do funcionário não encontrado');
     }
 
-    console.log(`[validateEmployeeEligibility] Found SECTOR ${sector.id} for employee ${employeeId}`);
     return { hierarchyId: sector.id };
   }
 

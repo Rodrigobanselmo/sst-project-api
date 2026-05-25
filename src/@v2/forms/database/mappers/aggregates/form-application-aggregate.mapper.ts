@@ -1,6 +1,8 @@
 import { FormApplicationAggregate } from '@/@v2/forms/domain/aggregates/form-application.aggregate';
+import { FormApplicationCompanyEntity } from '@/@v2/forms/domain/entities/form-application-company.entity';
 import {
   FormApplication as PrismaFormApplication,
+  FormApplicationCompany as PrismaFormApplicationCompany,
   FormParticipantsHierarchy as PrismaFormParticipantsHierarchy,
   FormParticipantsWorkspace as PrismaFormParticipantsWorkspace,
   FormParticipants as PrismaFormParticipants,
@@ -19,6 +21,7 @@ export type FormApplicationAggregateMapperConstructor = PrismaFormApplication & 
       })
     | null;
   question_identifier_group: FormQuestionIdentifierGroupAggregateMapperConstructor[];
+  applicationCompanies: PrismaFormApplicationCompany[];
 };
 
 export class FormApplicationAggregateMapper {
@@ -32,6 +35,14 @@ export class FormApplicationAggregateMapper {
       form: FormEntityMapper.toEntity(prisma.form),
       participants: FormParticipantsAggregateMapper.toAggregate(prisma.participants),
       identifier: FormQuestionIdentifierGroupAggregateMapper.toAggregate(prisma.question_identifier_group[0]!),
+      applicationCompanies: prisma.applicationCompanies.map(
+        (row) =>
+          new FormApplicationCompanyEntity({
+            id: row.id,
+            companyId: row.company_id,
+            isNew: false,
+          }),
+      ),
     });
   }
 

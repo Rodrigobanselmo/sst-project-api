@@ -1,4 +1,5 @@
 import { FormApplicationEntity } from '@/@v2/forms/domain/entities/form-application.entity';
+import { FormApplicationScopeTypeEnum } from '@/@v2/forms/domain/enums/form-application-scope-type.enum';
 import { FormStatusEnum } from '@/@v2/forms/domain/enums/form-status.enum';
 import { FormApplication as PrismaFormApplication } from '@prisma/client';
 
@@ -23,6 +24,8 @@ export class FormApplicationEntityMapper {
       bannerWhyText: prisma.banner_why_text,
       bannerContactText: prisma.banner_contact_text,
       reminderCount: prisma.reminder_count,
+      scopeType: FormApplicationScopeTypeEnum[prisma.scope_type],
+      companyGroupId: prisma.company_group_id,
     });
   }
 
