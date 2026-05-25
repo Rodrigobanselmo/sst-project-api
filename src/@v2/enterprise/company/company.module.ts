@@ -4,6 +4,12 @@ import { BrowseWorkspaceController } from './application/workspace/browse-all-wo
 import { BrowseWorkspaceUseCase } from './application/workspace/browse-all-workspaces/use-cases/browse-all-workspaces.usecase';
 import { DeleteWorkspaceController } from './application/workspace/delete-workspace/controllers/delete-workspace.controller';
 import { DeleteWorkspaceUseCase } from './application/workspace/delete-workspace/use-cases/delete-workspace.usecase';
+import { ConvertWorkspaceToCompanyController } from './application/workspace/convert-to-company/controllers/convert-workspace-to-company.controller';
+import { RepairHybridFormApplicationsController } from './application/workspace/convert-to-company/controllers/repair-hybrid-form-applications.controller';
+import { PreviewConvertWorkspaceToCompanyUseCase } from './application/workspace/convert-to-company/use-cases/preview-convert-workspace-to-company.usecase';
+import { ConvertWorkspaceToCompanyUseCase } from './application/workspace/convert-to-company/use-cases/convert-workspace-to-company.usecase';
+import { WorkspaceConvertService } from './application/workspace/convert-to-company/services/workspace-convert.service';
+import { WorkspaceOperationalDataCloneService } from './application/workspace/convert-to-company/services/workspace-operational-data-clone.service';
 import { ReadVisualIdentityController } from './application/visual-identity/read-visual-identity/controllers/read-visual-identity.controller';
 import { ReadVisualIdentityUseCase } from './application/visual-identity/read-visual-identity/use-cases/read-visual-identity.usecase';
 import { WorkspaceDAO } from './database/dao/workspace/workspace.dao';
@@ -14,6 +20,8 @@ import { VisualIdentityDAO } from './database/dao/visual-identity/visual-identit
   controllers: [
     BrowseWorkspaceController,
     DeleteWorkspaceController,
+    ConvertWorkspaceToCompanyController,
+    RepairHybridFormApplicationsController,
     ReadVisualIdentityController,
   ],
   providers: [
@@ -24,8 +32,12 @@ import { VisualIdentityDAO } from './database/dao/visual-identity/visual-identit
     // Use Cases
     BrowseWorkspaceUseCase,
     DeleteWorkspaceUseCase,
+    PreviewConvertWorkspaceToCompanyUseCase,
+    ConvertWorkspaceToCompanyUseCase,
+    WorkspaceConvertService,
+    WorkspaceOperationalDataCloneService,
     ReadVisualIdentityUseCase,
   ],
-  exports: []
+  exports: [],
 })
-export class CompanyModule { }
+export class CompanyModule {}

@@ -5,16 +5,27 @@ import {
   FormQuestionsAnswersAnalysisBrowseResultModel,
 } from '../../../../../forms/domain/models/form-questions-answers/form-questions-answers-analysis-browse.model';
 import { IBrowseFormQuestionsAnswersAnalysisUseCase } from './browse-form-questions-answers-analysis.types';
+import { FormApplicationScopeService } from '@/@v2/forms/application/shared/services/form-application-scope.service';
 
 @Injectable()
 export class BrowseFormQuestionsAnswersAnalysisUseCase {
-  constructor(private readonly prisma: PrismaServiceV2) {}
+  constructor(
+    private readonly prisma: PrismaServiceV2,
+    private readonly formApplicationScopeService: FormApplicationScopeService,
+  ) {}
 
   async execute(params: IBrowseFormQuestionsAnswersAnalysisUseCase.Params): Promise<FormQuestionsAnswersAnalysisBrowseModel> {
-    // Get AI analysis results from database
+    const scope = await this.formApplicationScopeService.resolve({
+      formApplicationId: params.formApplicationId,
+      accessCompanyId: params.companyId,
+    });
+
+    const companyIds =
+      this.formApplicationScopeService.participantCompanyIdsForScope(scope);
+
     const analysisResults = await this.prisma.formAiAnalysis.findMany({
       where: {
-        companyId: params.companyId,
+        companyId: { in: companyIds },
         formApplicationId: params.formApplicationId,
       },
       include: {
@@ -33,7 +44,6 @@ export class BrowseFormQuestionsAnswersAnalysisUseCase {
       orderBy: [{ hierarchy: { name: 'asc' } }, { riskFactor: { name: 'asc' } }, { created_at: 'desc' }],
     });
 
-    // Map results to domain models
     const results = analysisResults.map(
       (analysis) =>
         new FormQuestionsAnswersAnalysisBrowseResultModel({

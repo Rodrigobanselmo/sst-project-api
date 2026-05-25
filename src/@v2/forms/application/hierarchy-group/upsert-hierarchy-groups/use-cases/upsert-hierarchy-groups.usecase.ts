@@ -1,5 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service';
+import { formApplicationAccessWhere } from '@/@v2/forms/application/shared/helpers/form-application-access.helper';
+import { FormApplicationScopeService } from '@/@v2/forms/application/shared/services/form-application-scope.service';
 
 export namespace IUpsertHierarchyGroupsUseCase {
   export type GroupInput = {
@@ -17,21 +19,29 @@ export namespace IUpsertHierarchyGroupsUseCase {
 
 @Injectable()
 export class UpsertHierarchyGroupsUseCase {
-  constructor(private readonly prisma: PrismaServiceV2) {}
+  constructor(
+    private readonly prisma: PrismaServiceV2,
+    private readonly formApplicationScopeService: FormApplicationScopeService,
+  ) {}
 
   async execute(params: IUpsertHierarchyGroupsUseCase.Params) {
-    // Validate form application exists
     const formApplication = await this.prisma.formApplication.findFirst({
-      where: {
-        id: params.applicationId,
-        company_id: params.companyId,
-        deleted_at: null,
-      },
+      where: formApplicationAccessWhere({
+        formApplicationId: params.applicationId,
+        accessCompanyId: params.companyId,
+      }),
     });
 
     if (!formApplication) {
       throw new NotFoundException('Aplicação de formulário não encontrada');
     }
+
+    const scope = await this.formApplicationScopeService.resolve({
+      formApplicationId: params.applicationId,
+      accessCompanyId: params.companyId,
+    });
+    const participantCompanyIds =
+      this.formApplicationScopeService.participantCompanyIdsForScope(scope);
 
     // Validate no hierarchy appears in more than one group
     const allHierarchyIds = params.groups.flatMap((g) => g.hierarchyIds);
@@ -45,7 +55,7 @@ export class UpsertHierarchyGroupsUseCase {
       const validHierarchies = await this.prisma.hierarchy.count({
         where: {
           id: { in: Array.from(uniqueHierarchyIds) },
-          companyId: params.companyId,
+          companyId: { in: participantCompanyIds },
         },
       });
 

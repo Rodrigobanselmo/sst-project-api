@@ -1,3 +1,4 @@
+import { formApplicationNestedAccessWhere } from '@/@v2/forms/application/shared/helpers/form-application-access.helper';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service';
 
@@ -18,10 +19,7 @@ export class DeleteHierarchyGroupUseCase {
       where: {
         id: params.groupId,
         form_application_id: params.applicationId,
-        form_application: {
-          company_id: params.companyId,
-          deleted_at: null,
-        },
+        form_application: formApplicationNestedAccessWhere(params.companyId),
       },
     });
 

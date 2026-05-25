@@ -19,12 +19,20 @@ export class PrismaDbExceptionFilter implements ExceptionFilter {
     const { cause, target, field_name } = meta;
 
     switch (code) {
-      case 'P2002':
-        if (target)
-          error = new BadRequestException(
-            `Dado que está tentando criar já existe: ${target.join(', ')} está em conflito`,
-          );
+      case 'P2002': {
+        const modelName =
+          typeof meta?.modelName === 'string' ? meta.modelName : undefined;
+        const targetLabel = target
+          ? Array.isArray(target)
+            ? target.join(', ')
+            : String(target)
+          : 'id';
+        const modelPrefix = modelName ? `tabela/modelo ${modelName}: ` : '';
+        error = new BadRequestException(
+          `Dado que está tentando criar já existe: ${modelPrefix}${targetLabel} está em conflito`,
+        );
         break;
+      }
 
       case 'P2003':
         if (field_name)

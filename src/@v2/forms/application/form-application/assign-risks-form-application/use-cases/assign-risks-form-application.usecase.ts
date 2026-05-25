@@ -1,6 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { IAssignRisksFormApplicationUseCase } from './assign-risks-form-application.types';
 import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service';
+import { formApplicationAccessWhere } from '@/@v2/forms/application/shared/helpers/form-application-access.helper';
+import { resolveOperationalCompanyIdForHierarchy } from '@/@v2/forms/application/shared/helpers/resolve-operational-company-for-hierarchy.helper';
+import { FormApplicationScopeService } from '@/@v2/forms/application/shared/services/form-application-scope.service';
 import { asyncBatch } from '@/@v2/shared/utils/helpers/async-batch';
 import { UpsertRiskDataService } from '@/modules/sst/services/risk-data/upsert-risk-data/upsert-risk.service';
 import { HomoTypeEnum } from '@prisma/client';
@@ -10,40 +13,49 @@ export class AssignRisksFormApplicationUseCase {
   constructor(
     private readonly upsertRiskDataService: UpsertRiskDataService,
     private readonly prisma: PrismaServiceV2,
+    private readonly formApplicationScopeService: FormApplicationScopeService,
   ) {}
 
   async execute(params: IAssignRisksFormApplicationUseCase.Params) {
-    const { companyId, applicationId, risks } = params;
+    const accessCompanyId = params.companyId;
+    const { applicationId, risks } = params;
 
     const formApplication = await this.prisma.formApplication.findFirst({
-      where: {
-        id: applicationId,
-        company_id: companyId,
-        deleted_at: null,
-      },
+      where: formApplicationAccessWhere({
+        formApplicationId: applicationId,
+        accessCompanyId,
+      }),
     });
 
     if (!formApplication) {
       throw new NotFoundException('Form application not found');
     }
 
-    const riskFactorGroupData = await this.prisma.riskFactorGroupData.findFirst({
-      where: {
-        companyId: companyId,
-      },
-    });
-
-    if (!riskFactorGroupData) {
-      throw new NotFoundException('Risk factor group data not found');
-    }
-
     await asyncBatch({
       items: risks,
       batchSize: 5,
       callback: async (risk) => {
+        const operationalCompanyId = await resolveOperationalCompanyIdForHierarchy({
+          prisma: this.prisma,
+          formApplicationScopeService: this.formApplicationScopeService,
+          formApplicationId: applicationId,
+          accessCompanyId,
+          hierarchyId: risk.hierarchyId,
+        });
+
+        const riskFactorGroupData = await this.prisma.riskFactorGroupData.findFirst({
+          where: {
+            companyId: operationalCompanyId,
+          },
+        });
+
+        if (!riskFactorGroupData) {
+          throw new NotFoundException('Risk factor group data not found');
+        }
+
         await this.upsertRiskDataService.execute({
           riskId: risk.riskId,
-          companyId: companyId,
+          companyId: operationalCompanyId,
           riskFactorGroupDataId: riskFactorGroupData.id,
           homogeneousGroupId: risk.hierarchyId,
           probability: risk.probability,

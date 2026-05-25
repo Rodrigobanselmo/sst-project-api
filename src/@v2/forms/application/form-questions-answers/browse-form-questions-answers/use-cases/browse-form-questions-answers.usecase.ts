@@ -3,6 +3,7 @@ import { FormQuestionsAnswersDAO } from '@/@v2/forms/database/dao/form-questions
 import { FormQuestionTypeEnum } from '@/@v2/forms/domain/enums/form-question-type.enum';
 import { FormQuestionsAnswersBrowseModel } from '@/@v2/forms/domain/models/form-questions-answers/form-questions-answers-browse.model';
 import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service';
+import { FormApplicationScopeService } from '@/@v2/forms/application/shared/services/form-application-scope.service';
 import { Injectable } from '@nestjs/common';
 import { HierarchyEnum } from '@prisma/client';
 import { buildParticipantStructuresForBrowse } from '../helpers/build-participant-structures-for-browse';
@@ -14,6 +15,7 @@ export class BrowseFormQuestionsAnswersUseCase {
     private readonly formQuestionsAnswersDAO: FormQuestionsAnswersDAO,
     private readonly formParticipantStructuresDAO: FormParticipantStructuresDAO,
     private readonly prisma: PrismaServiceV2,
+    private readonly formApplicationScopeService: FormApplicationScopeService,
   ) {}
 
   async execute(params: IBrowseFormQuestionsAnswersUseCase.Params) {
@@ -25,9 +27,17 @@ export class BrowseFormQuestionsAnswersUseCase {
       },
     });
 
+    const scope = await this.formApplicationScopeService.resolve({
+      formApplicationId: params.formApplicationId,
+      accessCompanyId: params.companyId,
+    });
+
+    const participantCompanyIds =
+      this.formApplicationScopeService.participantCompanyIdsForScope(scope);
+
     const hierarchies = await this.prisma.hierarchy.findMany({
       where: {
-        companyId: params.companyId,
+        companyId: { in: participantCompanyIds },
         type: HierarchyEnum.SECTOR,
       },
     });

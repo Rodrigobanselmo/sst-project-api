@@ -14,6 +14,7 @@ import { Prisma } from '@prisma/client';
 import { participantWorkspaceLateralJoin } from './participant-workspace-lateral.sql';
 import { FormApplicationScopeTypeEnum } from '@/@v2/forms/domain/enums/form-application-scope-type.enum';
 import { FormApplicationScopeService } from '@/@v2/forms/application/shared/services/form-application-scope.service';
+import { ResolvedFormApplicationScope } from '@/@v2/forms/application/shared/services/form-application-scope.service';
 
 function coerceSqlCount(value: unknown): number {
   if (value === undefined || value === null) return 0;
@@ -48,7 +49,7 @@ export class FormParticipantsDAO {
 
     const scope = await this.formApplicationScopeService.resolve({
       formApplicationId: filters.applicationId,
-      anchorCompanyId: filters.companyId,
+      accessCompanyId: filters.companyId,
     });
 
     const browseWhereParams = this.browseWhere(filters, scope);
@@ -56,6 +57,10 @@ export class FormParticipantsDAO {
     const orderByParams = this.browseOrderBy(orderBy);
 
     const whereParams = [...browseWhereParams, ...filterWhereParams];
+    const participantScopeJoins = this.participantScopeJoins(
+      filters.applicationId,
+      scope,
+    );
 
     const participantsPromise = this.prisma.$queryRaw<IFormParticipantsBrowseResultModelMapper[]>`
       SELECT DISTINCT
@@ -118,16 +123,7 @@ export class FormParticipantsDAO {
         "Hierarchy" h_parent_4 ON h_parent_4."id" = h_parent_3."parentId"
       LEFT JOIN
         "Hierarchy" h_parent_5 ON h_parent_5."id" = h_parent_4."parentId"
-      LEFT JOIN
-        "_HierarchyToWorkspace" h_t_w ON h_t_w."A" = emp."hierarchyId"
-      LEFT JOIN
-        "FormApplication" form_ap ON form_ap."id" = ${filters.applicationId} AND form_ap."deleted_at" IS NULL
-      LEFT JOIN
-        "FormParticipants" form_part ON form_part."form_application_id" = form_ap."id"
-      LEFT JOIN
-        "FormParticipantsWorkspace" form_part_ws ON form_part_ws."form_participants_id" = form_part."id"
-      LEFT JOIN
-        "FormParticipantsHierarchy" form_part_hier ON form_part_hier."form_participants_id" = form_part."id"
+      ${participantScopeJoins}
       LEFT JOIN
         "FormParticipantsAnswers" form_answers ON form_answers."form_application_id" = ${filters.applicationId}
         AND form_answers."employee_id" = emp."id"
@@ -158,16 +154,7 @@ export class FormParticipantsDAO {
         "Hierarchy" h_parent_4 ON h_parent_4."id" = h_parent_3."parentId"
       LEFT JOIN
         "Hierarchy" h_parent_5 ON h_parent_5."id" = h_parent_4."parentId"
-      LEFT JOIN
-        "_HierarchyToWorkspace" h_t_w ON h_t_w."A" = emp."hierarchyId"
-      LEFT JOIN
-        "FormApplication" form_ap ON form_ap."id" = ${filters.applicationId} AND form_ap."deleted_at" IS NULL
-      LEFT JOIN
-        "FormParticipants" form_part ON form_part."form_application_id" = form_ap."id"
-      LEFT JOIN
-        "FormParticipantsWorkspace" form_part_ws ON form_part_ws."form_participants_id" = form_part."id"
-      LEFT JOIN
-        "FormParticipantsHierarchy" form_part_hier ON form_part_hier."form_participants_id" = form_part."id"
+      ${participantScopeJoins}
       LEFT JOIN
         "FormParticipantsAnswers" form_answers ON form_answers."form_application_id" = ${filters.applicationId}
         AND form_answers."employee_id" = emp."id"
@@ -192,16 +179,65 @@ export class FormParticipantsDAO {
     });
   }
 
+  /**
+   * JOINs de recorte por FormParticipants* só no modo híbrido (COMPANY_WORKSPACES).
+   * Em BUSINESS_GROUP_COMPANIES evita multiplicar linhas via _HierarchyToWorkspace.
+   */
+  private participantScopeJoins(
+    applicationId: string,
+    scope: ResolvedFormApplicationScope,
+  ): Prisma.Sql {
+    if (
+      scope.scopeType === FormApplicationScopeTypeEnum.BUSINESS_GROUP_COMPANIES ||
+      this.formApplicationScopeService.usesConsolidatedApplicationCompaniesParticipantScope(
+        scope,
+      )
+    ) {
+      return Prisma.empty;
+    }
+
+    return Prisma.sql`
+      LEFT JOIN
+        "_HierarchyToWorkspace" h_t_w ON h_t_w."A" = emp."hierarchyId"
+      LEFT JOIN
+        "FormApplication" form_ap ON form_ap."id" = ${applicationId} AND form_ap."deleted_at" IS NULL
+      LEFT JOIN
+        "FormParticipants" form_part ON form_part."form_application_id" = form_ap."id"
+      LEFT JOIN
+        "FormParticipantsWorkspace" form_part_ws ON form_part_ws."form_participants_id" = form_part."id"
+      LEFT JOIN
+        "FormParticipantsHierarchy" form_part_hier ON form_part_hier."form_participants_id" = form_part."id"
+    `;
+  }
+
   private browseWhere(
     filters: IFormParticipantsDAO.BrowseParams['filters'],
     scope: Awaited<ReturnType<FormApplicationScopeService['resolve']>>,
   ) {
     const where = [Prisma.sql`emp."status" = 'ACTIVE'`];
 
-    if (scope.scopeType === FormApplicationScopeTypeEnum.BUSINESS_GROUP_COMPANIES) {
+    if (
+      scope.scopeType === FormApplicationScopeTypeEnum.BUSINESS_GROUP_COMPANIES ||
+      this.formApplicationScopeService.usesConsolidatedApplicationCompaniesParticipantScope(
+        scope,
+      )
+    ) {
+      const companyIds =
+        this.formApplicationScopeService.participantCompanyIdsForScope(scope);
       where.push(
-        Prisma.sql`emp."companyId" IN (${Prisma.join(scope.participantCompanyIds)})`,
+        Prisma.sql`emp."companyId" IN (${Prisma.join(companyIds)})`,
       );
+    } else if (scope.convertedCompanyIds.length > 0) {
+      where.push(Prisma.sql`(
+        (
+          emp."companyId" = ${scope.anchorCompanyId}
+          AND (
+            emp."hierarchyId" = form_part_hier."hierarchy_id"
+            OR emp."hierarchyId" = h_t_w."A" AND h_t_w."B" = form_part_ws."workspace_id"
+          )
+        )
+        OR emp."companyId" IN (${Prisma.join(scope.convertedCompanyIds)})
+      )`);
     } else {
       where.push(Prisma.sql`emp."companyId" = ${filters.companyId}`);
       where.push(Prisma.sql`(

@@ -10,6 +10,7 @@ import { FormParticipantsAnswerStatusEnum } from '@/@v2/forms/domain/enums/form-
 import { getParticiantAnswersStatus } from '@/@v2/forms/domain/utils/get-particiant-answers-status';
 import { FormApplicationScopeTypeEnum } from '@/@v2/forms/domain/enums/form-application-scope-type.enum';
 import { FormApplicationScopeService, ResolvedFormApplicationScope } from '@/@v2/forms/application/shared/services/form-application-scope.service';
+import { formApplicationAccessWhere } from '@/@v2/forms/application/shared/helpers/form-application-access.helper';
 
 @Injectable()
 export class FormQuestionsAnswersDAO {
@@ -27,19 +28,61 @@ export class FormQuestionsAnswersDAO {
     scope: ResolvedFormApplicationScope,
     formApplicationId: string,
   ): Prisma.Sql {
-    if (scope.scopeType === FormApplicationScopeTypeEnum.BUSINESS_GROUP_COMPANIES) {
+    if (
+      scope.scopeType === FormApplicationScopeTypeEnum.BUSINESS_GROUP_COMPANIES ||
+      this.formApplicationScopeService.usesConsolidatedApplicationCompaniesParticipantScope(
+        scope,
+      )
+    ) {
+      const participantCompanyIds =
+        this.formApplicationScopeService.participantCompanyIdsForScope(scope);
       return Prisma.sql`(
         fpa.employee_id IS NULL
         OR EXISTS (
           SELECT 1
           FROM "Employee" emp
           WHERE emp.id = fpa.employee_id
-            AND emp."companyId" IN (${Prisma.join(scope.participantCompanyIds)})
+            AND emp."companyId" IN (${Prisma.join(participantCompanyIds)})
         )
       )`;
     }
 
     const companyId = scope.anchorCompanyId;
+
+    if (scope.convertedCompanyIds.length > 0) {
+      return Prisma.sql`(
+        fpa.employee_id IS NULL
+        OR EXISTS (
+          SELECT 1
+          FROM "Employee" emp
+          WHERE emp.id = fpa.employee_id
+            AND emp."companyId" IN (${Prisma.join(scope.convertedCompanyIds)})
+        )
+        OR EXISTS (
+          SELECT 1
+          FROM "Employee" emp
+          INNER JOIN "FormParticipants" fp ON fp.form_application_id = ${formApplicationId}
+          WHERE emp.id = fpa.employee_id
+            AND emp."companyId" = ${companyId}
+            AND (
+              EXISTS (
+                SELECT 1
+                FROM "FormParticipantsHierarchy" fph
+                WHERE fph.form_participants_id = fp.id
+                  AND fph.hierarchy_id = emp."hierarchyId"
+              )
+              OR EXISTS (
+                SELECT 1
+                FROM "FormParticipantsWorkspace" fpw
+                INNER JOIN "_HierarchyToWorkspace" htw
+                  ON htw."B" = fpw.workspace_id
+                  AND htw."A" = emp."hierarchyId"
+                WHERE fpw.form_participants_id = fp.id
+              )
+            )
+        )
+      )`;
+    }
 
     return Prisma.sql`(
       fpa.employee_id IS NULL
@@ -72,15 +115,14 @@ export class FormQuestionsAnswersDAO {
   async browse({ filters }: IFormQuestionsAnswersDAO.BrowseParams) {
     const scope = await this.formApplicationScopeService.resolve({
       formApplicationId: filters.formApplicationId,
-      anchorCompanyId: filters.companyId,
+      accessCompanyId: filters.companyId,
     });
 
     const form = await this.prisma.formApplication.findFirst({
-      where: {
-        id: filters.formApplicationId,
-        company_id: filters.companyId,
-        deleted_at: null,
-      },
+      where: formApplicationAccessWhere({
+        formApplicationId: filters.formApplicationId,
+        accessCompanyId: filters.companyId,
+      }),
       select: { form_id: true, status: true },
     });
 

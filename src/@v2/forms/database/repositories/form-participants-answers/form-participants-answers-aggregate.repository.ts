@@ -4,6 +4,7 @@ import { Prisma, StatusEnum } from '@prisma/client';
 import { asyncBatch } from '@/@v2/shared/utils/helpers/async-batch';
 import { FormParticipantsAnswersAggregateMapper } from '../../mappers/aggregates/form-participant-answers-aggregate.mapper';
 import { IFormParticipantsAnswersAggregateRepository } from './form-participants-answers-aggregate.repository.types';
+import { formApplicationNestedAccessWhere } from '@/@v2/forms/application/shared/helpers/form-application-access.helper';
 
 @Injectable()
 export class FormParticipantsAnswersAggregateRepository {
@@ -84,9 +85,7 @@ export class FormParticipantsAnswersAggregateRepository {
     const participantsAnswers = await this.prisma.formParticipantsAnswers.findFirst({
       where: {
         id: params.id,
-        form_application: {
-          company_id: params.companyId,
-        },
+        form_application: formApplicationNestedAccessWhere(params.companyId),
       },
       ...FormParticipantsAnswersAggregateRepository.selectOptions(),
     });
@@ -98,9 +97,7 @@ export class FormParticipantsAnswersAggregateRepository {
     const participantsAnswers = await this.prisma.formParticipantsAnswers.findMany({
       where: {
         form_application_id: params.formApplicationId,
-        form_application: {
-          company_id: params.companyId,
-        },
+        form_application: formApplicationNestedAccessWhere(params.companyId),
       },
       ...FormParticipantsAnswersAggregateRepository.selectOptions(),
     });
@@ -115,9 +112,7 @@ export class FormParticipantsAnswersAggregateRepository {
       where: {
         form_application_id: params.formApplicationId,
         employee_id: params.employeeId,
-        form_application: {
-          company_id: params.companyId,
-        },
+        form_application: formApplicationNestedAccessWhere(params.companyId),
       },
       ...FormParticipantsAnswersAggregateRepository.selectOptions(),
     });

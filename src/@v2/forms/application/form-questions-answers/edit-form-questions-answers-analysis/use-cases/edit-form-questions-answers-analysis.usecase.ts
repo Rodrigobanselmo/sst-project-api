@@ -1,17 +1,24 @@
+import { FormApplicationScopeService } from '@/@v2/forms/application/shared/services/form-application-scope.service';
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service';
 import { IEditFormQuestionsAnswersAnalysisUseCase } from './edit-form-questions-answers-analysis.types';
 
 @Injectable()
 export class EditFormQuestionsAnswersAnalysisUseCase {
-  constructor(private readonly prisma: PrismaServiceV2) {}
+  constructor(
+    private readonly prisma: PrismaServiceV2,
+    private readonly formApplicationScopeService: FormApplicationScopeService,
+  ) {}
 
   async execute(params: IEditFormQuestionsAnswersAnalysisUseCase.Params): Promise<IEditFormQuestionsAnswersAnalysisUseCase.Result> {
-    // Validate that the analysis exists and belongs to the company
+    await this.formApplicationScopeService.resolve({
+      formApplicationId: params.formApplicationId,
+      accessCompanyId: params.companyId,
+    });
+
     const existingAnalysis = await this.prisma.formAiAnalysis.findFirst({
       where: {
         id: params.analysisId,
-        companyId: params.companyId,
         formApplicationId: params.formApplicationId,
       },
     });
@@ -20,12 +27,10 @@ export class EditFormQuestionsAnswersAnalysisUseCase {
       throw new NotFoundException('Análise não encontrada');
     }
 
-    // Validate the analysis object structure
     if (!params.analysis || typeof params.analysis !== 'object') {
       throw new BadRequestException('Análise inválida');
     }
 
-    // Update only the analysis field
     const updatedAnalysis = await this.prisma.formAiAnalysis.update({
       where: {
         id: params.analysisId,
@@ -47,4 +52,3 @@ export class EditFormQuestionsAnswersAnalysisUseCase {
     };
   }
 }
-
