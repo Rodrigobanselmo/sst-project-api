@@ -44,6 +44,66 @@ export class FormParticipantsDAO {
     private readonly formApplicationScopeService: FormApplicationScopeService,
   ) {}
 
+  /**
+   * Participantes únicos (escopo geral da campanha, sem filtros de recorte)
+   * com pelo menos uma submissão no status informado.
+   */
+  async countCampaignRespondedParticipants(params: {
+    companyId: string;
+    applicationId: string;
+    answerStatus: 'VALID' | 'TESTING';
+  }): Promise<number> {
+    const scope = await this.formApplicationScopeService.resolve({
+      formApplicationId: params.applicationId,
+      accessCompanyId: params.companyId,
+    });
+
+    const browseWhereParams = this.browseWhere(
+      {
+        companyId: params.companyId,
+        applicationId: params.applicationId,
+      },
+      scope,
+    );
+
+    const participantScopeJoins = this.participantScopeJoins(
+      params.applicationId,
+      scope,
+    );
+
+    const answerStatusSql =
+      params.answerStatus === 'TESTING'
+        ? Prisma.sql`'TESTING'`
+        : Prisma.sql`'VALID'`;
+
+    const rows = await this.prisma.$queryRaw<{ responded: number }[]>`
+      SELECT
+        COUNT(DISTINCT CASE WHEN form_answers."id" IS NOT NULL THEN emp."id" END)::int AS responded
+      FROM
+        "Employee" emp
+      LEFT JOIN
+        "Hierarchy" hier ON hier."id" = emp."hierarchyId"
+      LEFT JOIN
+        "Hierarchy" h_parent_1 ON h_parent_1."id" = hier."parentId"
+      LEFT JOIN
+        "Hierarchy" h_parent_2 ON h_parent_2."id" = h_parent_1."parentId"
+      LEFT JOIN
+        "Hierarchy" h_parent_3 ON h_parent_3."id" = h_parent_2."parentId"
+      LEFT JOIN
+        "Hierarchy" h_parent_4 ON h_parent_4."id" = h_parent_3."parentId"
+      LEFT JOIN
+        "Hierarchy" h_parent_5 ON h_parent_5."id" = h_parent_4."parentId"
+      ${participantScopeJoins}
+      LEFT JOIN
+        "FormParticipantsAnswers" form_answers ON form_answers."form_application_id" = ${params.applicationId}
+        AND form_answers."employee_id" = emp."id"
+        AND form_answers."status" IN (${answerStatusSql})
+      ${gerWhereRawPrisma(browseWhereParams)};
+    `;
+
+    return readFilterSummaryRow(rows).responded;
+  }
+
   async browse({ limit, page, orderBy, filters, cryptoAdapter }: IFormParticipantsDAO.BrowseParams) {
     const pagination = getPagination(page, limit, FORM_PARTICIPANTS_BROWSE_MAX_LIMIT);
 

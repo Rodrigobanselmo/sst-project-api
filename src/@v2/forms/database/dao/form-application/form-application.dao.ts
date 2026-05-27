@@ -14,12 +14,14 @@ import { FormStatusEnum } from '@/@v2/forms/domain/enums/form-status.enum';
 import { FormApplicationScopeTypeEnum } from '@/@v2/forms/domain/enums/form-application-scope-type.enum';
 import { FormApplicationScopeService } from '@/@v2/forms/application/shared/services/form-application-scope.service';
 import { formApplicationAccessWhere } from '@/@v2/forms/application/shared/helpers/form-application-access.helper';
+import { FormParticipantsDAO } from '../form-participants/form-participants.dao';
 
 @Injectable()
 export class FormApplicationDAO {
   constructor(
     private readonly prisma: PrismaServiceV2,
     private readonly formApplicationScopeService: FormApplicationScopeService,
+    private readonly formParticipantsDAO: FormParticipantsDAO,
   ) {}
 
   async read(params: IFormApplicationDAO.ReadParams) {
@@ -168,12 +170,22 @@ export class FormApplicationDAO {
               },
             });
 
+    const answerStatus =
+      formApplication.status === FormStatusEnum.TESTING ? 'TESTING' : 'VALID';
+
     const totalAnswersPromise = this.prisma.formParticipantsAnswers.count({
       where: {
         form_application_id: params.id,
-        status: formApplication.status === FormStatusEnum.TESTING ? 'TESTING' : 'VALID',
+        status: answerStatus,
       },
     });
+
+    const respondedParticipantsCountPromise =
+      this.formParticipantsDAO.countCampaignRespondedParticipants({
+        companyId: params.companyId,
+        applicationId: params.id,
+        answerStatus,
+      });
 
     const averageTimeSpentPromise = this.prisma.formParticipantsAnswers.aggregate({
       where: {
@@ -188,12 +200,23 @@ export class FormApplicationDAO {
       },
     });
 
-    const [totalParticipants, totalAnswers, averageTimeSpentResult] = await Promise.all([totalParticipantsPromise, totalAnswersPromise, averageTimeSpentPromise]);
+    const [
+      totalParticipants,
+      totalAnswers,
+      respondedParticipantsCount,
+      averageTimeSpentResult,
+    ] = await Promise.all([
+      totalParticipantsPromise,
+      totalAnswersPromise,
+      respondedParticipantsCountPromise,
+      averageTimeSpentPromise,
+    ]);
 
     return FormApplicationReadModelMapper.toModel({
       ...formApplication,
       totalParticipants,
       totalAnswers,
+      respondedParticipantsCount,
       averageTimeSpent: averageTimeSpentResult._avg.time_spent,
     });
   }

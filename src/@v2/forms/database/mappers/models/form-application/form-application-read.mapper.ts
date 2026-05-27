@@ -22,6 +22,7 @@ export type IFormApplicationReadModelMapper = PrismaFormApplication & {
   form: PrismaForm;
   totalParticipants: number;
   totalAnswers: number;
+  respondedParticipantsCount: number;
   averageTimeSpent: number | null;
   applicationCompanies: {
     company_id: string;
@@ -95,6 +96,7 @@ export class FormApplicationReadModelMapper {
       },
       totalParticipants: prisma.totalParticipants,
       totalAnswers: prisma.totalAnswers,
+      respondedParticipantsCount: prisma.respondedParticipantsCount,
       averageTimeSpent: prisma.averageTimeSpent,
       bannerIntroText: prisma.banner_intro_text ?? null,
       bannerWhyText: prisma.banner_why_text ?? null,

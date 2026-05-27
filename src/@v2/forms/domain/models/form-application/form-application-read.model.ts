@@ -27,6 +27,7 @@ export type IFormApplicationReadModel = {
   isAnonymous: boolean;
   totalParticipants: number;
   totalAnswers: number;
+  respondedParticipantsCount: number;
   averageTimeSpent: number | null;
   bannerIntroText: string | null;
   bannerWhyText: string | null;
@@ -56,6 +57,7 @@ export class FormApplicationReadModel {
   };
   totalParticipants: number;
   totalAnswers: number;
+  respondedParticipantsCount: number;
   averageTimeSpent: number | null;
   participationGoal: number | null;
   bannerIntroText: string | null;
@@ -83,6 +85,7 @@ export class FormApplicationReadModel {
     this.questionIdentifierGroup = params.questionIdentifierGroup;
     this.totalParticipants = params.totalParticipants;
     this.totalAnswers = params.totalAnswers;
+    this.respondedParticipantsCount = params.respondedParticipantsCount;
     this.participationGoal = params.participationGoal;
     this.averageTimeSpent = params.averageTimeSpent;
     this.bannerIntroText = params.bannerIntroText;
