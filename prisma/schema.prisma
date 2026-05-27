@@ -366,7 +366,9 @@ model Company {
   TaskProject                TaskProject[]
   Task                       Task[]
   CompanyFlags               CompanyFlags?
-  formAiAnalyses             FormAiAnalysis[]
+  formAiAnalyses                  FormAiAnalysis[]
+  formRiskNarrativeDiagnostics       FormRiskNarrativeDiagnostic[]
+  formIndicatorsNarrativeDiagnostics FormIndicatorsNarrativeDiagnostic[]
   aiPendingActions           AiPendingAction[]
   formPreliminaryLibraryQuestions FormPreliminaryLibraryQuestion[]
   formPreliminaryLibraryBlocks    FormPreliminaryLibraryBlock[]
@@ -1297,6 +1299,8 @@ model FormApplication {
   question_identifier_group FormQuestionGroup[]
   formApplicationRiskLog    FormApplicationRiskLog[]
   formAiAnalysis            FormAiAnalysis[]
+  formRiskNarrativeDiagnostics       FormRiskNarrativeDiagnostic[]
+  formIndicatorsNarrativeDiagnostics FormIndicatorsNarrativeDiagnostic[]
   hierarchyGroups           FormApplicationHierarchyGroup[]
 
   @@unique([id, company_id])
@@ -1346,6 +1350,70 @@ model FormAiAnalysis {
   @@index([formApplicationId])
   @@index([hierarchyId])
   @@index([riskId])
+}
+
+model SystemAiPrompt {
+  id         String                @id @default(cuid())
+  key        SystemAiPromptKeyEnum @unique
+  content    String                @db.Text
+  revision   Int                   @default(1)
+  updatedBy  Int?
+  created_at DateTime              @default(now())
+  updated_at DateTime              @updatedAt
+
+  updatedByUser User? @relation("SystemAiPromptUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  @@index([key])
+}
+
+model FormRiskNarrativeDiagnostic {
+  id                String                   @id @default(cuid())
+  companyId         String
+  formApplicationId String
+  scopeKey          String
+  scope             Json
+  status            FormAiAnalysisStatusEnum @default(PROCESSING)
+  contentMarkdown   String?                  @db.Text
+  metadata          Json?
+  model             String?
+  generatedBy       Int?
+  processingTimeMs  Int?
+  created_at        DateTime                 @default(now())
+  updated_at        DateTime                 @updatedAt
+
+  company         Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  formApplication FormApplication @relation(fields: [formApplicationId], references: [id], onDelete: Cascade)
+  generatedByUser User?           @relation("FormRiskNarrativeDiagnosticGeneratedBy", fields: [generatedBy], references: [id], onDelete: SetNull)
+
+  @@unique([formApplicationId, scopeKey])
+  @@index([companyId])
+  @@index([formApplicationId])
+  @@index([status])
+}
+
+model FormIndicatorsNarrativeDiagnostic {
+  id                String                   @id @default(cuid())
+  companyId         String
+  formApplicationId String
+  scopeKey          String
+  scope             Json
+  status            FormAiAnalysisStatusEnum @default(PROCESSING)
+  contentMarkdown   String?                  @db.Text
+  metadata          Json?
+  model             String?
+  generatedBy       Int?
+  processingTimeMs  Int?
+  created_at        DateTime                 @default(now())
+  updated_at        DateTime                 @updatedAt
+
+  company         Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  formApplication FormApplication @relation(fields: [formApplicationId], references: [id], onDelete: Cascade)
+  generatedByUser User?           @relation("FormIndicatorsNarrativeDiagnosticGeneratedBy", fields: [generatedBy], references: [id], onDelete: SetNull)
+
+  @@unique([formApplicationId, scopeKey])
+  @@index([companyId])
+  @@index([formApplicationId])
+  @@index([status])
 }
 
 model FormApplicationRiskLog {
@@ -2489,6 +2557,9 @@ model User {
   aiThreads              AiThread[]
   aiFiles                AiFile[]                    @relation("AiFileUploader")
   aiPendingActions       AiPendingAction[]
+  systemAiPromptsUpdated              SystemAiPrompt[]              @relation("SystemAiPromptUpdatedBy")
+  formRiskNarrativeDiagnosticsCreated       FormRiskNarrativeDiagnostic[]       @relation("FormRiskNarrativeDiagnosticGeneratedBy")
+  formIndicatorsNarrativeDiagnosticsCreated FormIndicatorsNarrativeDiagnostic[] @relation("FormIndicatorsNarrativeDiagnosticGeneratedBy")
 
   @@unique([id, name])
   @@index([email])
@@ -3027,6 +3098,15 @@ enum FormAiAnalysisStatusEnum {
   PROCESSING
   DONE
   FAILED
+}
+
+enum SystemAiPromptKeyEnum {
+  RISK_SOURCES_RECOMMENDATIONS
+  RISK_NARRATIVE_DIAGNOSTIC
+  INDICATORS_NARRATIVE_ANALYSIS
+  INDICATORS_NARRATIVE_DIAGNOSTIC
+  INDICATORS_NARRATIVE_DIAGNOSTIC_GROUPS_ONLY
+  INDICATORS_NARRATIVE_DIAGNOSTIC_GROUPS_AND_QUESTIONS
 }
 
 enum RiskRecTypeEnum {

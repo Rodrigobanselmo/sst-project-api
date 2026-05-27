@@ -91,6 +91,21 @@ import { BrowseHierarchyGroupsUseCase } from './application/hierarchy-group/brow
 import { UpsertHierarchyGroupsUseCase } from './application/hierarchy-group/upsert-hierarchy-groups/use-cases/upsert-hierarchy-groups.usecase';
 import { DeleteHierarchyGroupUseCase } from './application/hierarchy-group/delete-hierarchy-group/use-cases/delete-hierarchy-group.usecase';
 import { FormApplicationScopeService } from './application/shared/services/form-application-scope.service';
+import { SystemAiPromptController } from './application/system-ai-prompt/controllers/system-ai-prompt.controller';
+import { ReadSystemAiPromptUseCase } from './application/system-ai-prompt/read-system-ai-prompt/use-cases/read-system-ai-prompt.usecase';
+import { UpsertSystemAiPromptUseCase } from './application/system-ai-prompt/upsert-system-ai-prompt/use-cases/upsert-system-ai-prompt.usecase';
+import { SystemAiPromptRepository } from './database/repositories/system-ai-prompt/system-ai-prompt.repository';
+import { SystemAiPromptResolverService } from './application/system-ai-prompt/services/system-ai-prompt-resolver.service';
+import { RiskNarrativeDiagnosticController } from './application/form-questions-answers/risk-narrative-diagnostic/controllers/risk-narrative-diagnostic.controller';
+import { GenerateRiskNarrativeDiagnosticUseCase } from './application/form-questions-answers/risk-narrative-diagnostic/generate-risk-narrative-diagnostic/use-cases/generate-risk-narrative-diagnostic.usecase';
+import { ReadRiskNarrativeDiagnosticUseCase } from './application/form-questions-answers/risk-narrative-diagnostic/read-risk-narrative-diagnostic/use-cases/read-risk-narrative-diagnostic.usecase';
+import { BuildRiskNarrativeInputService } from './application/form-questions-answers/risk-narrative-diagnostic/services/build-risk-narrative-input.service';
+import { FormRiskNarrativeDiagnosticRepository } from './database/repositories/form-risk-narrative-diagnostic/form-risk-narrative-diagnostic.repository';
+import { IndicatorsNarrativeDiagnosticController } from './application/form-questions-answers/indicators-narrative-diagnostic/controllers/indicators-narrative-diagnostic.controller';
+import { GenerateIndicatorsNarrativeDiagnosticUseCase } from './application/form-questions-answers/indicators-narrative-diagnostic/generate-indicators-narrative-diagnostic/use-cases/generate-indicators-narrative-diagnostic.usecase';
+import { ReadIndicatorsNarrativeDiagnosticUseCase } from './application/form-questions-answers/indicators-narrative-diagnostic/read-indicators-narrative-diagnostic/use-cases/read-indicators-narrative-diagnostic.usecase';
+import { BuildIndicatorsNarrativeInputService } from './application/form-questions-answers/indicators-narrative-diagnostic/services/build-indicators-narrative-input.service';
+import { FormIndicatorsNarrativeDiagnosticRepository } from './database/repositories/form-indicators-narrative-diagnostic/form-indicators-narrative-diagnostic.repository';
 
 @Module({
   imports: [SharedModule, SSTModule, CacheModule.register()],
@@ -123,6 +138,9 @@ import { FormApplicationScopeService } from './application/shared/services/form-
     FormPreliminaryLibraryQuestionsController,
     FormPreliminaryLibraryBlocksController,
     HierarchyGroupController,
+    SystemAiPromptController,
+    RiskNarrativeDiagnosticController,
+    IndicatorsNarrativeDiagnosticController,
   ],
   providers: [
     // Database
@@ -190,6 +208,18 @@ import { FormApplicationScopeService } from './application/shared/services/form-
     BrowseHierarchyGroupsUseCase,
     UpsertHierarchyGroupsUseCase,
     DeleteHierarchyGroupUseCase,
+    SystemAiPromptRepository,
+    ReadSystemAiPromptUseCase,
+    UpsertSystemAiPromptUseCase,
+    SystemAiPromptResolverService,
+    FormRiskNarrativeDiagnosticRepository,
+    BuildRiskNarrativeInputService,
+    GenerateRiskNarrativeDiagnosticUseCase,
+    ReadRiskNarrativeDiagnosticUseCase,
+    FormIndicatorsNarrativeDiagnosticRepository,
+    BuildIndicatorsNarrativeInputService,
+    GenerateIndicatorsNarrativeDiagnosticUseCase,
+    ReadIndicatorsNarrativeDiagnosticUseCase,
   ],
   exports: [],
 })

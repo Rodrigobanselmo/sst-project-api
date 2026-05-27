@@ -7,6 +7,8 @@ export namespace IAiAnalyzeFormQuestionsRisksUseCase {
     formApplicationId: string;
     customPrompt?: string;
     model?: string; // Optional AI model to use (e.g., 'gpt-4o', 'gpt-4o-mini', 'gpt-3.5-turbo')
+    /** Resolved server-side; do not send from client. */
+    analysisPrompt?: string;
   };
 
   export type QuestionData = {
@@ -71,6 +73,12 @@ export namespace IAiAnalyzeFormQuestionsRisksUseCase {
       model?: string;
       processingTimeMs: number;
       failedAnalyses?: number;
+      analysesQueued?: number;
+      analysesSkipped?: number;
+      promptKey?: string;
+      promptSource?: string;
+      promptLength?: number;
+      promptRevision?: number;
     };
   };
 }

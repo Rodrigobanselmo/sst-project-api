@@ -56,6 +56,7 @@ export class BrowseFormQuestionsAnswersAnalysisUseCase {
           probability: analysis.probability || undefined,
           confidence: analysis.confidence || undefined,
           analysis: analysis.analysis as any,
+          metadata: (analysis.metadata as Record<string, unknown>) || undefined,
           model: analysis.model || undefined,
           processingTimeMs: analysis.processingTimeMs || undefined,
           createdAt: analysis.created_at,
