@@ -21,6 +21,10 @@ export const FormRoutes = {
     AI_ANALYZE_RISKS: 'v2/companies/:companyId/forms/applications/:applicationId/questions-answers/ai-analyze-risks',
     BROWSE_ANALYSIS: 'v2/companies/:companyId/forms/applications/:applicationId/questions-answers-analysis',
     EDIT_ANALYSIS: 'v2/companies/:companyId/forms/applications/:applicationId/questions-answers-analysis/:analysisId',
+    RISK_NARRATIVE_DIAGNOSTIC:
+      'v2/companies/:companyId/forms/applications/:applicationId/questions-answers/risk-narrative-diagnostic',
+    INDICATORS_NARRATIVE_DIAGNOSTIC:
+      'v2/companies/:companyId/forms/applications/:applicationId/questions-answers/indicators-narrative-diagnostic',
   },
   RISK: {
     PATH: 'v2/companies/:companyId/forms/risks/',
@@ -41,5 +45,8 @@ export const FormRoutes = {
   HIERARCHY_GROUP: {
     PATH: 'v2/companies/:companyId/forms/applications/:applicationId/hierarchy-groups/',
     PATH_ID: 'v2/companies/:companyId/forms/applications/:applicationId/hierarchy-groups/:groupId',
+  },
+  SYSTEM_AI_PROMPT: {
+    PATH: 'v2/system/ai-prompts',
   },
 } as const;
