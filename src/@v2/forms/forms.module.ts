@@ -91,6 +91,7 @@ import { BrowseHierarchyGroupsUseCase } from './application/hierarchy-group/brow
 import { UpsertHierarchyGroupsUseCase } from './application/hierarchy-group/upsert-hierarchy-groups/use-cases/upsert-hierarchy-groups.usecase';
 import { DeleteHierarchyGroupUseCase } from './application/hierarchy-group/delete-hierarchy-group/use-cases/delete-hierarchy-group.usecase';
 import { FormApplicationScopeService } from './application/shared/services/form-application-scope.service';
+import { FormApplicationRiskInventoryStatusService } from './application/shared/services/form-application-risk-inventory-status.service';
 import { SystemAiPromptController } from './application/system-ai-prompt/controllers/system-ai-prompt.controller';
 import { ReadSystemAiPromptUseCase } from './application/system-ai-prompt/read-system-ai-prompt/use-cases/read-system-ai-prompt.usecase';
 import { UpsertSystemAiPromptUseCase } from './application/system-ai-prompt/upsert-system-ai-prompt/use-cases/upsert-system-ai-prompt.usecase';
@@ -192,6 +193,7 @@ import { FormIndicatorsNarrativeDiagnosticRepository } from './database/reposito
     // Services
     FormApplicationCacheService,
     FormApplicationScopeService,
+    FormApplicationRiskInventoryStatusService,
     FormQuestionsAnswersRisksService,
     FormPreliminaryLibraryDAO,
     BrowseFormPreliminaryLibraryQuestionsUseCase,

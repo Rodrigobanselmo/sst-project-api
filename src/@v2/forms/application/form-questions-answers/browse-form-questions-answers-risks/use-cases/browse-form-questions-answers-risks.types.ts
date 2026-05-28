@@ -23,5 +23,6 @@ export namespace IBrowseFormQuestionsAnswersRisksUseCase {
     groupedEntityMap: Record<string, { id: string; name: string; type: string }>;
     hierarchyGroups: Array<{ id: string; name: string; hierarchyIds: string[] }>;
     entityEstablishmentMap: Record<string, string>;
+    inventoryStatusByKey: Record<string, boolean>;
   };
 }

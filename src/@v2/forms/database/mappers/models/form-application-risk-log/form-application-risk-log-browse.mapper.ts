@@ -5,6 +5,7 @@ export type IFormApplicationRiskLogBrowseModelMapper = {
   entity_id: string;
   probability: number;
   risk_id: string;
+  existsInInventory?: boolean;
 };
 
 export class FormApplicationRiskLogBrowseModelMapper {
@@ -13,6 +14,7 @@ export class FormApplicationRiskLogBrowseModelMapper {
       entityId: prisma.entity_id,
       probability: prisma.probability,
       riskId: prisma.risk_id,
+      existsInInventory: prisma.existsInInventory ?? false,
     });
   }
 
