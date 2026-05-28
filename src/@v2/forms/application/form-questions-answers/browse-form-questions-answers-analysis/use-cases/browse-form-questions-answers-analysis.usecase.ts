@@ -1,3 +1,6 @@
+import { FormApplicationRiskInventoryStatusService } from '@/@v2/forms/application/shared/services/form-application-risk-inventory-status.service';
+import { FormApplicationScopeService } from '@/@v2/forms/application/shared/services/form-application-scope.service';
+import { AiRiskAnalysisResponse } from '@/@v2/shared/types/ai-risk-analysis-response.types';
 import { Injectable } from '@nestjs/common';
 import { PrismaServiceV2 } from '../../../../../shared/adapters/database/prisma.service';
 import {
@@ -5,13 +8,13 @@ import {
   FormQuestionsAnswersAnalysisBrowseResultModel,
 } from '../../../../../forms/domain/models/form-questions-answers/form-questions-answers-analysis-browse.model';
 import { IBrowseFormQuestionsAnswersAnalysisUseCase } from './browse-form-questions-answers-analysis.types';
-import { FormApplicationScopeService } from '@/@v2/forms/application/shared/services/form-application-scope.service';
 
 @Injectable()
 export class BrowseFormQuestionsAnswersAnalysisUseCase {
   constructor(
     private readonly prisma: PrismaServiceV2,
     private readonly formApplicationScopeService: FormApplicationScopeService,
+    private readonly formApplicationRiskInventoryStatusService: FormApplicationRiskInventoryStatusService,
   ) {}
 
   async execute(params: IBrowseFormQuestionsAnswersAnalysisUseCase.Params): Promise<FormQuestionsAnswersAnalysisBrowseModel> {
@@ -64,8 +67,23 @@ export class BrowseFormQuestionsAnswersAnalysisUseCase {
         }),
     );
 
+    const analysisInventoryStatus =
+      await this.formApplicationRiskInventoryStatusService.buildAnalysisInventoryStatus(
+        {
+          formApplicationId: params.formApplicationId,
+          accessCompanyId: params.companyId,
+          analyses: analysisResults.map((analysis) => ({
+            id: analysis.id,
+            riskId: analysis.riskId,
+            hierarchyId: analysis.hierarchyId,
+            analysis: analysis.analysis as AiRiskAnalysisResponse | null,
+          })),
+        },
+      );
+
     return new FormQuestionsAnswersAnalysisBrowseModel({
       results,
+      analysisInventoryStatus,
     });
   }
 }
