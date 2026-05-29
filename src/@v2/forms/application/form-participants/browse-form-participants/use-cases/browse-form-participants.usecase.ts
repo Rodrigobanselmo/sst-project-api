@@ -21,6 +21,8 @@ export class BrowseFormParticipantsUseCase {
         applicationId: params.applicationId,
         search: params.search,
         hierarchyIds: params.hierarchyIds,
+        workspaceIds: params.workspaceIds,
+        hasResponded: params.hasResponded,
         onlyWithEmail: params.onlyWithEmail,
       },
       cryptoAdapter: this.cryptoAdapter,

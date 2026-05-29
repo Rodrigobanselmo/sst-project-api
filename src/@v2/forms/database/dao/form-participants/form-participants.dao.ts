@@ -219,6 +219,7 @@ export class FormParticipantsDAO {
         "FormParticipantsAnswers" form_answers ON form_answers."form_application_id" = ${filters.applicationId}
         AND form_answers."employee_id" = emp."id"
         AND form_answers."status" IN ('VALID')
+      ${participantWorkspaceLateralJoin(filters.applicationId)}
       ${gerWhereRawPrisma(whereParams)};
     `;
 
@@ -331,17 +332,48 @@ export class FormParticipantsDAO {
     return where;
   }
 
+  /** Busca textual — ILIKE (não depende da extensão unaccent no Postgres). */
+  private participantSearchWhere(term: string): Prisma.Sql {
+    const pattern = `%${term}%`;
+    const digitsOnly = term.replace(/\D/g, '');
+
+    const conditions: Prisma.Sql[] = [
+      Prisma.sql`COALESCE(emp.name, '') ILIKE ${pattern}`,
+      Prisma.sql`COALESCE(emp."socialName", '') ILIKE ${pattern}`,
+      Prisma.sql`COALESCE(emp.nickname, '') ILIKE ${pattern}`,
+      Prisma.sql`COALESCE(emp.email, '') ILIKE ${pattern}`,
+      Prisma.sql`COALESCE(emp.cpf, '') ILIKE ${pattern}`,
+      Prisma.sql`COALESCE(emp.phone, '') ILIKE ${pattern}`,
+    ];
+
+    if (digitsOnly.length >= 3) {
+      const digitPattern = `%${digitsOnly}%`;
+      conditions.push(
+        Prisma.sql`regexp_replace(COALESCE(emp.cpf, ''), '[^0-9]', '', 'g') ILIKE ${digitPattern}`,
+        Prisma.sql`regexp_replace(COALESCE(emp.phone, ''), '[^0-9]', '', 'g') ILIKE ${digitPattern}`,
+      );
+    }
+
+    return Prisma.sql`(${Prisma.join(conditions, ' OR ')})`;
+  }
+
   private filterWhere(filters: IFormParticipantsDAO.BrowseParams['filters']) {
     const where: Prisma.Sql[] = [];
 
-    if (filters.search) {
-      const search = `%${filters.search}%`;
-      where.push(Prisma.sql`(
-        unaccent(lower(emp.name)) ILIKE unaccent(lower(${search}))
-        OR emp.cpf ILIKE ${search}
-        OR unaccent(lower(emp.email)) ILIKE unaccent(lower(${search}))
-        OR emp.phone ILIKE ${search}
-      )`);
+    if (filters.search?.trim()) {
+      where.push(this.participantSearchWhere(filters.search.trim()));
+    }
+
+    if (filters.workspaceIds && filters.workspaceIds.length > 0) {
+      where.push(
+        Prisma.sql`participant_ws.workspace_id IN (${Prisma.join(filters.workspaceIds)})`,
+      );
+    }
+
+    if (filters.hasResponded === true) {
+      where.push(Prisma.sql`form_answers."id" IS NOT NULL`);
+    } else if (filters.hasResponded === false) {
+      where.push(Prisma.sql`form_answers."id" IS NULL`);
     }
 
     if (filters.participantIds && filters.participantIds.length > 0) {

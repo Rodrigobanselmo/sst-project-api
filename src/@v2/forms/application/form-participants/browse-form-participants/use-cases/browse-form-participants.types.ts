@@ -10,6 +10,8 @@ export namespace IFormParticipantsUseCase {
     orderBy?: IOrderBy<FormParticipantsOrderByEnum>;
     pagination: IPagination;
     hierarchyIds?: string[];
+    workspaceIds?: string[];
+    hasResponded?: boolean;
     onlyWithEmail?: boolean;
   };
 }

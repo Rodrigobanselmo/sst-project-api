@@ -9,10 +9,23 @@ export class BrowseHierarchiesUseCase {
   constructor(private readonly prisma: PrismaServiceV2) {}
 
   async execute(params: IBrowseHierarchiesUseCase.Params) {
+    const defaultTypes = [
+      HierarchyTypeEnum.DIRECTORY,
+      HierarchyTypeEnum.MANAGEMENT,
+      HierarchyTypeEnum.SECTOR,
+      HierarchyTypeEnum.SUB_SECTOR,
+      HierarchyTypeEnum.OFFICE,
+      HierarchyTypeEnum.SUB_OFFICE,
+    ];
+
     return new HierarchyBrowseShortQuery(this.prisma).browseShort({
+      page: params.pagination?.page,
+      limit: params.pagination?.limit,
       filters: {
         companyId: params.companyId,
-        type: [HierarchyTypeEnum.DIRECTORY, HierarchyTypeEnum.MANAGEMENT, HierarchyTypeEnum.SECTOR, HierarchyTypeEnum.SUB_SECTOR, HierarchyTypeEnum.OFFICE],
+        type: params.type?.length ? params.type : defaultTypes,
+        search: params.search,
+        workspaceIds: params.workspaceIds,
       },
     });
   }

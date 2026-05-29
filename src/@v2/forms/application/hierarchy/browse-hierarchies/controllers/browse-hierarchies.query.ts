@@ -9,7 +9,23 @@ export class BrowseHierarchiesQuery {
   @Type(() => String)
   type?: HierarchyTypeEnum[];
 
+  @IsArray()
+  @IsOptional()
+  @IsString({ each: true })
+  @Type(() => String)
+  workspaceIds?: string[];
+
+  @IsString()
+  @IsOptional()
+  search?: string;
+
   @IsString()
   @IsOptional()
   parent?: string;
+
+  @IsOptional()
+  page?: number;
+
+  @IsOptional()
+  limit?: number;
 }

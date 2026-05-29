@@ -1,5 +1,5 @@
-import { Type } from 'class-transformer';
-import { IsArray, IsBoolean, IsEnum, IsInt, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import { IsArray, IsEnum, IsIn, IsInt, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { OrderByDirectionEnum } from '@/@v2/shared/types/order-by.types';
 
 export enum FormParticipantsOrderByEnum {
@@ -33,10 +33,6 @@ class Pagination {
 }
 
 export class BrowseFormParticipantsQuery {
-  @IsString()
-  @IsOptional()
-  search?: string;
-
   @IsOptional()
   @ValidateNested()
   @Type(() => Pagination)
@@ -62,8 +58,18 @@ export class BrowseFormParticipantsQuery {
   @Type(() => String)
   hierarchyIds?: string[];
 
-  @IsBoolean()
+  @IsArray()
   @IsOptional()
-  @Type(() => Boolean)
-  onlyWithEmail?: boolean;
+  @IsString({ each: true })
+  @Type(() => String)
+  workspaceIds?: string[];
+
+  /** Query string only — parsed in controller (evita Boolean("false") === true). */
+  @IsOptional()
+  @IsIn(['true', 'false'])
+  hasResponded?: 'true' | 'false';
+
+  @IsOptional()
+  @IsIn(['true', 'false'])
+  onlyWithEmail?: 'true' | 'false';
 }

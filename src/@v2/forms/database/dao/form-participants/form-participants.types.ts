@@ -12,6 +12,8 @@ export namespace IFormParticipantsDAO {
       applicationId: string;
       search?: string;
       hierarchyIds?: string[];
+      workspaceIds?: string[];
+      hasResponded?: boolean;
       participantIds?: number[];
       onlyWithEmail?: boolean;
       employeeIds?: number[];

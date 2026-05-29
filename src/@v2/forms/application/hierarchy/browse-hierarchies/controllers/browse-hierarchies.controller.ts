@@ -24,6 +24,12 @@ export class BrowseHierarchiesController {
       companyId: path.companyId,
       type: query.type,
       parent: query.parent,
+      search: query.search,
+      workspaceIds: query.workspaceIds,
+      pagination: {
+        page: query.page,
+        limit: query.limit,
+      },
     });
   }
 }

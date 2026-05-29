@@ -5,6 +5,12 @@ export namespace IBrowseHierarchiesUseCase {
     companyId: string;
     type?: HierarchyTypeEnum[];
     parent?: string;
+    search?: string;
+    workspaceIds?: string[];
+    pagination?: {
+      page?: number;
+      limit?: number;
+    };
   };
 
   export type Result = {
