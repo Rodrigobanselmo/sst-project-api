@@ -11,6 +11,7 @@ import { getMatrizRisk } from '@/@v2/shared/domain/functions/security/get-matrix
 import { IAiAnalyzeFormQuestionsRisksUseCase } from './ai-analyze-form-questions-risks.types';
 import { FormQuestionsAnswersRisksService } from '../../shared/services/form-questions-answers-risks.service';
 import { IFormQuestionsAnswersRisksService } from '../../shared/services/form-questions-answers-risks.types';
+import { resolveEffectiveRiskProbability } from '../../shared/utils/resolve-effective-risk-probability.util';
 import { AiRiskAnalysisResponse } from '@/@v2/shared/types/ai-risk-analysis-response.types';
 import { FormAiAnalysisStatusEnum } from '@prisma/client';
 import { LocalContext, UserContext } from '@/@v2/shared/adapters/context';
@@ -439,6 +440,15 @@ export class AiAnalyzeFormQuestionsRisksUseCase {
 
         if (!risk || !availableRisk) return;
 
+        const effective = resolveEffectiveRiskProbability({
+          hierarchyId,
+          riskId,
+          entityRiskMap: formData.entityRiskMap,
+          groupedEntityRiskMap: formData.groupedEntityRiskMap,
+          hierarchyGroups: formData.hierarchyGroups,
+          individualProbabilityFallback: riskSummary.probability,
+        });
+
         // Transform question summaries into detailed question data for AI analysis
         const questions: IAiAnalyzeFormQuestionsRisksUseCase.QuestionData[] = riskSummary.questions.map((questionSummary) => ({
           id: questionSummary.questionId,
@@ -452,7 +462,7 @@ export class AiAnalyzeFormQuestionsRisksUseCase {
           questions.push({
             id: `${hierarchyId}-${riskId}-summary`,
             text: `Perguntas relacionadas ao risco ${risk.name}`,
-            probability: riskSummary.probability,
+            probability: effective.probability,
             values: riskSummary.values,
           });
         }
@@ -464,8 +474,11 @@ export class AiAnalyzeFormQuestionsRisksUseCase {
           riskId,
           riskName: risk.name,
           riskType: risk.type,
-          probability: riskSummary.probability,
+          probability: effective.probability,
           questions,
+          probabilitySource: effective.source,
+          hierarchyGroupId: effective.groupId,
+          hierarchyGroupName: effective.groupName,
         });
       });
     });
@@ -568,12 +581,17 @@ export class AiAnalyzeFormQuestionsRisksUseCase {
   ): Array<{ type: 'text'; text: string }> {
     const content = [];
 
+    const probabilityNote =
+      hierarchyRisk.probabilitySource === 'hierarchy_group' && hierarchyRisk.hierarchyGroupName
+        ? ` (probabilidade oficial calculada pelo agrupamento de setores "${hierarchyRisk.hierarchyGroupName}")`
+        : '';
+
     // Add sector and risk information
     content.push({
       type: 'text' as const,
       text: `SETOR AVALIADO: ${hierarchyRisk.hierarchyName}
 FRPS: ${hierarchyRisk.riskName}
-PROBABILIDADE CALCULADA: ${hierarchyRisk.probability}
+PROBABILIDADE CALCULADA: ${hierarchyRisk.probability}${probabilityNote}
 
 PERGUNTAS RELACIONADAS AO FRPS COM INDICADORES DE RESULTADO:`,
     });

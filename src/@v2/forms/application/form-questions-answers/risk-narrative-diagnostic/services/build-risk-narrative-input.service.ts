@@ -11,6 +11,7 @@ import {
   getSeverityLabel,
 } from '../shared/matrix-risk-label.util';
 import { RiskNarrativeDiagnosticScope } from '../shared/risk-narrative-diagnostic-scope.types';
+import { resolveEffectiveRiskProbability } from '../../shared/utils/resolve-effective-risk-probability.util';
 
 export type RiskNarrativeInputBuildResult = {
   content: Array<{ type: 'text'; text: string }>;
@@ -101,6 +102,7 @@ export class BuildRiskNarrativeInputService {
       probability: number;
       nroLabel: string;
       questionsCount: number;
+      probabilityNote?: string;
     }> = [];
 
     Object.entries(formData.hierarchyRiskMap).forEach(([hierarchyId, risks]) => {
@@ -116,8 +118,20 @@ export class BuildRiskNarrativeInputService {
         const risk = formData.riskMap[riskId];
         if (!risk) return;
 
-        const probability = riskSummary.probability;
+        const effective = resolveEffectiveRiskProbability({
+          hierarchyId,
+          riskId,
+          entityRiskMap: formData.entityRiskMap,
+          groupedEntityRiskMap: formData.groupedEntityRiskMap,
+          hierarchyGroups: formData.hierarchyGroups,
+          individualProbabilityFallback: riskSummary.probability,
+        });
+        const probability = effective.probability;
         const nroLabel = getOccupationalRiskLabel(risk.severity, probability);
+        const probabilityNote =
+          effective.source === 'hierarchy_group' && effective.groupName
+            ? `probabilidade calculada pelo agrupamento ${effective.groupName}`
+            : undefined;
 
         riskSectorRows.push({
           hierarchyId,
@@ -129,6 +143,7 @@ export class BuildRiskNarrativeInputService {
           probability,
           nroLabel,
           questionsCount: riskSummary.questions.length,
+          probabilityNote,
         });
       });
     });
@@ -159,7 +174,7 @@ export class BuildRiskNarrativeInputService {
           `${index + 1}. FRPS: ${row.riskName}`,
           `   Setor: ${row.hierarchyName}`,
           `   Estabelecimento: ${row.establishment}`,
-          `   Probabilidade (oficial): ${getProbabilityLabel(row.probability)} (${row.probability})`,
+          `   Probabilidade (oficial): ${getProbabilityLabel(row.probability)} (${row.probability})${row.probabilityNote ? ` — ${row.probabilityNote}` : ''}`,
           `   Severidade (cadastro FRPS): ${getSeverityLabel(row.severity)} (${row.severity})`,
           `   Risco ocupacional / NRO (oficial): ${row.nroLabel}`,
           `   Perguntas vinculadas no recorte: ${row.questionsCount}`,

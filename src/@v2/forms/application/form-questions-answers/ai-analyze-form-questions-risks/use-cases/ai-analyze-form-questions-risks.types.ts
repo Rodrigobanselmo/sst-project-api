@@ -25,8 +25,11 @@ export namespace IAiAnalyzeFormQuestionsRisksUseCase {
     riskId: string;
     riskName: string;
     riskType: RiskFactorsEnum;
-    probability: number; // Overall probability for this risk in this hierarchy
+    probability: number; // Official probability (grouped when sector belongs to a hierarchy group)
     questions: QuestionData[];
+    probabilitySource?: 'individual' | 'hierarchy_group';
+    hierarchyGroupId?: string;
+    hierarchyGroupName?: string;
   };
 
   export type AvailableRiskData = {
