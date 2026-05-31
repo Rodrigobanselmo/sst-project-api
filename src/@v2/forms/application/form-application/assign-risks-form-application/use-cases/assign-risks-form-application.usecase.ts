@@ -43,14 +43,18 @@ export class AssignRisksFormApplicationUseCase {
           hierarchyId: risk.hierarchyId,
         });
 
-        const riskFactorGroupData = await this.prisma.riskFactorGroupData.findFirst({
+        let riskFactorGroupData = await this.prisma.riskFactorGroupData.findFirst({
           where: {
             companyId: operationalCompanyId,
           },
         });
 
         if (!riskFactorGroupData) {
-          throw new NotFoundException('Risk factor group data not found');
+          riskFactorGroupData = await this.prisma.riskFactorGroupData.create({
+            data: {
+              companyId: operationalCompanyId,
+            },
+          });
         }
 
         await this.upsertRiskDataService.execute({

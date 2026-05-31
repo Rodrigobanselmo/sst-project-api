@@ -17,6 +17,11 @@ type CloneParams = {
   targetCompanyId: string;
   targetWorkspaceId: string;
   hierarchyMap: Map<string, string>;
+  /**
+   * Hierarquias que foram MOVIDAS (id preservado) em vez de clonadas. Para essas, o GHO
+   * tipo HIERARCHY (cujo id == id da hierarquia) também precisa ser MOVIDO, não recriado.
+   */
+  movedHierarchyIds: Set<string>;
 };
 
 /**
@@ -602,6 +607,52 @@ export class WorkspaceOperationalDataCloneService {
         params.hierarchyMap,
       );
       maps.homogeneousGroupMap.set(group.id, newHomoId);
+
+      // GHO tipo HIERARCHY tem id == id da hierarquia. Se a hierarquia foi MOVIDA (id preservado),
+      // recriar o GHO com o mesmo id colidiria com o registro de origem (mesmo PK). Movemos o GHO
+      // no lugar e mantemos os HierarchyOnHomogeneous existentes (já apontam para os ids preservados).
+      if (
+        group.type === HomoTypeEnum.HIERARCHY &&
+        params.movedHierarchyIds.has(group.id)
+      ) {
+        await params.tx.homogeneousGroup.update({
+          where: { id: group.id },
+          data: {
+            companyId: params.targetCompanyId,
+            workspaces: {
+              connect: {
+                id_companyId: {
+                  id: params.targetWorkspaceId,
+                  companyId: params.targetCompanyId,
+                },
+              },
+            },
+          },
+        });
+        counts.homogeneousGroups += 1;
+
+        if (group.characterization) {
+          await params.tx.companyCharacterization.update({
+            where: { id: group.id },
+            data: {
+              companyId: params.targetCompanyId,
+              workspaceId: params.targetWorkspaceId,
+            },
+          });
+          counts.characterizations += 1;
+        }
+        if (group.environment) {
+          await params.tx.companyEnvironment.update({
+            where: { id: group.id },
+            data: {
+              companyId: params.targetCompanyId,
+              workspaceId: params.targetWorkspaceId,
+            },
+          });
+          counts.environments += 1;
+        }
+        return;
+      }
 
       await params.tx.homogeneousGroup.create({
         data: {
@@ -1667,9 +1718,28 @@ export class WorkspaceOperationalDataCloneService {
     maps: OperationalCloneMaps,
   ) {
     for (const oldHomoId of maps.homogeneousGroupMap.keys()) {
+      // GHO tipo HIERARCHY movido (id == hierarquia movida): preservamos o registro e seus
+      // HierarchyOnHomogeneous; apenas removemos o vínculo do workspace de origem.
+      if (params.movedHierarchyIds.has(oldHomoId)) {
+        await params.tx.homogeneousGroup.update({
+          where: { id: oldHomoId },
+          data: {
+            workspaces: {
+              disconnect: {
+                id_companyId: {
+                  id: params.sourceWorkspaceId,
+                  companyId: params.sourceCompanyId,
+                },
+              },
+            },
+          },
+        });
+        continue;
+      }
+
       const homo = await params.tx.homogeneousGroup.findFirst({
         where: { id: oldHomoId },
-        include: { workspaces: { select: { id: true } } },
+        include: { workspaces: { where: { deleted_at: null }, select: { id: true } } },
       });
       if (!homo) continue;
 
@@ -1707,9 +1777,13 @@ export class WorkspaceOperationalDataCloneService {
       }
     }
 
+    // Exclui os GHOs movidos: seus HierarchyOnHomogeneous são os vínculos vivos preservados.
+    const nonMovedHomoIds = [...maps.homogeneousGroupMap.keys()].filter(
+      (id) => !params.movedHierarchyIds.has(id),
+    );
     await params.tx.hierarchyOnHomogeneous.updateMany({
       where: {
-        homogeneousGroupId: { in: [...maps.homogeneousGroupMap.keys()] },
+        homogeneousGroupId: { in: nonMovedHomoIds },
         deletedAt: null,
       },
       data: { deletedAt: new Date() },
