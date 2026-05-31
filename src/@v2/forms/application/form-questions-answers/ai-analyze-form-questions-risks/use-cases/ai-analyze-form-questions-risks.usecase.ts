@@ -12,6 +12,7 @@ import { IAiAnalyzeFormQuestionsRisksUseCase } from './ai-analyze-form-questions
 import { FormQuestionsAnswersRisksService } from '../../shared/services/form-questions-answers-risks.service';
 import { IFormQuestionsAnswersRisksService } from '../../shared/services/form-questions-answers-risks.types';
 import { resolveEffectiveRiskProbability } from '../../shared/utils/resolve-effective-risk-probability.util';
+import { materializeHierarchyGroupRiskPairs } from '../../shared/utils/materialize-hierarchy-group-risk-pairs.util';
 import { AiRiskAnalysisResponse } from '@/@v2/shared/types/ai-risk-analysis-response.types';
 import { FormAiAnalysisStatusEnum } from '@prisma/client';
 import { LocalContext, UserContext } from '@/@v2/shared/adapters/context';
@@ -136,6 +137,27 @@ export class AiAnalyzeFormQuestionsRisksUseCase {
     const MIN_OCCUPATIONAL_RISK_LEVEL = 3;
 
     const availableRisksMap = new Map(availableRisks.map((risk) => [risk.id, risk]));
+
+    const existingPairKeys = new Set(
+      hierarchyRiskData.map((item) =>
+        this.buildPairKey(item.hierarchyId, item.riskId),
+      ),
+    );
+
+    const syntheticPairs = materializeHierarchyGroupRiskPairs({
+      formData,
+      availableRisksMap,
+      existingPairKeys,
+      minOccupationalRiskLevel: MIN_OCCUPATIONAL_RISK_LEVEL,
+    });
+
+    if (syntheticPairs.length > 0) {
+      console.log(
+        `[AI Analysis] Materialized ${syntheticPairs.length} hierarchy-group synthetic pair(s)`,
+      );
+      hierarchyRiskData.push(...syntheticPairs);
+    }
+
     const eligibleHierarchyRiskData = this.filterEligibleHierarchyRiskData(
       hierarchyRiskData,
       availableRisksMap,
