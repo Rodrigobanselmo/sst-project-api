@@ -1,12 +1,20 @@
 import { HierarchyEnum, RiskFactorsEnum } from '@prisma/client';
 import { AiRiskAnalysisResponse } from '../../../../../shared/types/ai-risk-analysis-response.types';
+import {
+  AiAnalyzeFormQuestionsRisksModeEnum,
+  AnalysisQuotas,
+  ExcludedAnalysisItem,
+} from './ai-risk-analysis-merge.helpers';
 
 export namespace IAiAnalyzeFormQuestionsRisksUseCase {
   export type Params = {
     companyId: string;
     formApplicationId: string;
+    mode?: AiAnalyzeFormQuestionsRisksModeEnum;
+    riskId?: string;
+    hierarchyId?: string;
     customPrompt?: string;
-    model?: string; // Optional AI model to use (e.g., 'gpt-4o', 'gpt-4o-mini', 'gpt-3.5-turbo')
+    model?: string;
     /** Resolved server-side; do not send from client. */
     analysisPrompt?: string;
   };
@@ -14,8 +22,8 @@ export namespace IAiAnalyzeFormQuestionsRisksUseCase {
   export type QuestionData = {
     id: string;
     text: string;
-    probability: number; // Calculated probability from answers
-    values: number[]; // All answer values for this question
+    probability: number;
+    values: number[];
   };
 
   export type HierarchyRiskData = {
@@ -25,7 +33,7 @@ export namespace IAiAnalyzeFormQuestionsRisksUseCase {
     riskId: string;
     riskName: string;
     riskType: RiskFactorsEnum;
-    probability: number; // Official probability (grouped when sector belongs to a hierarchy group)
+    probability: number;
     questions: QuestionData[];
     probabilitySource?: 'individual' | 'hierarchy_group';
     hierarchyGroupId?: string;
@@ -49,6 +57,14 @@ export namespace IAiAnalyzeFormQuestionsRisksUseCase {
       id: string;
       name: string;
     }>;
+  };
+
+  export type AnalysisJob = {
+    hierarchyRisk: HierarchyRiskData;
+    existingAnalysis: AiRiskAnalysisResponse | null;
+    existingMetadata: Record<string, unknown>;
+    excludedItems: ExcludedAnalysisItem[];
+    quotas: AnalysisQuotas;
   };
 
   export type HierarchyRiskAnalysis = {
@@ -78,6 +94,10 @@ export namespace IAiAnalyzeFormQuestionsRisksUseCase {
       failedAnalyses?: number;
       analysesQueued?: number;
       analysesSkipped?: number;
+      analysesComplemented?: number;
+      mode?: AiAnalyzeFormQuestionsRisksModeEnum;
+      targetRiskId?: string;
+      targetHierarchyId?: string;
       promptKey?: string;
       promptSource?: string;
       promptLength?: number;

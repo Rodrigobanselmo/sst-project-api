@@ -1,11 +1,24 @@
-import { IsString, IsOptional } from 'class-validator';
+import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { AiAnalyzeFormQuestionsRisksModeEnum } from '../use-cases/ai-risk-analysis-merge.helpers';
 
 export class AiAnalyzeFormQuestionsRisksPayload {
+  @IsEnum(AiAnalyzeFormQuestionsRisksModeEnum)
+  @IsOptional()
+  mode?: AiAnalyzeFormQuestionsRisksModeEnum;
+
+  @IsString()
+  @IsOptional()
+  riskId?: string;
+
+  @IsString()
+  @IsOptional()
+  hierarchyId?: string;
+
   @IsString()
   @IsOptional()
   customPrompt?: string;
 
   @IsString()
   @IsOptional()
-  model?: string; // Optional AI model to use (e.g., 'gpt-4o', 'gpt-4o-mini', 'gpt-3.5-turbo')
+  model?: string;
 }
