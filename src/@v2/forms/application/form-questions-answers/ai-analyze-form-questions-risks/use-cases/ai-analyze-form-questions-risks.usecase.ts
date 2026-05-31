@@ -18,6 +18,16 @@ import { LocalContext, UserContext } from '@/@v2/shared/adapters/context';
 import { ContextKey } from '@/@v2/shared/adapters/context/types/enum/context-key.enum';
 import { SystemAiPromptResolverService } from '@/@v2/forms/application/system-ai-prompt/services/system-ai-prompt-resolver.service';
 import { SystemAiPromptKeyEnum } from '@/@v2/forms/application/system-ai-prompt/constants/system-ai-prompt-key.enum';
+import {
+  AiAnalyzeFormQuestionsRisksModeEnum,
+  buildIncrementalPromptContext,
+  computeAnalysisQuotas,
+  getExcludedItemsFromMetadata,
+  isRecentlyProcessingRecord,
+  mergeAiRiskAnalysis,
+  parseStoredAnalysisResponse,
+  shouldSkipCompleteAnalysis,
+} from './ai-risk-analysis-merge.helpers';
 
 @Injectable()
 export class AiAnalyzeFormQuestionsRisksUseCase {
@@ -68,8 +78,15 @@ export class AiAnalyzeFormQuestionsRisksUseCase {
       hasCustomPromptInRequest: Boolean(params.customPrompt?.trim()),
     });
 
+    const mode =
+      params.mode ?? AiAnalyzeFormQuestionsRisksModeEnum.FULL;
+    const isIncremental =
+      mode === AiAnalyzeFormQuestionsRisksModeEnum.FULL_INCREMENTAL ||
+      mode === AiAnalyzeFormQuestionsRisksModeEnum.TARGET;
+
     const paramsWithPrompt: IAiAnalyzeFormQuestionsRisksUseCase.Params = {
       ...params,
+      mode,
       customPrompt: undefined,
       analysisPrompt,
     };
@@ -119,20 +136,40 @@ export class AiAnalyzeFormQuestionsRisksUseCase {
     const MIN_OCCUPATIONAL_RISK_LEVEL = 3;
 
     const availableRisksMap = new Map(availableRisks.map((risk) => [risk.id, risk]));
-    const eligibleHierarchyRiskData = hierarchyRiskData.filter((item) => {
-      const risk = availableRisksMap.get(item.riskId);
-      if (!risk) return false;
-      if (item.questions.length === 0) return false;
-      if (item.probability === 0) return false;
+    const eligibleHierarchyRiskData = this.filterEligibleHierarchyRiskData(
+      hierarchyRiskData,
+      availableRisksMap,
+      MIN_OCCUPATIONAL_RISK_LEVEL,
+    );
 
-      const nro = getMatrizRisk(risk.severity, item.probability);
-      if (nro < MIN_OCCUPATIONAL_RISK_LEVEL) return false;
+    let scopedEligibleHierarchyRiskData = eligibleHierarchyRiskData;
 
-      return true;
-    });
-    const skippedCount = hierarchyRiskData.length - eligibleHierarchyRiskData.length;
+    if (mode === AiAnalyzeFormQuestionsRisksModeEnum.TARGET) {
+      if (!paramsWithPrompt.riskId || !paramsWithPrompt.hierarchyId) {
+        throw new BadRequestException(
+          'riskId e hierarchyId são obrigatórios para mode TARGET.',
+        );
+      }
 
-    if (eligibleHierarchyRiskData.length === 0) {
+      const targetPair = scopedEligibleHierarchyRiskData.find(
+        (item) =>
+          item.riskId === paramsWithPrompt.riskId &&
+          item.hierarchyId === paramsWithPrompt.hierarchyId,
+      );
+
+      if (!targetPair) {
+        throw new BadRequestException(
+          'Par risco/setor não elegível para análise de IA.',
+        );
+      }
+
+      scopedEligibleHierarchyRiskData = [targetPair];
+    }
+
+    const skippedEligibilityCount =
+      hierarchyRiskData.length - scopedEligibleHierarchyRiskData.length;
+
+    if (scopedEligibleHierarchyRiskData.length === 0) {
       console.warn('[AI Analysis] No eligible hierarchy-risk combinations to analyze', {
         companyId: paramsWithPrompt.companyId,
         formApplicationId: paramsWithPrompt.formApplicationId,
@@ -141,28 +178,83 @@ export class AiAnalyzeFormQuestionsRisksUseCase {
       throw new BadRequestException('No eligible risk data for analysis. Ensure the form has answered questions with non-zero probability.');
     }
 
-    console.log(`[AI Analysis] Eligible: ${eligibleHierarchyRiskData.length} / Skipped: ${skippedCount} / Total: ${hierarchyRiskData.length}`);
+    const existingRecords = await this.prisma.formAiAnalysis.findMany({
+      where: {
+        companyId: paramsWithPrompt.companyId,
+        formApplicationId: paramsWithPrompt.formApplicationId,
+      },
+    });
+    const existingRecordsByKey = new Map(
+      existingRecords.map((record) => [
+        this.buildPairKey(record.hierarchyId, record.riskId),
+        record,
+      ]),
+    );
 
-    // Create processing records in database to track status — only for eligible pairs.
+    const { jobs, analysesSkipped, analysesComplemented } =
+      this.resolveAnalysisJobs({
+        eligibleHierarchyRiskData: scopedEligibleHierarchyRiskData,
+        existingRecordsByKey,
+        isIncremental,
+      });
+
+    const totalSkipped = skippedEligibilityCount + analysesSkipped;
+
+    console.log(
+      `[AI Analysis] Mode=${mode} Eligible=${scopedEligibleHierarchyRiskData.length} Queued=${jobs.length} Skipped=${totalSkipped} Complemented=${analysesComplemented}`,
+    );
+
+    if (jobs.length === 0) {
+      return {
+        analyses: [],
+        totalHierarchies: new Set(
+          scopedEligibleHierarchyRiskData.map((hr) => hr.hierarchyId),
+        ).size,
+        totalRisks: new Set(scopedEligibleHierarchyRiskData.map((hr) => hr.riskId))
+          .size,
+        totalAnalyses: 0,
+        metadata: {
+          companyId: paramsWithPrompt.companyId,
+          formApplicationId: paramsWithPrompt.formApplicationId,
+          timestamp: new Date().toISOString(),
+          model: paramsWithPrompt.model,
+          processingTimeMs: Date.now() - startTime,
+          analysesQueued: 0,
+          analysesSkipped: totalSkipped,
+          analysesComplemented,
+          mode,
+          targetRiskId: paramsWithPrompt.riskId,
+          targetHierarchyId: paramsWithPrompt.hierarchyId,
+          promptKey: SystemAiPromptKeyEnum.RISK_SOURCES_RECOMMENDATIONS,
+          promptSource: resolvedPrompt.source,
+          promptLength: analysisPrompt.length,
+          promptRevision: resolvedPrompt.revision,
+        },
+      };
+    }
+
     try {
-      await this.createProcessingRecords(eligibleHierarchyRiskData, paramsWithPrompt);
-      console.log(`[AI Analysis] Created processing records for ${eligibleHierarchyRiskData.length} analyses`);
+      await this.createProcessingRecords(jobs, paramsWithPrompt, isIncremental);
+      console.log(`[AI Analysis] Created processing records for ${jobs.length} analyses`);
     } catch (error) {
       console.error('[AI Analysis] Failed to create processing records:', error);
       throw new BadRequestException(`Failed to create processing records: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
 
-    // Fire-and-forget: run the heavy AI batch in the background so the HTTP response
-    // returns immediately. The client polls FormAiAnalysis records by status and will
-    // pick up DONE/FAILED as the background work progresses.
-    void this.runAnalysesInBackground(eligibleHierarchyRiskData, availableRisks, paramsWithPrompt).catch((error) => {
+    void this.runAnalysesInBackground(
+      jobs,
+      availableRisks,
+      paramsWithPrompt,
+      isIncremental,
+    ).catch((error) => {
       console.error('[AI Analysis] Background runner unhandled rejection:', error);
     });
 
     return {
       analyses: [],
-      totalHierarchies: new Set(eligibleHierarchyRiskData.map((hr) => hr.hierarchyId)).size,
-      totalRisks: new Set(eligibleHierarchyRiskData.map((hr) => hr.riskId)).size,
+      totalHierarchies: new Set(jobs.map((job) => job.hierarchyRisk.hierarchyId))
+        .size,
+      totalRisks: new Set(jobs.map((job) => job.hierarchyRisk.riskId)).size,
       totalAnalyses: 0,
       metadata: {
         companyId: paramsWithPrompt.companyId,
@@ -170,8 +262,12 @@ export class AiAnalyzeFormQuestionsRisksUseCase {
         timestamp: new Date().toISOString(),
         model: paramsWithPrompt.model,
         processingTimeMs: Date.now() - startTime,
-        analysesQueued: eligibleHierarchyRiskData.length,
-        analysesSkipped: skippedCount,
+        analysesQueued: jobs.length,
+        analysesSkipped: totalSkipped,
+        analysesComplemented,
+        mode,
+        targetRiskId: paramsWithPrompt.riskId,
+        targetHierarchyId: paramsWithPrompt.hierarchyId,
         promptKey: SystemAiPromptKeyEnum.RISK_SOURCES_RECOMMENDATIONS,
         promptSource: resolvedPrompt.source,
         promptLength: analysisPrompt.length,
@@ -180,21 +276,126 @@ export class AiAnalyzeFormQuestionsRisksUseCase {
     };
   }
 
+  private filterEligibleHierarchyRiskData(
+    hierarchyRiskData: IAiAnalyzeFormQuestionsRisksUseCase.HierarchyRiskData[],
+    availableRisksMap: Map<string, IAiAnalyzeFormQuestionsRisksUseCase.AvailableRiskData>,
+    minOccupationalRiskLevel: number,
+  ): IAiAnalyzeFormQuestionsRisksUseCase.HierarchyRiskData[] {
+    return hierarchyRiskData.filter((item) => {
+      const risk = availableRisksMap.get(item.riskId);
+      if (!risk) return false;
+      if (item.questions.length === 0) return false;
+      if (item.probability === 0) return false;
+
+      const nro = getMatrizRisk(risk.severity, item.probability);
+      if (nro < minOccupationalRiskLevel) return false;
+
+      return true;
+    });
+  }
+
+  private buildPairKey(hierarchyId: string, riskId: string): string {
+    return `${hierarchyId}:${riskId}`;
+  }
+
+  private resolveAnalysisJobs(params: {
+    eligibleHierarchyRiskData: IAiAnalyzeFormQuestionsRisksUseCase.HierarchyRiskData[];
+    existingRecordsByKey: Map<
+      string,
+      {
+        status: FormAiAnalysisStatusEnum;
+        analysis: unknown;
+        metadata: unknown;
+        updated_at: Date;
+        created_at: Date;
+      }
+    >;
+    isIncremental: boolean;
+  }): {
+    jobs: IAiAnalyzeFormQuestionsRisksUseCase.AnalysisJob[];
+    analysesSkipped: number;
+    analysesComplemented: number;
+  } {
+    const jobs: IAiAnalyzeFormQuestionsRisksUseCase.AnalysisJob[] = [];
+    let analysesSkipped = 0;
+    let analysesComplemented = 0;
+
+    for (const hierarchyRisk of params.eligibleHierarchyRiskData) {
+      const pairKey = this.buildPairKey(
+        hierarchyRisk.hierarchyId,
+        hierarchyRisk.riskId,
+      );
+      const existingRecord = params.existingRecordsByKey.get(pairKey);
+      const existingMetadata =
+        (existingRecord?.metadata as Record<string, unknown> | null) ?? {};
+      const excludedItems = getExcludedItemsFromMetadata(existingMetadata);
+      const existingAnalysis =
+        existingRecord?.analysis &&
+        existingRecord.status !== FormAiAnalysisStatusEnum.PROCESSING
+          ? parseStoredAnalysisResponse(existingRecord.analysis)
+          : null;
+
+      if (
+        existingRecord &&
+        isRecentlyProcessingRecord({
+          status: existingRecord.status,
+          updatedAt: existingRecord.updated_at,
+          createdAt: existingRecord.created_at,
+        })
+      ) {
+        analysesSkipped += 1;
+        continue;
+      }
+
+      const quotas = computeAnalysisQuotas(existingAnalysis);
+
+      if (params.isIncremental && shouldSkipCompleteAnalysis(quotas)) {
+        analysesSkipped += 1;
+        continue;
+      }
+
+      if (
+        params.isIncremental &&
+        existingAnalysis &&
+        (quotas.missingSources < 4 || quotas.missingRecommendations < 4)
+      ) {
+        analysesComplemented += 1;
+      }
+
+      jobs.push({
+        hierarchyRisk,
+        existingAnalysis,
+        existingMetadata,
+        excludedItems,
+        quotas,
+      });
+    }
+
+    return { jobs, analysesSkipped, analysesComplemented };
+  }
+
   private async runAnalysesInBackground(
-    eligibleHierarchyRiskData: IAiAnalyzeFormQuestionsRisksUseCase.HierarchyRiskData[],
+    jobs: IAiAnalyzeFormQuestionsRisksUseCase.AnalysisJob[],
     availableRisks: IAiAnalyzeFormQuestionsRisksUseCase.AvailableRiskData[],
     params: IAiAnalyzeFormQuestionsRisksUseCase.Params,
+    isIncremental: boolean,
   ): Promise<void> {
     const startTime = Date.now();
 
     try {
       const analyses = await asyncBatch({
-        items: eligibleHierarchyRiskData,
+        items: jobs,
         batchSize: 10,
-        callback: async (hierarchyRisk, batchIndex, chunkIndex) => {
+        callback: async (job, batchIndex, chunkIndex) => {
+          const { hierarchyRisk } = job;
           console.log(`[AI Analysis] Processing batch ${batchIndex}, chunk ${chunkIndex}: ${hierarchyRisk.hierarchyName} - ${hierarchyRisk.riskName}`);
           try {
-            return await this.analyzeHierarchyRisk(hierarchyRisk, availableRisks, params);
+            return await this.analyzeHierarchyRisk(
+              job,
+              availableRisks,
+              params,
+              isIncremental,
+            );
           } catch (error) {
             console.error(`[AI Analysis] Failed to analyze ${hierarchyRisk.hierarchyName} - ${hierarchyRisk.riskName}:`, error);
             return {
@@ -224,7 +425,12 @@ export class AiAnalyzeFormQuestionsRisksUseCase {
 
       if (successfulAnalyses.length > 0) {
         try {
-          await this.storeAnalysesToDatabase(successfulAnalyses, params, processingTimeMs);
+          await this.storeAnalysesToDatabase(
+            successfulAnalyses,
+            params,
+            processingTimeMs,
+            isIncremental,
+          );
         } catch (error) {
           console.error('[AI Analysis] Failed to store analyses to database:', error);
         }
@@ -232,43 +438,53 @@ export class AiAnalyzeFormQuestionsRisksUseCase {
 
       if (failedAnalysesData.length > 0) {
         try {
-          await this.storeFailedAnalysesToDatabase(failedAnalysesData, params);
+          await this.storeFailedAnalysesToDatabase(
+            failedAnalysesData,
+            params,
+            isIncremental,
+          );
         } catch (error) {
           console.error('[AI Analysis] Failed to store failed analyses to database:', error);
         }
       }
 
-      // Safety net: ensure no PROCESSING record is left orphaned. Any eligible pair
-      // that did not produce a result is marked as FAILED so the UI/polling can stop.
-      const resolvedKeys = new Set<string>([...successfulAnalyses.map((a) => `${a.hierarchyId}:${a.riskId}`), ...failedAnalysesData.map((a) => `${a.hierarchyId}:${a.riskId}`)]);
-      const orphanData = eligibleHierarchyRiskData.filter((hr) => !resolvedKeys.has(`${hr.hierarchyId}:${hr.riskId}`));
+      const resolvedKeys = new Set<string>([
+        ...successfulAnalyses.map((a) => `${a.hierarchyId}:${a.riskId}`),
+        ...failedAnalysesData.map((a) => `${a.hierarchyId}:${a.riskId}`),
+      ]);
+      const orphanData = jobs.filter(
+        (job) =>
+          !resolvedKeys.has(
+            `${job.hierarchyRisk.hierarchyId}:${job.hierarchyRisk.riskId}`,
+          ),
+      );
       if (orphanData.length > 0) {
         console.warn(`[AI Analysis] ${orphanData.length} orphan PROCESSING records detected, marking as FAILED`);
         try {
           await this.storeFailedAnalysesToDatabase(
-            orphanData.map((hr) => ({
-              hierarchyId: hr.hierarchyId,
-              riskId: hr.riskId,
+            orphanData.map((job) => ({
+              hierarchyId: job.hierarchyRisk.hierarchyId,
+              riskId: job.hierarchyRisk.riskId,
               error: 'Analysis returned no result',
             })),
             params,
+            isIncremental,
           );
         } catch (error) {
           console.error('[AI Analysis] Failed to mark orphan analyses as FAILED:', error);
         }
       }
     } catch (error) {
-      // Catastrophic batch failure — mark every in-flight PROCESSING record as FAILED so
-      // the UI does not stay stuck in PROCESSING.
       console.error('[AI Analysis] Catastrophic background error, marking all eligible records as FAILED:', error);
       try {
         await this.storeFailedAnalysesToDatabase(
-          eligibleHierarchyRiskData.map((hr) => ({
-            hierarchyId: hr.hierarchyId,
-            riskId: hr.riskId,
+          jobs.map((job) => ({
+            hierarchyId: job.hierarchyRisk.hierarchyId,
+            riskId: job.hierarchyRisk.riskId,
             error: error instanceof Error ? error.message : 'Unknown background error',
           })),
           params,
+          isIncremental,
         );
       } catch (storageError) {
         console.error('[AI Analysis] Failed to mark records as FAILED after catastrophic error:', storageError);
@@ -280,25 +496,46 @@ export class AiAnalyzeFormQuestionsRisksUseCase {
     analyses: IAiAnalyzeFormQuestionsRisksUseCase.HierarchyRiskAnalysis[],
     params: IAiAnalyzeFormQuestionsRisksUseCase.Params,
     processingTimeMs: number,
+    isIncremental: boolean,
   ): Promise<void> {
-    const analysisData = analyses.map((analysis) => ({
-      companyId: params.companyId,
-      formApplicationId: params.formApplicationId,
-      hierarchyId: analysis.hierarchyId,
-      riskId: analysis.riskId,
-      status: FormAiAnalysisStatusEnum.DONE,
-      probability: analysis.probability,
-      confidence: analysis.confidence,
-      analysis: analysis.analysis as any, // Store the AI response as JSON
-      metadata: analysis.metadata || {},
-      model: params.model,
-      processingTimeMs,
-    }));
-
-    // Use upsert to handle potential duplicates (same formApplicationId, hierarchyId, riskId)
     await Promise.all(
-      analysisData.map((data) =>
-        this.prisma.formAiAnalysis.upsert({
+      analyses.map(async (analysis) => {
+        const existingRecord = await this.prisma.formAiAnalysis.findUnique({
+          where: {
+            formApplicationId_hierarchyId_riskId: {
+              formApplicationId: params.formApplicationId,
+              hierarchyId: analysis.hierarchyId,
+              riskId: analysis.riskId,
+            },
+          },
+        });
+        const existingMetadata =
+          (existingRecord?.metadata as Record<string, unknown> | null) ?? {};
+        const preservedExcludedItems = getExcludedItemsFromMetadata(
+          existingMetadata,
+        );
+
+        const data = {
+          companyId: params.companyId,
+          formApplicationId: params.formApplicationId,
+          hierarchyId: analysis.hierarchyId,
+          riskId: analysis.riskId,
+          status: FormAiAnalysisStatusEnum.DONE,
+          probability: analysis.probability,
+          confidence: analysis.confidence,
+          analysis: analysis.analysis as any,
+          metadata: {
+            ...existingMetadata,
+            ...(analysis.metadata || {}),
+            ...(isIncremental
+              ? { excludedItems: preservedExcludedItems }
+              : {}),
+          },
+          model: params.model,
+          processingTimeMs,
+        };
+
+        return this.prisma.formAiAnalysis.upsert({
           where: {
             formApplicationId_hierarchyId_riskId: {
               formApplicationId: data.formApplicationId,
@@ -317,32 +554,50 @@ export class AiAnalyzeFormQuestionsRisksUseCase {
             updated_at: new Date(),
           },
           create: data,
-        }),
-      ),
+        });
+      }),
     );
   }
 
-  private async storeFailedAnalysesToDatabase(failedAnalyses: Array<{ hierarchyId: string; riskId: string; error: string }>, params: IAiAnalyzeFormQuestionsRisksUseCase.Params): Promise<void> {
+  private async storeFailedAnalysesToDatabase(
+    failedAnalyses: Array<{ hierarchyId: string; riskId: string; error: string }>,
+    params: IAiAnalyzeFormQuestionsRisksUseCase.Params,
+    isIncremental: boolean,
+  ): Promise<void> {
     if (failedAnalyses.length === 0) return;
 
-    const failedData = failedAnalyses.map((failed) => ({
-      companyId: params.companyId,
-      formApplicationId: params.formApplicationId,
-      hierarchyId: failed.hierarchyId,
-      riskId: failed.riskId,
-      status: FormAiAnalysisStatusEnum.FAILED,
-      probability: null,
-      confidence: null,
-      analysis: null,
-      metadata: { error: failed.error },
-      model: params.model,
-      processingTimeMs: null,
-    }));
-
-    // Use upsert to handle potential duplicates
     await Promise.all(
-      failedData.map((data) =>
-        this.prisma.formAiAnalysis.upsert({
+      failedAnalyses.map(async (failed) => {
+        const existingRecord = await this.prisma.formAiAnalysis.findUnique({
+          where: {
+            formApplicationId_hierarchyId_riskId: {
+              formApplicationId: params.formApplicationId,
+              hierarchyId: failed.hierarchyId,
+              riskId: failed.riskId,
+            },
+          },
+        });
+        const existingMetadata =
+          (existingRecord?.metadata as Record<string, unknown> | null) ?? {};
+
+        const data = {
+          companyId: params.companyId,
+          formApplicationId: params.formApplicationId,
+          hierarchyId: failed.hierarchyId,
+          riskId: failed.riskId,
+          status: FormAiAnalysisStatusEnum.FAILED,
+          probability: isIncremental ? existingRecord?.probability ?? null : null,
+          confidence: isIncremental ? existingRecord?.confidence ?? null : null,
+          analysis: isIncremental ? existingRecord?.analysis ?? null : null,
+          metadata: {
+            ...existingMetadata,
+            error: failed.error,
+          },
+          model: params.model,
+          processingTimeMs: null,
+        };
+
+        return this.prisma.formAiAnalysis.upsert({
           where: {
             formApplicationId_hierarchyId_riskId: {
               formApplicationId: data.formApplicationId,
@@ -352,34 +607,59 @@ export class AiAnalyzeFormQuestionsRisksUseCase {
           },
           update: {
             status: data.status,
+            ...(isIncremental
+              ? {}
+              : {
+                  probability: null,
+                  confidence: null,
+                  analysis: null,
+                }),
             metadata: data.metadata,
             updated_at: new Date(),
           },
           create: data,
-        }),
-      ),
+        });
+      }),
     );
   }
 
-  private async createProcessingRecords(hierarchyRiskData: Array<{ hierarchyId: string; riskId: string }>, params: IAiAnalyzeFormQuestionsRisksUseCase.Params): Promise<void> {
-    const processingData = hierarchyRiskData.map((hr) => ({
-      companyId: params.companyId,
-      formApplicationId: params.formApplicationId,
-      hierarchyId: hr.hierarchyId,
-      riskId: hr.riskId,
-      status: FormAiAnalysisStatusEnum.PROCESSING,
-      probability: null,
-      confidence: null,
-      analysis: null,
-      metadata: { startedAt: new Date().toISOString() },
-      model: params.model,
-      processingTimeMs: null,
-    }));
-
-    // Use upsert to handle potential existing records
+  private async createProcessingRecords(
+    jobs: IAiAnalyzeFormQuestionsRisksUseCase.AnalysisJob[],
+    params: IAiAnalyzeFormQuestionsRisksUseCase.Params,
+    isIncremental: boolean,
+  ): Promise<void> {
     await Promise.all(
-      processingData.map((data) =>
-        this.prisma.formAiAnalysis.upsert({
+      jobs.map(async (job) => {
+        const existingRecord = await this.prisma.formAiAnalysis.findUnique({
+          where: {
+            formApplicationId_hierarchyId_riskId: {
+              formApplicationId: params.formApplicationId,
+              hierarchyId: job.hierarchyRisk.hierarchyId,
+              riskId: job.hierarchyRisk.riskId,
+            },
+          },
+        });
+        const existingMetadata =
+          (existingRecord?.metadata as Record<string, unknown> | null) ?? {};
+
+        const data = {
+          companyId: params.companyId,
+          formApplicationId: params.formApplicationId,
+          hierarchyId: job.hierarchyRisk.hierarchyId,
+          riskId: job.hierarchyRisk.riskId,
+          status: FormAiAnalysisStatusEnum.PROCESSING,
+          probability: isIncremental ? existingRecord?.probability ?? null : null,
+          confidence: isIncremental ? existingRecord?.confidence ?? null : null,
+          analysis: isIncremental ? existingRecord?.analysis ?? null : null,
+          metadata: {
+            ...existingMetadata,
+            startedAt: new Date().toISOString(),
+          },
+          model: params.model,
+          processingTimeMs: null,
+        };
+
+        return this.prisma.formAiAnalysis.upsert({
           where: {
             formApplicationId_hierarchyId_riskId: {
               formApplicationId: data.formApplicationId,
@@ -389,17 +669,21 @@ export class AiAnalyzeFormQuestionsRisksUseCase {
           },
           update: {
             status: data.status,
-            analysis: null,
-            probability: null,
-            confidence: null,
+            ...(isIncremental
+              ? {}
+              : {
+                  analysis: null,
+                  probability: null,
+                  confidence: null,
+                }),
             metadata: data.metadata,
             model: data.model,
             processingTimeMs: null,
             updated_at: new Date(),
           },
           create: data,
-        }),
-      ),
+        });
+      }),
     );
   }
 
@@ -418,6 +702,21 @@ export class AiAnalyzeFormQuestionsRisksUseCase {
 
     if (params.customPrompt && typeof params.customPrompt !== 'string') {
       throw new BadRequestException('customPrompt must be a string if provided');
+    }
+
+    if (
+      params.mode &&
+      !Object.values(AiAnalyzeFormQuestionsRisksModeEnum).includes(params.mode)
+    ) {
+      throw new BadRequestException('mode inválido.');
+    }
+
+    if (params.mode === AiAnalyzeFormQuestionsRisksModeEnum.TARGET) {
+      if (!params.riskId || !params.hierarchyId) {
+        throw new BadRequestException(
+          'riskId e hierarchyId são obrigatórios para mode TARGET.',
+        );
+      }
     }
   }
 
@@ -487,15 +786,14 @@ export class AiAnalyzeFormQuestionsRisksUseCase {
   }
 
   private async analyzeHierarchyRisk(
-    hierarchyRisk: IAiAnalyzeFormQuestionsRisksUseCase.HierarchyRiskData,
+    job: IAiAnalyzeFormQuestionsRisksUseCase.AnalysisJob,
     availableRisks: IAiAnalyzeFormQuestionsRisksUseCase.AvailableRiskData[],
     params: IAiAnalyzeFormQuestionsRisksUseCase.Params,
+    isIncremental: boolean,
   ): Promise<IAiAnalyzeFormQuestionsRisksUseCase.HierarchyRiskAnalysis> {
+    const hierarchyRisk = job.hierarchyRisk;
     const analysisId = `${hierarchyRisk.hierarchyName}-${hierarchyRisk.riskName}`;
 
-    // Skippable cases are filtered upfront in execute(). These defensive throws ensure
-    // that if a skippable case ever reaches here, it is propagated as a FAILED record
-    // instead of producing a silent null that would leave a PROCESSING orphan.
     try {
       const riskData = availableRisks.find((risk) => risk.id === hierarchyRisk.riskId);
       if (!riskData) {
@@ -510,13 +808,18 @@ export class AiAnalyzeFormQuestionsRisksUseCase {
 
       console.log(`[AI Analysis] Starting analysis for: ${analysisId} (probability: ${hierarchyRisk.probability})`);
 
-      // Build content for AI analysis
       const content = this.buildAnalysisContent(hierarchyRisk, riskData);
+      const incrementalContext = isIncremental
+        ? buildIncrementalPromptContext({
+            existing: job.existingAnalysis,
+            excludedItems: job.excludedItems,
+            quotas: job.quotas,
+          })
+        : '';
+      const prompt = [params.analysisPrompt ?? '', incrementalContext]
+        .filter(Boolean)
+        .join('\n\n');
 
-      // Create the analysis prompt
-      const prompt = params.analysisPrompt ?? '';
-
-      // Call the AI adapter with timeout handling
       const result = await Promise.race([
         this.aiAdapter.analyze({
           content,
@@ -527,7 +830,7 @@ export class AiAnalyzeFormQuestionsRisksUseCase {
             json_schema: {
               name: 'psychosocial_risk_analysis',
               strict: true,
-              schema: this.getResponseSchema(),
+              schema: this.getResponseSchema(job.quotas, isIncremental),
             },
           },
           systemPrompt:
@@ -535,12 +838,19 @@ export class AiAnalyzeFormQuestionsRisksUseCase {
           model: params.model,
         }),
         new Promise<never>(
-          (_, reject) => setTimeout(() => reject(new Error('AI analysis timeout')), 1200000), // 20 minute timeout
+          (_, reject) => setTimeout(() => reject(new Error('AI analysis timeout')), 1200000),
         ),
       ]);
 
-      // Parse the AI response
-      const analysis = this.parseAiResponse(result.analysis, riskData);
+      const parsedAnalysis = this.parseAiResponse(result.analysis, riskData);
+      const analysis = isIncremental
+        ? mergeAiRiskAnalysis({
+            existing: job.existingAnalysis,
+            incoming: parsedAnalysis,
+            excludedItems: job.excludedItems,
+            riskName: hierarchyRisk.riskName,
+          })
+        : parsedAnalysis;
 
       console.log(`[AI Analysis] Completed analysis for: ${analysisId} (confidence: ${result.confidence})`);
 
@@ -555,9 +865,11 @@ export class AiAnalyzeFormQuestionsRisksUseCase {
         confidence: result.confidence,
         questionsAnalyzed: hierarchyRisk.questions.length,
         metadata: {
+          ...job.existingMetadata,
           ...result.metadata,
           analysisId,
           timestamp: new Date().toISOString(),
+          excludedItems: job.excludedItems,
         },
       };
     } catch (error) {
@@ -695,13 +1007,24 @@ INSTRUÇÕES PARA ASSOCIAÇÃO:
   }
 
 
-  private getResponseSchema(): Record<string, any> {
+  private getResponseSchema(
+    quotas?: { missingSources: number; missingRecommendations: number },
+    isIncremental = false,
+  ): Record<string, any> {
+    const maxSources = isIncremental
+      ? Math.max(quotas?.missingSources ?? 4, 0)
+      : 4;
+    const maxRecommendations = isIncremental
+      ? Math.max(quotas?.missingRecommendations ?? 4, 0)
+      : 4;
+
     return {
       type: 'object',
       properties: {
         frps: { type: 'string' },
         fontesGeradoras: {
           type: 'array',
+          maxItems: maxSources,
           items: {
             type: 'object',
             properties: {
@@ -715,6 +1038,7 @@ INSTRUÇÕES PARA ASSOCIAÇÃO:
         },
         medidasEngenhariaRecomendadas: {
           type: 'array',
+          maxItems: maxRecommendations,
           items: {
             type: 'object',
             properties: {
@@ -728,6 +1052,7 @@ INSTRUÇÕES PARA ASSOCIAÇÃO:
         },
         medidasAdministrativasRecomendadas: {
           type: 'array',
+          maxItems: maxRecommendations,
           items: {
             type: 'object',
             properties: {

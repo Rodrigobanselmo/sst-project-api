@@ -24,6 +24,9 @@ export class AiAnalyzeFormQuestionsRisksController {
     const response = await this.aiAnalyzeFormQuestionsRisksUseCase.execute({
       companyId: path.companyId,
       formApplicationId: path.applicationId,
+      mode: body.mode,
+      riskId: body.riskId,
+      hierarchyId: body.hierarchyId,
       customPrompt: body.customPrompt,
       model: body.model,
     });
