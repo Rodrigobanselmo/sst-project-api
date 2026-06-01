@@ -11,6 +11,14 @@ import { RiskGroupDataRepository } from './../../../../../modules/sst/repositori
 import { PrismaService } from '../../../../../prisma/prisma.service';
 import { SyncMissingDerivedMeasureAfterRecMedUpdateService } from '../../rec-med/sync-missing-derived-measure-after-rec-med-update/sync-missing-derived-measure-after-rec-med-update.service';
 import { tryPromoteResidualToCurrentWhenPlanFullyImplemented } from '../../../../../@v2/security/action-plan/database/utils/try-promote-residual-to-current-when-plan-fully-implemented';
+import {
+  findGenerateSourceByNormalizedName,
+  findRecMedByNormalizedName,
+} from '@/shared/utils/normalize-inventory-item-name.util';
+import {
+  buildGenerateSourceCatalogVisibilityWhere,
+  buildRecMedCatalogVisibilityWhere,
+} from '@/shared/utils/risk-catalog-visibility.util';
 
 @Injectable()
 export class UpsertRiskDataService {
@@ -180,17 +188,62 @@ export class UpsertRiskDataService {
       throw new Error('Risk data not found');
     }
 
+    const hasCatalogLookups =
+      (recAddOnly?.length ?? 0) > 0 ||
+      (admsAddOnly?.length ?? 0) > 0 ||
+      (generateSourcesAddOnly?.length ?? 0) > 0 ||
+      (engsAddOnly?.length ?? 0) > 0;
+
+    const riskFactor = hasCatalogLookups
+      ? await this.prisma.riskFactors.findUnique({
+          where: { id: restDto.riskId },
+          select: { type: true },
+        })
+      : null;
+
+    const [generateSourceCandidates, recMedCandidates] = hasCatalogLookups
+      ? await Promise.all([
+          this.prisma.generateSource.findMany({
+            where: buildGenerateSourceCatalogVisibilityWhere({
+              riskId: restDto.riskId,
+              companyId: restDto.companyId,
+            }),
+            select: {
+              id: true,
+              name: true,
+              companyId: true,
+              system: true,
+              status: true,
+            },
+          }),
+          this.prisma.recMed.findMany({
+            where: buildRecMedCatalogVisibilityWhere({
+              riskId: restDto.riskId,
+              companyId: restDto.companyId,
+              riskType: riskFactor?.type,
+            }),
+            select: {
+              id: true,
+              recName: true,
+              medName: true,
+              companyId: true,
+              system: true,
+              medType: true,
+              recType: true,
+              status: true,
+            },
+          }),
+        ])
+      : [[], []];
+
     // Handle recAddOnly
     if (recAddOnly && recAddOnly.length > 0) {
       for (const recData of recAddOnly) {
-        // Find existing RecMed or create new one
-        let recMed = await this.prisma.recMed.findFirst({
-          where: {
-            riskId: restDto.riskId,
-            OR: [{ recName: recData.recName || 'no-id' }, { medName: recData.medName || 'no-id' }],
-            companyId: restDto.companyId,
-          },
-        });
+        let recMed = findRecMedByNormalizedName(
+          recMedCandidates,
+          recData,
+          restDto.companyId,
+        );
 
         if (!recMed) {
           recMed = await this.prisma.recMed.create({
@@ -245,14 +298,11 @@ export class UpsertRiskDataService {
     // Handle admsAddOnly
     if (admsAddOnly && admsAddOnly.length > 0) {
       for (const admData of admsAddOnly) {
-        // Find existing RecMed or create new one
-        let admMed = await this.prisma.recMed.findFirst({
-          where: {
-            riskId: restDto.riskId,
-            OR: [{ recName: admData.recName || 'no-id' }, { medName: admData.medName || 'no-id' }],
-            companyId: restDto.companyId,
-          },
-        });
+        let admMed = findRecMedByNormalizedName(
+          recMedCandidates,
+          admData,
+          restDto.companyId,
+        );
 
         if (!admMed) {
           admMed = await this.prisma.recMed.create({
@@ -298,14 +348,11 @@ export class UpsertRiskDataService {
     // Handle generateSourcesAddOnly
     if (generateSourcesAddOnly && generateSourcesAddOnly.length > 0) {
       for (const sourceData of generateSourcesAddOnly) {
-        // Find existing GenerateSource or create new one
-        let generateSource = await this.prisma.generateSource.findFirst({
-          where: {
-            riskId: restDto.riskId,
-            name: sourceData.name,
-            companyId: restDto.companyId,
-          },
-        });
+        let generateSource = findGenerateSourceByNormalizedName(
+          generateSourceCandidates,
+          sourceData.name,
+          restDto.companyId,
+        );
 
         if (!generateSource) {
           generateSource = await this.prisma.generateSource.create({
@@ -346,14 +393,11 @@ export class UpsertRiskDataService {
     // Handle engsAddOnly
     if (engsAddOnly && engsAddOnly.length > 0) {
       for (const engData of engsAddOnly) {
-        // Find existing RecMed or create new one
-        let recMed = await this.prisma.recMed.findFirst({
-          where: {
-            riskId: restDto.riskId,
-            OR: [{ recName: engData.recName || 'no-id' }, { medName: engData.medName || 'no-id' }],
-            companyId: restDto.companyId,
-          },
-        });
+        let recMed = findRecMedByNormalizedName(
+          recMedCandidates,
+          engData,
+          restDto.companyId,
+        );
 
         if (!recMed) {
           recMed = await this.prisma.recMed.create({

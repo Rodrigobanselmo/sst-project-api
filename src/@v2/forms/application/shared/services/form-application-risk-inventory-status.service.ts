@@ -7,6 +7,17 @@ import {
 } from '@/@v2/forms/domain/models/form-questions-answers/form-questions-answers-analysis-browse.model';
 import { AiRiskAnalysisResponse } from '@/@v2/shared/types/ai-risk-analysis-response.types';
 import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service';
+import {
+  addRecMedCatalogMatchKeysToSet,
+  catalogNameSetHas,
+  inventoryNameSetHas,
+  normalizeInventoryItemName,
+} from '@/shared/utils/normalize-inventory-item-name.util';
+import {
+  buildBatchRecMedCatalogVisibilityWhere,
+  buildBatchRiskCatalogVisibilityWhere,
+  isRiskCatalogRecordVisibleForCompany,
+} from '@/shared/utils/risk-catalog-visibility.util';
 import { Injectable } from '@nestjs/common';
 import { MeasuresTypeEnum, RecTypeEnum } from '@prisma/client';
 
@@ -21,16 +32,24 @@ export type {
   AnalysisInventoryStatusMap,
 };
 
-export function normalizeInventoryItemName(name: string | undefined | null): string {
-  if (!name) return '';
-  return name.trim().replace(/\s+/g, ' ').toLowerCase();
-}
+export { normalizeInventoryItemName } from '@/shared/utils/normalize-inventory-item-name.util';
 
 type AnalysisForItemInventoryStatus = {
   id: string;
   riskId: string;
   hierarchyId: string;
   analysis?: AiRiskAnalysisResponse | null;
+};
+
+/** Catálogo visível (dropdown) + subconjuntos tipados para inventário. */
+type RiskCatalogNameSets = {
+  generateSources: Set<string>;
+  /** RecSelect (`onlyRec`) — qualquer recomendação com recName, independente de recType. */
+  recommendationRecNames: Set<string>;
+  /** MedSelect (`onlyMed`) — medidas com medName. */
+  measureMedNames: Set<string>;
+  engineeringMeasures: Set<string>;
+  administrativeMeasures: Set<string>;
 };
 
 @Injectable()
@@ -292,13 +311,23 @@ export class FormApplicationRiskInventoryStatusService {
     itemName: string;
     inventoryNames?: Set<string>;
     catalogNames?: Set<string>;
+    useRecMedCatalogMatching?: boolean;
   }): AnalysisItemInventoryEntry {
     const normalized = normalizeInventoryItemName(params.itemName);
+    const existsInCatalog =
+      !!normalized &&
+      !!params.catalogNames &&
+      (params.useRecMedCatalogMatching
+        ? catalogNameSetHas(params.catalogNames, params.itemName)
+        : inventoryNameSetHas(params.catalogNames, params.itemName));
+
     return {
       existsInInventory:
-        !!normalized && (params.inventoryNames?.has(normalized) ?? false),
-      existsInCatalog:
-        !!normalized && (params.catalogNames?.has(normalized) ?? false),
+        !!normalized &&
+        (params.inventoryNames
+          ? inventoryNameSetHas(params.inventoryNames, params.itemName)
+          : false),
+      existsInCatalog,
     };
   }
 
@@ -309,11 +338,7 @@ export class FormApplicationRiskInventoryStatusService {
       engineeringMeasures: Set<string>;
       administrativeMeasures: Set<string>;
     };
-    catalogNames?: {
-      generateSources: Set<string>;
-      engineeringMeasures: Set<string>;
-      administrativeMeasures: Set<string>;
-    };
+    catalogNames?: RiskCatalogNameSets;
   }): AnalysisItemInventoryStatus {
     return {
       fontesGeradoras: (params.analysis?.fontesGeradoras ?? []).map((item) =>
@@ -329,7 +354,10 @@ export class FormApplicationRiskInventoryStatusService {
         this.buildItemEntry({
           itemName: item.nome,
           inventoryNames: params.inventoryNames?.engineeringMeasures,
-          catalogNames: params.catalogNames?.engineeringMeasures,
+          catalogNames:
+            params.catalogNames?.measureMedNames ??
+            params.catalogNames?.engineeringMeasures,
+          useRecMedCatalogMatching: true,
         }),
       ),
       medidasAdministrativasRecomendadas: (
@@ -338,7 +366,10 @@ export class FormApplicationRiskInventoryStatusService {
         this.buildItemEntry({
           itemName: item.nome,
           inventoryNames: params.inventoryNames?.administrativeMeasures,
-          catalogNames: params.catalogNames?.administrativeMeasures,
+          catalogNames:
+            params.catalogNames?.recommendationRecNames ??
+            params.catalogNames?.administrativeMeasures,
+          useRecMedCatalogMatching: true,
         }),
       ),
     };
@@ -372,24 +403,8 @@ export class FormApplicationRiskInventoryStatusService {
   private async buildCatalogNamesByRiskCompanyKey(params: {
     analyses: AnalysisForItemInventoryStatus[];
     operationalCompanyByHierarchy: Map<string, string>;
-  }): Promise<
-    Map<
-      string,
-      {
-        generateSources: Set<string>;
-        engineeringMeasures: Set<string>;
-        administrativeMeasures: Set<string>;
-      }
-    >
-  > {
-    const result = new Map<
-      string,
-      {
-        generateSources: Set<string>;
-        engineeringMeasures: Set<string>;
-        administrativeMeasures: Set<string>;
-      }
-    >();
+  }): Promise<Map<string, RiskCatalogNameSets>> {
+    const result = new Map<string, RiskCatalogNameSets>();
 
     const riskCompanyPairs: Array<{ riskId: string; companyId: string }> = [];
     const seenKeys = new Set<string>();
@@ -406,6 +421,8 @@ export class FormApplicationRiskInventoryStatusService {
       riskCompanyPairs.push({ riskId: analysis.riskId, companyId });
       result.set(key, {
         generateSources: new Set<string>(),
+        recommendationRecNames: new Set<string>(),
+        measureMedNames: new Set<string>(),
         engineeringMeasures: new Set<string>(),
         administrativeMeasures: new Set<string>(),
       });
@@ -420,29 +437,74 @@ export class FormApplicationRiskInventoryStatusService {
       ...new Set(riskCompanyPairs.map((pair) => pair.companyId)),
     ];
 
+    const riskTypeRows = await this.prisma.riskFactors.findMany({
+      where: { id: { in: uniqueRiskIds } },
+      select: { id: true, type: true },
+    });
+    const riskTypeById = new Map(riskTypeRows.map((row) => [row.id, row.type]));
+    const uniqueRiskTypes = [
+      ...new Set(riskTypeRows.map((row) => row.type)),
+    ];
+
     const generateSourceRows = await this.prisma.generateSource.findMany({
-      where: {
-        riskId: { in: uniqueRiskIds },
-        companyId: { in: uniqueCompanyIds },
-        deleted_at: null,
+      where: buildBatchRiskCatalogVisibilityWhere({
+        riskIds: uniqueRiskIds,
+        companyIds: uniqueCompanyIds,
+      }),
+      select: {
+        riskId: true,
+        companyId: true,
+        name: true,
+        system: true,
+        company: {
+          select: {
+            applyingServiceContracts: {
+              where: {
+                receivingServiceCompanyId: { in: uniqueCompanyIds },
+                status: 'ACTIVE',
+              },
+              select: { receivingServiceCompanyId: true },
+            },
+          },
+        },
       },
-      select: { riskId: true, companyId: true, name: true },
     });
 
     for (const row of generateSourceRows) {
-      const key = this.buildRiskCompanyKey(row.riskId, row.companyId);
-      const catalog = result.get(key);
-      if (!catalog) continue;
       const normalized = normalizeInventoryItemName(row.name);
-      if (normalized) catalog.generateSources.add(normalized);
+      if (!normalized) continue;
+
+      const contractReceiverCompanyIds =
+        row.company.applyingServiceContracts?.map(
+          (contract) => contract.receivingServiceCompanyId,
+        ) ?? [];
+
+      for (const pair of riskCompanyPairs) {
+        if (pair.riskId !== row.riskId) continue;
+        if (
+          !isRiskCatalogRecordVisibleForCompany(
+            {
+              companyId: row.companyId,
+              system: row.system,
+              contractReceiverCompanyIds,
+            },
+            pair.companyId,
+          )
+        ) {
+          continue;
+        }
+
+        const catalog = result.get(this.buildRiskCompanyKey(pair.riskId, pair.companyId));
+        catalog?.generateSources.add(normalized);
+      }
     }
 
     const recMedRows = await this.prisma.recMed.findMany({
-      where: {
-        riskId: { in: uniqueRiskIds },
-        companyId: { in: uniqueCompanyIds },
-        deleted_at: null,
-      },
+      where: buildBatchRecMedCatalogVisibilityWhere({
+        riskIds: uniqueRiskIds,
+        companyIds: uniqueCompanyIds,
+        riskTypes: uniqueRiskTypes,
+      }),
       select: {
         riskId: true,
         companyId: true,
@@ -450,26 +512,69 @@ export class FormApplicationRiskInventoryStatusService {
         medName: true,
         recType: true,
         medType: true,
+        system: true,
+        risk: { select: { representAll: true, type: true } },
+        company: {
+          select: {
+            applyingServiceContracts: {
+              where: {
+                receivingServiceCompanyId: { in: uniqueCompanyIds },
+                status: 'ACTIVE',
+              },
+              select: { receivingServiceCompanyId: true },
+            },
+          },
+        },
       },
     });
 
     for (const row of recMedRows) {
-      const key = this.buildRiskCompanyKey(row.riskId, row.companyId);
-      const catalog = result.get(key);
-      if (!catalog) continue;
-
       const normalizedNames = this.getRecMedNormalizedNames(row);
       if (normalizedNames.length === 0) continue;
 
-      if (this.isAdministrativeRecMed(row)) {
-        for (const name of normalizedNames) {
-          catalog.administrativeMeasures.add(name);
-        }
-      }
+      const contractReceiverCompanyIds =
+        row.company.applyingServiceContracts?.map(
+          (contract) => contract.receivingServiceCompanyId,
+        ) ?? [];
 
-      if (this.isEngineeringRecMed(row)) {
-        for (const name of normalizedNames) {
-          catalog.engineeringMeasures.add(name);
+      for (const pair of riskCompanyPairs) {
+        const pairRiskType = riskTypeById.get(pair.riskId);
+        const appliesToPairRisk =
+          row.riskId === pair.riskId ||
+          (row.risk.representAll &&
+            pairRiskType != null &&
+            row.risk.type === pairRiskType);
+        if (!appliesToPairRisk) continue;
+
+        if (
+          !isRiskCatalogRecordVisibleForCompany(
+            {
+              companyId: row.companyId,
+              system: row.system,
+              contractReceiverCompanyIds,
+            },
+            pair.companyId,
+          )
+        ) {
+          continue;
+        }
+
+        const catalog = result.get(this.buildRiskCompanyKey(pair.riskId, pair.companyId));
+        if (!catalog) continue;
+
+        addRecMedCatalogMatchKeysToSet(catalog.recommendationRecNames, row.recName);
+        addRecMedCatalogMatchKeysToSet(catalog.measureMedNames, row.medName);
+
+        if (this.isAdministrativeRecMed(row)) {
+          for (const name of normalizedNames) {
+            catalog.administrativeMeasures.add(name);
+          }
+        }
+
+        if (this.isEngineeringRecMed(row)) {
+          for (const name of normalizedNames) {
+            catalog.engineeringMeasures.add(name);
+          }
         }
       }
     }
