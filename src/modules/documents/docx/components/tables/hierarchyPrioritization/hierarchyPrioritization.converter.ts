@@ -74,10 +74,7 @@ export const hierarchyPrioritizationConverter = (
         };
 
         allHierarchyRecord[hierarchy.id] = {
-          homogeneousGroupIds: removeDuplicate(
-            [...hierarchyMap.homogeneousGroupIds, ...hierarchiesData.allHomogeneousGroupIds],
-            { simpleCompare: true },
-          ),
+          homogeneousGroupIds: removeDuplicate([...hierarchyMap.homogeneousGroupIds, ...hierarchiesData.allHomogeneousGroupIds], { simpleCompare: true }),
           name: hierarchy.name,
         };
       }
@@ -101,8 +98,7 @@ export const hierarchyPrioritizationConverter = (
         name = `${riskData.homogeneousGroup.environment?.name}\n(${originRiskMap[riskData.homogeneousGroup.environment.type].name})`;
       }
 
-      if (riskData.homogeneousGroup.characterization)
-        name = `${riskData.homogeneousGroup.characterization.name}\n(${originRiskMap[riskData.homogeneousGroup.characterization.type].name})`;
+      if (riskData.homogeneousGroup.characterization) name = `${riskData.homogeneousGroup.characterization.name}\n(${originRiskMap[riskData.homogeneousGroup.characterization.type].name})`;
 
       //nivel hierarquido da estrtura organizacional
       if (riskData.homogeneousGroup.type == HomoTypeEnum.HIERARCHY) {
@@ -152,12 +148,8 @@ export const hierarchyPrioritizationConverter = (
   const allRisks = Object.values(allRiskRecord);
   const allHierarchy = Object.values(allHierarchyRecord);
 
-  const isLengthGreaterThan50 = allHierarchy.length > 50;
-  const shouldRiskBeInRows = isLengthGreaterThan50;
-
-  // const isLengthGreaterThan50 = allRisks.length > 50 && allHierarchy.length > 50;
-  // const isRiskLengthGreater = allRisks.length > allHierarchy.length;
-  // const shouldRiskBeInRows = isLengthGreaterThan50 || isRiskLengthGreater;
+  // Smart logic: invert rows/columns when risks > 25 AND risks > hierarchy count
+  const shouldRiskBeInRows = allRisks.length > 25 && allRisks.length > allHierarchy.length;
 
   const header: (IHierarchyDataType | IRiskDataMap)[] = shouldRiskBeInRows ? allHierarchy : allRisks;
 
@@ -178,8 +170,7 @@ export const hierarchyPrioritizationConverter = (
 
           const isQuantity = !isHomoString && 'isQuantity' in homogeneousGroup && !!homogeneousGroup.isQuantity;
           const isDataRisk = !isHomoString && 'riskDegree' in homogeneousGroup && homogeneousGroup.riskDegree;
-          const isDataRiskLevel =
-            !isHomoString && 'riskDegreeLevel' in homogeneousGroup && homogeneousGroup.riskDegreeLevel;
+          const isDataRiskLevel = !isHomoString && 'riskDegreeLevel' in homogeneousGroup && homogeneousGroup.riskDegreeLevel;
 
           HomoPositionMap.set(homogeneousGroupId, {
             data: [
@@ -208,10 +199,10 @@ export const hierarchyPrioritizationConverter = (
     };
 
     row.unshift({
-      text: isByGroup ? groupName() : hierarchyMap[hierarchyType].text,
+      text: shouldRiskBeInRows ? 'Riscos' : isByGroup ? groupName() : hierarchyMap[hierarchyType].text,
       position: 0,
       textDirection: undefined,
-      size: row.length < 6 ? 1 : Math.ceil(row.length / 6),
+      size: row.length < 6 ? 1 : row.length < 10 ? 2 : 3,
       borders: borderStyleGlobal(palette.common.white.string),
     });
 

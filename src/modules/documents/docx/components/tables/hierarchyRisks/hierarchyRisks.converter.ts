@@ -57,10 +57,7 @@ export const hierarchyRisksConverter = (
         };
 
         allHierarchyRecord[hierarchy.id] = {
-          homogeneousGroupIds: removeDuplicate(
-            [...hierarchyMap.homogeneousGroupIds, ...hierarchiesData.allHomogeneousGroupIds],
-            { simpleCompare: true },
-          ),
+          homogeneousGroupIds: removeDuplicate([...hierarchyMap.homogeneousGroupIds, ...hierarchiesData.allHomogeneousGroupIds], { simpleCompare: true }),
           name: hierarchy.name,
         };
       }
@@ -86,12 +83,8 @@ export const hierarchyRisksConverter = (
   const allRisks = Object.values(allRiskRecord);
   const allHierarchy = Object.values(allHierarchyRecord);
 
-  const isLengthGreaterThan50 = allHierarchy.length > 50;
-  const shouldRiskBeInRows = isLengthGreaterThan50;
-
-  // const isLengthGreaterThan50 = allRisks.length > 50 && allHierarchy.length > 50;
-  // const isRiskLengthGreater = allRisks.length > allHierarchy.length;
-  // const shouldRiskBeInRows = isLengthGreaterThan50 || isRiskLengthGreater;
+  // Smart logic: invert rows/columns when risks > 25 AND risks > hierarchy count
+  const shouldRiskBeInRows = allRisks.length > 25 && allRisks.length > allHierarchy.length;
 
   const header = shouldRiskBeInRows ? allHierarchy : allRisks;
   const body = shouldRiskBeInRows ? allRisks : allHierarchy;
@@ -117,10 +110,10 @@ export const hierarchyRisksConverter = (
       });
 
     row.unshift({
-      text: hierarchyMap[hierarchyType].text,
+      text: shouldRiskBeInRows ? 'Riscos' : hierarchyMap[hierarchyType].text,
       position: 0,
       textDirection: undefined,
-      size: row.length < 6 ? 1 : Math.ceil(row.length / 6),
+      size: row.length < 6 ? 1 : row.length < 10 ? 2 : 3,
       borders: borderStyleGlobal(palette.common.white.string),
     });
 
