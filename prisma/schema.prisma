@@ -3311,6 +3311,41 @@ enum FormCOPSOQDimensionEnum {
   JUSTICA_E_RESPEITO_ORGANIZACIONAL
 }
 
+enum RiskCatalogKind {
+  GENERATE_SOURCE
+  REC_MED
+}
+
+enum RiskCatalogEquivalenceType {
+  TECHNICAL_DUPLICATE
+  SEMANTIC_ALIAS
+}
+
+/// Equivalência entre itens de catálogo (fonte geradora / RecMed). Alias aponta para canônico.
+model RiskCatalogEquivalence {
+  id              String                       @id @default(uuid())
+  kind            RiskCatalogKind
+  equivalenceType RiskCatalogEquivalenceType
+  riskId          String
+  canonicalId     String
+  aliasId         String
+  canonicalLabel  String
+  aliasLabel      String
+  normalizedKey   String?
+  confirmedById   Int?
+  confirmedAt     DateTime?
+  revokedAt       DateTime?
+  revokeReason    String?
+  metadata        Json?
+  created_at      DateTime                     @default(now())
+  updated_at      DateTime                     @updatedAt
+
+  @@index([kind, riskId, canonicalId])
+  @@index([kind, riskId, aliasId])
+  @@index([kind, riskId, normalizedKey])
+  @@map("risk_catalog_equivalence")
+}
+
 model WorkspaceToCompanyConversionLog {
   id                  String   @id @default(cuid())
   created_at          DateTime @default(now())

@@ -54,7 +54,7 @@ function buildRecMedCompanyCatalogVisibilityOr(
 }
 
 /** Mesmo escopo de risco que `RecMedRepository.find` (riskIds + risco representAll por tipo). */
-function buildRecMedRiskScopeOr(params: {
+export function buildRecMedRiskScopeOr(params: {
   riskId?: string;
   riskIds?: string[];
   riskTypes?: RiskFactorsEnum[];

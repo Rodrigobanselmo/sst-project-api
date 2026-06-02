@@ -129,7 +129,7 @@ export class GenerateSourceRepository implements IGenerateSourceRepository {
 
     const { where } = prismaFilter(whereInit, {
       query,
-      skip: ['search', 'companyId', 'riskIds'],
+      skip: ['search', 'companyId', 'riskIds', 'excludeAliasIds'],
     });
 
     if ('riskIds' in query) {
@@ -161,6 +161,16 @@ export class GenerateSourceRepository implements IGenerateSourceRepository {
 
       (where.AND as any).push({
         OR,
+      } as typeof options.where);
+    }
+
+    if (
+      'excludeAliasIds' in query &&
+      Array.isArray(query.excludeAliasIds) &&
+      query.excludeAliasIds.length
+    ) {
+      (where.AND as any).push({
+        id: { notIn: query.excludeAliasIds as string[] },
       } as typeof options.where);
     }
 

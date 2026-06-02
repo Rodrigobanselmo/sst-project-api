@@ -86,6 +86,7 @@ import { UpdateFormPreliminaryLibraryBlockUseCase } from './application/form-pre
 import { UpdateFormPreliminaryLibraryQuestionUseCase } from './application/form-preliminary-library/update-form-preliminary-library-question/use-cases/update-form-preliminary-library-question.usecase';
 import { FormPreliminaryLibraryDAO } from './database/dao/form-preliminary-library/form-preliminary-library.dao';
 import { SSTModule } from '@/modules/sst/sst.module';
+import { RiskCatalogEquivalenceModule } from '@/shared/risk-catalog-equivalence/risk-catalog-equivalence.module';
 import { HierarchyGroupController } from './application/hierarchy-group/hierarchy-group.controller';
 import { BrowseHierarchyGroupsUseCase } from './application/hierarchy-group/browse-hierarchy-groups/use-cases/browse-hierarchy-groups.usecase';
 import { UpsertHierarchyGroupsUseCase } from './application/hierarchy-group/upsert-hierarchy-groups/use-cases/upsert-hierarchy-groups.usecase';
@@ -109,7 +110,7 @@ import { BuildIndicatorsNarrativeInputService } from './application/form-questio
 import { FormIndicatorsNarrativeDiagnosticRepository } from './database/repositories/form-indicators-narrative-diagnostic/form-indicators-narrative-diagnostic.repository';
 
 @Module({
-  imports: [SharedModule, SSTModule, CacheModule.register()],
+  imports: [SharedModule, SSTModule, RiskCatalogEquivalenceModule, CacheModule.register()],
   controllers: [
     ReadFormController,
     DuplicateFormController,

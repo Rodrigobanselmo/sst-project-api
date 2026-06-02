@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { HomoTypeEnum } from '@prisma/client';
+import { HomoTypeEnum, RiskCatalogKind } from '@prisma/client';
 
 import { HierarchyRepository } from '../../../../company/repositories/implementations/HierarchyRepository';
 import { HomoGroupRepository } from '../../../../company/repositories/implementations/HomoGroupRepository';
@@ -15,6 +15,11 @@ import {
   findGenerateSourceByNormalizedName,
   findRecMedByNormalizedName,
 } from '@/shared/utils/normalize-inventory-item-name.util';
+import { RiskCatalogEquivalenceService } from '@/shared/risk-catalog-equivalence/risk-catalog-equivalence.service';
+import {
+  resolveGenerateSourceEntityToCanonical,
+  resolveRecMedEntityToCanonical,
+} from '@/shared/risk-catalog-equivalence/risk-catalog-equivalence-resolve.helper';
 import {
   buildGenerateSourceCatalogVisibilityWhere,
   buildRecMedCatalogVisibilityWhere,
@@ -31,6 +36,7 @@ export class UpsertRiskDataService {
     private readonly checkEmployeeExamService: CheckEmployeeExamService,
     private readonly prisma: PrismaService,
     private readonly syncMissingDerivedMeasureAfterRecMedUpdate: SyncMissingDerivedMeasureAfterRecMedUpdateService,
+    private readonly riskCatalogEquivalenceService: RiskCatalogEquivalenceService,
   ) {}
 
   /**
@@ -236,6 +242,19 @@ export class UpsertRiskDataService {
         ])
       : [[], []];
 
+    const [generateSourceAliasMap, recMedAliasMap] = hasCatalogLookups
+      ? await Promise.all([
+          this.riskCatalogEquivalenceService.buildCanonicalCatalogMap(
+            RiskCatalogKind.GENERATE_SOURCE,
+            restDto.riskId,
+          ),
+          this.riskCatalogEquivalenceService.buildCanonicalCatalogMap(
+            RiskCatalogKind.REC_MED,
+            restDto.riskId,
+          ),
+        ])
+      : [new Map<string, string>(), new Map<string, string>()];
+
     // Handle recAddOnly
     if (recAddOnly && recAddOnly.length > 0) {
       for (const recData of recAddOnly) {
@@ -269,6 +288,13 @@ export class UpsertRiskDataService {
             },
           });
         }
+
+        recMed = await resolveRecMedEntityToCanonical(
+          this.prisma,
+          this.riskCatalogEquivalenceService,
+          recMed,
+          recMedAliasMap,
+        );
 
         // Connect to risk data if not already connected
         const existingConnection = await this.prisma.recMedOnRiskData.findUnique({
@@ -329,6 +355,13 @@ export class UpsertRiskDataService {
           });
         }
 
+        admMed = await resolveRecMedEntityToCanonical(
+          this.prisma,
+          this.riskCatalogEquivalenceService,
+          admMed,
+          recMedAliasMap,
+        );
+
         // Check if already connected as adm
         const isAlreadyConnected = existingRiskData.adms.some((adm) => adm.id === admMed.id);
 
@@ -373,6 +406,13 @@ export class UpsertRiskDataService {
             },
           });
         }
+
+        generateSource = await resolveGenerateSourceEntityToCanonical(
+          this.prisma,
+          this.riskCatalogEquivalenceService,
+          generateSource,
+          generateSourceAliasMap,
+        );
 
         // Check if already connected to risk data
         const isAlreadyConnected = existingRiskData.generateSources.some((gs) => gs.id === generateSource.id);
@@ -423,6 +463,13 @@ export class UpsertRiskDataService {
             },
           });
         }
+
+        recMed = await resolveRecMedEntityToCanonical(
+          this.prisma,
+          this.riskCatalogEquivalenceService,
+          recMed,
+          recMedAliasMap,
+        );
 
         // Check if already connected to risk data as engineering measure
         const existingConnection = await this.prisma.engsToRiskFactorData.findUnique({
@@ -499,6 +546,7 @@ export class UpsertRiskDataService {
       }
     }
   }
+
 }
 
 export const hierarchyCreateHomo = async ({

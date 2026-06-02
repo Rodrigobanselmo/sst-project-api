@@ -28,6 +28,7 @@ import { TaskModule } from './@v2/task/task.module';
 import { CommunicationModule } from './@v2/communications/comunication.module';
 import { UploadModule } from './@v2/import/upload/upload.module';
 import { AiChatModule } from './@v2/ai-chat/ai-chat.module';
+import { RiskCatalogModule } from './@v2/risk-catalog/risk-catalog.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { AiChatModule } from './@v2/ai-chat/ai-chat.module';
     CommunicationModule,
     UploadModule,
     AiChatModule,
+    RiskCatalogModule,
   ],
   providers: [
     {

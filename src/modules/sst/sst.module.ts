@@ -103,6 +103,7 @@ import { ReloadEmployeeExamTimeService } from './services/exam/reload-employee-e
 import { DeleteExamToClinicService } from './services/examToClinic/delete-exam-to-clinic/find-exam-to-clinic.service';
 import { DeleteSoftExamRiskService } from './services/examToRisk/delete-soft-exam-risk/delete-soft-exam-risk.service';
 import { CacheModule } from '@nestjs/cache-manager';
+import { RiskCatalogEquivalenceModule } from '@/shared/risk-catalog-equivalence/risk-catalog-equivalence.module';
 
 @Module({
   controllers: [
@@ -231,7 +232,12 @@ import { CacheModule } from '@nestjs/cache-manager';
     ReloadEmployeeExamTimeService,
     ProtocolToRiskRepository,
     UpsertRiskDataService,
+    RiskCatalogEquivalenceModule,
   ],
-  imports: [forwardRef(() => CompanyModule), CacheModule.register()],
+  imports: [
+    forwardRef(() => CompanyModule),
+    CacheModule.register(),
+    RiskCatalogEquivalenceModule,
+  ],
 })
 export class SSTModule {}

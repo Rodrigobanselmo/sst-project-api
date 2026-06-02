@@ -18,8 +18,10 @@ import {
   buildBatchRiskCatalogVisibilityWhere,
   isRiskCatalogRecordVisibleForCompany,
 } from '@/shared/utils/risk-catalog-visibility.util';
+import { enrichCatalogNameSetsWithEquivalences } from '@/shared/risk-catalog-equivalence/risk-catalog-equivalence.util';
+import { RiskCatalogEquivalenceService } from '@/shared/risk-catalog-equivalence/risk-catalog-equivalence.service';
 import { Injectable } from '@nestjs/common';
-import { MeasuresTypeEnum, RecTypeEnum } from '@prisma/client';
+import { MeasuresTypeEnum, RecTypeEnum, RiskCatalogKind } from '@prisma/client';
 
 export type RiskInventoryPair = {
   riskId: string;
@@ -57,6 +59,7 @@ export class FormApplicationRiskInventoryStatusService {
   constructor(
     private readonly prisma: PrismaServiceV2,
     private readonly formApplicationScopeService: FormApplicationScopeService,
+    private readonly riskCatalogEquivalenceService: RiskCatalogEquivalenceService,
   ) {}
 
   buildStatusKey(riskId: string, hierarchyId: string): string {
@@ -579,7 +582,46 @@ export class FormApplicationRiskInventoryStatusService {
       }
     }
 
+    const [generateSourceEquivalences, recMedEquivalences] = await Promise.all([
+      this.riskCatalogEquivalenceService.findActiveByRiskIds(
+        RiskCatalogKind.GENERATE_SOURCE,
+        uniqueRiskIds,
+      ),
+      this.riskCatalogEquivalenceService.findActiveByRiskIds(
+        RiskCatalogKind.REC_MED,
+        uniqueRiskIds,
+      ),
+    ]);
+
+    const gsEquivalencesByRiskId = this.groupEquivalencesByRiskId(
+      generateSourceEquivalences,
+    );
+    const recEquivalencesByRiskId = this.groupEquivalencesByRiskId(recMedEquivalences);
+
+    for (const pair of riskCompanyPairs) {
+      const catalog = result.get(this.buildRiskCompanyKey(pair.riskId, pair.companyId));
+      if (!catalog) continue;
+
+      const equivalences = [
+        ...(gsEquivalencesByRiskId.get(pair.riskId) ?? []),
+        ...(recEquivalencesByRiskId.get(pair.riskId) ?? []),
+      ];
+      enrichCatalogNameSetsWithEquivalences(catalog, equivalences);
+    }
+
     return result;
+  }
+
+  private groupEquivalencesByRiskId<T extends { riskId: string }>(
+    rows: T[],
+  ): Map<string, T[]> {
+    const map = new Map<string, T[]>();
+    for (const row of rows) {
+      const list = map.get(row.riskId) ?? [];
+      list.push(row);
+      map.set(row.riskId, list);
+    }
+    return map;
   }
 
   private async buildInventoryNamesByRiskDataId(riskFactorDataIds: string[]) {
