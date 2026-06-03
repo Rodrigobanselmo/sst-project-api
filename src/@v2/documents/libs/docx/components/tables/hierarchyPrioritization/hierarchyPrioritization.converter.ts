@@ -6,11 +6,12 @@ import { removeDuplicate } from '@/@v2/shared/utils/helpers/remove-duplicate';
 import { sortNumber } from '@/@v2/shared/utils/sorts/number.sort';
 import { sortString } from '@/@v2/shared/utils/sorts/string.sort';
 import { riskMap } from '@/modules/documents/constants/risks.constant';
-import { originRiskMap } from '@/shared/constants/maps/origin-risk';
+import { originRiskMap } from '../../../constants/origin-risk';
 import { borderStyleGlobal } from '../../../base/config/styles';
 import { matrixRiskMap } from '../../../constants/matriz-risk-map';
 import { palette } from '../../../constants/palette';
 import { IHierarchyData, IHierarchyMap, IRiskGroupDataConverter } from '../../../converter/hierarchy.converter';
+import { getRiskTypeDocumentCode } from '@/modules/documents/docx/utils/risk-type-display-label.util';
 import { hierarchyMap } from '../appr/parts/first/first.constant';
 import { bodyTableProps } from './elements/body';
 import { headerTableProps } from './elements/header';
@@ -140,7 +141,7 @@ export const hierarchyPrioritizationConverter = (
 
       allRiskRecord[riskData.risk.id] = {
         ...hasRisk,
-        name: `(${riskData.risk?.type}) ${riskData.risk.name}`,
+        name: `(${getRiskTypeDocumentCode(riskData.risk)}) ${riskData.risk.name}`,
         type: riskData.risk?.type,
         homogeneousGroupIds: [...hasRisk.homogeneousGroupIds, dataRisk],
       };
@@ -195,7 +196,7 @@ export const hierarchyPrioritizationConverter = (
 
     const groupName = () => {
       if (!homoType) return 'GSE';
-      if (homoType === 'HIERARCHY') return 'Nível Hierarquico';
+      if (homoType === 'HIERARCHY') return 'Nível Hierárquico';
       if (homoType === 'ENVIRONMENT') return 'Ambiente';
       return 'Mão de Obra';
     };

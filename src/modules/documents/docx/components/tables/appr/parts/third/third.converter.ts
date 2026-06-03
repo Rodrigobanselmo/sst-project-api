@@ -14,7 +14,7 @@ import {
   thirdRiskInventoryColumnWidth,
   thirdRiskInventoryVerticalColumns,
 } from './third.constant';
-import { originRiskMap } from '../../../../../../../../shared/constants/maps/origin-risk';
+import { originRiskMap } from '../../../../../constants/origin-risk';
 import { sortString } from '../../../../../../../../shared/utils/sorts/string.sort';
 import { RiskFactorDataEntity } from 'src/modules/sst/entities/riskData.entity';
 import { shouldHideRecommendationInPgr } from '../../../../../utils/pgr-recommendation-document-visibility';

@@ -106,7 +106,7 @@ export const hierarchyRisksTableAllSections = (
   const table4 = convertToDocx([
     {
       type: DocumentSectionChildrenTypeEnum.PARAGRAPH_TABLE,
-      text: 'Relação de Fatores de Risco e Perigos por Sub Setores da Empresa',
+      text: 'Relação de Fatores de Risco e Perigos por Subsetores da Empresa',
     },
     {
       type: DocumentSectionChildrenTypeEnum.BREAK,

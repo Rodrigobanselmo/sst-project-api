@@ -13,6 +13,7 @@ import { IEntityRange, IInlineStyleRange, InlineStyleTypeEnum } from '../../buil
 import { isOdd } from '../../../../../shared/utils/isOdd';
 import { rgbStringToHex } from '../../../../../shared/utils/rgbToHex';
 import { lineHeightToDocxLineSpacing } from '../utils/line-height-docx.util';
+import { normalizeDocxTableCaptionText } from '../../utils/docx-table-caption-text.util';
 
 interface ParagraphProps extends IParagraphOptions {
   break?: boolean;
@@ -310,7 +311,7 @@ export const textLink = (text: string, options = {} as ParagraphProps) => {
 };
 
 export const paragraphTable = (text: string, options = {} as ParagraphProps) =>
-  paragraphNewNormal(text, {
+  paragraphNewNormal(normalizeDocxTableCaptionText(text), {
     ...options,
     children: [
       new TextRun({

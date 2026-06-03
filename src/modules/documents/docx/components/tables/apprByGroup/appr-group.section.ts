@@ -6,7 +6,7 @@ import { ISectionOptions } from 'docx';
 import { removeDuplicate } from '../../../../../../shared/utils/removeDuplicate';
 
 import { sectionLandscapeRiskInventoryAnnexProperties } from '../../../base/config/styles';
-import { originRiskMap } from '../../../../../../shared/constants/maps/origin-risk';
+import { originRiskMap } from '../../../constants/origin-risk';
 import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
 import { HomoGroupEntity } from '../../../../../company/entities/homoGroup.entity';
 import { HierarchyMapData, IHierarchyData, IHierarchyMap, IHomoGroupMap } from '../../../converter/hierarchy.converter';

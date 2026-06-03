@@ -95,6 +95,11 @@ export class RiskGroupDataRepository {
             engsToRiskFactorData: { include: { recMed: true } },
             riskFactor: {
               include: {
+                subTypes: {
+                  include: {
+                    sub_type: true,
+                  },
+                },
                 docInfo: {
                   where: {
                     OR: [
@@ -226,6 +231,11 @@ export class RiskGroupDataRepository {
             engsToRiskFactorData: { include: { recMed: true } },
             riskFactor: {
               include: {
+                subTypes: {
+                  include: {
+                    sub_type: true,
+                  },
+                },
                 docInfo: {
                   where: {
                     OR: [

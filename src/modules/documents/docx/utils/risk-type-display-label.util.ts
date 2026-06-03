@@ -15,14 +15,22 @@ export type RiskTypeDisplayInput = {
   subTypes?: { sub_type?: { name?: string } }[];
 };
 
-/** Rótulo da coluna Tipo no inventário (ex.: ERG-PSIC em vez de Ergonômico genérico). */
-export function getRiskTypeDisplayLabel(risk: RiskTypeDisplayInput): string {
+/** Código exibido entre parênteses nas matrizes DOCX (ex.: ERG-PSIC ou ERG). */
+export function getRiskTypeDocumentCode(risk: RiskTypeDisplayInput): string {
   for (const subtypeName of Object.keys(SUBTYPE_LABEL_SUFFIX_BY_NAME)) {
     if (risk.subTypes?.some((s) => s?.sub_type?.name === subtypeName)) {
       const suffix = SUBTYPE_LABEL_SUFFIX_BY_NAME[subtypeName];
       return risk.type === RiskFactorsEnum.ERG ? `ERG-${suffix}` : suffix;
     }
   }
+
+  return String(risk.type);
+}
+
+/** Rótulo da coluna Tipo no inventário (ex.: ERG-PSIC em vez de Ergonômico genérico). */
+export function getRiskTypeDisplayLabel(risk: RiskTypeDisplayInput): string {
+  const code = getRiskTypeDocumentCode(risk);
+  if (code !== String(risk.type)) return code;
 
   return riskMap[risk.type as keyof typeof riskMap]?.label ?? '';
 }

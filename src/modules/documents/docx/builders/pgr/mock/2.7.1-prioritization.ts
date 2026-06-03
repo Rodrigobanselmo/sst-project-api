@@ -58,7 +58,7 @@ export const prioritization2Section: IDocumentPGRSectionGroup = {
       children: [
         {
           type: DocumentSectionChildrenTypeEnum.PARAGRAPH_TABLE,
-          text: 'Resumo Avaliação Qualitativa/Quantitativa por Fatores de Riscos/Perigos Atrelados diretamente a um nível hierarquico do organograma da empresa – Risco Ocupacional',
+          text: 'Resumo Avaliação Qualitativa/Quantitativa por Fatores de Riscos/Perigos Atrelados diretamente a um nível hierárquico do organograma da empresa – Risco Ocupacional',
         },
         {
           type: DocumentSectionChildrenTypeEnum.TABLE_PRIORITIZATION_HIERARCHY,

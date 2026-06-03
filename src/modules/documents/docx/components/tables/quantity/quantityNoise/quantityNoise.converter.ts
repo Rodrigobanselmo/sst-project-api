@@ -4,7 +4,7 @@ import { HomoTypeEnum } from '@prisma/client';
 
 import { palette } from '../../../../../../../shared/constants/palette';
 import { sortData } from '../../../../../../../shared/utils/sorts/data.sort';
-import { originRiskMap } from './../../../../../../../shared/constants/maps/origin-risk';
+import { originRiskMap } from '../../../../constants/origin-risk';
 import { getMatrizRisk } from './../../../../../../../shared/utils/matriz';
 import { RiskFactorGroupDataEntity } from '../../../../../../sst/entities/riskGroupData.entity';
 import { borderStyleGlobal } from './../../../../base/config/styles';

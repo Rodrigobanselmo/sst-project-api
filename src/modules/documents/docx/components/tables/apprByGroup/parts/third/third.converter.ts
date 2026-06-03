@@ -16,7 +16,7 @@ import {
   thirdRiskInventoryColumnWidth,
   thirdRiskInventoryVerticalColumns,
 } from '../../../appr/parts/third/third.constant';
-import { originRiskMap } from '../../../../../../../../shared/constants/maps/origin-risk';
+import { originRiskMap } from '../../../../../constants/origin-risk';
 import { sortString } from '../../../../../../../../shared/utils/sorts/string.sort';
 import { isRiskValidForHierarchyData } from '../../../appr/parts/third/third.converter';
 import { shouldHideRecommendationInPgr } from '../../../../../utils/pgr-recommendation-document-visibility';

@@ -12,6 +12,7 @@ import { hierarchyMap } from '../appr/parts/first/first.constant';
 import { bodyTableProps } from './elements/body';
 import { headerTableProps } from './elements/header';
 import { filterRisk } from '../../../../../..//shared/utils/filterRisk';
+import { getRiskTypeDocumentCode } from '../../../utils/risk-type-display-label.util';
 
 export interface IHierarchyRiskOptions {
   hierarchyType?: HierarchyEnum;
@@ -73,7 +74,7 @@ export const hierarchyRisksConverter = (
       };
 
       allRiskRecord[riskData.riskId] = {
-        name: `(${riskData.riskFactor?.type}) ${riskData.riskFactor.name}`,
+        name: `(${getRiskTypeDocumentCode(riskData.riskFactor)}) ${riskData.riskFactor.name}`,
         type: riskData.riskFactor?.type,
         homogeneousGroupIds: [...hasRisk.homogeneousGroupIds, riskData.homogeneousGroupId],
       };

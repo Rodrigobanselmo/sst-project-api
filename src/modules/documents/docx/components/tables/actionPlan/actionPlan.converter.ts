@@ -11,7 +11,7 @@ import { getMatrizRisk } from '../../../../../../shared/utils/matriz';
 import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
 import { borderStyleGlobal } from '../../../base/config/styles';
 import { IHierarchyMap } from '../../../converter/hierarchy.converter';
-import { originRiskMap } from './../../../../../../shared/constants/maps/origin-risk';
+import { originRiskMap } from '../../../constants/origin-risk';
 import { ActionPlanColumnEnum } from './actionPlan.constant';
 import { bodyTableProps } from './elements/body';
 

@@ -1,6 +1,6 @@
 import { sortNumber } from './../../../../../../shared/utils/sorts/number.sort';
 import { riskMap } from './../../../../constants/risks.constant';
-import { originRiskMap } from './../../../../../../shared/constants/maps/origin-risk';
+import { originRiskMap } from '../../../constants/origin-risk';
 import { HierarchyEnum, HomoTypeEnum, RiskFactorsEnum } from '@prisma/client';
 
 import { palette } from '../../../../../../shared/constants/palette';
@@ -9,6 +9,7 @@ import { sortString } from '../../../../../../shared/utils/sorts/string.sort';
 import { RiskFactorGroupDataEntity } from '../../../../../sst/entities/riskGroupData.entity';
 import { getMatrizRisk } from '../../../../../../shared/utils/matriz';
 import { IHierarchyData, IHierarchyMap } from '../../../converter/hierarchy.converter';
+import { getRiskTypeDocumentCode } from '../../../utils/risk-type-display-label.util';
 import { hierarchyMap } from '../appr/parts/first/first.constant';
 import { bodyTableProps } from './elements/body';
 import { headerTableProps } from './elements/header';
@@ -138,7 +139,7 @@ export const hierarchyPrioritizationConverter = (
 
       allRiskRecord[riskData.riskId] = {
         ...hasRisk,
-        name: `(${riskData.riskFactor?.type}) ${riskData.riskFactor.name}`,
+        name: `(${getRiskTypeDocumentCode(riskData.riskFactor)}) ${riskData.riskFactor.name}`,
         type: riskData.riskFactor?.type,
         homogeneousGroupIds: [...hasRisk.homogeneousGroupIds, dataRisk],
       };
@@ -193,7 +194,7 @@ export const hierarchyPrioritizationConverter = (
 
     const groupName = () => {
       if (!homoType) return 'GSE';
-      if (homoType === 'HIERARCHY') return 'Nível Hierarquico';
+      if (homoType === 'HIERARCHY') return 'Nível Hierárquico';
       if (homoType === 'ENVIRONMENT') return 'Ambiente';
       return 'Mão de Obra';
     };

@@ -32,7 +32,7 @@ export const hierarchyPrioritizationPage = (
         ...convertToDocx([
           {
             type: DocumentSectionChildrenTypeEnum.LEGEND,
-            text: '**Lengenda**',
+            text: '**Legenda**',
             spacing: { after: 0 },
           },
         ]),

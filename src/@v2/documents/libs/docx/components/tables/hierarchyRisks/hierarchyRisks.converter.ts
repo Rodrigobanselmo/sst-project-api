@@ -8,6 +8,7 @@ import { borderStyleGlobal } from '../../../base/config/styles';
 import { palette } from '../../../constants/palette';
 import { riskMap } from '../../../constants/risks-map';
 import { IHierarchyData, IHierarchyMap, IRiskGroupDataConverter } from '../../../converter/hierarchy.converter';
+import { getRiskTypeDocumentCode } from '@/modules/documents/docx/utils/risk-type-display-label.util';
 import { hierarchyMap } from '../appr/parts/first/first.constant';
 import { bodyTableProps } from './elements/body';
 import { headerTableProps } from './elements/header';
@@ -71,7 +72,7 @@ export const hierarchyRisksConverter = (
       };
 
       allRiskRecord[riskData.risk.id] = {
-        name: `(${riskData.risk.type}) ${riskData.risk.name}`,
+        name: `(${getRiskTypeDocumentCode(riskData.risk)}) ${riskData.risk.name}`,
         type: riskData.risk.type,
         homogeneousGroupIds: [...hasRisk.homogeneousGroupIds, homogeneousGroup.gho.id],
       };

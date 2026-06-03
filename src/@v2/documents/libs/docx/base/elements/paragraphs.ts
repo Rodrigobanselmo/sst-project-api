@@ -4,6 +4,7 @@ import { InlineStyleTypeEnum } from '@/@v2/documents/domain/enums/inline-style-t
 import { rgbToHex } from '../../helpers/rgb-to-regex';
 import { isOdd } from '@/@v2/shared/utils/helpers/is-odd';
 import { lineHeightToDocxLineSpacing } from '@/modules/documents/docx/base/utils/line-height-docx.util';
+import { normalizeDocxTableCaptionText } from '@/modules/documents/docx/utils/docx-table-caption-text.util';
 
 interface ParagraphProps extends IParagraphOptions {
   break?: boolean;
@@ -252,7 +253,7 @@ export const textLink = (text: string, options = {} as ParagraphProps) => {
 };
 
 export const paragraphTable = (text: string, options = {} as ParagraphProps) =>
-  paragraphNewNormal(text, {
+  paragraphNewNormal(normalizeDocxTableCaptionText(text), {
     ...options,
     children: [
       new TextRun({

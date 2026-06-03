@@ -1,4 +1,4 @@
-import { originRiskMap } from './../../../../../../shared/constants/maps/origin-risk';
+import { originRiskMap } from '../../../constants/origin-risk';
 import { HomoTypeEnum } from '@prisma/client';
 import { hierarchyList } from '../../../../../../shared/constants/lists/hierarchy.list';
 import { palette } from '../../../../../../shared/constants/palette';
