@@ -75,7 +75,7 @@ export class SectionsMapClass {
       return chapterSection({
         version: this.version,
         chapter: replaceAllVariables(text || '', this.variables),
-        imagePath: this.data.documentBase.mainLogoPath,
+        imagePath: this.data.documentBase.documentOwnerLogoPath,
         title: replaceAllVariables(`??${VariablesPGREnum.DOCUMENT_TITLE}??`, this.variables),
       });
     },

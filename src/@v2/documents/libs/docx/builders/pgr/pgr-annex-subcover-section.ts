@@ -11,7 +11,7 @@ export function pgrAnnexSubcoverSection(data: DocumentPGRModel, version: string,
   return chapterSection({
     version,
     chapter: chapterLine,
-    imagePath: data.documentBase.mainLogoPath,
+    imagePath: data.documentBase.documentOwnerLogoPath,
     title: docTitle,
   });
 }

@@ -77,8 +77,13 @@ export class DocumentBaseModel {
   }
 
   get mainLogoPath(): string | null {
-    // Prioritize workspace logo over company logo
+    // Prioritize workspace logo over company logo (capa principal e cabeçalho interno)
     return this.workspace?.logoPath || this.company?.logoPath || null;
+  }
+
+  /** Logo da empresa objeto do documento (divisórias/subcapas). Sem fallback para workspace. */
+  get documentOwnerLogoPath(): string | null {
+    return this.company?.logoPath || null;
   }
 
   get consultantLogoPath(): string | null {
