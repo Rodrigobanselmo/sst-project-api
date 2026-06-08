@@ -17,7 +17,7 @@ export class CreatorDocumentFRPS {
   ) {}
 
   async execute({ documentVersionId, homogeneousGroupsIds }: ICreatorDocumentFRPS.Params) {
-    this.documentCreationService.execute({
+    await this.documentCreationService.execute({
       product: this.factoryMethod(),
       body: { documentVersionId, homogeneousGroupsIds },
     });

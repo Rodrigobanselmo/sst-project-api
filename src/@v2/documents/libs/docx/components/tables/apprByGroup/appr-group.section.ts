@@ -18,6 +18,17 @@ export interface IAPPRTableOptions {
   isHideOrigin: boolean;
 }
 
+const resolveHierarchyNode = (gho: IGHODataConverter['gho'], hierarchyTree: IHierarchyMap) => {
+  return hierarchyTree[gho.id] || hierarchyTree[gho.name];
+};
+
+const getHomoPgrRisksCount = (homo: IGHODataConverter, homoGroupTree: IHomoGroupMap) => {
+  const node = homoGroupTree[homo.gho.id];
+  if (!node?.gho) return 0;
+
+  return node.gho.risksData({ documentType: 'isPGR' }).length;
+};
+
 export const APPRByGroupTableSection = (
   riskFactorGroupData: IDocumentRiskGroupDataConverter,
   hierarchyData: IHierarchyData,
@@ -40,10 +51,24 @@ export const APPRByGroupTableSection = (
   const everyHomoNotFound = [] as string[];
 
   const setHomoGroup = (homo: IGHODataConverter) => {
+    const homoGroupNode = homoGroupTree[homo.gho.id];
+    if (!homoGroupNode) return;
+
+    const hierarchy =
+      homo.gho.type === HomoTypeEnum.HIERARCHY ? resolveHierarchyNode(homo.gho, hierarchyTree) : undefined;
+
+    if (homo.gho.type === HomoTypeEnum.HIERARCHY && !hierarchy) {
+      if (getHomoPgrRisksCount(homo, homoGroupTree) === 0) return;
+
+      console.warn(
+        `[APPRByGroup] Orphan HIERARCHY homogeneous group without matching hierarchy (has risks): id=${homo.gho.id}`,
+      );
+    }
+
     const { desc, descRh, nameOrigin, typeOrigin } = getHomoGroupName(homo, hierarchyTree);
 
     hierarchyDataHomoGroup.set(homo.gho.id, {
-      hierarchies: homoGroupTree[homo.gho.id].hierarchies,
+      hierarchies: homoGroupNode.hierarchies,
       allHomogeneousGroupIds: [homo.gho.id],
       descReal: desc,
       descRh: descRh || desc,
@@ -56,7 +81,7 @@ export const APPRByGroupTableSection = (
           environments: '',
           homogeneousGroupIds: [homo.gho.id],
           type: '',
-          typeEnum: homo.gho.type === HomoTypeEnum.HIERARCHY ? hierarchyTree[homo.gho.name].type : ('' as any),
+          typeEnum: homo.gho.type === HomoTypeEnum.HIERARCHY ? (hierarchy?.type ?? ('' as any)) : ('' as any),
         },
       ],
       workspace,
@@ -175,13 +200,17 @@ export const getHomoGroupName = (homo: IGHODataConverter, hierarchyTree?: IHiera
   }
 
   if (hierarchyTree && homo.gho.type == HomoTypeEnum.HIERARCHY) {
-    const hierarchy = hierarchyTree[homo.gho.id] || hierarchyTree[homo.gho.name];
+    const hierarchy = resolveHierarchyNode(homo.gho, hierarchyTree);
 
     if (hierarchy) {
       typeOrigin = `GSE Desenvolvido (${originRiskMap[hierarchy.type].name})`;
       nameOrigin = `${hierarchy.name}`;
       desc = hierarchy.realDescription;
       descRh = hierarchy.description;
+    } else {
+      typeOrigin = 'GSE Desenvolvido';
+      nameOrigin = homo.gho.name || homo.gho.id;
+      desc = homo.gho.description || '';
     }
   }
 

@@ -17,7 +17,7 @@ export class CreatorDocumentPGR {
   ) {}
 
   async execute({ documentVersionId, homogeneousGroupsIds }: ICreatorDocumentPGR.Params) {
-    this.documentCreationService.execute({
+    await this.documentCreationService.execute({
       product: this.factoryMethod(),
       body: { documentVersionId, homogeneousGroupsIds },
     });
