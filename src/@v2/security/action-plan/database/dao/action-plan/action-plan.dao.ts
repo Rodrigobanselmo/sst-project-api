@@ -152,6 +152,51 @@ export class ActionPlanDAO {
       },
       select: {
         id: true,
+        status: true,
+        endDate: true,
+        responsibleId: true,
+        monitoringMethod: true,
+        resultCriteria: true,
+        effectivenessStatus: true,
+        effectivenessDate: true,
+        effectivenessComment: true,
+        effectivenessBy: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        responsible: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+
+    const documentDataPromise = this.prisma.documentData.findFirst({
+      where: {
+        type: 'PGR',
+        workspaceId: params.workspaceId,
+        companyId: params.companyId,
+      },
+      select: {
+        validityStart: true,
+        months_period_level_2: true,
+        months_period_level_3: true,
+        months_period_level_4: true,
+        months_period_level_5: true,
+      },
+    });
+
+    const riskFactorDataPromise = this.prisma.riskFactorData.findFirst({
+      where: {
+        id: params.riskDataId,
+        companyId: params.companyId,
+      },
+      select: {
+        level: true,
       },
     });
 
@@ -185,9 +230,26 @@ export class ActionPlanDAO {
       },
     });
 
-    const [homogeneousGroup, photos, actionPlan, generateSourcesData] = await Promise.all([homogeneousGroupPromise, photosPromise, actionPlanPromise, generateSourcesPromise]);
+    const [homogeneousGroup, photos, actionPlan, generateSourcesData, documentData, riskFactorData] = await Promise.all([
+      homogeneousGroupPromise,
+      photosPromise,
+      actionPlanPromise,
+      generateSourcesPromise,
+      documentDataPromise,
+      riskFactorDataPromise,
+    ]);
 
-    return homogeneousGroup ? ActionPlanReadMapper.toModel({ homogeneousGroup, photos, actionPlan, generateSources: generateSourcesData?.generateSources || [], params }) : null;
+    return homogeneousGroup
+      ? ActionPlanReadMapper.toModel({
+          homogeneousGroup,
+          photos,
+          actionPlan,
+          generateSources: generateSourcesData?.generateSources || [],
+          documentData,
+          riskLevel: riskFactorData?.level ?? null,
+          params,
+        })
+      : null;
   }
 
   async browse({ limit, page, orderBy, filters }: IActionPlanDAO.BrowseParams) {
@@ -225,6 +287,13 @@ export class ActionPlanDAO {
         rfd_rec."canceledDate" AS rfd_rec_canceled_date,
         rfd_rec."endDate" AS rfd_rec_end_date,
         rfd_rec."status" AS rfd_rec_status,
+        rfd_rec."monitoringMethod" AS rfd_rec_monitoring_method,
+        rfd_rec."resultCriteria" AS rfd_rec_result_criteria,
+        rfd_rec."effectivenessStatus" AS rfd_rec_effectiveness_status,
+        rfd_rec."effectivenessDate" AS rfd_rec_effectiveness_date,
+        rfd_rec."effectivenessComment" AS rfd_rec_effectiveness_comment,
+        u_eff."id" AS eff_by_id,
+        u_eff."name" AS eff_by_name,
         rec_to_rfd."sequential_id" AS rec_to_rfd_sequential_id,
         w."id" AS w_id,
         w."name" AS w_name,
@@ -311,6 +380,8 @@ export class ActionPlanDAO {
       LEFT JOIN 
         "User" u_resp ON u_resp."id" = rfd_rec."responsibleId"
       LEFT JOIN
+        "User" u_eff ON u_eff."id" = rfd_rec."effectivenessById"
+      LEFT JOIN
         "HomogeneousGroup" hg ON hg."id" = rfd."homogeneousGroupId"
       ${
         includeResponsible
@@ -377,6 +448,13 @@ export class ActionPlanDAO {
         rfd_rec."canceledDate",
         rfd_rec."endDate",
         rfd_rec."status",
+        rfd_rec."monitoringMethod",
+        rfd_rec."resultCriteria",
+        rfd_rec."effectivenessStatus",
+        rfd_rec."effectivenessDate",
+        rfd_rec."effectivenessComment",
+        u_eff."id",
+        u_eff."name",
         rec_to_rfd."sequential_id",
         w."id",
         w."name",

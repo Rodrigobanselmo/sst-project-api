@@ -1,4 +1,4 @@
-import { RiskFactorDataRec, StatusEnum } from '@prisma/client';
+import { EffectivenessStatusEnum, RiskFactorDataRec, StatusEnum } from '@prisma/client';
 import { RiskDataRecCommentsEntity } from './riskDataRecComments.entity';
 
 export class RiskDataRecEntity implements RiskFactorDataRec {
@@ -20,6 +20,12 @@ export class RiskDataRecEntity implements RiskFactorDataRec {
   responsibleId: number;
   responsible_updated_at: Date | null;
   responsible_notified_at: Date | null;
+  monitoringMethod: string | null;
+  resultCriteria: string | null;
+  effectivenessStatus: EffectivenessStatusEnum;
+  effectivenessDate: Date | null;
+  effectivenessComment: string | null;
+  effectivenessById: number | null;
 
   constructor(partial: Partial<RiskDataRecEntity>) {
     Object.assign(this, partial);

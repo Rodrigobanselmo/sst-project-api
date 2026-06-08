@@ -10,6 +10,8 @@ import { IRiskLevelValues } from '@/@v2/shared/domain/types/security/risk-level-
 import { ActionPlanStatusEnum } from '../../enums/action-plan-status.enum';
 import { CommentTextTypeEnum } from '../../enums/comment-text-type.enum';
 import { CommentTypeEnum } from '../../enums/comment-type.enum';
+import { ActionPlanEffectivenessModel, IActionPlanEffectivenessModel } from './action-plan-effectiveness.model';
+import { ActionPlanPlanningModel, IActionPlanPlanningModel } from './action-plan-planning.model';
 
 export type IActionPlanBrowseResultModel = {
   uuid: { id?: string; riskDataId: string; recommendationId: string; workspaceId: string };
@@ -49,6 +51,8 @@ export type IActionPlanBrowseResultModel = {
     isApproved: boolean | null;
     createdAt: Date;
   }[];
+  planning: IActionPlanPlanningModel;
+  effectiveness: IActionPlanEffectivenessModel;
 };
 
 export class ActionPlanBrowseResultModel {
@@ -75,6 +79,8 @@ export class ActionPlanBrowseResultModel {
     approvedComment: string | null;
     isApproved: boolean | null;
   }[];
+  planning: ActionPlanPlanningModel;
+  effectiveness: ActionPlanEffectivenessModel;
 
   constructor(params: IActionPlanBrowseResultModel) {
     this.sequentialId = params.sequentialId;
@@ -118,5 +124,7 @@ export class ActionPlanBrowseResultModel {
       id: params.homogeneousGroup.id,
       ...getOriginHomogeneousGroup(params.homogeneousGroup),
     };
+    this.planning = new ActionPlanPlanningModel(params.planning);
+    this.effectiveness = new ActionPlanEffectivenessModel(params.effectiveness);
   }
 }

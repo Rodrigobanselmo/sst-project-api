@@ -1,4 +1,5 @@
 import { ActionPlanStatusEnum } from '@/@v2/security/action-plan/domain/enums/action-plan-status.enum';
+import { EffectivenessStatusEnum } from '@/@v2/security/action-plan/domain/enums/effectiveness-status.enum';
 import { CommentTextTypeEnum } from '@/@v2/security/action-plan/domain/enums/comment-text-type.enum';
 import { CommentTypeEnum } from '@/@v2/security/action-plan/domain/enums/comment-type.enum';
 import { ActionPlanBrowseResultModel } from '@/@v2/security/action-plan/domain/models/action-plan/action-plan-browse-result.model';
@@ -51,6 +52,13 @@ export type IActionPlanBrowseResultModelMapper = {
   h_name: string | null;
   resp_id: string | null;
   resp_name: string | null;
+  rfd_rec_monitoring_method: string | null;
+  rfd_rec_result_criteria: string | null;
+  rfd_rec_effectiveness_status: string | null;
+  rfd_rec_effectiveness_date: Date | null;
+  rfd_rec_effectiveness_comment: string | null;
+  eff_by_id: string | null;
+  eff_by_name: string | null;
   generatesources: {
     id: string;
     name: string;
@@ -144,6 +152,24 @@ export class ActionPlanBrowseResultModelMapper {
         isApproved: comment.is_approved,
         createdAt: comment.created_at,
       })),
+      planning: {
+        monitoringMethod: prisma.rfd_rec_monitoring_method,
+        resultCriteria: prisma.rfd_rec_result_criteria,
+      },
+      effectiveness: {
+        status: prisma.rfd_rec_effectiveness_status
+          ? EffectivenessStatusEnum[prisma.rfd_rec_effectiveness_status as keyof typeof EffectivenessStatusEnum]
+          : EffectivenessStatusEnum.NOT_EVALUATED,
+        date: prisma.rfd_rec_effectiveness_date,
+        comment: prisma.rfd_rec_effectiveness_comment,
+        evaluatedBy:
+          prisma.eff_by_id && prisma.eff_by_name
+            ? {
+                id: prisma.eff_by_id,
+                name: prisma.eff_by_name,
+              }
+            : null,
+      },
     });
   }
 

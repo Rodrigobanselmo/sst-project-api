@@ -14,5 +14,7 @@ export namespace IEditActionPlanUseCase {
       text?: string
       textType?: CommentTextTypeEnum
     }
+    monitoringMethod?: string | null;
+    resultCriteria?: string | null;
   }
 }

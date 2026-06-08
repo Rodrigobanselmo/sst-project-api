@@ -1,5 +1,5 @@
 import { ActionPlanAggregateRepository } from '@/@v2/security/action-plan/database/repositories/action-plan/action-plan-aggregate.repository';
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { IEditActionPlanService } from './edit-action-plan.service.types';
 
 @Injectable()
@@ -16,10 +16,21 @@ export class EditActionPlanService {
 
     if (!aggregate) return null;
 
-    aggregate.actionPlan.responsibleId = params.responsibleId;
+    if (params.responsibleId !== undefined) {
+      aggregate.actionPlan.responsibleId = params.responsibleId;
+    }
+
+    if (params.monitoringMethod !== undefined || params.resultCriteria !== undefined) {
+      const [, planningError] = aggregate.setPlanning({
+        monitoringMethod: params.monitoringMethod,
+        resultCriteria: params.resultCriteria,
+      });
+
+      if (planningError) throw new BadRequestException(planningError.message);
+    }
 
     if (params.validDate !== undefined) {
-      aggregate.setValidDate({
+      const [, validDateError] = aggregate.setValidDate({
         validDate: params.validDate,
         comment: {
           text: params.comment?.text,
@@ -27,10 +38,12 @@ export class EditActionPlanService {
           commentedById: params.userId,
         },
       });
+
+      if (validDateError) throw new BadRequestException(validDateError.message);
     }
 
     if (params.status) {
-      aggregate.setStatus({
+      const [, statusError] = aggregate.setStatus({
         status: params.status,
         comment: {
           text: params.comment?.text,
@@ -38,6 +51,8 @@ export class EditActionPlanService {
           commentedById: params.userId,
         },
       });
+
+      if (statusError) throw new BadRequestException(statusError.message);
     }
 
     return aggregate;

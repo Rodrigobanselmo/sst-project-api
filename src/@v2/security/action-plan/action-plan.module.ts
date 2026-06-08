@@ -12,6 +12,8 @@ import { ExportActionPlanUseCase } from './application/action-plan/export-action
 import { ExcelProvider } from '@/shared/providers/ExcelProvider/implementations/ExcelProvider';
 import { EditActionPlanController } from './application/action-plan/edit-action-plan/controllers/edit-action-plan.controller';
 import { EditActionPlanUseCase } from './application/action-plan/edit-action-plan/use-cases/edit-action-plan.usecase';
+import { EditActionPlanEffectivenessController } from './application/action-plan/edit-action-plan-effectiveness/controllers/edit-action-plan-effectiveness.controller';
+import { EditActionPlanEffectivenessUseCase } from './application/action-plan/edit-action-plan-effectiveness/use-cases/edit-action-plan-effectiveness.usecase';
 import { EditManyActionPlanController } from './application/action-plan/edit-many-action-plan/controllers/edit-many-action-plan.controller';
 import { EditManyActionPlanUseCase } from './application/action-plan/edit-many-action-plan/use-cases/edit-many-action-plan.usecase';
 import { ReadActionPlanController } from './application/action-plan/read-action-plan/controllers/read-action-plan.controller';
@@ -41,6 +43,7 @@ import { ActionPlanAggregateRepository } from './database/repositories/action-pl
 import { CommentAggregateRepository } from './database/repositories/comment/comment-aggregate.repository';
 import { CoordinatorRepository } from './database/repositories/coordinator/coordinator.repository';
 import { EditActionPlanService } from './services/edit-action-plan/edit-action-plan.service';
+import { EditActionPlanEffectivenessService } from './services/edit-action-plan-effectiveness/edit-action-plan-effectiveness.service';
 import { EditCommentService } from './services/edit-comment/edit-comment.service';
 import { ActionPlanPhotoAggregateRepository } from './database/repositories/action-plan-photo/action-plan-photo-aggregate.repository';
 import { AddActionPlanPhotoFileController } from './application/action-plan-photo/add-action-plan-photo-file/controllers/add-action-plan-photo-file.controller';
@@ -60,6 +63,7 @@ import { ActionPlanRuleAggregateRepository } from './database/repositories/actio
     BrowseActionPlanController,
     ExportActionPlanController,
     EditActionPlanController,
+    EditActionPlanEffectivenessController,
     EditManyActionPlanController,
     FindActionPlanInfoController,
     EditManyCommentController,
@@ -101,6 +105,7 @@ import { ActionPlanRuleAggregateRepository } from './database/repositories/actio
     ExcelProvider,
     EditManyActionPlanUseCase,
     EditActionPlanUseCase,
+    EditActionPlanEffectivenessUseCase,
     EditManyCommentsUseCase,
     ReadActionPlanInfoUseCase,
     EditActionPlanInfoUseCase,
@@ -118,6 +123,7 @@ import { ActionPlanRuleAggregateRepository } from './database/repositories/actio
 
     // Services
     EditActionPlanService,
+    EditActionPlanEffectivenessService,
     EditCommentService,
   ],
   exports: [],

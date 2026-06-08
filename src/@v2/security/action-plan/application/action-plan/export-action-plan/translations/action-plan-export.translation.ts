@@ -1,6 +1,15 @@
 import { ActionPlanStatusEnum } from '@/@v2/security/action-plan/domain/enums/action-plan-status.enum';
+import { EffectivenessStatusEnum } from '@/@v2/security/action-plan/domain/enums/effectiveness-status.enum';
 import { OriginTypeEnum } from '@/@v2/shared/domain/enum/security/origin-type.enum';
 import { IRiskLevelValues } from '@/@v2/shared/domain/types/security/risk-level-values.type';
+
+export const EffectivenessStatusExportTranslation: Record<EffectivenessStatusEnum, string> = {
+  [EffectivenessStatusEnum.NOT_EVALUATED]: 'Não avaliada',
+  [EffectivenessStatusEnum.EFFECTIVE]: 'Eficaz',
+  [EffectivenessStatusEnum.PARTIALLY_EFFECTIVE]: 'Parcialmente eficaz',
+  [EffectivenessStatusEnum.INEFFECTIVE]: 'Ineficaz',
+  [EffectivenessStatusEnum.NOT_APPLICABLE]: 'Não aplicável',
+};
 
 export const ActionPlanStatusExportTranslation: Record<ActionPlanStatusEnum, string> = {
   [ActionPlanStatusEnum.PENDING]: 'Pendente',

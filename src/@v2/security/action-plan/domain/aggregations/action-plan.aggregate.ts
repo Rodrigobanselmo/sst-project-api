@@ -4,8 +4,18 @@ import { CommentEntity } from '../entities/comment.entity';
 import { ActionPlanStatusEnum } from '../enums/action-plan-status.enum';
 import { CommentTextTypeEnum } from '../enums/comment-text-type.enum';
 import { CommentTypeEnum } from '../enums/comment-type.enum';
-import { errorCommentRequired, errorCommentTextRequired } from '../errors/diagnose.errors';
+import { EffectivenessStatusEnum } from '../enums/effectiveness-status.enum';
+import {
+  errorCommentRequired,
+  errorCommentTextRequired,
+  errorEffectivenessCommentRequired,
+  errorEffectivenessNotAllowedForStatus,
+  errorEffectivenessStatusNotAllowed,
+  errorPlanningNotAllowedOnCanceled,
+} from '../errors/diagnose.errors';
 import { CoordinatorEntity } from '../entities/coordinator.entity';
+
+const EFFECTIVENESS_COMMENT_MIN_LENGTH = 10;
 
 type ISetStatus = {
   comment?: {
@@ -23,6 +33,17 @@ type ISetValidDate = {
     commentedById: number;
   };
   validDate: Date | null;
+};
+
+type ISetPlanning = {
+  monitoringMethod?: string | null;
+  resultCriteria?: string | null;
+};
+
+type ISetEffectiveness = {
+  effectivenessStatus: EffectivenessStatusEnum;
+  effectivenessComment?: string | null;
+  evaluatedById: number;
 };
 
 export type IActionPlanAggregate = {
@@ -139,6 +160,71 @@ export class ActionPlanAggregate {
     }
 
     this.actionPlan._status = status;
+    return [, null];
+  }
+
+  setPlanning({ monitoringMethod, resultCriteria }: ISetPlanning): DomainResponse {
+    if (this.actionPlan.status === ActionPlanStatusEnum.CANCELED) {
+      return [, errorPlanningNotAllowedOnCanceled];
+    }
+
+    if (monitoringMethod !== undefined) {
+      this.actionPlan._monitoringMethod = monitoringMethod;
+    }
+
+    if (resultCriteria !== undefined) {
+      this.actionPlan._resultCriteria = resultCriteria;
+    }
+
+    return [, null];
+  }
+
+  setEffectiveness({ effectivenessStatus, effectivenessComment, evaluatedById }: ISetEffectiveness): DomainResponse {
+    const executionStatus = this.actionPlan.status;
+
+    if ([ActionPlanStatusEnum.PENDING, ActionPlanStatusEnum.PROGRESS, ActionPlanStatusEnum.REJECTED].includes(executionStatus)) {
+      return [, errorEffectivenessNotAllowedForStatus];
+    }
+
+    if (executionStatus === ActionPlanStatusEnum.CANCELED) {
+      if (effectivenessStatus !== EffectivenessStatusEnum.NOT_APPLICABLE) {
+        return [, errorEffectivenessStatusNotAllowed];
+      }
+    }
+
+    if (executionStatus === ActionPlanStatusEnum.DONE) {
+      if (effectivenessStatus === EffectivenessStatusEnum.NOT_APPLICABLE) {
+        return [, errorEffectivenessStatusNotAllowed];
+      }
+    }
+
+    if (
+      effectivenessStatus === EffectivenessStatusEnum.PARTIALLY_EFFECTIVE ||
+      effectivenessStatus === EffectivenessStatusEnum.INEFFECTIVE
+    ) {
+      const trimmedComment = effectivenessComment?.trim() || '';
+      if (trimmedComment.length < EFFECTIVENESS_COMMENT_MIN_LENGTH) {
+        return [, errorEffectivenessCommentRequired];
+      }
+    }
+
+    this.actionPlan._effectivenessStatus = effectivenessStatus;
+
+    if (effectivenessStatus === EffectivenessStatusEnum.NOT_EVALUATED) {
+      this.actionPlan._effectivenessDate = null;
+      this.actionPlan._effectivenessComment = null;
+      this.actionPlan._effectivenessById = null;
+      return [, null];
+    }
+
+    this.actionPlan._effectivenessDate = new Date();
+    this.actionPlan._effectivenessById = evaluatedById;
+    this.actionPlan._effectivenessComment =
+      effectivenessStatus === EffectivenessStatusEnum.PARTIALLY_EFFECTIVE ||
+      effectivenessStatus === EffectivenessStatusEnum.INEFFECTIVE
+        ? effectivenessComment?.trim() || null
+        : effectivenessComment?.trim() || null;
+
     return [, null];
   }
 }

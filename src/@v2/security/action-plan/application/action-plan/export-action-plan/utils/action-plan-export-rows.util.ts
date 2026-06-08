@@ -3,6 +3,7 @@ import { IReportRow } from '@/shared/providers/ExcelProvider/models/IExcelProvid
 import { dateUtils } from '@/@v2/shared/utils/helpers/date-utils';
 import {
   ActionPlanStatusExportTranslation,
+  EffectivenessStatusExportTranslation,
   OccupationalRiskLevelExportTranslation,
   OriginTypeExportTranslation,
 } from '../translations/action-plan-export.translation';
@@ -69,6 +70,12 @@ export const ACTION_PLAN_EXPORT_HEADERS: IReportRow = [
   headerCell('ID Risco (dados)', 38),
   headerCell('ID Recomendação', 38),
   headerCell('ID Workspace', 38),
+  headerCell('Forma de Acompanhamento', 36),
+  headerCell('Critério de Aferição', 36),
+  headerCell('Eficácia', 18),
+  headerCell('Data Aferição', 14),
+  headerCell('Resultado Aferição', 40),
+  headerCell('Avaliado por', 22),
 ];
 
 export const mapActionPlanToExportRow = (item: ActionPlanBrowseResultModel): IReportRow => [
@@ -100,4 +107,10 @@ export const mapActionPlanToExportRow = (item: ActionPlanBrowseResultModel): IRe
   cell(item.uuid.riskDataId, 38),
   cell(item.uuid.recommendationId, 38),
   cell(item.uuid.workspaceId, 38),
+  cell(item.planning.monitoringMethod ?? '', 36),
+  cell(item.planning.resultCriteria ?? '', 36),
+  cell(EffectivenessStatusExportTranslation[item.effectiveness.status] ?? item.effectiveness.status, 18),
+  cell(formatDate(item.effectiveness.date), 14),
+  cell(item.effectiveness.comment ?? '', 40),
+  cell(item.effectiveness.evaluatedBy?.name ?? '', 22),
 ];

@@ -1,6 +1,7 @@
 import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service';
 import { Injectable } from '@nestjs/common';
-import { Prisma, StatusEnum } from '@prisma/client';
+import { EffectivenessStatusEnum as PrismaEffectivenessStatusEnum, Prisma, StatusEnum } from '@prisma/client';
+import { ActionPlanEntity } from '../../../domain/entities/action-plan.entity';
 import { syncDerivedMeasureFromDonePlanIfMissing } from '../../utils/sync-derived-measure-from-done-plan';
 import { tryPromoteResidualToCurrentWhenPlanFullyImplemented } from '../../utils/try-promote-residual-to-current-when-plan-fully-implemented';
 import { ActionPlanAggregate } from '../../../domain/aggregations/action-plan.aggregate';
@@ -11,6 +12,17 @@ import { IActionPlanAggregateRepository } from './action-plan-aggregate.types';
 @Injectable()
 export class ActionPlanAggregateRepository implements IActionPlanAggregateRepository {
   constructor(private readonly prisma: PrismaServiceV2) {}
+
+  private static mapPlanningAndEffectivenessFields(actionPlan: ActionPlanEntity) {
+    return {
+      monitoringMethod: actionPlan.monitoringMethod,
+      resultCriteria: actionPlan.resultCriteria,
+      effectivenessStatus: actionPlan.effectivenessStatus as PrismaEffectivenessStatusEnum,
+      effectivenessDate: actionPlan.effectivenessDate,
+      effectivenessComment: actionPlan.effectivenessComment,
+      effectivenessById: actionPlan.effectivenessById,
+    };
+  }
 
   static selectOptions(params: IActionPlanAggregateRepository.SelectOptionsParams) {
     const select = {
@@ -91,6 +103,7 @@ export class ActionPlanAggregateRepository implements IActionPlanAggregateReposi
           startDate: params.actionPlan.startDate,
           doneDate: params.actionPlan.doneDate,
           canceledDate: params.actionPlan.canceledDate,
+          ...ActionPlanAggregateRepository.mapPlanningAndEffectivenessFields(params.actionPlan),
           comments: {
             createMany: {
               data: params.comments
@@ -120,6 +133,7 @@ export class ActionPlanAggregateRepository implements IActionPlanAggregateReposi
           startDate: params.actionPlan.startDate,
           doneDate: params.actionPlan.doneDate,
           canceledDate: params.actionPlan.canceledDate,
+          ...ActionPlanAggregateRepository.mapPlanningAndEffectivenessFields(params.actionPlan),
           comments: {
             createMany: {
               data: params.comments
@@ -177,6 +191,7 @@ export class ActionPlanAggregateRepository implements IActionPlanAggregateReposi
             startDate: aggregate.actionPlan.startDate,
             doneDate: aggregate.actionPlan.doneDate,
             canceledDate: aggregate.actionPlan.canceledDate,
+            ...ActionPlanAggregateRepository.mapPlanningAndEffectivenessFields(aggregate.actionPlan),
             comments: {
               createMany: {
                 data: aggregate.comments
@@ -206,6 +221,7 @@ export class ActionPlanAggregateRepository implements IActionPlanAggregateReposi
             startDate: aggregate.actionPlan.startDate,
             doneDate: aggregate.actionPlan.doneDate,
             canceledDate: aggregate.actionPlan.canceledDate,
+            ...ActionPlanAggregateRepository.mapPlanningAndEffectivenessFields(aggregate.actionPlan),
             comments: {
               createMany: {
                 data: aggregate.comments

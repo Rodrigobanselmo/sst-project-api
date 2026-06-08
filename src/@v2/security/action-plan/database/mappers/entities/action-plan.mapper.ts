@@ -1,6 +1,7 @@
-import { StatusEnum } from '@prisma/client';
+import { EffectivenessStatusEnum as PrismaEffectivenessStatusEnum, StatusEnum } from '@prisma/client';
 import { ActionPlanEntity } from '../../../domain/entities/action-plan.entity';
 import { ActionPlanStatusEnum } from '../../../domain/enums/action-plan-status.enum';
+import { EffectivenessStatusEnum } from '../../../domain/enums/effectiveness-status.enum';
 import { calculateActionPlanValidDate } from '../../../domain/functions/calculate-action-plan-valid-date.func';
 
 export type IActionPlanEntityMapper = {
@@ -14,6 +15,12 @@ export type IActionPlanEntityMapper = {
   canceledDate?: Date | null;
   responsibleId?: number | null;
   endDate?: Date | null;
+  monitoringMethod?: string | null;
+  resultCriteria?: string | null;
+  effectivenessStatus?: PrismaEffectivenessStatusEnum;
+  effectivenessDate?: Date | null;
+  effectivenessComment?: string | null;
+  effectivenessById?: number | null;
 };
 
 export type IActionPlanDataEntityMapper = {
@@ -48,6 +55,14 @@ export class ActionPlanMapper {
         validityStart: info.documentData.validityStart,
         validDate: data.endDate || null,
       }),
+      monitoringMethod: data.monitoringMethod ?? null,
+      resultCriteria: data.resultCriteria ?? null,
+      effectivenessStatus: data.effectivenessStatus
+        ? EffectivenessStatusEnum[data.effectivenessStatus]
+        : EffectivenessStatusEnum.NOT_EVALUATED,
+      effectivenessDate: data.effectivenessDate ?? null,
+      effectivenessComment: data.effectivenessComment ?? null,
+      effectivenessById: data.effectivenessById ?? null,
     });
   }
 }

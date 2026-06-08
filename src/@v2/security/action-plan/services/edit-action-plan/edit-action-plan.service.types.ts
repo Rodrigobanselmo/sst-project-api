@@ -11,6 +11,8 @@ export namespace IEditActionPlanService {
     responsibleId?: number | null;
     validDate?: Date | null;
     status?: ActionPlanStatusEnum;
+    monitoringMethod?: string | null;
+    resultCriteria?: string | null;
     comment?: {
       text?: string
       textType?: CommentTextTypeEnum

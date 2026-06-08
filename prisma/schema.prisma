@@ -2315,6 +2315,14 @@ model RiskFactorDataRec {
   responsible_updated_at  DateTime?
   responsible_notified_at DateTime?
 
+  monitoringMethod     String?                  @db.VarChar(2000)
+  resultCriteria       String?                  @db.VarChar(2000)
+  effectivenessStatus  EffectivenessStatusEnum  @default(NOT_EVALUATED)
+  effectivenessDate    DateTime?
+  effectivenessComment String?                  @db.VarChar(4000)
+  effectivenessById    Int?
+  effectivenessBy      User?                    @relation("ActionPlanEffectivenessBy", fields: [effectivenessById], references: [id], onDelete: SetNull)
+
   comments      RiskFactorDataRecComments[]
   photos        RiskFactorDataRecPhoto[]
   Task          Task[]
@@ -2546,8 +2554,9 @@ model User {
   coordinator            DocumentData[]
   recComments            RiskFactorDataRecComments[]
   recCommentsAnswer      RiskFactorDataRecComments[] @relation("rec_comment_answer")
-  RiskFactorDataRec      RiskFactorDataRec[]
-  Employee               Employee[]
+  RiskFactorDataRec                 RiskFactorDataRec[]
+  actionPlanEffectivenessReviews    RiskFactorDataRec[]         @relation("ActionPlanEffectivenessBy")
+  Employee                          Employee[]
   taskHistory            TaskHistory[]
   taskProject            TaskProject[]
   taskCreator            Task[]
@@ -3067,6 +3076,14 @@ enum StatusEnum {
   WATTING_APPROVAL
   REJECTED
   TESTING
+}
+
+enum EffectivenessStatusEnum {
+  NOT_EVALUATED
+  EFFECTIVE
+  PARTIALLY_EFFECTIVE
+  INEFFECTIVE
+  NOT_APPLICABLE
 }
 
 enum RecTypeEnum {
