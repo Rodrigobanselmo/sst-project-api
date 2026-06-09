@@ -21,6 +21,14 @@ export interface IAPPRTableOptions {
   isByGroup?: boolean;
 }
 
+const resolveHierarchyNode = (homo: HomoGroupEntity, hierarchyTree: IHierarchyMap) => {
+  return hierarchyTree[homo.id] || hierarchyTree[homo.name];
+};
+
+const getHomoRisksCount = (homo: HomoGroupEntity) => {
+  return (homo.riskFactorData || []).length;
+};
+
 export const APPRByGroupTableSection = (
   riskFactorGroupData: RiskFactorGroupDataEntity & DocumentDataEntity & DocumentDataPGRDto,
   hierarchyData: IHierarchyData,
@@ -45,10 +53,23 @@ export const APPRByGroupTableSection = (
   const everyHomoNotFound = [] as string[];
 
   const setHomoGroup = (homo: HomoGroupEntity) => {
+    const homoGroupNode = homoGroupTree[homo.id];
+    if (!homoGroupNode) return;
+
+    const hierarchy = homo.type === HomoTypeEnum.HIERARCHY ? resolveHierarchyNode(homo, hierarchyTree) : undefined;
+
+    if (homo.type === HomoTypeEnum.HIERARCHY && !hierarchy) {
+      if (getHomoRisksCount(homo) === 0) return;
+
+      console.warn(
+        `[APPRByGroup] Orphan HIERARCHY homogeneous group without matching hierarchy (has risks): id=${homo.id}`,
+      );
+    }
+
     const { desc, descRh, nameOrigin, typeOrigin } = getHomoGroupName(homo, hierarchyTree);
 
     hierarchyDataHomoGroup.set(homo.id, {
-      hierarchies: homoGroupTree[homo.id].hierarchies,
+      hierarchies: homoGroupNode.hierarchies,
       allHomogeneousGroupIds: [homo.id],
       descReal: desc,
       descRh: descRh || desc,
@@ -61,7 +82,7 @@ export const APPRByGroupTableSection = (
           environments: '',
           homogeneousGroupIds: [homo.id],
           type: '',
-          typeEnum: homo.type === HomoTypeEnum.HIERARCHY ? hierarchyTree[homo.name].type : ('' as any),
+          typeEnum: homo.type === HomoTypeEnum.HIERARCHY ? (hierarchy?.type ?? ('' as any)) : ('' as any),
         },
       ],
       workspace,
@@ -169,13 +190,17 @@ export const getHomoGroupName = (homo: HomoGroupEntity, hierarchyTree?: IHierarc
   }
 
   if (hierarchyTree && homo.type == HomoTypeEnum.HIERARCHY) {
-    const hierarchy = hierarchyTree[homo.id] || hierarchyTree[homo.name];
+    const hierarchy = resolveHierarchyNode(homo, hierarchyTree);
 
     if (hierarchy) {
       typeOrigin = `GSE Desenvolvido (${originRiskMap[hierarchy.type].name})`;
       nameOrigin = `${hierarchy.name}`;
       desc = hierarchy.realDescription;
       descRh = hierarchy.description;
+    } else {
+      typeOrigin = 'GSE Desenvolvido';
+      nameOrigin = homo.name || homo.id;
+      desc = homo.description || '';
     }
   }
 
