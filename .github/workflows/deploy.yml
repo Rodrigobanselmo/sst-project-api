@@ -1,0 +1,67 @@
+name: Deploy to Production
+
+# Roda automaticamente a cada push/merge na branch master,
+# e também pode ser disparado manualmente em Actions > Deploy to Production > Run workflow.
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+# Garante que apenas um deploy roda por vez. Se um novo merge chegar
+# durante um deploy em andamento, o anterior é cancelado.
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy via SSH
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy on Magalu Cloud VM
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          port: ${{ secrets.SSH_PORT }}
+          key: ${{ secrets.SSH_KEY }}
+          # 30 min — geração de documentos e migrations podem demorar
+          command_timeout: 30m
+          script_stop: true
+          script: |
+            set -euo pipefail
+            export PATH="$PATH:/usr/local/bin:/usr/bin"
+
+            APP_DIR="/home/ubuntu/sst-project-api"
+            APP_NAME="simplesst-api"
+
+            cd "$APP_DIR"
+
+            echo "==> Atualizando código (reset para origin/master)"
+            git fetch --prune origin master
+            git reset --hard origin/master
+
+            echo "==> Instalando dependências"
+            yarn install --frozen-lockfile
+
+            echo "==> Gerando Prisma Client"
+            npx prisma generate
+
+            echo "==> Buildando aplicação"
+            yarn build
+
+            echo "==> Rodando migrations"
+            npx prisma migrate deploy
+
+            echo "==> Reiniciando aplicação (PM2)"
+            if pm2 describe "$APP_NAME" > /dev/null 2>&1; then
+              pm2 restart "$APP_NAME" --update-env
+            else
+              pm2 start dist/main.js --name "$APP_NAME" \
+                --max-memory-restart 6G \
+                --node-args='--max-old-space-size=6144'
+            fi
+
+            pm2 save
+            echo "==> Status final"
+            pm2 status
