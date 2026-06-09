@@ -23,6 +23,22 @@ export class CreateRecMedService {
 
     const system = user.isSystem && user.companyId === createRecMedDto.companyId;
 
+    // Quando o cliente (app offline) envia um `id` próprio, esse id é a fonte da verdade: o mesmo
+    // id é reutilizado depois ao vincular RecMedOnRiskData / engs ao risco-dado. Por isso honramos
+    // o id em vez de retornar um RecMed existente com id diferente (via returnIfExist por nome), o
+    // que faria a FK quebrar ao salvar o risco-dado (RecMedOnRiskData_rec_med_id_fkey).
+    if (createRecMedDto.id) {
+      const existingById = await this.recMedRepository.findNude({
+        where: { id: createRecMedDto.id },
+      });
+
+      if (existingById.count > 0) return existingById.data[0];
+
+      const created = await this.recMedRepository.create(createRecMedDto, system || false);
+      await this.invalidateRepresentAllCache();
+      return created;
+    }
+
     if (createRecMedDto.recName) {
       const foundRecFactor = await this.recMedRepository.find(
         {
@@ -64,16 +80,20 @@ export class CreateRecMedService {
     }
 
     const RecMedFactor = await this.recMedRepository.create(createRecMedDto, system || false);
+    await this.invalidateRepresentAllCache();
+
+    return RecMedFactor;
+  }
+
+  private async invalidateRepresentAllCache() {
     const cacheKey = CacheEnum.REC_MED_REPRESENT_ALL;
 
     // const keys = await this.cacheManager.store.reset(cacheKey);
     const keys = (await this.cacheManager.store.keys()) as string[];
-    Promise.all(
+    await Promise.all(
       keys.map(async (key) => {
         if (key.includes(cacheKey)) await this.cacheManager.del(key);
       }),
     );
-
-    return RecMedFactor;
   }
 }

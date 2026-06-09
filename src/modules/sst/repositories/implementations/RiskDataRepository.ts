@@ -66,6 +66,61 @@ export class RiskDataRepository {
     }
   }
 
+  /**
+   * Mantém em recs/adms/engs/generateSources apenas ids que realmente existem como
+   * RecMed/GenerateSource. Evita que um id desconhecido (ex.: catálogo offline ainda não
+   * sincronizado, ou recurso de outra empresa) derrube todo o upsert com erro de FK
+   * (RecMedOnRiskData_rec_med_id_fkey / GenerateSource não encontrado).
+   */
+  private async sanitizeCatalogRefs(refs: {
+    recs?: string[];
+    adms?: string[];
+    generateSources?: string[];
+    engs?: EngsRiskDataDto[];
+  }): Promise<{
+    recs?: string[];
+    adms?: string[];
+    generateSources?: string[];
+    engs?: EngsRiskDataDto[];
+  }> {
+    const recMedIds = [
+      ...new Set([
+        ...(refs.recs ?? []),
+        ...(refs.adms ?? []),
+        ...((refs.engs ?? []).map((eng) => eng.recMedId).filter(Boolean) as string[]),
+      ]),
+    ];
+    const generateSourceIds = [...new Set(refs.generateSources ?? [])];
+
+    const [existingRecMeds, existingGenerateSources] = await Promise.all([
+      recMedIds.length
+        ? this.prisma.recMed.findMany({ where: { id: { in: recMedIds } }, select: { id: true } })
+        : Promise.resolve([] as { id: string }[]),
+      generateSourceIds.length
+        ? this.prisma.generateSource.findMany({ where: { id: { in: generateSourceIds } }, select: { id: true } })
+        : Promise.resolve([] as { id: string }[]),
+    ]);
+
+    const validRecMed = new Set(existingRecMeds.map((r) => r.id));
+    const validGenerateSource = new Set(existingGenerateSources.map((g) => g.id));
+
+    const droppedRecMed = recMedIds.filter((id) => !validRecMed.has(id));
+    const droppedGenerateSource = generateSourceIds.filter((id) => !validGenerateSource.has(id));
+    if (droppedRecMed.length || droppedGenerateSource.length) {
+      console.warn('[RiskDataRepository] Ignorando referências de catálogo inexistentes', {
+        recMed: droppedRecMed,
+        generateSource: droppedGenerateSource,
+      });
+    }
+
+    return {
+      recs: refs.recs?.filter((id) => validRecMed.has(id)),
+      adms: refs.adms?.filter((id) => validRecMed.has(id)),
+      engs: refs.engs?.filter((eng) => !eng.recMedId || validRecMed.has(eng.recMedId)),
+      generateSources: refs.generateSources?.filter((id) => validGenerateSource.has(id)),
+    };
+  }
+
   async upsert(upsertRiskDataDto: Omit<UpsertRiskDataDto, 'keepEmpty' | 'type'>): Promise<RiskFactorDataEntity> {
     const level = await this.addLevel(upsertRiskDataDto);
     if (level) upsertRiskDataDto.level = level;
@@ -435,6 +490,12 @@ export class RiskDataRepository {
   }
 
   private async upsertPrisma({ recs, adms, engs, epis, exams, generateSources, companyId, createId, id, ...createDto }: Omit<UpsertRiskDataDto, 'keepEmpty'>) {
+    const sanitized = await this.sanitizeCatalogRefs({ recs, adms, engs, generateSources });
+    recs = sanitized.recs;
+    adms = sanitized.adms;
+    engs = sanitized.engs;
+    generateSources = sanitized.generateSources;
+
     const isCreation = !id;
     if (isCreation) {
       const foundRiskData = await this.prisma.riskFactorData.findMany({
@@ -596,6 +657,12 @@ export class RiskDataRepository {
   }
 
   private async upsertConnectPrisma({ recs, adms, engs, epis, exams, generateSources, companyId, id, ...createDto }: Omit<UpsertRiskDataDto, 'keepEmpty'>) {
+    const sanitized = await this.sanitizeCatalogRefs({ recs, adms, engs, generateSources });
+    recs = sanitized.recs;
+    adms = sanitized.adms;
+    engs = sanitized.engs;
+    generateSources = sanitized.generateSources;
+
     const foundRiskData = await this.prisma.riskFactorData.findMany({
       where: {
         riskFactorGroupDataId: createDto.riskFactorGroupDataId,
