@@ -85,6 +85,7 @@ export type IActionPlanReadMapper = {
   } | null;
 
   riskLevel: number | null;
+  exposedWorkersCount: number;
 
   params: IActionPlanDAO.FindParams;
 };
@@ -97,6 +98,7 @@ export class ActionPlanReadMapper {
     generateSources,
     documentData,
     riskLevel,
+    exposedWorkersCount,
     params,
   }: IActionPlanReadMapper): ActionPlanReadModel {
     const origin = getOriginHomogeneousGroup({
@@ -194,6 +196,7 @@ export class ActionPlanReadMapper {
               }
             : null,
       },
+      exposedWorkersCount,
     });
   }
 

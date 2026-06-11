@@ -53,6 +53,7 @@ export type IActionPlanBrowseResultModel = {
   }[];
   planning: IActionPlanPlanningModel;
   effectiveness: IActionPlanEffectivenessModel;
+  exposedWorkersCount: number;
 };
 
 export class ActionPlanBrowseResultModel {
@@ -81,6 +82,7 @@ export class ActionPlanBrowseResultModel {
   }[];
   planning: ActionPlanPlanningModel;
   effectiveness: ActionPlanEffectivenessModel;
+  exposedWorkersCount: number;
 
   constructor(params: IActionPlanBrowseResultModel) {
     this.sequentialId = params.sequentialId;
@@ -126,5 +128,6 @@ export class ActionPlanBrowseResultModel {
     };
     this.planning = new ActionPlanPlanningModel(params.planning);
     this.effectiveness = new ActionPlanEffectivenessModel(params.effectiveness);
+    this.exposedWorkersCount = params.exposedWorkersCount ?? 0;
   }
 }

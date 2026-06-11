@@ -73,6 +73,7 @@ export type IActionPlanBrowseResultModelMapper = {
     created_at: Date;
   }[];
   risk_sub_types: { id: number; name: string }[];
+  exposed_workers_count: number | null;
 };
 
 export class ActionPlanBrowseResultModelMapper {
@@ -170,6 +171,7 @@ export class ActionPlanBrowseResultModelMapper {
               }
             : null,
       },
+      exposedWorkersCount: Number(prisma.exposed_workers_count ?? 0),
     });
   }
 

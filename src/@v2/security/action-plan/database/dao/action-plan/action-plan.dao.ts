@@ -17,6 +17,7 @@ import { ActionPlanAllTasksMapper } from '../../mappers/models/action-plan/actio
 import { LocalContext, UserContext } from '@/@v2/shared/adapters/context';
 import { SharedTokens } from '@/@v2/shared/constants/tokens';
 import { ContextKey } from '@/@v2/shared/adapters/context/types/enum/context-key.enum';
+import { buildGhoExposedWorkersCte, getExposedWorkersCountByGhoIds } from '../../utils/get-exposed-workers-count-by-gho-ids.util';
 
 @Injectable()
 export class ActionPlanDAO {
@@ -239,6 +240,10 @@ export class ActionPlanDAO {
       riskFactorDataPromise,
     ]);
 
+    const exposedWorkersByGho = homogeneousGroup
+      ? await getExposedWorkersCountByGhoIds(this.prisma, params.companyId, [homogeneousGroup.id])
+      : {};
+
     return homogeneousGroup
       ? ActionPlanReadMapper.toModel({
           homogeneousGroup,
@@ -247,6 +252,7 @@ export class ActionPlanDAO {
           generateSources: generateSourcesData?.generateSources || [],
           documentData,
           riskLevel: riskFactorData?.level ?? null,
+          exposedWorkersCount: exposedWorkersByGho[homogeneousGroup.id] ?? 0,
           params,
         })
       : null;
@@ -272,7 +278,8 @@ export class ActionPlanDAO {
         SELECT DISTINCT ON ("workspaceId") *
         FROM "DocumentData" dd
         WHERE dd."type" = 'PGR'
-      )
+      ),
+      ${buildGhoExposedWorkersCte(filters.companyId)}
       SELECT 
         rec."id" AS rec_id,
         rec."recName" AS rec_name,
@@ -356,7 +363,8 @@ export class ActionPlanDAO {
             ,'created_at', comment."created_at"
           )) 
           FILTER (WHERE comment."id" IS NOT NULL), '[]'
-        ) AS comments
+        ) AS comments,
+        COALESCE(MAX(gew.exposed_workers_count), 0) AS exposed_workers_count
       FROM 
         "RiskFactorData" rfd
       JOIN 
@@ -430,6 +438,8 @@ export class ActionPlanDAO {
       }
       LEFT JOIN
         "CompanyCharacterization" cc ON cc."id" = hg."id"
+      LEFT JOIN
+        "GhoExposedWorkers" gew ON gew.hg_id = hg."id"
       LEFT JOIN
         "Workspace" w ON w."companyId" = rfd."companyId"
       LEFT JOIN
@@ -856,6 +866,7 @@ export class ActionPlanDAO {
           ELSE rfd."level"
         END
       `,
+      [ActionPlanOrderByEnum.EXPOSED_WORKERS]: 'exposed_workers_count',
     };
 
     const orderByRaw = orderBy.map<IOrderByRawPrisma>(({ field, order }) => ({ column: map[field], order }));
