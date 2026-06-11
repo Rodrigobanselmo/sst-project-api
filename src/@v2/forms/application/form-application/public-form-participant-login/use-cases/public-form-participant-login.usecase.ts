@@ -1,11 +1,19 @@
 import { FormParticipantsDAO } from '@/@v2/forms/database/dao/form-participants/form-participants.dao';
 import { FormApplicationAggregateRepository } from '@/@v2/forms/database/repositories/form-application/form-application-aggregate.repository';
+import { FormApplicationAggregate } from '@/@v2/forms/domain/aggregates/form-application.aggregate';
 import { CryptoAdapter } from '@/@v2/shared/adapters/crypto/models/crypto.interface';
 import { PrismaServiceV2 } from '@/@v2/shared/adapters/database/prisma.service';
 import { SharedTokens } from '@/@v2/shared/constants/tokens';
-import { BadRequestException, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { dayjs } from 'src/shared/providers/DateProvider/implementations/DayJSProvider';
 import { IPublicFormParticipantLoginUseCase } from './public-form-participant-login.types';
+
+type EmployeeCandidate = {
+  id: number;
+  name: string;
+  cpf: string;
+  companyId: string;
+};
 
 @Injectable()
 export class PublicFormParticipantLoginUseCase {
@@ -43,10 +51,12 @@ export class PublicFormParticipantLoginUseCase {
     const startOfDay = birthdayDate.startOf('day').utc().toDate();
     const endOfDay = birthdayDate.endOf('day').utc().toDate();
 
-    const employee = await this.prisma.employee.findFirst({
+    const allowedCompanyIds = this.getAllowedCompanyIds(formApplication);
+
+    const candidates = await this.prisma.employee.findMany({
       where: {
         cpf: params.cpf,
-        companyId: formApplication.formApplication.companyId, // Filter by form's company
+        companyId: { in: allowedCompanyIds },
         birthday: {
           gte: startOfDay,
           lt: endOfDay,
@@ -58,27 +68,58 @@ export class PublicFormParticipantLoginUseCase {
         cpf: true,
         companyId: true,
       },
+      orderBy: { id: 'asc' },
     });
 
-    if (!employee) {
+    if (!candidates.length) {
       throw new BadRequestException('CPF ou data de nascimento incorretos. Verifique os dados e tente novamente.');
     }
 
-    const participants = await this.formParticipantsDAO.browse({
-      page: 1,
-      limit: 1,
-      filters: {
-        companyId: employee.companyId,
-        applicationId: params.applicationId,
-        employeeIds: [employee.id],
-      },
-      cryptoAdapter: this.cryptoAdapter,
-    });
+    const authorizedEmployee = await this.resolveAuthorizedEmployee(
+      candidates,
+      params.applicationId,
+    );
 
-    if (!participants.results.length) {
-      throw new BadRequestException('Usuário não autorizado para responder este formulário');
+    if (!authorizedEmployee) {
+      if (candidates.length === 1) {
+        throw new BadRequestException('Usuário não autorizado para responder este formulário');
+      }
+
+      throw new BadRequestException('CPF ou data de nascimento incorretos. Verifique os dados e tente novamente.');
     }
 
-    return employee;
+    return authorizedEmployee;
+  }
+
+  private getAllowedCompanyIds(formApplication: FormApplicationAggregate): string[] {
+    if (formApplication.applicationCompanies.length > 0) {
+      return formApplication.applicationCompanies.map((ac) => ac.companyId);
+    }
+
+    return [formApplication.formApplication.companyId];
+  }
+
+  private async resolveAuthorizedEmployee(
+    candidates: EmployeeCandidate[],
+    applicationId: string,
+  ): Promise<EmployeeCandidate | null> {
+    for (const candidate of candidates) {
+      const participants = await this.formParticipantsDAO.browse({
+        page: 1,
+        limit: 1,
+        filters: {
+          companyId: candidate.companyId,
+          applicationId,
+          employeeIds: [candidate.id],
+        },
+        cryptoAdapter: this.cryptoAdapter,
+      });
+
+      if (participants.results.length) {
+        return candidate;
+      }
+    }
+
+    return null;
   }
 }
