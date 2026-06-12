@@ -367,7 +367,10 @@ export class FormApplicationDAO {
     const [forms, totalForms, distinctFilters] = await Promise.all([formsPromise, totalFormsPromise, distinctFiltersPromise]);
 
     // Get aggregated data for each form application separately
-    const formsWithAggregatedData = await this.addAggregatedDataToForms(forms);
+    const formsWithAggregatedData = await this.addAggregatedDataToForms(
+      forms,
+      filters.companyId,
+    );
 
     return FormApplicationBrowseModelMapper.toModel({
       results: formsWithAggregatedData,
@@ -434,11 +437,21 @@ export class FormApplicationDAO {
   }
 
   private async addAggregatedDataToForms(
-    forms: Omit<IFormApplicationBrowseResultModelMapper, 'total_answers' | 'total_participants' | 'average_time_spent'>[],
+    forms: Omit<
+      IFormApplicationBrowseResultModelMapper,
+      | 'total_answers'
+      | 'total_participants'
+      | 'average_time_spent'
+      | 'is_business_group_application'
+      | 'current_company_participants'
+      | 'current_company_answers'
+    >[],
+    accessCompanyId: string,
   ): Promise<IFormApplicationBrowseResultModelMapper[]> {
     if (forms.length === 0) return [];
 
     const formApplicationIds = forms.map((form) => form.id);
+    const applications = await this.loadApplicationsScopeMetadata(formApplicationIds);
 
     // Get answers count and average time spent for all form applications
     const answersDataPromise = this.prisma.$queryRaw<{ form_application_id: string; total_answers: number; average_time_spent: number | null }[]>`
@@ -452,35 +465,51 @@ export class FormApplicationDAO {
       GROUP BY form_application_id;
     `;
 
-    // Get participants count for all form applications - optimized approach
-    const participantsDataPromise = this.getParticipantsCountOptimized(formApplicationIds);
+    const participantsDataPromise =
+      this.getParticipantsCountFromMetadata(applications);
+    const currentCompanyMetricsPromise =
+      this.getCurrentCompanyMetricsForBusinessGroup(accessCompanyId, applications);
 
-    const [answersData, participantsData] = await Promise.all([answersDataPromise, participantsDataPromise]);
+    const [answersData, participantsData, currentCompanyMetrics] = await Promise.all([
+      answersDataPromise,
+      participantsDataPromise,
+      currentCompanyMetricsPromise,
+    ]);
 
     // Create lookup maps for efficient data retrieval
     const answersMap = new Map(answersData.map((item) => [item.form_application_id, item]));
     const participantsMap = new Map(participantsData.map((item) => [item.form_application_id, item]));
+    const applicationScopeMap = new Map(applications.map((application) => [application.id, application]));
 
     // Combine the data
     return forms.map((form) => {
       const answers = answersMap.get(form.id);
       const participants = participantsMap.get(form.id);
+      const application = applicationScopeMap.get(form.id);
+      const isBusinessGroupApplication =
+        application?.scope_type === FormApplicationScopeTypeEnum.BUSINESS_GROUP_COMPANIES;
+      const currentCompanyMetric = currentCompanyMetrics.get(form.id);
 
       return {
         ...form,
         total_answers: answers?.total_answers || 0,
         total_participants: participants?.total_participants || 0,
         average_time_spent: answers?.average_time_spent || null,
+        is_business_group_application: isBusinessGroupApplication,
+        current_company_participants: isBusinessGroupApplication
+          ? currentCompanyMetric?.participants ?? 0
+          : null,
+        current_company_answers: isBusinessGroupApplication
+          ? currentCompanyMetric?.answers ?? 0
+          : null,
       };
     });
   }
 
-  private async getParticipantsCountOptimized(
-    formApplicationIds: string[],
-  ): Promise<{ form_application_id: string; total_participants: number }[]> {
+  private async loadApplicationsScopeMetadata(formApplicationIds: string[]) {
     if (formApplicationIds.length === 0) return [];
 
-    const applications = await this.prisma.formApplication.findMany({
+    return this.prisma.formApplication.findMany({
       where: { id: { in: formApplicationIds }, deleted_at: null },
       select: {
         id: true,
@@ -494,6 +523,92 @@ export class FormApplicationDAO {
         },
       },
     });
+  }
+
+  private async getCurrentCompanyMetricsForBusinessGroup(
+    accessCompanyId: string,
+    applications: Awaited<ReturnType<FormApplicationDAO['loadApplicationsScopeMetadata']>>,
+  ): Promise<Map<string, { participants: number; answers: number }>> {
+    const businessGroupApplications = applications.filter(
+      (application) =>
+        application.scope_type === FormApplicationScopeTypeEnum.BUSINESS_GROUP_COMPANIES,
+    );
+
+    if (businessGroupApplications.length === 0) {
+      return new Map();
+    }
+
+    const businessGroupApplicationIds = businessGroupApplications.map(
+      (application) => application.id,
+    );
+
+    const answersData = await this.prisma.$queryRaw<
+      { form_application_id: string; total_answers: number }[]
+    >`
+      SELECT
+        fpa.form_application_id,
+        COUNT(*)::integer as total_answers
+      FROM "FormParticipantsAnswers" fpa
+      INNER JOIN "Employee" emp ON emp.id = fpa.employee_id
+      WHERE fpa.form_application_id = ANY(${businessGroupApplicationIds})
+        AND fpa.status = 'VALID'
+        AND emp."companyId" = ${accessCompanyId}
+      GROUP BY fpa.form_application_id;
+    `;
+
+    const answersMap = new Map(
+      answersData.map((item) => [item.form_application_id, item.total_answers]),
+    );
+
+    const participantsEntries = await Promise.all(
+      businessGroupApplications.map(async (application) => {
+        const participantCompanyIds = application.applicationCompanies.map(
+          (row) => row.company_id,
+        );
+
+        if (!participantCompanyIds.includes(accessCompanyId)) {
+          return {
+            formApplicationId: application.id,
+            participants: 0,
+          };
+        }
+
+        const participants = await this.prisma.employee.count({
+          where: {
+            companyId: accessCompanyId,
+            status: 'ACTIVE',
+          },
+        });
+
+        return {
+          formApplicationId: application.id,
+          participants,
+        };
+      }),
+    );
+
+    return new Map(
+      participantsEntries.map((entry) => [
+        entry.formApplicationId,
+        {
+          participants: entry.participants,
+          answers: answersMap.get(entry.formApplicationId) ?? 0,
+        },
+      ]),
+    );
+  }
+
+  private async getParticipantsCountOptimized(
+    formApplicationIds: string[],
+  ): Promise<{ form_application_id: string; total_participants: number }[]> {
+    const applications = await this.loadApplicationsScopeMetadata(formApplicationIds);
+    return this.getParticipantsCountFromMetadata(applications);
+  }
+
+  private async getParticipantsCountFromMetadata(
+    applications: Awaited<ReturnType<FormApplicationDAO['loadApplicationsScopeMetadata']>>,
+  ): Promise<{ form_application_id: string; total_participants: number }[]> {
+    if (applications.length === 0) return [];
 
     const companyScopedApplicationIds: string[] = [];
     const workspaceScopedApplicationIds: string[] = [];
