@@ -1,6 +1,10 @@
 export const CompanyRoutes = {
   COMPANY_GROUP: {
     HOME_SUMMARY: 'v2/company-groups/:companyGroupId/home-summary',
+    CONSOLIDATED_VIEW_ELIGIBILITY:
+      'v2/company-groups/:companyGroupId/forms/applications/consolidated-view/eligibility',
+    CONSOLIDATED_VIEW_SUMMARY:
+      'v2/company-groups/:companyGroupId/forms/applications/consolidated-view/summary',
   },
   REPAIR_HYBRID_FORM_APPLICATIONS:
     'v2/companies/:companyId/repair-hybrid-form-applications',

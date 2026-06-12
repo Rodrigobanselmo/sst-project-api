@@ -20,6 +20,13 @@ import { CompanyGroupHomeSummaryUseCase } from './application/company-group/home
 import { CompanyGroupHomeSummaryDAO } from './database/dao/company-group/company-group-home-summary.dao';
 import { AccessibleGroupCompaniesService } from './application/shared/services/accessible-group-companies.service';
 import { CompanyGroupActionPlanSummaryService } from './application/company-group/home-summary/services/company-group-action-plan-summary.service';
+import { CompanyGroupConsolidatedViewEligibilityController } from './application/company-group/consolidated-view/controllers/company-group-consolidated-view-eligibility.controller';
+import { CompanyGroupConsolidatedViewSummaryController } from './application/company-group/consolidated-view/controllers/company-group-consolidated-view-summary.controller';
+import { CompanyGroupConsolidatedViewEligibilityUseCase } from './application/company-group/consolidated-view/use-cases/company-group-consolidated-view-eligibility.usecase';
+import { CompanyGroupConsolidatedViewSummaryUseCase } from './application/company-group/consolidated-view/use-cases/company-group-consolidated-view-summary.usecase';
+import { CompanyGroupConsolidatedViewEligibilityService } from './application/company-group/consolidated-view/services/company-group-consolidated-view-eligibility.service';
+import { CompanyGroupConsolidatedViewMetricsService } from './application/company-group/consolidated-view/services/company-group-consolidated-view-metrics.service';
+import { FormApplicationStructureFingerprintService } from './application/company-group/consolidated-view/services/form-application-structure-fingerprint.service';
 
 @Module({
   imports: [SharedModule, ActionPlanModule],
@@ -30,6 +37,8 @@ import { CompanyGroupActionPlanSummaryService } from './application/company-grou
     RepairHybridFormApplicationsController,
     ReadVisualIdentityController,
     CompanyGroupHomeSummaryController,
+    CompanyGroupConsolidatedViewEligibilityController,
+    CompanyGroupConsolidatedViewSummaryController,
   ],
   providers: [
     // Database
@@ -48,6 +57,11 @@ import { CompanyGroupActionPlanSummaryService } from './application/company-grou
     CompanyGroupHomeSummaryUseCase,
     AccessibleGroupCompaniesService,
     CompanyGroupActionPlanSummaryService,
+    CompanyGroupConsolidatedViewEligibilityUseCase,
+    CompanyGroupConsolidatedViewSummaryUseCase,
+    CompanyGroupConsolidatedViewEligibilityService,
+    CompanyGroupConsolidatedViewMetricsService,
+    FormApplicationStructureFingerprintService,
   ],
   exports: [AccessibleGroupCompaniesService],
 })
