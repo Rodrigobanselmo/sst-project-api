@@ -6,8 +6,8 @@ export enum ConsolidatedViewCapabilityStatusEnum {
 
 export const CONSOLIDATED_VIEW_CAPABILITIES = {
   participants: ConsolidatedViewCapabilityStatusEnum.IMPLEMENTED,
-  charts: ConsolidatedViewCapabilityStatusEnum.NOT_IMPLEMENTED,
-  indicators: ConsolidatedViewCapabilityStatusEnum.NOT_IMPLEMENTED,
+  charts: ConsolidatedViewCapabilityStatusEnum.IMPLEMENTED,
+  indicators: ConsolidatedViewCapabilityStatusEnum.IMPLEMENTED,
   structuralGroupings: ConsolidatedViewCapabilityStatusEnum.NOT_IMPLEMENTED,
   riskAnalysisOperational: ConsolidatedViewCapabilityStatusEnum.DISABLED,
   riskNarrativeConcat: ConsolidatedViewCapabilityStatusEnum.NOT_IMPLEMENTED,

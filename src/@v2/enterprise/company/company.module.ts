@@ -24,13 +24,16 @@ import { CompanyGroupActionPlanSummaryService } from './application/company-grou
 import { CompanyGroupConsolidatedViewEligibilityController } from './application/company-group/consolidated-view/controllers/company-group-consolidated-view-eligibility.controller';
 import { CompanyGroupConsolidatedViewSummaryController } from './application/company-group/consolidated-view/controllers/company-group-consolidated-view-summary.controller';
 import { CompanyGroupConsolidatedViewParticipantsController } from './application/company-group/consolidated-view/controllers/company-group-consolidated-view-participants.controller';
+import { CompanyGroupConsolidatedViewQuestionsAnswersController } from './application/company-group/consolidated-view/controllers/company-group-consolidated-view-questions-answers.controller';
 import { CompanyGroupConsolidatedViewEligibilityUseCase } from './application/company-group/consolidated-view/use-cases/company-group-consolidated-view-eligibility.usecase';
 import { CompanyGroupConsolidatedViewSummaryUseCase } from './application/company-group/consolidated-view/use-cases/company-group-consolidated-view-summary.usecase';
 import { CompanyGroupConsolidatedViewParticipantsUseCase } from './application/company-group/consolidated-view/use-cases/company-group-consolidated-view-participants.usecase';
+import { CompanyGroupConsolidatedViewQuestionsAnswersUseCase } from './application/company-group/consolidated-view/use-cases/company-group-consolidated-view-questions-answers.usecase';
 import { CompanyGroupConsolidatedViewEligibilityService } from './application/company-group/consolidated-view/services/company-group-consolidated-view-eligibility.service';
 import { CompanyGroupConsolidatedViewMetricsService } from './application/company-group/consolidated-view/services/company-group-consolidated-view-metrics.service';
 import { CompanyGroupConsolidatedViewContextService } from './application/company-group/consolidated-view/services/company-group-consolidated-view-context.service';
 import { CompanyGroupConsolidatedViewParticipantsService } from './application/company-group/consolidated-view/services/company-group-consolidated-view-participants.service';
+import { CompanyGroupConsolidatedViewQuestionsAnswersService } from './application/company-group/consolidated-view/services/company-group-consolidated-view-questions-answers.service';
 import { FormApplicationStructureFingerprintService } from './application/company-group/consolidated-view/services/form-application-structure-fingerprint.service';
 
 @Module({
@@ -45,6 +48,7 @@ import { FormApplicationStructureFingerprintService } from './application/compan
     CompanyGroupConsolidatedViewEligibilityController,
     CompanyGroupConsolidatedViewSummaryController,
     CompanyGroupConsolidatedViewParticipantsController,
+    CompanyGroupConsolidatedViewQuestionsAnswersController,
   ],
   providers: [
     // Database
@@ -66,10 +70,12 @@ import { FormApplicationStructureFingerprintService } from './application/compan
     CompanyGroupConsolidatedViewEligibilityUseCase,
     CompanyGroupConsolidatedViewSummaryUseCase,
     CompanyGroupConsolidatedViewParticipantsUseCase,
+    CompanyGroupConsolidatedViewQuestionsAnswersUseCase,
     CompanyGroupConsolidatedViewEligibilityService,
     CompanyGroupConsolidatedViewMetricsService,
     CompanyGroupConsolidatedViewContextService,
     CompanyGroupConsolidatedViewParticipantsService,
+    CompanyGroupConsolidatedViewQuestionsAnswersService,
     FormApplicationStructureFingerprintService,
   ],
   exports: [AccessibleGroupCompaniesService],

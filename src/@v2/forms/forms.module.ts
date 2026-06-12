@@ -231,6 +231,6 @@ import { FormIndicatorsNarrativeDiagnosticRepository } from './database/reposito
     GenerateIndicatorsNarrativeDiagnosticUseCase,
     ReadIndicatorsNarrativeDiagnosticUseCase,
   ],
-  exports: [FormParticipantsDAO],
+  exports: [FormParticipantsDAO, BrowseFormQuestionsAnswersUseCase],
 })
 export class FormModule {}

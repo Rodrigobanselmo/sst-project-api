@@ -7,6 +7,8 @@ export const CompanyRoutes = {
       'v2/company-groups/:companyGroupId/forms/applications/consolidated-view/summary',
     CONSOLIDATED_VIEW_PARTICIPANTS:
       'v2/company-groups/:companyGroupId/forms/applications/consolidated-view/participants',
+    CONSOLIDATED_VIEW_QUESTIONS_ANSWERS:
+      'v2/company-groups/:companyGroupId/forms/applications/consolidated-view/questions-answers',
   },
   REPAIR_HYBRID_FORM_APPLICATIONS:
     'v2/companies/:companyId/repair-hybrid-form-applications',
