@@ -34,9 +34,29 @@ export namespace ICompanyGroupHomeSummaryUseCase {
       pgrLatestAt: null;
       pcmsoLatestAt: null;
     };
-    actionPlan: {
-      status: 'not_available_in_group_scope';
-    };
+    actionPlan:
+      | {
+          status: 'available';
+          total: number;
+          pending: number;
+          started: number;
+          done: number;
+          canceled: number;
+          companies: {
+            companyId: string;
+            companyName: string | null;
+            companyFantasy: string | null;
+            companyInitials: string | null;
+            total: number;
+            pending: number;
+            started: number;
+            done: number;
+            canceled: number;
+          }[];
+        }
+      | {
+          status: 'not_available_in_group_scope';
+        };
     absenteeism: {
       status: 'partial';
       awayActive: number;

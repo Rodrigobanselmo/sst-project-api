@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { CompanyGroupHomeSummaryDAO } from '@/@v2/enterprise/company/database/dao/company-group/company-group-home-summary.dao';
 import { AccessibleGroupCompaniesService } from '@/@v2/enterprise/company/application/shared/services/accessible-group-companies.service';
+import { CompanyGroupActionPlanSummaryService } from '../services/company-group-action-plan-summary.service';
 
 import { ICompanyGroupHomeSummaryUseCase } from './company-group-home-summary.types';
 
@@ -10,6 +11,7 @@ export class CompanyGroupHomeSummaryUseCase {
   constructor(
     private readonly accessibleGroupCompaniesService: AccessibleGroupCompaniesService,
     private readonly companyGroupHomeSummaryDAO: CompanyGroupHomeSummaryDAO,
+    private readonly companyGroupActionPlanSummaryService: CompanyGroupActionPlanSummaryService,
   ) {}
 
   async execute(
@@ -21,8 +23,10 @@ export class CompanyGroupHomeSummaryUseCase {
         user: params.user,
       });
 
-    const aggregated =
-      await this.companyGroupHomeSummaryDAO.aggregate(includedCompanyIds);
+    const [aggregated, actionPlan] = await Promise.all([
+      this.companyGroupHomeSummaryDAO.aggregate(includedCompanyIds),
+      this.companyGroupActionPlanSummaryService.aggregate(includedCompanyIds),
+    ]);
 
     return {
       companyGroupId,
@@ -37,9 +41,7 @@ export class CompanyGroupHomeSummaryUseCase {
         pgrLatestAt: null,
         pcmsoLatestAt: null,
       },
-      actionPlan: {
-        status: 'not_available_in_group_scope',
-      },
+      actionPlan,
       absenteeism: {
         status: 'partial',
         awayActive: aggregated.employees.away,

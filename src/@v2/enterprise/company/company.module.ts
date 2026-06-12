@@ -1,3 +1,4 @@
+import { ActionPlanModule } from '@/@v2/security/action-plan/action-plan.module';
 import { SharedModule } from '@/@v2/shared/shared.module';
 import { Module } from '@nestjs/common';
 import { BrowseWorkspaceController } from './application/workspace/browse-all-workspaces/controllers/browse-all-workspaces.controller';
@@ -18,9 +19,10 @@ import { CompanyGroupHomeSummaryController } from './application/company-group/h
 import { CompanyGroupHomeSummaryUseCase } from './application/company-group/home-summary/use-cases/company-group-home-summary.usecase';
 import { CompanyGroupHomeSummaryDAO } from './database/dao/company-group/company-group-home-summary.dao';
 import { AccessibleGroupCompaniesService } from './application/shared/services/accessible-group-companies.service';
+import { CompanyGroupActionPlanSummaryService } from './application/company-group/home-summary/services/company-group-action-plan-summary.service';
 
 @Module({
-  imports: [SharedModule],
+  imports: [SharedModule, ActionPlanModule],
   controllers: [
     BrowseWorkspaceController,
     DeleteWorkspaceController,
@@ -45,6 +47,7 @@ import { AccessibleGroupCompaniesService } from './application/shared/services/a
     ReadVisualIdentityUseCase,
     CompanyGroupHomeSummaryUseCase,
     AccessibleGroupCompaniesService,
+    CompanyGroupActionPlanSummaryService,
   ],
   exports: [AccessibleGroupCompaniesService],
 })
