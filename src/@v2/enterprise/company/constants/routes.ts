@@ -9,6 +9,8 @@ export const CompanyRoutes = {
       'v2/company-groups/:companyGroupId/forms/applications/consolidated-view/participants',
     CONSOLIDATED_VIEW_QUESTIONS_ANSWERS:
       'v2/company-groups/:companyGroupId/forms/applications/consolidated-view/questions-answers',
+    CONSOLIDATED_VIEW_INDICATORS_NARRATIVE_DIAGNOSTIC:
+      'v2/company-groups/:companyGroupId/forms/applications/consolidated-view/indicators-narrative-diagnostic',
   },
   REPAIR_HYBRID_FORM_APPLICATIONS:
     'v2/companies/:companyId/repair-hybrid-form-applications',
