@@ -12,7 +12,10 @@ import { FormApplicationReadModelMapper } from '../../mappers/models/form-applic
 import { FormApplicationReadPublicModelMapper } from '../../mappers/models/form-application/form-application-read-public.mapper';
 import { FormStatusEnum } from '@/@v2/forms/domain/enums/form-status.enum';
 import { FormApplicationScopeTypeEnum } from '@/@v2/forms/domain/enums/form-application-scope-type.enum';
-import { FormApplicationScopeService } from '@/@v2/forms/application/shared/services/form-application-scope.service';
+import {
+  FormApplicationScopeService,
+  ResolvedFormApplicationScope,
+} from '@/@v2/forms/application/shared/services/form-application-scope.service';
 import { formApplicationAccessWhere } from '@/@v2/forms/application/shared/helpers/form-application-access.helper';
 import { FormParticipantsDAO } from '../form-participants/form-participants.dao';
 
@@ -472,9 +475,135 @@ export class FormApplicationDAO {
     });
   }
 
-  private async getParticipantsCountOptimized(formApplicationIds: string[]): Promise<{ form_application_id: string; total_participants: number }[]> {
-    // Use UNION to combine hierarchy and workspace participants, letting the database handle deduplication
-    // This is much faster than the original LEFT JOIN with OR condition
+  private async getParticipantsCountOptimized(
+    formApplicationIds: string[],
+  ): Promise<{ form_application_id: string; total_participants: number }[]> {
+    if (formApplicationIds.length === 0) return [];
+
+    const applications = await this.prisma.formApplication.findMany({
+      where: { id: { in: formApplicationIds }, deleted_at: null },
+      select: {
+        id: true,
+        scope_type: true,
+        company_id: true,
+        applicationCompanies: { select: { company_id: true } },
+        participants: {
+          select: {
+            workspaces: { select: { workspace_id: true } },
+          },
+        },
+      },
+    });
+
+    const companyScopedApplicationIds: string[] = [];
+    const workspaceScopedApplicationIds: string[] = [];
+
+    for (const application of applications) {
+      const scope = this.toResolvedScope(application);
+
+      if (
+        this.formApplicationScopeService.isBusinessGroupScope(scope) ||
+        this.formApplicationScopeService.usesConsolidatedApplicationCompaniesParticipantScope(
+          scope,
+        )
+      ) {
+        companyScopedApplicationIds.push(application.id);
+        continue;
+      }
+
+      workspaceScopedApplicationIds.push(application.id);
+    }
+
+    const [companyScopedCounts, workspaceScopedCounts] = await Promise.all([
+      this.countParticipantsByCompanyScope(companyScopedApplicationIds, applications),
+      workspaceScopedApplicationIds.length > 0
+        ? this.countParticipantsByWorkspaceScope(workspaceScopedApplicationIds)
+        : Promise.resolve([]),
+    ]);
+
+    return [...companyScopedCounts, ...workspaceScopedCounts];
+  }
+
+  private toResolvedScope(application: {
+    scope_type: string;
+    company_id: string;
+    applicationCompanies: { company_id: string }[];
+    participants: { workspaces: { workspace_id: string }[] } | null;
+  }): ResolvedFormApplicationScope {
+    const participantWorkspaceIds =
+      application.participants?.workspaces.map(
+        (workspace) => workspace.workspace_id,
+      ) ?? [];
+
+    if (application.scope_type === FormApplicationScopeTypeEnum.BUSINESS_GROUP_COMPANIES) {
+      const companies = application.applicationCompanies.map((row) => ({
+        id: row.company_id,
+        name: '',
+      }));
+
+      return {
+        scopeType: FormApplicationScopeTypeEnum.BUSINESS_GROUP_COMPANIES,
+        anchorCompanyId: application.company_id,
+        companyGroupId: 0,
+        participantCompanyIds: companies.map((company) => company.id),
+        companies,
+        participantWorkspaceIds,
+      };
+    }
+
+    const convertedCompanyIds = application.applicationCompanies
+      .map((row) => row.company_id)
+      .filter((companyId) => companyId !== application.company_id);
+
+    return {
+      scopeType: FormApplicationScopeTypeEnum.COMPANY_WORKSPACES,
+      anchorCompanyId: application.company_id,
+      participantCompanyIds: [application.company_id],
+      convertedCompanyIds,
+      participantWorkspaceIds,
+    };
+  }
+
+  private async countParticipantsByCompanyScope(
+    applicationIds: string[],
+    applications: Array<{
+      id: string;
+      scope_type: string;
+      company_id: string;
+      applicationCompanies: { company_id: string }[];
+      participants: { workspaces: { workspace_id: string }[] } | null;
+    }>,
+  ): Promise<{ form_application_id: string; total_participants: number }[]> {
+    if (applicationIds.length === 0) return [];
+
+    const applicationIdSet = new Set(applicationIds);
+
+    return Promise.all(
+      applications
+        .filter((application) => applicationIdSet.has(application.id))
+        .map(async (application) => {
+          const scope = this.toResolvedScope(application);
+          const companyIds =
+            this.formApplicationScopeService.participantCompanyIdsForScope(scope);
+
+          const totalParticipants = await this.prisma.employee.count({
+            where: {
+              companyId: { in: companyIds },
+              status: 'ACTIVE',
+            },
+          });
+
+          return {
+            form_application_id: application.id,
+            total_participants: totalParticipants,
+          };
+        }),
+    );
+  }
+
+  private countParticipantsByWorkspaceScope(
+    formApplicationIds: string[],
+  ): Promise<{ form_application_id: string; total_participants: number }[]> {
     return this.prisma.$queryRaw<{ form_application_id: string; total_participants: number }[]>`
       SELECT
         form_application_id,
@@ -488,6 +617,7 @@ export class FormApplicationDAO {
         INNER JOIN "Employee" emp ON emp."hierarchyId" = form_part_hier.hierarchy_id
         WHERE form_part.form_application_id = ANY(${formApplicationIds})
           AND emp.id IS NOT NULL
+          AND emp."status" = 'ACTIVE'
 
         UNION
 
@@ -500,6 +630,7 @@ export class FormApplicationDAO {
         INNER JOIN "Employee" emp ON emp."hierarchyId" = h_t_w."A"
         WHERE form_part.form_application_id = ANY(${formApplicationIds})
           AND emp.id IS NOT NULL
+          AND emp."status" = 'ACTIVE'
       ) combined_participants
       GROUP BY form_application_id;
     `;
