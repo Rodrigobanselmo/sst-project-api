@@ -18,6 +18,9 @@ export type IFormApplicationBrowseResultModel = {
   createdAt: Date;
   updatedAt: Date;
   companyId: string;
+  companyName?: string | null;
+  companyFantasy?: string | null;
+  companyInitials?: string | null;
   totalAnswers: number;
   totalParticipants: number;
   averageTimeSpent: number | null;
@@ -37,6 +40,9 @@ export class FormApplicationBrowseResultModel {
   createdAt: Date;
   updatedAt: Date;
   companyId: string;
+  companyName: string | null;
+  companyFantasy: string | null;
+  companyInitials: string | null;
   totalAnswers: number;
   totalParticipants: number;
   averageTimeSpent: number | null;
@@ -55,6 +61,9 @@ export class FormApplicationBrowseResultModel {
     this.createdAt = params.createdAt;
     this.updatedAt = params.updatedAt;
     this.companyId = params.companyId;
+    this.companyName = params.companyName ?? null;
+    this.companyFantasy = params.companyFantasy ?? null;
+    this.companyInitials = params.companyInitials ?? null;
 
     this.totalParticipants = params.totalParticipants;
     this.totalAnswers = params.totalAnswers;

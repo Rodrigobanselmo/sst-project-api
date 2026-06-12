@@ -374,9 +374,11 @@ export class FormApplicationDAO {
         consolidatedGroupScope: filters.companyGroupScope === 'consolidated',
       },
     );
+    const enrichedResults =
+      await this.enrichBrowseResultsWithCompanyFields(formsWithAggregatedData);
 
     return FormApplicationBrowseModelMapper.toModel({
-      results: formsWithAggregatedData,
+      results: enrichedResults,
       pagination: { limit: pagination.limit, page: pagination.page, total: Number(totalForms[0].total) },
       filters: distinctFilters[0],
     });
@@ -516,8 +518,13 @@ export class FormApplicationDAO {
         application?.scope_type === FormApplicationScopeTypeEnum.BUSINESS_GROUP_COMPANIES;
       const currentCompanyMetric = currentCompanyMetrics.get(form.id);
 
+      const companyId =
+        (form as { company_id?: string; companyId?: string }).company_id ||
+        (form as { companyId?: string }).companyId;
+
       return {
         ...form,
+        companyId,
         total_answers: answers?.total_answers || 0,
         total_participants: participants?.total_participants || 0,
         average_time_spent: answers?.average_time_spent || null,
@@ -530,6 +537,44 @@ export class FormApplicationDAO {
           consolidatedGroupScope || !isBusinessGroupApplication
             ? null
             : currentCompanyMetric?.answers ?? 0,
+      };
+    });
+  }
+
+  private async enrichBrowseResultsWithCompanyFields<
+    T extends { companyId?: string; company_id?: string },
+  >(forms: T[]) {
+    const companyIds = [
+      ...new Set(
+        forms
+          .map((form) => form.companyId || form.company_id)
+          .filter((id): id is string => Boolean(id)),
+      ),
+    ];
+
+    if (!companyIds.length) {
+      return forms.map((form) => ({
+        ...form,
+        companyId: form.companyId || form.company_id,
+      }));
+    }
+
+    const companies = await this.prisma.company.findMany({
+      where: { id: { in: companyIds } },
+      select: { id: true, name: true, fantasy: true, initials: true },
+    });
+    const companyById = new Map(companies.map((company) => [company.id, company]));
+
+    return forms.map((form) => {
+      const companyId = form.companyId || form.company_id;
+      const company = companyId ? companyById.get(companyId) : undefined;
+
+      return {
+        ...form,
+        companyId,
+        company_name: company?.name ?? null,
+        company_fantasy: company?.fantasy ?? null,
+        company_initials: company?.initials ?? null,
       };
     });
   }
