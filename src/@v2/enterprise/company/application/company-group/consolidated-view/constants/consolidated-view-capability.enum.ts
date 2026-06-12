@@ -12,7 +12,7 @@ export const CONSOLIDATED_VIEW_CAPABILITIES = {
   riskAnalysisOperational: ConsolidatedViewCapabilityStatusEnum.DISABLED,
   riskNarrativeConcat: ConsolidatedViewCapabilityStatusEnum.NOT_IMPLEMENTED,
   indicatorsNarrative: ConsolidatedViewCapabilityStatusEnum.IMPLEMENTED,
-  pdf: ConsolidatedViewCapabilityStatusEnum.NOT_IMPLEMENTED,
+  pdf: ConsolidatedViewCapabilityStatusEnum.IMPLEMENTED,
   emails: ConsolidatedViewCapabilityStatusEnum.DISABLED,
   reminders: ConsolidatedViewCapabilityStatusEnum.DISABLED,
   banner: ConsolidatedViewCapabilityStatusEnum.DISABLED,
