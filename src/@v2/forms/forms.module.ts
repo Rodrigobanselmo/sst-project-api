@@ -1,3 +1,4 @@
+import { CompanyModule } from '@/@v2/enterprise/company/company.module';
 import { SharedModule } from '@/@v2/shared/shared.module';
 import { Module } from '@nestjs/common';
 import { CacheModule } from '@nestjs/cache-manager';
@@ -110,7 +111,13 @@ import { BuildIndicatorsNarrativeInputService } from './application/form-questio
 import { FormIndicatorsNarrativeDiagnosticRepository } from './database/repositories/form-indicators-narrative-diagnostic/form-indicators-narrative-diagnostic.repository';
 
 @Module({
-  imports: [SharedModule, SSTModule, RiskCatalogEquivalenceModule, CacheModule.register()],
+  imports: [
+    SharedModule,
+    CompanyModule,
+    SSTModule,
+    RiskCatalogEquivalenceModule,
+    CacheModule.register(),
+  ],
   controllers: [
     ReadFormController,
     DuplicateFormController,

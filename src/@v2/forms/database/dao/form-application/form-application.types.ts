@@ -29,6 +29,8 @@ export namespace IFormApplicationDAO {
       companyId: string;
       search?: string;
       status?: FormStatusEnum[];
+      companyGroupScope?: 'consolidated';
+      accessibleCompanyIds?: string[];
     };
   };
 }

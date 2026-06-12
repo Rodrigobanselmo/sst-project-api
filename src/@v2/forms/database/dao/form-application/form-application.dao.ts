@@ -370,6 +370,9 @@ export class FormApplicationDAO {
     const formsWithAggregatedData = await this.addAggregatedDataToForms(
       forms,
       filters.companyId,
+      {
+        consolidatedGroupScope: filters.companyGroupScope === 'consolidated',
+      },
     );
 
     return FormApplicationBrowseModelMapper.toModel({
@@ -380,6 +383,26 @@ export class FormApplicationDAO {
   }
 
   private browseWhere(filters: IFormApplicationDAO.BrowseParams['filters']) {
+    if (
+      filters.companyGroupScope === 'consolidated' &&
+      filters.accessibleCompanyIds?.length
+    ) {
+      const accessibleCompanyIds = filters.accessibleCompanyIds;
+
+      return [
+        Prisma.sql`form_ap."deleted_at" IS NULL`,
+        Prisma.sql`(
+          form_ap."company_id" = ANY(${accessibleCompanyIds}::text[])
+          OR EXISTS (
+            SELECT 1
+            FROM "FormApplicationCompany" fac
+            WHERE fac."form_application_id" = form_ap."id"
+              AND fac."company_id" = ANY(${accessibleCompanyIds}::text[])
+          )
+        )`,
+      ];
+    }
+
     const where = [
       Prisma.sql`form_ap."deleted_at" IS NULL`,
       Prisma.sql`(
@@ -447,7 +470,9 @@ export class FormApplicationDAO {
       | 'current_company_answers'
     >[],
     accessCompanyId: string,
+    options?: { consolidatedGroupScope?: boolean },
   ): Promise<IFormApplicationBrowseResultModelMapper[]> {
+    const consolidatedGroupScope = options?.consolidatedGroupScope ?? false;
     if (forms.length === 0) return [];
 
     const formApplicationIds = forms.map((form) => form.id);
@@ -467,8 +492,9 @@ export class FormApplicationDAO {
 
     const participantsDataPromise =
       this.getParticipantsCountFromMetadata(applications);
-    const currentCompanyMetricsPromise =
-      this.getCurrentCompanyMetricsForBusinessGroup(accessCompanyId, applications);
+    const currentCompanyMetricsPromise = consolidatedGroupScope
+      ? Promise.resolve(new Map<string, { participants: number; answers: number }>())
+      : this.getCurrentCompanyMetricsForBusinessGroup(accessCompanyId, applications);
 
     const [answersData, participantsData, currentCompanyMetrics] = await Promise.all([
       answersDataPromise,
@@ -496,12 +522,14 @@ export class FormApplicationDAO {
         total_participants: participants?.total_participants || 0,
         average_time_spent: answers?.average_time_spent || null,
         is_business_group_application: isBusinessGroupApplication,
-        current_company_participants: isBusinessGroupApplication
-          ? currentCompanyMetric?.participants ?? 0
-          : null,
-        current_company_answers: isBusinessGroupApplication
-          ? currentCompanyMetric?.answers ?? 0
-          : null,
+        current_company_participants:
+          consolidatedGroupScope || !isBusinessGroupApplication
+            ? null
+            : currentCompanyMetric?.participants ?? 0,
+        current_company_answers:
+          consolidatedGroupScope || !isBusinessGroupApplication
+            ? null
+            : currentCompanyMetric?.answers ?? 0,
       };
     });
   }

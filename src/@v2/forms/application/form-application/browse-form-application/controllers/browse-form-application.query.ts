@@ -2,7 +2,7 @@ import { FormApplicationOrderByEnum } from '@/@v2/forms/database/dao/form-applic
 import { FormStatusEnum } from '@/@v2/forms/domain/enums/form-status.enum';
 import { OrderByDirectionEnum } from '@/@v2/shared/types/order-by.types';
 import { Type } from 'class-transformer';
-import { IsArray, IsEnum, IsInt, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsArray, IsEnum, IsIn, IsInt, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 class OrderBy {
   @IsEnum(FormApplicationOrderByEnum)
@@ -34,4 +34,13 @@ export class BrowseFormApplicationQuery {
   @ValidateNested({ each: true })
   @Type(() => OrderBy)
   orderBy?: OrderBy[];
+
+  @IsOptional()
+  @IsIn(['consolidated'])
+  companyGroupScope?: 'consolidated';
+
+  @Type(() => Number)
+  @IsInt()
+  @IsOptional()
+  companyGroupId?: number;
 }

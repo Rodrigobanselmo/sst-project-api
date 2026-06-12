@@ -1,4 +1,7 @@
 export const CompanyRoutes = {
+  COMPANY_GROUP: {
+    HOME_SUMMARY: 'v2/company-groups/:companyGroupId/home-summary',
+  },
   REPAIR_HYBRID_FORM_APPLICATIONS:
     'v2/companies/:companyId/repair-hybrid-form-applications',
   WORKSPACE: {

@@ -14,6 +14,10 @@ import { ReadVisualIdentityController } from './application/visual-identity/read
 import { ReadVisualIdentityUseCase } from './application/visual-identity/read-visual-identity/use-cases/read-visual-identity.usecase';
 import { WorkspaceDAO } from './database/dao/workspace/workspace.dao';
 import { VisualIdentityDAO } from './database/dao/visual-identity/visual-identity.dao';
+import { CompanyGroupHomeSummaryController } from './application/company-group/home-summary/controllers/company-group-home-summary.controller';
+import { CompanyGroupHomeSummaryUseCase } from './application/company-group/home-summary/use-cases/company-group-home-summary.usecase';
+import { CompanyGroupHomeSummaryDAO } from './database/dao/company-group/company-group-home-summary.dao';
+import { AccessibleGroupCompaniesService } from './application/shared/services/accessible-group-companies.service';
 
 @Module({
   imports: [SharedModule],
@@ -23,11 +27,13 @@ import { VisualIdentityDAO } from './database/dao/visual-identity/visual-identit
     ConvertWorkspaceToCompanyController,
     RepairHybridFormApplicationsController,
     ReadVisualIdentityController,
+    CompanyGroupHomeSummaryController,
   ],
   providers: [
     // Database
     WorkspaceDAO,
     VisualIdentityDAO,
+    CompanyGroupHomeSummaryDAO,
 
     // Use Cases
     BrowseWorkspaceUseCase,
@@ -37,7 +43,9 @@ import { VisualIdentityDAO } from './database/dao/visual-identity/visual-identit
     WorkspaceConvertService,
     WorkspaceOperationalDataCloneService,
     ReadVisualIdentityUseCase,
+    CompanyGroupHomeSummaryUseCase,
+    AccessibleGroupCompaniesService,
   ],
-  exports: [],
+  exports: [AccessibleGroupCompaniesService],
 })
 export class CompanyModule {}
