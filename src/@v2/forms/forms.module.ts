@@ -1,6 +1,6 @@
 import { CompanyModule } from '@/@v2/enterprise/company/company.module';
 import { SharedModule } from '@/@v2/shared/shared.module';
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { CacheModule } from '@nestjs/cache-manager';
 import { FormApplicationCacheService } from './services/form-application-cache.service';
 import { FormQuestionsAnswersRisksService } from './application/form-questions-answers/shared/services/form-questions-answers-risks.service';
@@ -113,7 +113,7 @@ import { FormIndicatorsNarrativeDiagnosticRepository } from './database/reposito
 @Module({
   imports: [
     SharedModule,
-    CompanyModule,
+    forwardRef(() => CompanyModule),
     SSTModule,
     RiskCatalogEquivalenceModule,
     CacheModule.register(),
@@ -231,6 +231,6 @@ import { FormIndicatorsNarrativeDiagnosticRepository } from './database/reposito
     GenerateIndicatorsNarrativeDiagnosticUseCase,
     ReadIndicatorsNarrativeDiagnosticUseCase,
   ],
-  exports: [],
+  exports: [FormParticipantsDAO],
 })
 export class FormModule {}

@@ -1,10 +1,11 @@
 export enum ConsolidatedViewCapabilityStatusEnum {
+  IMPLEMENTED = 'implemented',
   NOT_IMPLEMENTED = 'not_implemented',
   DISABLED = 'disabled',
 }
 
 export const CONSOLIDATED_VIEW_CAPABILITIES = {
-  participants: ConsolidatedViewCapabilityStatusEnum.NOT_IMPLEMENTED,
+  participants: ConsolidatedViewCapabilityStatusEnum.IMPLEMENTED,
   charts: ConsolidatedViewCapabilityStatusEnum.NOT_IMPLEMENTED,
   indicators: ConsolidatedViewCapabilityStatusEnum.NOT_IMPLEMENTED,
   structuralGroupings: ConsolidatedViewCapabilityStatusEnum.NOT_IMPLEMENTED,

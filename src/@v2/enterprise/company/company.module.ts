@@ -1,6 +1,7 @@
+import { FormModule } from '@/@v2/forms/forms.module';
 import { ActionPlanModule } from '@/@v2/security/action-plan/action-plan.module';
 import { SharedModule } from '@/@v2/shared/shared.module';
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { BrowseWorkspaceController } from './application/workspace/browse-all-workspaces/controllers/browse-all-workspaces.controller';
 import { BrowseWorkspaceUseCase } from './application/workspace/browse-all-workspaces/use-cases/browse-all-workspaces.usecase';
 import { DeleteWorkspaceController } from './application/workspace/delete-workspace/controllers/delete-workspace.controller';
@@ -22,14 +23,18 @@ import { AccessibleGroupCompaniesService } from './application/shared/services/a
 import { CompanyGroupActionPlanSummaryService } from './application/company-group/home-summary/services/company-group-action-plan-summary.service';
 import { CompanyGroupConsolidatedViewEligibilityController } from './application/company-group/consolidated-view/controllers/company-group-consolidated-view-eligibility.controller';
 import { CompanyGroupConsolidatedViewSummaryController } from './application/company-group/consolidated-view/controllers/company-group-consolidated-view-summary.controller';
+import { CompanyGroupConsolidatedViewParticipantsController } from './application/company-group/consolidated-view/controllers/company-group-consolidated-view-participants.controller';
 import { CompanyGroupConsolidatedViewEligibilityUseCase } from './application/company-group/consolidated-view/use-cases/company-group-consolidated-view-eligibility.usecase';
 import { CompanyGroupConsolidatedViewSummaryUseCase } from './application/company-group/consolidated-view/use-cases/company-group-consolidated-view-summary.usecase';
+import { CompanyGroupConsolidatedViewParticipantsUseCase } from './application/company-group/consolidated-view/use-cases/company-group-consolidated-view-participants.usecase';
 import { CompanyGroupConsolidatedViewEligibilityService } from './application/company-group/consolidated-view/services/company-group-consolidated-view-eligibility.service';
 import { CompanyGroupConsolidatedViewMetricsService } from './application/company-group/consolidated-view/services/company-group-consolidated-view-metrics.service';
+import { CompanyGroupConsolidatedViewContextService } from './application/company-group/consolidated-view/services/company-group-consolidated-view-context.service';
+import { CompanyGroupConsolidatedViewParticipantsService } from './application/company-group/consolidated-view/services/company-group-consolidated-view-participants.service';
 import { FormApplicationStructureFingerprintService } from './application/company-group/consolidated-view/services/form-application-structure-fingerprint.service';
 
 @Module({
-  imports: [SharedModule, ActionPlanModule],
+  imports: [SharedModule, ActionPlanModule, forwardRef(() => FormModule)],
   controllers: [
     BrowseWorkspaceController,
     DeleteWorkspaceController,
@@ -39,6 +44,7 @@ import { FormApplicationStructureFingerprintService } from './application/compan
     CompanyGroupHomeSummaryController,
     CompanyGroupConsolidatedViewEligibilityController,
     CompanyGroupConsolidatedViewSummaryController,
+    CompanyGroupConsolidatedViewParticipantsController,
   ],
   providers: [
     // Database
@@ -59,8 +65,11 @@ import { FormApplicationStructureFingerprintService } from './application/compan
     CompanyGroupActionPlanSummaryService,
     CompanyGroupConsolidatedViewEligibilityUseCase,
     CompanyGroupConsolidatedViewSummaryUseCase,
+    CompanyGroupConsolidatedViewParticipantsUseCase,
     CompanyGroupConsolidatedViewEligibilityService,
     CompanyGroupConsolidatedViewMetricsService,
+    CompanyGroupConsolidatedViewContextService,
+    CompanyGroupConsolidatedViewParticipantsService,
     FormApplicationStructureFingerprintService,
   ],
   exports: [AccessibleGroupCompaniesService],
