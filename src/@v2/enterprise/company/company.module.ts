@@ -26,18 +26,26 @@ import { CompanyGroupConsolidatedViewSummaryController } from './application/com
 import { CompanyGroupConsolidatedViewParticipantsController } from './application/company-group/consolidated-view/controllers/company-group-consolidated-view-participants.controller';
 import { CompanyGroupConsolidatedViewQuestionsAnswersController } from './application/company-group/consolidated-view/controllers/company-group-consolidated-view-questions-answers.controller';
 import { CompanyGroupConsolidatedViewIndicatorsNarrativeDiagnosticController } from './application/company-group/consolidated-view/controllers/company-group-consolidated-view-indicators-narrative-diagnostic.controller';
+import { CompanyGroupConsolidatedViewRiskAnalysisController } from './application/company-group/consolidated-view/controllers/company-group-consolidated-view-risk-analysis.controller';
+import { CompanyGroupConsolidatedViewRiskNarrativeDiagnosticController } from './application/company-group/consolidated-view/controllers/company-group-consolidated-view-risk-narrative-diagnostic.controller';
 import { CompanyGroupConsolidatedViewEligibilityUseCase } from './application/company-group/consolidated-view/use-cases/company-group-consolidated-view-eligibility.usecase';
 import { CompanyGroupConsolidatedViewSummaryUseCase } from './application/company-group/consolidated-view/use-cases/company-group-consolidated-view-summary.usecase';
 import { CompanyGroupConsolidatedViewParticipantsUseCase } from './application/company-group/consolidated-view/use-cases/company-group-consolidated-view-participants.usecase';
 import { CompanyGroupConsolidatedViewQuestionsAnswersUseCase } from './application/company-group/consolidated-view/use-cases/company-group-consolidated-view-questions-answers.usecase';
 import { CompanyGroupConsolidatedViewIndicatorsNarrativeDiagnosticReadUseCase } from './application/company-group/consolidated-view/use-cases/company-group-consolidated-view-indicators-narrative-diagnostic-read.usecase';
 import { CompanyGroupConsolidatedViewIndicatorsNarrativeDiagnosticGenerateUseCase } from './application/company-group/consolidated-view/use-cases/company-group-consolidated-view-indicators-narrative-diagnostic-generate.usecase';
+import { CompanyGroupConsolidatedViewRiskAnalysisUseCase } from './application/company-group/consolidated-view/use-cases/company-group-consolidated-view-risk-analysis.usecase';
+import { CompanyGroupConsolidatedViewRiskNarrativeDiagnosticGenerateUseCase } from './application/company-group/consolidated-view/use-cases/company-group-consolidated-view-risk-narrative-diagnostic-generate.usecase';
+import { CompanyGroupConsolidatedViewRiskNarrativeDiagnosticReadUseCase } from './application/company-group/consolidated-view/use-cases/company-group-consolidated-view-risk-narrative-diagnostic-read.usecase';
 import { CompanyGroupConsolidatedViewEligibilityService } from './application/company-group/consolidated-view/services/company-group-consolidated-view-eligibility.service';
 import { CompanyGroupConsolidatedViewMetricsService } from './application/company-group/consolidated-view/services/company-group-consolidated-view-metrics.service';
 import { CompanyGroupConsolidatedViewContextService } from './application/company-group/consolidated-view/services/company-group-consolidated-view-context.service';
 import { CompanyGroupConsolidatedViewParticipantsService } from './application/company-group/consolidated-view/services/company-group-consolidated-view-participants.service';
 import { CompanyGroupConsolidatedViewQuestionsAnswersService } from './application/company-group/consolidated-view/services/company-group-consolidated-view-questions-answers.service';
 import { CompanyGroupConsolidatedViewIndicatorsNarrativeDiagnosticService } from './application/company-group/consolidated-view/services/company-group-consolidated-view-indicators-narrative-diagnostic.service';
+import { CompanyGroupConsolidatedViewRiskAnalysisService } from './application/company-group/consolidated-view/services/company-group-consolidated-view-risk-analysis.service';
+import { CompanyGroupConsolidatedViewRiskNarrativeDiagnosticService } from './application/company-group/consolidated-view/services/company-group-consolidated-view-risk-narrative-diagnostic.service';
+import { BuildConsolidatedRiskNarrativeInputService } from './application/company-group/consolidated-view/services/build-consolidated-risk-narrative-input.service';
 import { BuildConsolidatedIndicatorsNarrativeInputService } from './application/company-group/consolidated-view/services/build-consolidated-indicators-narrative-input.service';
 import { FormApplicationStructureFingerprintService } from './application/company-group/consolidated-view/services/form-application-structure-fingerprint.service';
 
@@ -55,6 +63,8 @@ import { FormApplicationStructureFingerprintService } from './application/compan
     CompanyGroupConsolidatedViewParticipantsController,
     CompanyGroupConsolidatedViewQuestionsAnswersController,
     CompanyGroupConsolidatedViewIndicatorsNarrativeDiagnosticController,
+    CompanyGroupConsolidatedViewRiskAnalysisController,
+    CompanyGroupConsolidatedViewRiskNarrativeDiagnosticController,
   ],
   providers: [
     // Database
@@ -79,12 +89,18 @@ import { FormApplicationStructureFingerprintService } from './application/compan
     CompanyGroupConsolidatedViewQuestionsAnswersUseCase,
     CompanyGroupConsolidatedViewIndicatorsNarrativeDiagnosticReadUseCase,
     CompanyGroupConsolidatedViewIndicatorsNarrativeDiagnosticGenerateUseCase,
+    CompanyGroupConsolidatedViewRiskAnalysisUseCase,
+    CompanyGroupConsolidatedViewRiskNarrativeDiagnosticGenerateUseCase,
+    CompanyGroupConsolidatedViewRiskNarrativeDiagnosticReadUseCase,
     CompanyGroupConsolidatedViewEligibilityService,
     CompanyGroupConsolidatedViewMetricsService,
     CompanyGroupConsolidatedViewContextService,
     CompanyGroupConsolidatedViewParticipantsService,
     CompanyGroupConsolidatedViewQuestionsAnswersService,
     CompanyGroupConsolidatedViewIndicatorsNarrativeDiagnosticService,
+    CompanyGroupConsolidatedViewRiskAnalysisService,
+    CompanyGroupConsolidatedViewRiskNarrativeDiagnosticService,
+    BuildConsolidatedRiskNarrativeInputService,
     BuildConsolidatedIndicatorsNarrativeInputService,
     FormApplicationStructureFingerprintService,
   ],

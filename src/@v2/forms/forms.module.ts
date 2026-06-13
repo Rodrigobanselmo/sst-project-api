@@ -234,7 +234,10 @@ import { FormIndicatorsNarrativeDiagnosticRepository } from './database/reposito
   exports: [
     FormParticipantsDAO,
     BrowseFormQuestionsAnswersUseCase,
+    BrowseFormQuestionsAnswersRisksUseCase,
+    BrowseFormQuestionsAnswersAnalysisUseCase,
     FormIndicatorsNarrativeDiagnosticRepository,
+    FormRiskNarrativeDiagnosticRepository,
     SystemAiPromptResolverService,
   ],
 })

@@ -11,6 +11,10 @@ export const CompanyRoutes = {
       'v2/company-groups/:companyGroupId/forms/applications/consolidated-view/questions-answers',
     CONSOLIDATED_VIEW_INDICATORS_NARRATIVE_DIAGNOSTIC:
       'v2/company-groups/:companyGroupId/forms/applications/consolidated-view/indicators-narrative-diagnostic',
+    CONSOLIDATED_VIEW_RISK_ANALYSIS:
+      'v2/company-groups/:companyGroupId/forms/applications/consolidated-view/risk-analysis',
+    CONSOLIDATED_VIEW_RISK_NARRATIVE_DIAGNOSTIC:
+      'v2/company-groups/:companyGroupId/forms/applications/consolidated-view/risk-narrative-diagnostic',
   },
   REPAIR_HYBRID_FORM_APPLICATIONS:
     'v2/companies/:companyId/repair-hybrid-form-applications',
