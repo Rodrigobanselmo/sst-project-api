@@ -8,11 +8,16 @@ import {
   Post,
   Query,
   Res,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 
 import { OccupationalHygieneRoutes } from '@/@v2/occupational-hygiene/constants/routes';
+import { ALLOWED_ALL_TYPES, MAX_DOCUMENT_SIZE } from '@/@v2/shared/constants/files';
+import { createFileValidator } from '@/@v2/shared/utils/file/create-file-validator';
 import { JwtAuthGuard } from '@/@v2/shared/guards/jwt-auth.guard';
 import { PermissionEnum } from '@/shared/constants/enum/authorization';
 import { Permissions } from '@/shared/decorators/permissions.decorator';
@@ -26,6 +31,7 @@ import {
   HoMethodRiskSearchQuery,
   HoMethodWritePayload,
 } from './ho-method.dto';
+import { HoMethodImportService } from '../import/ho-method-import.service';
 import { HoMethodRiskSearchService } from '../ho-method-risk-search.service';
 import { HoMethodService } from '../ho-method.service';
 import { HoMethodWriteInput } from '../ho-method.types';
@@ -55,6 +61,7 @@ export class HoMethodController {
   constructor(
     private readonly hoMethodService: HoMethodService,
     private readonly hoMethodRiskSearchService: HoMethodRiskSearchService,
+    private readonly hoMethodImportService: HoMethodImportService,
   ) {}
 
   @Get('risk-factors/search')
@@ -95,6 +102,31 @@ export class HoMethodController {
         status: query.status,
         prioritized: query.prioritized,
       },
+    });
+  }
+
+  @Post('import/parse-pdf')
+  @UseInterceptors(FileInterceptor('file'))
+  @Permissions({
+    code: PermissionEnum.RISK,
+    crud: 'c',
+    isMember: true,
+    isContract: true,
+  })
+  parseImportPdf(
+    @UploadedFile(
+      createFileValidator({
+        maxSize: MAX_DOCUMENT_SIZE,
+        fileType: ALLOWED_ALL_TYPES,
+      }),
+    )
+    file: any,
+    @User() user: UserPayloadDto,
+  ) {
+    return this.hoMethodImportService.parsePdf({
+      buffer: file.buffer,
+      filename: file.originalname,
+      companyId: user.targetCompanyId || user.companyId,
     });
   }
 

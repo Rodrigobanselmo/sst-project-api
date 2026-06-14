@@ -18,6 +18,7 @@ import {
   HoMethodFileService,
   HoSamplerService,
 } from './ho-method/ho-catalog.service';
+import { HoMethodImportService } from './ho-method/import/ho-method-import.service';
 import { HoMethodDAO } from './ho-method/ho-method.dao';
 import { HoMethodRepository } from './ho-method/ho-method.repository';
 import { HoMethodRiskSearchService } from './ho-method/ho-method-risk-search.service';
@@ -38,6 +39,7 @@ import { HoMethodService } from './ho-method/ho-method.service';
     HoMethodRepository,
     HoMethodService,
     HoMethodRiskSearchService,
+    HoMethodImportService,
     HoSamplerService,
     HoExtractionSolventService,
     HoLaboratoryService,

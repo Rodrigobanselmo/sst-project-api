@@ -4,6 +4,7 @@ export const OccupationalHygieneRoutes = {
     BY_ID: 'v2/ho-methods/:id',
     UPLOAD: 'v2/companies/:companyId/ho-methods/files',
     RISK_SEARCH: 'v2/ho-methods/risk-factors/search',
+    IMPORT_PARSE_PDF: 'v2/ho-methods/import/parse-pdf',
   },
   HO_SAMPLER: {
     BASE: 'v2/ho-samplers',
