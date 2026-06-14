@@ -435,15 +435,21 @@ export class RiskRepository implements IRiskRepository {
     });
 
     if ('search' in query && query.search) {
+      const normalizedSearch = query.search.trim();
+      const casCompact = normalizedSearch.replace(/[-\s]/g, '');
       const synonymousRiskIds = await this.findIdsBySynonymousSearch({
         companyId: String(query.companyId),
-        search: query.search,
+        search: normalizedSearch,
       });
 
       (where.AND as any).push({
         OR: [
-          { name: { contains: query.search, mode: 'insensitive' } },
-          { cas: { contains: query.search, mode: 'insensitive' } },
+          { name: { contains: normalizedSearch, mode: 'insensitive' } },
+          { cas: { contains: normalizedSearch, mode: 'insensitive' } },
+          { search: { contains: normalizedSearch.toLowerCase(), mode: 'insensitive' } },
+          ...(casCompact && casCompact !== normalizedSearch
+            ? [{ cas: { contains: casCompact, mode: 'insensitive' } }]
+            : []),
           ...(synonymousRiskIds.length ? [{ id: { in: synonymousRiskIds } }] : []),
         ],
       } as typeof options.where);

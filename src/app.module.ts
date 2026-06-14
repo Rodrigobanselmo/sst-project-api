@@ -29,6 +29,7 @@ import { CommunicationModule } from './@v2/communications/comunication.module';
 import { UploadModule } from './@v2/import/upload/upload.module';
 import { AiChatModule } from './@v2/ai-chat/ai-chat.module';
 import { RiskCatalogModule } from './@v2/risk-catalog/risk-catalog.module';
+import { OccupationalHygieneModule } from './@v2/occupational-hygiene/occupational-hygiene.module';
 
 @Module({
   imports: [
@@ -56,6 +57,7 @@ import { RiskCatalogModule } from './@v2/risk-catalog/risk-catalog.module';
     UploadModule,
     AiChatModule,
     RiskCatalogModule,
+    OccupationalHygieneModule,
   ],
   providers: [
     {
