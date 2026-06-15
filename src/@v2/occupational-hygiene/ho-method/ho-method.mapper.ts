@@ -47,6 +47,7 @@ const riskFactorOccupationalLimitSelect = {
   oshaCeiling: true,
   aihaWeel: true,
   aihaWeelCeiling: true,
+  coments: true,
 } as const;
 
 type RiskFactorOccupationalLimitPick = Pick<
@@ -94,6 +95,7 @@ export const mapHoMethodRiskFactorSnapshot = (
     oshaCeiling: record.oshaCeiling,
     aihaWeel: record.aihaWeel,
     aihaWeelCeiling: record.aihaWeelCeiling,
+    coments: record.coments,
   };
 };
 

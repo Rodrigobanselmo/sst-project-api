@@ -3,15 +3,17 @@ import {
   HoMethodImportField,
   HoMethodImportParseResult,
 } from './ho-method-import.types';
+import { parseSamplingBlock } from './ho-method-niosh-sampling-parser.util';
 import {
   associateExposureLimitsWithCompounds,
+  buildAgentTechnicalNotesFromExposureRow,
   buildOccupationalLimitsFromExposureRow,
   createEmptyOccupationalLimits,
   formatCompoundName,
   isInvalidAgentCandidate,
   normalizeCompoundNameForMatch,
-  parseCompoundSynonymsTable,
-  parseExposureLimitsTable,
+  parseNmamCompoundTable,
+  parseNmamExposureLimitsTable,
   referencesNmamTable,
 } from './ho-method-niosh-table-parser.util';
 
@@ -30,13 +32,6 @@ const firstMatch = (text: string, pattern: RegExp) => {
   return match?.[1]?.trim() ?? null;
 };
 
-const parseNumber = (raw: string | null) => {
-  if (!raw) return null;
-  const normalized = raw.replace(',', '.');
-  const parsed = Number(normalized);
-  return Number.isFinite(parsed) ? parsed : null;
-};
-
 const parseCasNumbers = (text: string) => {
   const matches = [...text.matchAll(/\b(\d{2,7}-\d{2}-\d)\b/g)];
   return [...new Set(matches.map((match) => match[1]))];
@@ -51,74 +46,7 @@ const parseIssueDate = (text: string, issueNumber: string | null) => {
   return firstMatch(text, pattern);
 };
 
-const parseSamplingTable = (text: string) => {
-  const tableMatch = text.match(
-    /SAMPLER:\s*\nFLOW RATE:\s*\nVOL-MIN:\s*\nMAX:\s*\nSHIPMENT:\s*\nSAMPLE\s*\nSTABILITY:\s*\nBLANKS:\s*\n([\s\S]*?)(?=ACCURACY)/i,
-  );
-
-  if (!tableMatch) return null;
-
-  const lines = tableMatch[1]
-    .split('\n')
-    .map((line) => line.trim())
-    .filter(Boolean);
-
-  const flowIdx = lines.findIndex((line) => /L\s*\/?\s*min/i.test(line));
-  if (flowIdx < 1) return null;
-
-  const sampler = lines
-    .slice(0, flowIdx)
-    .join(' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-  const flowRaw = lines[flowIdx] ?? null;
-  const volMinRaw = lines[flowIdx + 1] ?? null;
-  const volMaxRaw = lines[flowIdx + 2] ?? null;
-  const shipment = lines[flowIdx + 3] ?? null;
-  const stabilityRaw = lines[flowIdx + 4] ?? null;
-  const blanks = lines.slice(flowIdx + 5).join(' · ') || null;
-
-  const flowMatch = flowRaw?.match(
-    /(\d+(?:[.,]\d+)?)\s*(?:-|–|to)\s*(\d+(?:[.,]\d+)?)\s*L\s*\/?\s*min/i,
-  );
-  const volMinMatch = volMinRaw?.match(/(\d+(?:[.,]\d+)?)\s*L/i);
-  const volMaxMatch = volMaxRaw?.match(/(\d+(?:[.,]\d+)?)\s*L/i);
-
-  const weekMatch = stabilityRaw?.match(/(\d+)\s*week/i);
-  const dayMatch = stabilityRaw?.match(/(\d+)\s*day/i);
-  const tempMatch = stabilityRaw?.match(/@\s*(\d+(?:[.,]\d+)?)\s*°?\s*([CF])/i);
-  const stabilityDays = weekMatch
-    ? Number(weekMatch[1]) * 7
-    : dayMatch
-      ? Number(dayMatch[1])
-      : null;
-
-  return {
-    sampler,
-    flowRaw,
-    flowMatch,
-    volMinRaw,
-    volMaxRaw,
-    volMinMatch,
-    volMaxMatch,
-    shipment,
-    stabilityRaw,
-    blanks,
-    stabilityDays,
-    tempMatch,
-  };
-};
-
-const parseSamplerBlock = (text: string) => {
-  const table = parseSamplingTable(text);
-  if (table?.sampler) return table.sampler;
-
-  const block = firstMatch(
-    text,
-    /SAMPLER:\s*([^\n]+)/i,
-  );
-  return block?.replace(/\s+/g, ' ').trim() || null;
-};
+const parseSamplerBlock = (text: string) => parseSamplingBlock(text)?.sampler ?? null;
 
 const parseSynonyms = (text: string) => {
   const raw = firstMatch(text, /SYNONYMS:\s*([\s\S]*?)(?=SAMPLER:|ACCURACY|$)/i);
@@ -140,11 +68,13 @@ const buildAgentSuggestion = (
   cas: string | null,
   synonyms: string[],
   occupationalLimits?: HoMethodImportAgentSuggestion['occupationalLimits'],
+  technicalNotes?: string[],
 ): HoMethodImportAgentSuggestion => ({
   substanceName: formatCompoundName(substanceName),
   cas,
   synonyms,
   occupationalLimits,
+  technicalNotes,
   matchedRiskFactor: null,
   found: false,
   matchConfidence: 'none',
@@ -152,10 +82,10 @@ const buildAgentSuggestion = (
 });
 
 const parseAgentsFromCompoundTable = (text: string) => {
-  const compoundRows = parseCompoundSynonymsTable(text);
+  const compoundRows = parseNmamCompoundTable(text);
   if (!compoundRows.length) return [] as HoMethodImportAgentSuggestion[];
 
-  const exposureRows = parseExposureLimitsTable(text);
+  const exposureRows = parseNmamExposureLimitsTable(text);
   const limitsByCompound = associateExposureLimitsWithCompounds(
     compoundRows,
     exposureRows,
@@ -171,6 +101,7 @@ const parseAgentsFromCompoundTable = (text: string) => {
       row.cas,
       row.synonyms,
       limits ? buildOccupationalLimitsFromExposureRow(limits) : undefined,
+      buildAgentTechnicalNotesFromExposureRow(limits),
     );
   });
 };
@@ -182,15 +113,32 @@ const parseAgentsFromText = (
 ) => {
   const casHeader = firstMatch(text, /CAS:\s*([^\n]+)/i);
   const analyteRaw = firstMatch(text, /ANALYTE:\s*([^\n]+)/i);
+  const synonymsHeader = firstMatch(text, /SYNONYMS:\s*([^\n]+)/i);
+  const oshaHeader = firstMatch(text, /OSHA:\s*([^\n]+)/i);
+  const nioshHeader =
+    firstMatch(text, /NIOSH(?:\s*REL)?:\s*([^\n]+)/i) ??
+    firstMatch(text, /NIOSH:\s*([^\n]+)/i);
 
-  if (
+  const usesCompoundTable =
     referencesNmamTable(casHeader, 1) ||
     referencesNmamTable(analyteRaw, 1) ||
-    referencesNmamTable(firstMatch(text, /SYNONYMS:\s*([^\n]+)/i), 1)
-  ) {
+    referencesNmamTable(synonymsHeader, 1) ||
+    /see\s+(?:individual\s+compounds\s+in\s+)?table\s+1/i.test(analyteRaw ?? '') ||
+    /see\s+(?:individual\s+compounds\s+in\s+)?table\s+1/i.test(synonymsHeader ?? '');
+
+  const usesLimitsTable =
+    referencesNmamTable(oshaHeader, 2) ||
+    referencesNmamTable(oshaHeader, 3) ||
+    referencesNmamTable(nioshHeader, 2) ||
+    referencesNmamTable(nioshHeader, 3);
+
+  if (usesCompoundTable || usesLimitsTable) {
     const tableAgents = parseAgentsFromCompoundTable(text);
     if (tableAgents.length) return tableAgents;
   }
+
+  const fallbackTableAgents = parseAgentsFromCompoundTable(text);
+  if (fallbackTableAgents.length >= 2) return fallbackTableAgents;
 
   const titlePattern = methodCode
     ? new RegExp(
@@ -241,12 +189,12 @@ const parseAgentsFromText = (
 
 const capitalizeAgentName = (value: string) => formatCompoundName(value);
 
-const parseStability = (text: string, table?: ReturnType<typeof parseSamplingTable>) => {
-  const raw =
-    table?.stabilityRaw ??
-    firstMatch(text, /(?:SAMPLE\s*)?STABILITY:\s*([^\n]+)/i);
+const parseStability = (text: string, samplingBlock?: ReturnType<typeof parseSamplingBlock>) => {
+  const parsed =
+    samplingBlock?.stability ??
+  parseSamplingBlock(text)?.stability;
 
-  if (!raw) {
+  if (!parsed) {
     return {
       stabilityText: field<string>(null, 'low'),
       stabilityDays: field<number>(null, 'low'),
@@ -255,35 +203,22 @@ const parseStability = (text: string, table?: ReturnType<typeof parseSamplingTab
     };
   }
 
-  const weekMatch = raw.match(/(\d+)\s*week/i);
-  const dayMatch = raw.match(/(\d+)\s*day/i);
-  const tempMatch =
-    table?.tempMatch ?? raw.match(/@\s*(\d+(?:[.,]\d+)?)\s*°?\s*([CF])/i);
-
-  const stabilityDays =
-    table?.stabilityDays ??
-    (weekMatch
-      ? Number(weekMatch[1]) * 7
-      : dayMatch
-        ? Number(dayMatch[1])
-        : null);
-
   return {
-    stabilityText: field(raw, weekMatch || dayMatch ? 'high' : 'medium', raw),
+    stabilityText: field(parsed.text, parsed.days != null ? 'high' : 'medium', parsed.text),
     stabilityDays: field(
-      stabilityDays,
-      stabilityDays != null ? 'high' : 'medium',
-      raw,
+      parsed.days,
+      parsed.days != null ? 'high' : 'medium',
+      parsed.text,
     ),
     storageTemperature: field(
-      tempMatch ? parseNumber(tempMatch[1]) : null,
-      tempMatch ? 'high' : 'low',
-      raw,
+      parsed.temperature,
+      parsed.temperature != null ? 'high' : 'low',
+      parsed.text,
     ),
     storageTemperatureUnit: field(
-      tempMatch ? `°${tempMatch[2].toUpperCase()}` : null,
-      tempMatch ? 'high' : 'low',
-      raw,
+      parsed.temperatureUnit,
+      parsed.temperatureUnit ? 'high' : 'low',
+      parsed.text,
     ),
   };
 };
@@ -304,7 +239,9 @@ const parseOccupationalLimits = (text: string) => {
 
   if (
     referencesNmamTable(oshaRaw, 3) ||
-    referencesNmamTable(nioshRaw, 3)
+    referencesNmamTable(nioshRaw, 3) ||
+    referencesNmamTable(oshaRaw, 2) ||
+    referencesNmamTable(nioshRaw, 2)
   ) {
     return createEmptyOccupationalLimits();
   }
@@ -407,7 +344,7 @@ export function parseNioshNmamPdfText(text: string): HoMethodImportParseResult {
       ? 'NMAM'
       : 'UNKNOWN';
 
-  const samplingTable = parseSamplingTable(text);
+  const samplingBlock = parseSamplingBlock(text);
 
   const methodHeader = firstMatch(text, /METHOD:\s*([^,\n]+)/i);
   const methodCode = firstMatch(text, /METHOD:\s*(\d+)/i);
@@ -426,25 +363,16 @@ export function parseNioshNmamPdfText(text: string): HoMethodImportParseResult {
   const technique = techniqueShort ?? techniqueBlock;
   const analyticalMethod = techniqueShort ?? techniqueBlock;
   const sampler = parseSamplerBlock(text);
-  const flowRaw =
-    samplingTable?.flowRaw ?? firstMatch(text, /FLOW RATE:\s*([^\n]+)/i);
-  const flowMatch =
-    samplingTable?.flowMatch ??
-    flowRaw?.match(
-      /(\d+(?:[.,]\d+)?)\s*(?:-|–|to)\s*(\d+(?:[.,]\d+)?)\s*L\s*\/?\s*min/i,
-    );
-  const volMinRaw =
-    samplingTable?.volMinRaw ?? firstMatch(text, /VOL-MIN:\s*([^\n]+)/i);
+  const flow = samplingBlock?.flow;
+  const volume = samplingBlock?.volume;
+  const flowRaw = flow?.raw ?? firstMatch(text, /FLOW RATE:\s*([^\n]+)/i);
+  const volMinRaw = volume?.rawMin ?? firstMatch(text, /VOL-MIN:\s*([^\n]+)/i);
   const volMaxRaw =
-    samplingTable?.volMaxRaw ??
-    firstMatch(text, /(?:^|\n)MAX:\s*([^\n]+)/im);
-  const volMinMatch =
-    samplingTable?.volMinMatch ?? volMinRaw?.match(/(\d+(?:[.,]\d+)?)\s*L/i);
-  const volMaxMatch =
-    samplingTable?.volMaxMatch ?? volMaxRaw?.match(/(\d+(?:[.,]\d+)?)\s*L/i);
+    volume?.rawMax ?? firstMatch(text, /(?:VOL-MAX|MAX):\s*([^\n]+)/im);
   const shipment =
-    samplingTable?.shipment ?? firstMatch(text, /SHIPMENT:\s*([^\n]+)/i);
-  const desorption = firstMatch(text, /DESORPTION:\s*([^\n]+)/i);
+    samplingBlock?.shipment ?? firstMatch(text, /SHIPMENT:\s*([^\n]+)/i);
+  const desorption =
+    samplingBlock?.extractionSolvent ?? firstMatch(text, /DESORPTION:\s*([^\n]+)/i);
   const analyte = firstMatch(text, /ANALYTE:\s*([^\n]+)/i);
   const detector = firstMatch(text, /DETECTOR:\s*([^\n]+)/i);
   const lod = firstMatch(text, /ESTIMATED LOD:\s*([^\n]+)/i);
@@ -453,7 +381,7 @@ export function parseNioshNmamPdfText(text: string): HoMethodImportParseResult {
   const interferences = firstMatch(text, /INTERFERENCES:\s*([^\n]+)/i);
   const otherMethods = firstMatch(text, /OTHER METHODS:\s*([^\n]+)/i);
   const synonyms = parseSynonyms(text);
-  const stability = parseStability(text, samplingTable);
+  const stability = parseStability(text, samplingBlock);
   const occupationalLimits = parseOccupationalLimits(text);
 
   const substanceTitle =
@@ -523,29 +451,29 @@ export function parseNioshNmamPdfText(text: string): HoMethodImportParseResult {
       ),
       sampler: field(sampler, sampler ? 'high' : 'low', sampler),
       minimumFlowRate: field(
-        flowMatch ? parseNumber(flowMatch[1]) : null,
-        flowMatch ? 'high' : 'low',
+        flow?.minimum ?? null,
+        flow ? 'high' : 'low',
         flowRaw,
       ),
       maximumFlowRate: field(
-        flowMatch ? parseNumber(flowMatch[2]) : null,
-        flowMatch ? 'high' : 'low',
+        flow?.maximum ?? null,
+        flow ? 'high' : 'low',
         flowRaw,
       ),
-      flowRateUnit: field(flowMatch ? 'L/min' : null, flowMatch ? 'high' : 'low', flowRaw),
+      flowRateUnit: field(flow?.unit ?? null, flow ? 'high' : 'low', flowRaw),
       minimumVolume: field(
-        volMinMatch ? parseNumber(volMinMatch[1]) : null,
-        volMinMatch ? 'high' : 'low',
+        volume?.minimum ?? null,
+        volume?.minimum != null ? 'high' : 'low',
         volMinRaw,
       ),
       maximumVolume: field(
-        volMaxMatch ? parseNumber(volMaxMatch[1]) : null,
-        volMaxMatch ? 'high' : 'low',
+        volume?.maximum ?? null,
+        volume?.maximum != null ? 'high' : 'low',
         volMaxRaw,
       ),
       volumeUnit: field(
-        volMinMatch || volMaxMatch ? 'L' : null,
-        volMinMatch || volMaxMatch ? 'high' : 'low',
+        volume ? volume.unit : null,
+        volume ? 'high' : 'low',
         [volMinRaw, volMaxRaw].filter(Boolean).join(' · ') || null,
       ),
       shipment: field(shipment, shipment ? 'medium' : 'low', shipment),

@@ -15,6 +15,7 @@ export type HoMethodImportAgentSuggestion = {
   cas: string | null;
   synonyms: string[];
   occupationalLimits?: HoMethodImportOccupationalLimitSuggestions;
+  technicalNotes?: string[];
   matchedRiskFactor: HoMethodRiskFactorSnapshot | null;
   found: boolean;
   matchConfidence: HoMethodRiskMatchConfidence;

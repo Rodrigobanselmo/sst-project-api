@@ -35,6 +35,7 @@ const riskSelect = {
   oshaCeiling: true,
   aihaWeel: true,
   aihaWeelCeiling: true,
+  coments: true,
   json: true,
   search: true,
 } satisfies Prisma.RiskFactorsSelect;
@@ -237,6 +238,7 @@ export class HoMethodRiskSearchService {
       oshaCeiling: row.oshaCeiling,
       aihaWeel: row.aihaWeel,
       aihaWeelCeiling: row.aihaWeelCeiling,
+      coments: row.coments,
     };
   }
 

@@ -165,6 +165,7 @@ export type HoMethodRiskFactorSnapshot = {
   oshaCeiling: string | null;
   aihaWeel: string | null;
   aihaWeelCeiling: string | null;
+  coments: string | null;
 };
 
 export type HoMethodRecord = {
@@ -262,6 +263,7 @@ export const hoMethodLegacyInclude = {
       oshaCeiling: true,
       aihaWeel: true,
       aihaWeelCeiling: true,
+      coments: true,
     },
   },
   evaluationConditions: {
@@ -305,6 +307,7 @@ export const hoMethodInclude = {
           oshaCeiling: true,
           aihaWeel: true,
           aihaWeelCeiling: true,
+          coments: true,
         },
       },
       evaluationConditions: {
