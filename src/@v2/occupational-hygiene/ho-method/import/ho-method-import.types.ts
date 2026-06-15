@@ -14,6 +14,7 @@ export type HoMethodImportAgentSuggestion = {
   substanceName: string;
   cas: string | null;
   synonyms: string[];
+  occupationalLimits?: HoMethodImportOccupationalLimitSuggestions;
   matchedRiskFactor: HoMethodRiskFactorSnapshot | null;
   found: boolean;
   matchConfidence: HoMethodRiskMatchConfidence;

@@ -3,6 +3,17 @@ import {
   HoMethodImportField,
   HoMethodImportParseResult,
 } from './ho-method-import.types';
+import {
+  associateExposureLimitsWithCompounds,
+  buildOccupationalLimitsFromExposureRow,
+  createEmptyOccupationalLimits,
+  formatCompoundName,
+  isInvalidAgentCandidate,
+  normalizeCompoundNameForMatch,
+  parseCompoundSynonymsTable,
+  parseExposureLimitsTable,
+  referencesNmamTable,
+} from './ho-method-niosh-table-parser.util';
 
 const field = <T>(
   value: T | null,
@@ -113,6 +124,10 @@ const parseSynonyms = (text: string) => {
   const raw = firstMatch(text, /SYNONYMS:\s*([\s\S]*?)(?=SAMPLER:|ACCURACY|$)/i);
   if (!raw) return [] as string[];
 
+  if (referencesNmamTable(raw.split('\n')[0], 1)) {
+    return [] as string[];
+  }
+
   return raw
     .split(/[;\n]/)
     .flatMap((part) => part.split(','))
@@ -120,11 +135,63 @@ const parseSynonyms = (text: string) => {
     .filter(Boolean);
 };
 
+const buildAgentSuggestion = (
+  substanceName: string,
+  cas: string | null,
+  synonyms: string[],
+  occupationalLimits?: HoMethodImportAgentSuggestion['occupationalLimits'],
+): HoMethodImportAgentSuggestion => ({
+  substanceName: formatCompoundName(substanceName),
+  cas,
+  synonyms,
+  occupationalLimits,
+  matchedRiskFactor: null,
+  found: false,
+  matchConfidence: 'none',
+  candidateRiskFactors: [],
+});
+
+const parseAgentsFromCompoundTable = (text: string) => {
+  const compoundRows = parseCompoundSynonymsTable(text);
+  if (!compoundRows.length) return [] as HoMethodImportAgentSuggestion[];
+
+  const exposureRows = parseExposureLimitsTable(text);
+  const limitsByCompound = associateExposureLimitsWithCompounds(
+    compoundRows,
+    exposureRows,
+  );
+
+  return compoundRows.map((row) => {
+    const limits = limitsByCompound.get(
+      normalizeCompoundNameForMatch(row.compound),
+    );
+
+    return buildAgentSuggestion(
+      row.compound,
+      row.cas,
+      row.synonyms,
+      limits ? buildOccupationalLimitsFromExposureRow(limits) : undefined,
+    );
+  });
+};
+
 const parseAgentsFromText = (
   text: string,
   synonyms: string[],
   methodCode: string | null,
 ) => {
+  const casHeader = firstMatch(text, /CAS:\s*([^\n]+)/i);
+  const analyteRaw = firstMatch(text, /ANALYTE:\s*([^\n]+)/i);
+
+  if (
+    referencesNmamTable(casHeader, 1) ||
+    referencesNmamTable(analyteRaw, 1) ||
+    referencesNmamTable(firstMatch(text, /SYNONYMS:\s*([^\n]+)/i), 1)
+  ) {
+    const tableAgents = parseAgentsFromCompoundTable(text);
+    if (tableAgents.length) return tableAgents;
+  }
+
   const titlePattern = methodCode
     ? new RegExp(
         `NIOSH Manual of Analytical Methods[\\s\\S]*?\\n([A-Z0-9][A-Z0-9 /-]{2,}?)\\s+${methodCode}`,
@@ -135,67 +202,44 @@ const parseAgentsFromText = (
   const titleAgent =
     titleMatch?.[1]?.replace(/\s+/g, ' ').trim().toUpperCase() ?? null;
 
-  const analyteRaw = firstMatch(text, /ANALYTE:\s*([^\n]+)/i);
   const casNumbers = parseCasNumbers(text);
 
   const analyteNames =
-    analyteRaw
-      ?.split(/\band\b|,|;/i)
-      .map((name) => name.trim())
-      .filter(Boolean) ?? [];
+    analyteRaw && !referencesNmamTable(analyteRaw, 1)
+      ? analyteRaw
+          .split(/\band\b|,|;/i)
+          .map((name) => name.trim())
+          .filter((name) => name && !isInvalidAgentCandidate(name))
+      : [];
 
   const agents: HoMethodImportAgentSuggestion[] = [];
 
   if (analyteNames.length && casNumbers.length >= analyteNames.length) {
     analyteNames.forEach((name, index) => {
-      agents.push({
-        substanceName: capitalizeAgentName(name),
-        cas: casNumbers[index] ?? null,
-        synonyms,
-        matchedRiskFactor: null,
-        found: false,
-        matchConfidence: 'none',
-        candidateRiskFactors: [],
-      });
+      agents.push(
+        buildAgentSuggestion(name, casNumbers[index] ?? null, synonyms),
+      );
     });
     return agents;
   }
 
   if (analyteNames.length) {
     analyteNames.forEach((name) => {
-      agents.push({
-        substanceName: capitalizeAgentName(name),
-        cas: null,
-        synonyms,
-        matchedRiskFactor: null,
-        found: false,
-        matchConfidence: 'none',
-        candidateRiskFactors: [],
-      });
+      agents.push(buildAgentSuggestion(name, null, synonyms));
     });
     return agents;
   }
 
-  if (titleAgent) {
-    agents.push({
-      substanceName: capitalizeAgentName(titleAgent),
-      cas: casNumbers[0] ?? null,
-      synonyms,
-      matchedRiskFactor: null,
-      found: false,
-      matchConfidence: 'none',
-      candidateRiskFactors: [],
-    });
+  if (titleAgent && !isInvalidAgentCandidate(titleAgent)) {
+    agents.push(
+      buildAgentSuggestion(titleAgent, casNumbers[0] ?? null, synonyms),
+    );
   }
 
   return agents;
 };
 
-const capitalizeAgentName = (value: string) =>
-  value
-    .split(/\s+/)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
-    .join(' ');
+const capitalizeAgentName = (value: string) => formatCompoundName(value);
 
 const parseStability = (text: string, table?: ReturnType<typeof parseSamplingTable>) => {
   const raw =
@@ -246,7 +290,9 @@ const parseStability = (text: string, table?: ReturnType<typeof parseSamplingTab
 
 const parseOccupationalLimits = (text: string) => {
   const oshaRaw = firstMatch(text, /OSHA:\s*([^\n]+)/i);
-  const nioshRaw = firstMatch(text, /NIOSH:\s*([^\n]+)/i);
+  const nioshRaw =
+    firstMatch(text, /NIOSH(?:\s*REL)?:\s*([^\n]+)/i) ??
+    firstMatch(text, /NIOSH:\s*([^\n]+)/i);
   const acgihRaw = firstMatch(text, /ACGIH:\s*([^\n]+)/i);
   const aihaRaw =
     firstMatch(text, /AIHA(?:\s+WEEL)?:\s*([^\n]+)/i) ??
@@ -255,6 +301,13 @@ const parseOccupationalLimits = (text: string) => {
     firstMatch(text, /IDLH:\s*([^\n]+)/i) ??
     firstMatch(text, /IDHL:\s*([^\n]+)/i) ??
     firstMatch(text, /IPVS:\s*([^\n]+)/i);
+
+  if (
+    referencesNmamTable(oshaRaw, 3) ||
+    referencesNmamTable(nioshRaw, 3)
+  ) {
+    return createEmptyOccupationalLimits();
+  }
 
   const splitOsha = splitLimitValues(oshaRaw, 'osha');
   const splitNiosh = splitLimitValues(nioshRaw, 'niosh');
@@ -403,10 +456,12 @@ export function parseNioshNmamPdfText(text: string): HoMethodImportParseResult {
   const stability = parseStability(text, samplingTable);
   const occupationalLimits = parseOccupationalLimits(text);
 
-  const substanceTitle = firstMatch(
-    text,
-    /NIOSH Manual of Analytical Methods[\s\S]*?\n([A-Z][A-Z0-9 /-]{2,})\s+\d{3,5}/i,
-  );
+  const substanceTitle =
+    firstMatch(text, /([^\n:]+?)\s*:\s*METHOD\s*\d+/i) ??
+    firstMatch(
+      text,
+      /NIOSH Manual of Analytical Methods[\s\S]*?\n([A-Z][A-Z0-9 /-]{2,})\s+\d{3,5}/i,
+    );
   const displayName =
     methodCode && detectedFormat !== 'UNKNOWN'
       ? `${detectedFormat} ${methodCode}${substanceTitle ? ` — ${capitalizeAgentName(substanceTitle)}` : ''}`
