@@ -84,6 +84,7 @@ export class HoMethodImportService {
       possibleDuplicate,
       canConfirm,
       confirmBlockReason,
+      extractedText: text,
     };
   }
 
