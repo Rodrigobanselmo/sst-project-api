@@ -70,7 +70,7 @@ const filterAnswersByParticipants = (
   return answers.filter((answer) => participantIds.has(answer.participantsAnswersId));
 };
 
-const buildQuestionsWithOptions = (
+export const buildQuestionsWithOptions = (
   groups: FormQuestionsAnswersBrowseModel['results'],
   filteredParticipantIds?: Set<string> | null,
 ): QuestionForIndicator[] => {
@@ -101,7 +101,7 @@ const buildQuestionsWithOptions = (
   );
 };
 
-const calculateIndicatorForQuestions = (
+export const calculateIndicatorForQuestions = (
   questions: QuestionWithParticipantGroups[],
   participantGroupId?: string,
 ) => {

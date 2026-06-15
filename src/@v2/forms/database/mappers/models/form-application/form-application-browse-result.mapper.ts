@@ -12,9 +12,15 @@ export type IFormApplicationBrowseResultModelMapper = {
   created_at: Date;
   updated_at: Date;
   companyId: string;
+  company_name?: string | null;
+  company_fantasy?: string | null;
+  company_initials?: string | null;
   total_answers: number;
   total_participants: number;
   average_time_spent: number | null;
+  is_business_group_application?: boolean;
+  current_company_participants?: number | null;
+  current_company_answers?: number | null;
 
   form_id: string;
   form_name: string;
@@ -34,9 +40,15 @@ export class FormApplicationBrowseResultModelMapper {
       createdAt: prisma.created_at,
       updatedAt: prisma.updated_at,
       companyId: prisma.companyId,
+      companyName: prisma.company_name ?? null,
+      companyFantasy: prisma.company_fantasy ?? null,
+      companyInitials: prisma.company_initials ?? null,
       totalAnswers: prisma.total_answers,
       totalParticipants: prisma.total_participants,
       averageTimeSpent: prisma.average_time_spent,
+      isBusinessGroupApplication: prisma.is_business_group_application ?? false,
+      currentCompanyParticipants: prisma.current_company_participants ?? null,
+      currentCompanyAnswers: prisma.current_company_answers ?? null,
       form: {
         id: prisma.form_id,
         name: prisma.form_name,

@@ -17,6 +17,7 @@ export enum ActionPlanOrderByEnum {
   CANCEL_DATE = 'CANCEL_DATE',
   VALID_DATE = 'VALID_DATE',
   RESPONSIBLE = 'RESPONSIBLE',
+  EXPOSED_WORKERS = 'EXPOSED_WORKERS',
 }
 
 export namespace IActionPlanDAO {

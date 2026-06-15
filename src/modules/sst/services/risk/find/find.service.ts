@@ -26,6 +26,7 @@ export class FindRiskService {
           esocialCode: true,
           synonymous: true,
           search: true,
+          cas: true,
 
           symptoms: true,
           risk: true,

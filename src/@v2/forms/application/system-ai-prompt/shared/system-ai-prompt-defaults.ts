@@ -5,6 +5,14 @@ import { RISK_NARRATIVE_DIAGNOSTIC_DEFAULT_PROMPT } from '@/@v2/forms/applicatio
 import { INDICATORS_NARRATIVE_DIAGNOSTIC_DEFAULT_PROMPT } from '@/@v2/forms/application/form-questions-answers/indicators-narrative-diagnostic/constants/indicators-narrative-diagnostic-default-prompt.constant';
 import { INDICATORS_NARRATIVE_DIAGNOSTIC_GROUPS_ONLY_DEFAULT_PROMPT } from '@/@v2/forms/application/form-questions-answers/indicators-narrative-diagnostic/constants/indicators-narrative-diagnostic-groups-only-default-prompt.constant';
 import { INDICATORS_NARRATIVE_DIAGNOSTIC_GROUPS_AND_QUESTIONS_DEFAULT_PROMPT } from '@/@v2/forms/application/form-questions-answers/indicators-narrative-diagnostic/constants/indicators-narrative-diagnostic-groups-and-questions-default-prompt.constant';
+import { RISK_FACTOR_CHEMICAL_AI_SUGGESTIONS_DEFAULT_PROMPT } from '@/@v2/security/risk/application/risk-factor-ai-suggestions/constants/risk-factor-chemical-ai-suggestions-default-prompt.constant';
+import {
+  RISK_FACTOR_ACCIDENT_AI_SUGGESTIONS_DEFAULT_PROMPT,
+  RISK_FACTOR_BIOLOGICAL_AI_SUGGESTIONS_DEFAULT_PROMPT,
+  RISK_FACTOR_ERGONOMIC_AI_SUGGESTIONS_DEFAULT_PROMPT,
+  RISK_FACTOR_OTHER_AI_SUGGESTIONS_DEFAULT_PROMPT,
+  RISK_FACTOR_PHYSICAL_AI_SUGGESTIONS_DEFAULT_PROMPT,
+} from '@/@v2/security/risk/application/risk-factor-ai-suggestions/constants/risk-factor-ai-suggestions-default-prompts.constant';
 
 const DEFAULT_PROMPTS: Record<SystemAiPromptKeyEnum, string> = {
   [SystemAiPromptKeyEnum.RISK_SOURCES_RECOMMENDATIONS]: RISK_SOURCES_RECOMMENDATIONS_DEFAULT_PROMPT,
@@ -15,6 +23,18 @@ const DEFAULT_PROMPTS: Record<SystemAiPromptKeyEnum, string> = {
     INDICATORS_NARRATIVE_DIAGNOSTIC_GROUPS_ONLY_DEFAULT_PROMPT,
   [SystemAiPromptKeyEnum.INDICATORS_NARRATIVE_DIAGNOSTIC_GROUPS_AND_QUESTIONS]:
     INDICATORS_NARRATIVE_DIAGNOSTIC_GROUPS_AND_QUESTIONS_DEFAULT_PROMPT,
+  [SystemAiPromptKeyEnum.RISK_FACTOR_CHEMICAL_AI_SUGGESTIONS]:
+    RISK_FACTOR_CHEMICAL_AI_SUGGESTIONS_DEFAULT_PROMPT,
+  [SystemAiPromptKeyEnum.RISK_FACTOR_PHYSICAL_AI_SUGGESTIONS]:
+    RISK_FACTOR_PHYSICAL_AI_SUGGESTIONS_DEFAULT_PROMPT,
+  [SystemAiPromptKeyEnum.RISK_FACTOR_BIOLOGICAL_AI_SUGGESTIONS]:
+    RISK_FACTOR_BIOLOGICAL_AI_SUGGESTIONS_DEFAULT_PROMPT,
+  [SystemAiPromptKeyEnum.RISK_FACTOR_ERGONOMIC_AI_SUGGESTIONS]:
+    RISK_FACTOR_ERGONOMIC_AI_SUGGESTIONS_DEFAULT_PROMPT,
+  [SystemAiPromptKeyEnum.RISK_FACTOR_ACCIDENT_AI_SUGGESTIONS]:
+    RISK_FACTOR_ACCIDENT_AI_SUGGESTIONS_DEFAULT_PROMPT,
+  [SystemAiPromptKeyEnum.RISK_FACTOR_OTHER_AI_SUGGESTIONS]:
+    RISK_FACTOR_OTHER_AI_SUGGESTIONS_DEFAULT_PROMPT,
 };
 
 export const toPrismaSystemAiPromptKey = (key: SystemAiPromptKeyEnum): PrismaSystemAiPromptKeyEnum => {

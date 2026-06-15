@@ -9,6 +9,7 @@ export namespace IUpsertSystemAiPromptUseCase {
   export type Result = {
     key: SystemAiPromptKeyEnum;
     content: string;
+    defaultContent: string;
     revision: number;
     updatedBy: number | null;
     updatedAt: string;

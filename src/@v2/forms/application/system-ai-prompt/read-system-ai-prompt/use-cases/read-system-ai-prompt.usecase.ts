@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, ServiceUnavailableException } from '@nestjs/common';
 import { SharedTokens } from '@/@v2/shared/constants/tokens';
 import { LocalContext } from '@/@v2/shared/adapters/context';
 import { SystemAiPromptRepository } from '@/@v2/forms/database/repositories/system-ai-prompt/system-ai-prompt.repository';
@@ -9,6 +9,7 @@ import {
   toPrismaSystemAiPromptKey,
 } from '../../shared/system-ai-prompt-defaults';
 import { requireSystemMaster } from '../../shared/require-system-master.util';
+import { isSystemAiPromptEnumUnavailableError } from '../../shared/system-ai-prompt-prisma-error.util';
 import { IReadSystemAiPromptUseCase } from './read-system-ai-prompt.types';
 
 @Injectable()
@@ -26,12 +27,26 @@ export class ReadSystemAiPromptUseCase {
       throw new BadRequestException('Chave de prompt inválida.');
     }
 
-    const persisted = await this.systemAiPromptRepository.findByKey(toPrismaSystemAiPromptKey(params.key));
+    let persisted;
+    try {
+      persisted = await this.systemAiPromptRepository.findByKey(
+        toPrismaSystemAiPromptKey(params.key),
+      );
+    } catch (error) {
+      if (isSystemAiPromptEnumUnavailableError(error)) {
+        throw new ServiceUnavailableException(
+          'Configuração de IA ainda não disponível. Aplique as migrations e reinicie a API.',
+        );
+      }
+
+      throw error;
+    }
 
     if (persisted) {
       return {
         key: params.key,
         content: persisted.content,
+        defaultContent: getSystemAiPromptDefaultContent(params.key),
         revision: persisted.revision,
         updatedBy: persisted.updatedBy,
         updatedAt: persisted.updated_at.toISOString(),
@@ -39,9 +54,12 @@ export class ReadSystemAiPromptUseCase {
       };
     }
 
+    const defaultContent = getSystemAiPromptDefaultContent(params.key);
+
     return {
       key: params.key,
-      content: getSystemAiPromptDefaultContent(params.key),
+      content: defaultContent,
+      defaultContent,
       revision: 0,
       updatedBy: null,
       updatedAt: new Date(0).toISOString(),

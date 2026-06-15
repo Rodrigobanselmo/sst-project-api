@@ -126,6 +126,10 @@ import { ActionPlanRuleAggregateRepository } from './database/repositories/actio
     EditActionPlanEffectivenessService,
     EditCommentService,
   ],
-  exports: [],
+  exports: [
+    ActionPlanDAO,
+    ActionPlanRuleAggregateRepository,
+    ActionPlanInfoAggregateRepository,
+  ],
 })
 export class ActionPlanModule {}

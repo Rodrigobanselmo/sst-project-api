@@ -1,9 +1,21 @@
 import { QuantityTypeEnum } from "../../enum/security/quantity-type.enum";
 import { percentageCheck } from "../../functions/security/percentage-check.func";
 
+function hasAcgihCeilingMarker(value?: string | null): boolean {
+  if (!value?.trim()) return false;
+  const normalized = value.trim();
+
+  return (
+    /\bC(eiling)?\b/i.test(normalized) ||
+    /\bC$/i.test(normalized) ||
+    /\(C\)/i.test(normalized)
+  );
+}
+
 export type IRiskDataQuantityQuiVO = {
   stel?: string;
   twa?: string;
+  acgihCeiling?: string;
   nr15lt?: string;
   vmp?: string;
 
@@ -21,6 +33,7 @@ export type IRiskDataQuantityQuiVO = {
 export class RiskDataQuantityQuiVO {
   stel?: string;
   twa?: string;
+  acgihCeiling?: string;
   nr15lt?: string;
   vmp?: string;
 
@@ -37,6 +50,7 @@ export class RiskDataQuantityQuiVO {
   constructor(params: IRiskDataQuantityQuiVO) {
     this.stel = params.stel;
     this.twa = params.twa;
+    this.acgihCeiling = params.acgihCeiling;
     this.nr15lt = params.nr15lt;
     this.vmp = params.vmp;
 
@@ -59,15 +73,22 @@ export class RiskDataQuantityQuiVO {
   }
 
   get isStelTeto() {
-    return this.stel && this.stel.includes('C');
+    return (
+      Boolean(this.acgihCeiling?.trim()) ||
+      (this.stel && hasAcgihCeilingMarker(this.stel))
+    );
   }
 
   get isTwaTeto() {
-    return this.twa && this.twa.includes('C');
+    return this.twa && hasAcgihCeilingMarker(this.twa);
   }
 
   get isVmpTeto() {
     return this.vmp && this.vmp.includes('T');
+  }
+
+  get stelLimitValue() {
+    return this.acgihCeiling?.trim() || this.stel;
   }
 
   get nr15ltProb() {
@@ -75,7 +96,7 @@ export class RiskDataQuantityQuiVO {
   }
 
   get stelProb() {
-    return percentageCheck({ value: this.stelValue, limit: this.stel, maxLimitMultiplier: this.isStelTeto ? 1 : 5 });
+    return percentageCheck({ value: this.stelValue, limit: this.stelLimitValue, maxLimitMultiplier: this.isStelTeto ? 1 : 5 });
   }
 
   get twaProb() {

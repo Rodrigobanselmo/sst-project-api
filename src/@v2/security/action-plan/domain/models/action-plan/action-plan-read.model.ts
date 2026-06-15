@@ -24,6 +24,7 @@ export type IActionPlanReadModel = {
   }[];
   planning: IActionPlanPlanningModel;
   effectiveness: IActionPlanEffectivenessModel;
+  exposedWorkersCount: number;
 };
 
 export class ActionPlanReadModel {
@@ -46,6 +47,7 @@ export class ActionPlanReadModel {
   }[];
   planning: ActionPlanPlanningModel;
   effectiveness: ActionPlanEffectivenessModel;
+  exposedWorkersCount: number;
 
   constructor(params: IActionPlanReadModel) {
     this.uuid = params.uuid;
@@ -61,5 +63,6 @@ export class ActionPlanReadModel {
     this.generateSources = params.generateSources;
     this.planning = new ActionPlanPlanningModel(params.planning);
     this.effectiveness = new ActionPlanEffectivenessModel(params.effectiveness);
+    this.exposedWorkersCount = params.exposedWorkersCount ?? 0;
   }
 }

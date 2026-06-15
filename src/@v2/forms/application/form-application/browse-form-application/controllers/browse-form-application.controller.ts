@@ -3,6 +3,8 @@ import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '@/@v2/shared/guards/jwt-auth.guard';
 import { PermissionEnum } from '@/shared/constants/enum/authorization';
 import { Permissions } from '@/shared/decorators/permissions.decorator';
+import { User } from '@/shared/decorators/user.decorator';
+import { UserPayloadDto } from '@/shared/dto/user-payload.dto';
 import { BrowseFormApplicationUseCase } from '../use-cases/browse-form-application.usecase';
 import { BrowseFormApplicationPath } from './browse-form-application.path';
 import { BrowseFormApplicationQuery } from './browse-form-application.query';
@@ -20,12 +22,19 @@ export class BrowseFormApplicationController {
     isMember: true,
     crud: true,
   })
-  async execute(@Param() path: BrowseFormApplicationPath, @Query() query: BrowseFormApplicationQuery) {
+  async execute(
+    @Param() path: BrowseFormApplicationPath,
+    @Query() query: BrowseFormApplicationQuery,
+    @User() user: UserPayloadDto,
+  ) {
     return this.browseFormApplicationUseCase.execute({
       companyId: path.companyId,
       orderBy: query.orderBy,
       search: query.search,
       status: query.status,
+      companyGroupScope: query.companyGroupScope,
+      companyGroupId: query.companyGroupId,
+      user,
       pagination: {
         page: query.page,
         limit: query.limit,

@@ -1,5 +1,6 @@
+import { CompanyModule } from '@/@v2/enterprise/company/company.module';
 import { SharedModule } from '@/@v2/shared/shared.module';
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { CacheModule } from '@nestjs/cache-manager';
 import { FormApplicationCacheService } from './services/form-application-cache.service';
 import { FormQuestionsAnswersRisksService } from './application/form-questions-answers/shared/services/form-questions-answers-risks.service';
@@ -110,7 +111,13 @@ import { BuildIndicatorsNarrativeInputService } from './application/form-questio
 import { FormIndicatorsNarrativeDiagnosticRepository } from './database/repositories/form-indicators-narrative-diagnostic/form-indicators-narrative-diagnostic.repository';
 
 @Module({
-  imports: [SharedModule, SSTModule, RiskCatalogEquivalenceModule, CacheModule.register()],
+  imports: [
+    SharedModule,
+    forwardRef(() => CompanyModule),
+    SSTModule,
+    RiskCatalogEquivalenceModule,
+    CacheModule.register(),
+  ],
   controllers: [
     ReadFormController,
     DuplicateFormController,
@@ -224,6 +231,14 @@ import { FormIndicatorsNarrativeDiagnosticRepository } from './database/reposito
     GenerateIndicatorsNarrativeDiagnosticUseCase,
     ReadIndicatorsNarrativeDiagnosticUseCase,
   ],
-  exports: [],
+  exports: [
+    FormParticipantsDAO,
+    BrowseFormQuestionsAnswersUseCase,
+    BrowseFormQuestionsAnswersRisksUseCase,
+    BrowseFormQuestionsAnswersAnalysisUseCase,
+    FormIndicatorsNarrativeDiagnosticRepository,
+    FormRiskNarrativeDiagnosticRepository,
+    SystemAiPromptResolverService,
+  ],
 })
 export class FormModule {}

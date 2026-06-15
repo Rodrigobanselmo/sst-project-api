@@ -1,6 +1,6 @@
 import { prismaFilter } from '../../../../shared/utils/filters/prisma.filters';
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma, StatusEnum } from '@prisma/client';
 import { removeDuplicate } from '../../../../shared/utils/removeDuplicate';
 
@@ -97,7 +97,17 @@ function riskDocPresenceWhere(companyId: string, flag: RiskDocPresenceField): Pr
 export class RiskRepository implements IRiskRepository {
   constructor(private prisma: PrismaService) {}
 
-  async findIdsBySynonymousSearch({ companyId, search, mustHaveRiskData }: { companyId: string; search: string; mustHaveRiskData?: boolean }) {
+  async findIdsBySynonymousSearch({
+    companyId,
+    search,
+    mustHaveRiskData,
+    activeOnly,
+  }: {
+    companyId: string;
+    search: string;
+    mustHaveRiskData?: boolean;
+    activeOnly?: boolean;
+  }) {
     const likeTerm = `%${search}%`;
     const withRiskDataClause = mustHaveRiskData
       ? Prisma.sql`AND EXISTS (
@@ -105,6 +115,9 @@ export class RiskRepository implements IRiskRepository {
           FROM "RiskFactorData" rfd
           WHERE rfd."riskId" = rf."id" AND rfd."companyId" = ${companyId}
         )`
+      : Prisma.empty;
+    const activeOnlyClause = activeOnly
+      ? Prisma.sql`AND rf."status" = 'ACTIVE' AND rf."deleted_at" IS NULL`
       : Prisma.empty;
 
     const rows = await this.prisma.$queryRaw<{ id: string }[]>`
@@ -118,6 +131,7 @@ export class RiskRepository implements IRiskRepository {
           WHERE s ILIKE ${likeTerm}
         )
         ${withRiskDataClause}
+        ${activeOnlyClause}
     `;
 
     return rows.map((row) => row.id);
@@ -426,7 +440,10 @@ export class RiskRepository implements IRiskRepository {
     delete (query as { mustIsAso?: boolean }).mustIsAso;
 
     const whereInit = {
-      AND: [{ OR: [{ companyId: query.companyId }, { system: true }] }],
+      AND: [
+        { OR: [{ companyId: query.companyId }, { system: true }] },
+        { status: StatusEnum.ACTIVE, deleted_at: null },
+      ],
     } as typeof options.where;
 
     const { where } = prismaFilter(whereInit, {
@@ -435,15 +452,22 @@ export class RiskRepository implements IRiskRepository {
     });
 
     if ('search' in query && query.search) {
+      const normalizedSearch = query.search.trim();
+      const casCompact = normalizedSearch.replace(/[-\s]/g, '');
       const synonymousRiskIds = await this.findIdsBySynonymousSearch({
         companyId: String(query.companyId),
-        search: query.search,
+        search: normalizedSearch,
+        activeOnly: true,
       });
 
       (where.AND as any).push({
         OR: [
-          { name: { contains: query.search, mode: 'insensitive' } },
-          { cas: { contains: query.search, mode: 'insensitive' } },
+          { name: { contains: normalizedSearch, mode: 'insensitive' } },
+          { cas: { contains: normalizedSearch, mode: 'insensitive' } },
+          { search: { contains: normalizedSearch.toLowerCase(), mode: 'insensitive' } },
+          ...(casCompact && casCompact !== normalizedSearch
+            ? [{ cas: { contains: casCompact, mode: 'insensitive' } }]
+            : []),
           ...(synonymousRiskIds.length ? [{ id: { in: synonymousRiskIds } }] : []),
         ],
       } as typeof options.where);
@@ -560,6 +584,10 @@ export class RiskRepository implements IRiskRepository {
         },
         ...options,
       });
+    }
+
+    if (!risk) {
+      throw new NotFoundException('Risco não encontrado');
     }
 
     return new RiskFactorsEntity(risk as any);

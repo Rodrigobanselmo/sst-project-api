@@ -2,6 +2,7 @@ import { FormApplicationOrderByEnum } from '@/@v2/forms/database/dao/form-applic
 import { FormStatusEnum } from '@/@v2/forms/domain/enums/form-status.enum';
 import { IOrderBy } from '@/@v2/shared/types/order-by.types';
 import { IPagination } from '@/@v2/shared/types/pagination.types';
+import { UserPayloadDto } from '@/shared/dto/user-payload.dto';
 
 export namespace IFormApplicationUseCase {
   export type Params = {
@@ -10,5 +11,8 @@ export namespace IFormApplicationUseCase {
     status?: FormStatusEnum[];
     orderBy?: IOrderBy<FormApplicationOrderByEnum>;
     pagination: IPagination;
+    companyGroupScope?: 'consolidated';
+    companyGroupId?: number;
+    user?: UserPayloadDto;
   };
 }

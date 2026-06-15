@@ -2084,7 +2084,16 @@ model RiskFactors {
   nr15lt                 String?
   twa                    String?
   stel                   String?
+  acgihCeiling           String?
   ipvs                   String?
+  nioshRel               String?
+  nioshStel              String?
+  nioshCeiling           String?
+  oshaPel                String?
+  oshaStel               String?
+  oshaCeiling            String?
+  aihaWeel               String?
+  aihaWeelCeiling        String?
   pv                     String?
   pe                     String?
   carnogenicityACGIH     String?
@@ -2120,6 +2129,8 @@ model RiskFactors {
   subTypes               RiskToRiskSubType[]
   formApplicationRiskLog FormApplicationRiskLog[]
   formAiAnalyses         FormAiAnalysis[]
+  hoMethods              HoMethod[]
+  hoMethodAgents         HoMethodAgent[]
 
   @@unique([id, companyId])
   @@index([name])
@@ -3124,6 +3135,12 @@ enum SystemAiPromptKeyEnum {
   INDICATORS_NARRATIVE_DIAGNOSTIC
   INDICATORS_NARRATIVE_DIAGNOSTIC_GROUPS_ONLY
   INDICATORS_NARRATIVE_DIAGNOSTIC_GROUPS_AND_QUESTIONS
+  RISK_FACTOR_CHEMICAL_AI_SUGGESTIONS
+  RISK_FACTOR_PHYSICAL_AI_SUGGESTIONS
+  RISK_FACTOR_BIOLOGICAL_AI_SUGGESTIONS
+  RISK_FACTOR_ERGONOMIC_AI_SUGGESTIONS
+  RISK_FACTOR_ACCIDENT_AI_SUGGESTIONS
+  RISK_FACTOR_OTHER_AI_SUGGESTIONS
 }
 
 enum RiskRecTypeEnum {
@@ -3336,6 +3353,272 @@ enum RiskCatalogKind {
 enum RiskCatalogEquivalenceType {
   TECHNICAL_DUPLICATE
   SEMANTIC_ALIAS
+}
+
+enum HoMethodSourceEnum {
+  NIOSH
+  OSHA
+  FUNDACENTRO
+  ACGIH
+  AIHA
+  ISO
+  INTERNAL
+  OTHER
+}
+
+enum HoMethodAgentTypeEnum {
+  CHEMICAL
+  PHYSICAL
+  OTHER
+}
+
+enum HoMethodEvaluationTypeEnum {
+  TWA
+  STEL
+  CEILING
+  CMPT
+  VMP
+  NR15_TETO
+  ACGIH_CEILING
+  QUALITATIVE
+  OTHER
+}
+
+enum HoMethodAvailabilityStatusEnum {
+  ACTIVE
+  INACTIVE
+  UNDER_CONSULTATION
+  NOT_AVAILABLE
+}
+
+enum HoMethodLaboratoryAvailabilityStatusEnum {
+  AVAILABLE
+  NOT_AVAILABLE
+  UNDER_CONSULTATION
+  UNKNOWN
+}
+
+enum HoLaboratoryStatusEnum {
+  ACTIVE
+  INACTIVE
+}
+
+/// Cadastro estruturado de laboratórios para métodos de HO.
+model HoLaboratory {
+  id            String                 @id @default(cuid())
+  cnpj          String?                @unique
+  corporateName String
+  tradeName     String?
+  email         String?
+  phone         String?
+  contactName   String?
+  notes         String?
+  status        HoLaboratoryStatusEnum @default(ACTIVE)
+
+  methodLaboratories HoMethodLaboratory[]
+
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+
+  @@index([corporateName])
+  @@index([tradeName])
+  @@index([status])
+  @@map("HoLaboratory")
+}
+
+/// Cadastro técnico mestre de métodos de amostragem/análise de Higiene Ocupacional.
+model HoMethod {
+  id          String @id @default(cuid())
+  displayName String
+  description String?
+
+  agentName    String?
+  cas          String?
+  riskFactorId String?
+  riskFactor   RiskFactors? @relation(fields: [riskFactorId], references: [id], onDelete: SetNull)
+
+  institution      HoMethodSourceEnum
+  methodCode       String
+  methodVersion    String?
+  analyticalMethod String?
+
+  agentType   HoMethodAgentTypeEnum          @default(CHEMICAL)
+  prioritized Boolean                          @default(false)
+  status      HoMethodAvailabilityStatusEnum @default(ACTIVE)
+
+  samplerId String?
+  sampler   HoSampler? @relation(fields: [samplerId], references: [id], onDelete: SetNull)
+
+  minimumFlowRate  Decimal? @db.Decimal(12, 4)
+  maximumFlowRate  Decimal? @db.Decimal(12, 4)
+  minimumVolume    Decimal? @db.Decimal(12, 4)
+  maximumVolume    Decimal? @db.Decimal(12, 4)
+  flowRateUnit     String?
+  volumeUnit       String?
+
+  storageTemperature     Decimal? @db.Decimal(8, 2)
+  storageTemperatureUnit String?
+  stabilityDays          Int?
+
+  extractionSolventId String?
+  extractionSolvent   HoExtractionSolvent? @relation(fields: [extractionSolventId], references: [id], onDelete: SetNull)
+
+  originalDocumentFileId       String?
+  originalDocumentName         String?
+  originalDocumentUploadedAt   DateTime?
+
+  notes String?
+
+  evaluationConditions HoMethodEvaluationCondition[]
+  agents               HoMethodAgent[]
+  laboratories         HoMethodLaboratory[]
+
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+
+  @@index([agentName])
+  @@index([cas])
+  @@index([institution])
+  @@index([methodCode])
+  @@index([status])
+  @@index([prioritized])
+  @@index([riskFactorId])
+  @@map("HoMethod")
+}
+
+model HoMethodAgent {
+  id         String   @id @default(cuid())
+  hoMethodId String
+  hoMethod   HoMethod @relation(fields: [hoMethodId], references: [id], onDelete: Cascade)
+
+  riskFactorId String
+  riskFactor   RiskFactors @relation(fields: [riskFactorId], references: [id], onDelete: Restrict)
+
+  agentNameSnapshot String?
+  casSnapshot       String?
+  unitSnapshot      String?
+  agentType         HoMethodAgentTypeEnum?
+  sortOrder         Int @default(0)
+
+  evaluationConditions HoMethodEvaluationCondition[]
+
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+
+  @@index([hoMethodId])
+  @@index([riskFactorId])
+  @@map("HoMethodAgent")
+}
+
+model HoSampler {
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+  type        String?
+  notes       String?
+  active      Boolean @default(true)
+
+  methods      HoMethod[]
+  laboratories HoMethodLaboratory[]
+
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+
+  @@unique([name])
+  @@index([active])
+  @@map("HoSampler")
+}
+
+model HoExtractionSolvent {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  synonyms    String[]
+  notes       String?
+  active      Boolean  @default(true)
+
+  methods      HoMethod[]
+  laboratories HoMethodLaboratory[]
+
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+
+  @@unique([name])
+  @@index([active])
+  @@map("HoExtractionSolvent")
+}
+
+model HoMethodEvaluationCondition {
+  id         String   @id @default(cuid())
+  hoMethodId String
+  hoMethod   HoMethod @relation(fields: [hoMethodId], references: [id], onDelete: Cascade)
+
+  hoMethodAgentId String?
+  hoMethodAgent   HoMethodAgent? @relation(fields: [hoMethodAgentId], references: [id], onDelete: Cascade)
+
+  evaluationType HoMethodEvaluationTypeEnum
+  limitValue     String?
+  limitUnit      String?
+
+  minimumFlowRate Decimal? @db.Decimal(12, 4)
+  maximumFlowRate Decimal? @db.Decimal(12, 4)
+  minimumVolume   Decimal? @db.Decimal(12, 4)
+  maximumVolume   Decimal? @db.Decimal(12, 4)
+  flowRateUnit    String?
+  volumeUnit      String?
+  notes           String?
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@unique([hoMethodAgentId, evaluationType])
+  @@index([hoMethodId])
+  @@index([hoMethodAgentId])
+  @@index([evaluationType])
+  @@map("HoMethodEvaluationCondition")
+}
+
+model HoMethodLaboratory {
+  id         String   @id @default(cuid())
+  hoMethodId String
+  hoMethod   HoMethod @relation(fields: [hoMethodId], references: [id], onDelete: Cascade)
+
+  laboratoryId String?
+  laboratory   HoLaboratory? @relation(fields: [laboratoryId], references: [id], onDelete: SetNull)
+
+  laboratoryName       String
+  availabilityStatus   HoMethodLaboratoryAvailabilityStatusEnum @default(UNKNOWN)
+  lastConfirmationDate DateTime?
+  notes                String?
+  analyticalNotes      String?
+
+  samplerId String?
+  sampler   HoSampler? @relation(fields: [samplerId], references: [id], onDelete: SetNull)
+
+  extractionSolventId String?
+  extractionSolvent   HoExtractionSolvent? @relation(fields: [extractionSolventId], references: [id], onDelete: SetNull)
+
+  minimumFlowRateOverride      Decimal? @db.Decimal(12, 4)
+  maximumFlowRateOverride      Decimal? @db.Decimal(12, 4)
+  minimumVolumeOverride        Decimal? @db.Decimal(12, 4)
+  maximumVolumeOverride        Decimal? @db.Decimal(12, 4)
+  storageTemperatureOverride   Decimal? @db.Decimal(8, 2)
+  storageTemperatureUnitOverride String?
+  stabilityDaysOverride        Int?
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  deleted_at DateTime?
+
+  @@index([hoMethodId])
+  @@index([laboratoryId])
+  @@index([availabilityStatus])
+  @@map("HoMethodLaboratory")
 }
 
 /// Equivalência entre itens de catálogo (fonte geradora / RecMed). Alias aponta para canônico.

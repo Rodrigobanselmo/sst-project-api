@@ -1,5 +1,7 @@
+import { FormModule } from '@/@v2/forms/forms.module';
+import { ActionPlanModule } from '@/@v2/security/action-plan/action-plan.module';
 import { SharedModule } from '@/@v2/shared/shared.module';
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { BrowseWorkspaceController } from './application/workspace/browse-all-workspaces/controllers/browse-all-workspaces.controller';
 import { BrowseWorkspaceUseCase } from './application/workspace/browse-all-workspaces/use-cases/browse-all-workspaces.usecase';
 import { DeleteWorkspaceController } from './application/workspace/delete-workspace/controllers/delete-workspace.controller';
@@ -14,20 +16,61 @@ import { ReadVisualIdentityController } from './application/visual-identity/read
 import { ReadVisualIdentityUseCase } from './application/visual-identity/read-visual-identity/use-cases/read-visual-identity.usecase';
 import { WorkspaceDAO } from './database/dao/workspace/workspace.dao';
 import { VisualIdentityDAO } from './database/dao/visual-identity/visual-identity.dao';
+import { CompanyGroupHomeSummaryController } from './application/company-group/home-summary/controllers/company-group-home-summary.controller';
+import { CompanyGroupHomeSummaryUseCase } from './application/company-group/home-summary/use-cases/company-group-home-summary.usecase';
+import { CompanyGroupHomeSummaryDAO } from './database/dao/company-group/company-group-home-summary.dao';
+import { AccessibleGroupCompaniesService } from './application/shared/services/accessible-group-companies.service';
+import { CompanyGroupActionPlanSummaryService } from './application/company-group/home-summary/services/company-group-action-plan-summary.service';
+import { CompanyGroupConsolidatedViewEligibilityController } from './application/company-group/consolidated-view/controllers/company-group-consolidated-view-eligibility.controller';
+import { CompanyGroupConsolidatedViewSummaryController } from './application/company-group/consolidated-view/controllers/company-group-consolidated-view-summary.controller';
+import { CompanyGroupConsolidatedViewParticipantsController } from './application/company-group/consolidated-view/controllers/company-group-consolidated-view-participants.controller';
+import { CompanyGroupConsolidatedViewQuestionsAnswersController } from './application/company-group/consolidated-view/controllers/company-group-consolidated-view-questions-answers.controller';
+import { CompanyGroupConsolidatedViewIndicatorsNarrativeDiagnosticController } from './application/company-group/consolidated-view/controllers/company-group-consolidated-view-indicators-narrative-diagnostic.controller';
+import { CompanyGroupConsolidatedViewRiskAnalysisController } from './application/company-group/consolidated-view/controllers/company-group-consolidated-view-risk-analysis.controller';
+import { CompanyGroupConsolidatedViewRiskNarrativeDiagnosticController } from './application/company-group/consolidated-view/controllers/company-group-consolidated-view-risk-narrative-diagnostic.controller';
+import { CompanyGroupConsolidatedViewEligibilityUseCase } from './application/company-group/consolidated-view/use-cases/company-group-consolidated-view-eligibility.usecase';
+import { CompanyGroupConsolidatedViewSummaryUseCase } from './application/company-group/consolidated-view/use-cases/company-group-consolidated-view-summary.usecase';
+import { CompanyGroupConsolidatedViewParticipantsUseCase } from './application/company-group/consolidated-view/use-cases/company-group-consolidated-view-participants.usecase';
+import { CompanyGroupConsolidatedViewQuestionsAnswersUseCase } from './application/company-group/consolidated-view/use-cases/company-group-consolidated-view-questions-answers.usecase';
+import { CompanyGroupConsolidatedViewIndicatorsNarrativeDiagnosticReadUseCase } from './application/company-group/consolidated-view/use-cases/company-group-consolidated-view-indicators-narrative-diagnostic-read.usecase';
+import { CompanyGroupConsolidatedViewIndicatorsNarrativeDiagnosticGenerateUseCase } from './application/company-group/consolidated-view/use-cases/company-group-consolidated-view-indicators-narrative-diagnostic-generate.usecase';
+import { CompanyGroupConsolidatedViewRiskAnalysisUseCase } from './application/company-group/consolidated-view/use-cases/company-group-consolidated-view-risk-analysis.usecase';
+import { CompanyGroupConsolidatedViewRiskNarrativeDiagnosticGenerateUseCase } from './application/company-group/consolidated-view/use-cases/company-group-consolidated-view-risk-narrative-diagnostic-generate.usecase';
+import { CompanyGroupConsolidatedViewRiskNarrativeDiagnosticReadUseCase } from './application/company-group/consolidated-view/use-cases/company-group-consolidated-view-risk-narrative-diagnostic-read.usecase';
+import { CompanyGroupConsolidatedViewEligibilityService } from './application/company-group/consolidated-view/services/company-group-consolidated-view-eligibility.service';
+import { CompanyGroupConsolidatedViewMetricsService } from './application/company-group/consolidated-view/services/company-group-consolidated-view-metrics.service';
+import { CompanyGroupConsolidatedViewContextService } from './application/company-group/consolidated-view/services/company-group-consolidated-view-context.service';
+import { CompanyGroupConsolidatedViewParticipantsService } from './application/company-group/consolidated-view/services/company-group-consolidated-view-participants.service';
+import { CompanyGroupConsolidatedViewQuestionsAnswersService } from './application/company-group/consolidated-view/services/company-group-consolidated-view-questions-answers.service';
+import { CompanyGroupConsolidatedViewIndicatorsNarrativeDiagnosticService } from './application/company-group/consolidated-view/services/company-group-consolidated-view-indicators-narrative-diagnostic.service';
+import { CompanyGroupConsolidatedViewRiskAnalysisService } from './application/company-group/consolidated-view/services/company-group-consolidated-view-risk-analysis.service';
+import { CompanyGroupConsolidatedViewRiskNarrativeDiagnosticService } from './application/company-group/consolidated-view/services/company-group-consolidated-view-risk-narrative-diagnostic.service';
+import { BuildConsolidatedRiskNarrativeInputService } from './application/company-group/consolidated-view/services/build-consolidated-risk-narrative-input.service';
+import { BuildConsolidatedIndicatorsNarrativeInputService } from './application/company-group/consolidated-view/services/build-consolidated-indicators-narrative-input.service';
+import { FormApplicationStructureFingerprintService } from './application/company-group/consolidated-view/services/form-application-structure-fingerprint.service';
 
 @Module({
-  imports: [SharedModule],
+  imports: [SharedModule, ActionPlanModule, forwardRef(() => FormModule)],
   controllers: [
     BrowseWorkspaceController,
     DeleteWorkspaceController,
     ConvertWorkspaceToCompanyController,
     RepairHybridFormApplicationsController,
     ReadVisualIdentityController,
+    CompanyGroupHomeSummaryController,
+    CompanyGroupConsolidatedViewEligibilityController,
+    CompanyGroupConsolidatedViewSummaryController,
+    CompanyGroupConsolidatedViewParticipantsController,
+    CompanyGroupConsolidatedViewQuestionsAnswersController,
+    CompanyGroupConsolidatedViewIndicatorsNarrativeDiagnosticController,
+    CompanyGroupConsolidatedViewRiskAnalysisController,
+    CompanyGroupConsolidatedViewRiskNarrativeDiagnosticController,
   ],
   providers: [
     // Database
     WorkspaceDAO,
     VisualIdentityDAO,
+    CompanyGroupHomeSummaryDAO,
 
     // Use Cases
     BrowseWorkspaceUseCase,
@@ -37,7 +80,30 @@ import { VisualIdentityDAO } from './database/dao/visual-identity/visual-identit
     WorkspaceConvertService,
     WorkspaceOperationalDataCloneService,
     ReadVisualIdentityUseCase,
+    CompanyGroupHomeSummaryUseCase,
+    AccessibleGroupCompaniesService,
+    CompanyGroupActionPlanSummaryService,
+    CompanyGroupConsolidatedViewEligibilityUseCase,
+    CompanyGroupConsolidatedViewSummaryUseCase,
+    CompanyGroupConsolidatedViewParticipantsUseCase,
+    CompanyGroupConsolidatedViewQuestionsAnswersUseCase,
+    CompanyGroupConsolidatedViewIndicatorsNarrativeDiagnosticReadUseCase,
+    CompanyGroupConsolidatedViewIndicatorsNarrativeDiagnosticGenerateUseCase,
+    CompanyGroupConsolidatedViewRiskAnalysisUseCase,
+    CompanyGroupConsolidatedViewRiskNarrativeDiagnosticGenerateUseCase,
+    CompanyGroupConsolidatedViewRiskNarrativeDiagnosticReadUseCase,
+    CompanyGroupConsolidatedViewEligibilityService,
+    CompanyGroupConsolidatedViewMetricsService,
+    CompanyGroupConsolidatedViewContextService,
+    CompanyGroupConsolidatedViewParticipantsService,
+    CompanyGroupConsolidatedViewQuestionsAnswersService,
+    CompanyGroupConsolidatedViewIndicatorsNarrativeDiagnosticService,
+    CompanyGroupConsolidatedViewRiskAnalysisService,
+    CompanyGroupConsolidatedViewRiskNarrativeDiagnosticService,
+    BuildConsolidatedRiskNarrativeInputService,
+    BuildConsolidatedIndicatorsNarrativeInputService,
+    FormApplicationStructureFingerprintService,
   ],
-  exports: [],
+  exports: [AccessibleGroupCompaniesService],
 })
 export class CompanyModule {}

@@ -57,7 +57,7 @@ export const quantityQuiConverter = (riskGroupData: RiskFactorGroupDataEntity, h
         },
         {
           result: json.stelValue,
-          leo: json.stel,
+          leo: json.isStelTeto ? json.acgihCeiling || json.stel : json.stel,
           prob: json.stelProb,
           type: json.isStelTeto ? 'ACGIH C' : 'ACGIH TLV-STEL',
         },

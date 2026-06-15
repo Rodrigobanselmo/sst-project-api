@@ -1,4 +1,5 @@
 import { IRiskExamMap } from './../../../../../sst/entities/exam.entity';
+import { buildRiskCharacterizationTableLimitsDisplay } from 'src/shared/utils/risk/build-risk-characterization-table-limits.util';
 import { filterRisk } from '../../../../../../shared/utils/filterRisk';
 import { RiskOrderEnum } from '../../../../../../shared/constants/enum/risk.enums';
 import { palette } from '../../../../../../shared/constants/palette';
@@ -42,23 +43,25 @@ export const riskCharacterizationConverter = (riskGroup: RiskFactorGroupDataEnti
       size: 2,
       borders: borderStyleGlobal(palette.common.white.string),
     };
+    const limits = buildRiskCharacterizationTableLimitsDisplay(risk);
+
     cells[RiskCharacterizationColumnEnum.NR15LT] = {
-      text: risk.nr15lt || '--',
+      text: limits.nr15LtColumn,
       size: 2,
       borders: borderStyleGlobal(palette.common.white.string),
     };
     cells[RiskCharacterizationColumnEnum.ACGIH_TWA] = {
-      text: risk.twa || '--',
+      text: limits.acgihTwaColumn || ' ',
       size: 3,
       borders: borderStyleGlobal(palette.common.white.string),
     };
     cells[RiskCharacterizationColumnEnum.ACGIH_STEL] = {
-      text: risk.stel || '--',
+      text: limits.acgihStelColumn || ' ',
       size: 2,
       borders: borderStyleGlobal(palette.common.white.string),
     };
     cells[RiskCharacterizationColumnEnum.IPVS] = {
-      text: risk.ipvs || '--',
+      text: limits.ipvsColumn,
       size: 2,
       borders: borderStyleGlobal(palette.common.white.string),
     };

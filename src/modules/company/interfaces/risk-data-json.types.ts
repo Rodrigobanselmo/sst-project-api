@@ -16,6 +16,7 @@ export type IRiskDataActivities = {
 export interface IRiskDataJsonQui {
   stel?: string;
   twa?: string;
+  acgihCeiling?: string;
   nr15lt?: string;
   vmp?: string;
   stelValue?: string;

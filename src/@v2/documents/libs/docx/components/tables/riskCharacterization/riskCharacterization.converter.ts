@@ -1,4 +1,5 @@
 
+import { buildRiskCharacterizationTableLimitsDisplay } from 'src/shared/utils/risk/build-risk-characterization-table-limits.util';
 import { RiskDataExamModel } from '@/@v2/documents/domain/models/risk-data-exam.model';
 import { RiskDataModel } from '@/@v2/documents/domain/models/risk-data.model';
 import { RiskModel } from '@/@v2/documents/domain/models/risk.model';
@@ -55,23 +56,25 @@ export const riskCharacterizationConverter = (
       size: 2,
       borders: borderStyleGlobal(palette.common.white.string),
     };
+    const limits = buildRiskCharacterizationTableLimitsDisplay(risk);
+
     cells[RiskCharacterizationColumnEnum.NR15LT] = {
-      text: risk.nr15lt || '--',
+      text: limits.nr15LtColumn,
       size: 2,
       borders: borderStyleGlobal(palette.common.white.string),
     };
     cells[RiskCharacterizationColumnEnum.ACGIH_TWA] = {
-      text: risk.twa || '--',
+      text: limits.acgihTwaColumn || ' ',
       size: 3,
       borders: borderStyleGlobal(palette.common.white.string),
     };
     cells[RiskCharacterizationColumnEnum.ACGIH_STEL] = {
-      text: risk.stel || '--',
+      text: limits.acgihStelColumn || ' ',
       size: 2,
       borders: borderStyleGlobal(palette.common.white.string),
     };
     cells[RiskCharacterizationColumnEnum.IPVS] = {
-      text: risk.ipvs || '--',
+      text: limits.ipvsColumn,
       size: 2,
       borders: borderStyleGlobal(palette.common.white.string),
     };

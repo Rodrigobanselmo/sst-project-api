@@ -14,6 +14,7 @@ import { IExportActionPlanUseCase } from './export-action-plan.types';
 const DEFAULT_EXPORT_ORDER = [
   { field: ActionPlanOrderByEnum.STATUS, order: OrderByDirectionEnum.ASC },
   { field: ActionPlanOrderByEnum.LEVEL, order: OrderByDirectionEnum.DESC },
+  { field: ActionPlanOrderByEnum.EXPOSED_WORKERS, order: OrderByDirectionEnum.DESC },
   { field: ActionPlanOrderByEnum.ORIGIN, order: OrderByDirectionEnum.ASC },
 ];
 

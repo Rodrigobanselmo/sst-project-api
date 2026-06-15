@@ -133,11 +133,47 @@ export class CreateRiskDto {
 
   @IsString()
   @IsOptional()
+  acgihCeiling?: string;
+
+  @IsString()
+  @IsOptional()
   vmp?: string;
 
   @IsString()
   @IsOptional()
   ipvs?: string;
+
+  @IsString()
+  @IsOptional()
+  nioshRel?: string;
+
+  @IsString()
+  @IsOptional()
+  nioshStel?: string;
+
+  @IsString()
+  @IsOptional()
+  nioshCeiling?: string;
+
+  @IsString()
+  @IsOptional()
+  oshaPel?: string;
+
+  @IsString()
+  @IsOptional()
+  oshaStel?: string;
+
+  @IsString()
+  @IsOptional()
+  oshaCeiling?: string;
+
+  @IsString()
+  @IsOptional()
+  aihaWeel?: string;
+
+  @IsString()
+  @IsOptional()
+  aihaWeelCeiling?: string;
 
   @IsString()
   @IsOptional()
@@ -334,11 +370,47 @@ export class UpdateRiskDto {
 
   @IsString()
   @IsOptional()
+  acgihCeiling?: string;
+
+  @IsString()
+  @IsOptional()
   vmp?: string;
 
   @IsString()
   @IsOptional()
   ipvs?: string;
+
+  @IsString()
+  @IsOptional()
+  nioshRel?: string;
+
+  @IsString()
+  @IsOptional()
+  nioshStel?: string;
+
+  @IsString()
+  @IsOptional()
+  nioshCeiling?: string;
+
+  @IsString()
+  @IsOptional()
+  oshaPel?: string;
+
+  @IsString()
+  @IsOptional()
+  oshaStel?: string;
+
+  @IsString()
+  @IsOptional()
+  oshaCeiling?: string;
+
+  @IsString()
+  @IsOptional()
+  aihaWeel?: string;
+
+  @IsString()
+  @IsOptional()
+  aihaWeelCeiling?: string;
 
   @IsString()
   @IsOptional()

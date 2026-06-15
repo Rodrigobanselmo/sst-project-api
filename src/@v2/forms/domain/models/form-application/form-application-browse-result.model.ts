@@ -18,9 +18,15 @@ export type IFormApplicationBrowseResultModel = {
   createdAt: Date;
   updatedAt: Date;
   companyId: string;
+  companyName?: string | null;
+  companyFantasy?: string | null;
+  companyInitials?: string | null;
   totalAnswers: number;
   totalParticipants: number;
   averageTimeSpent: number | null;
+  isBusinessGroupApplication?: boolean;
+  currentCompanyParticipants?: number | null;
+  currentCompanyAnswers?: number | null;
   form: IFormResultModel;
 };
 
@@ -34,9 +40,15 @@ export class FormApplicationBrowseResultModel {
   createdAt: Date;
   updatedAt: Date;
   companyId: string;
+  companyName: string | null;
+  companyFantasy: string | null;
+  companyInitials: string | null;
   totalAnswers: number;
   totalParticipants: number;
   averageTimeSpent: number | null;
+  isBusinessGroupApplication: boolean;
+  currentCompanyParticipants: number | null;
+  currentCompanyAnswers: number | null;
   form: IFormResultModel;
 
   constructor(params: IFormApplicationBrowseResultModel) {
@@ -49,10 +61,16 @@ export class FormApplicationBrowseResultModel {
     this.createdAt = params.createdAt;
     this.updatedAt = params.updatedAt;
     this.companyId = params.companyId;
+    this.companyName = params.companyName ?? null;
+    this.companyFantasy = params.companyFantasy ?? null;
+    this.companyInitials = params.companyInitials ?? null;
 
     this.totalParticipants = params.totalParticipants;
     this.totalAnswers = params.totalAnswers;
     this.averageTimeSpent = params.averageTimeSpent;
+    this.isBusinessGroupApplication = params.isBusinessGroupApplication ?? false;
+    this.currentCompanyParticipants = params.currentCompanyParticipants ?? null;
+    this.currentCompanyAnswers = params.currentCompanyAnswers ?? null;
     this.form = params.form;
   }
 }

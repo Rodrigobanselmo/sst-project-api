@@ -17,6 +17,7 @@ import { ActionPlanAllTasksMapper } from '../../mappers/models/action-plan/actio
 import { LocalContext, UserContext } from '@/@v2/shared/adapters/context';
 import { SharedTokens } from '@/@v2/shared/constants/tokens';
 import { ContextKey } from '@/@v2/shared/adapters/context/types/enum/context-key.enum';
+import { buildGhoExposedWorkersCte, getExposedWorkersCountByGhoIds } from '../../utils/get-exposed-workers-count-by-gho-ids.util';
 
 @Injectable()
 export class ActionPlanDAO {
@@ -239,6 +240,10 @@ export class ActionPlanDAO {
       riskFactorDataPromise,
     ]);
 
+    const exposedWorkersByGho = homogeneousGroup
+      ? await getExposedWorkersCountByGhoIds(this.prisma, params.companyId, [homogeneousGroup.id])
+      : {};
+
     return homogeneousGroup
       ? ActionPlanReadMapper.toModel({
           homogeneousGroup,
@@ -247,6 +252,7 @@ export class ActionPlanDAO {
           generateSources: generateSourcesData?.generateSources || [],
           documentData,
           riskLevel: riskFactorData?.level ?? null,
+          exposedWorkersCount: exposedWorkersByGho[homogeneousGroup.id] ?? 0,
           params,
         })
       : null;
@@ -272,7 +278,8 @@ export class ActionPlanDAO {
         SELECT DISTINCT ON ("workspaceId") *
         FROM "DocumentData" dd
         WHERE dd."type" = 'PGR'
-      )
+      ),
+      ${buildGhoExposedWorkersCte(filters.companyId)}
       SELECT 
         rec."id" AS rec_id,
         rec."recName" AS rec_name,
@@ -356,7 +363,8 @@ export class ActionPlanDAO {
             ,'created_at', comment."created_at"
           )) 
           FILTER (WHERE comment."id" IS NOT NULL), '[]'
-        ) AS comments
+        ) AS comments,
+        COALESCE(MAX(gew.exposed_workers_count), 0) AS exposed_workers_count
       FROM 
         "RiskFactorData" rfd
       JOIN 
@@ -430,6 +438,8 @@ export class ActionPlanDAO {
       }
       LEFT JOIN
         "CompanyCharacterization" cc ON cc."id" = hg."id"
+      LEFT JOIN
+        "GhoExposedWorkers" gew ON gew.hg_id = hg."id"
       LEFT JOIN
         "Workspace" w ON w."companyId" = rfd."companyId"
       LEFT JOIN
@@ -583,6 +593,140 @@ export class ActionPlanDAO {
       pagination: { limit: pagination.limit, page: pagination.page, total: Number(totalActionPlans[0].total) },
       filters: totalActionPlans[0],
     });
+  }
+
+  async countHomeSummary(filters: IActionPlanDAO.BrowseParams['filters']) {
+    const browseWhereParams = this.browseWhere(filters);
+    const { filterHaving, filterWhere } = this.filterWhere(filters);
+    const whereParams = [...browseWhereParams, ...filterWhere];
+    const whereTotalParams = [...whereParams, ...filterHaving];
+
+    const includeHierarchies =
+      Array.isArray(filters.rules?.hierarchyAccess?.value) ||
+      !!filters.hierarchyIds?.length;
+    const includeResponsible =
+      !!filters.responsibleIds?.length || filters.rules?.hasAnyRule;
+
+    const [result] = await this.prisma.$queryRaw<
+      {
+        total: number;
+        pending: number;
+        progress: number;
+        done: number;
+        canceled: number;
+      }[]
+    >`
+      SELECT
+        COUNT(DISTINCT (rfd."id", rec."id"))::integer AS total,
+        COUNT(DISTINCT (rfd."id", rec."id")) FILTER (
+          WHERE CASE
+            WHEN rfd_rec."status" IS NULL THEN 'PENDING'
+            ELSE rfd_rec."status"::TEXT
+          END = 'PENDING'
+        )::integer AS pending,
+        COUNT(DISTINCT (rfd."id", rec."id")) FILTER (
+          WHERE CASE
+            WHEN rfd_rec."status" IS NULL THEN 'PENDING'
+            ELSE rfd_rec."status"::TEXT
+          END = 'PROGRESS'
+        )::integer AS progress,
+        COUNT(DISTINCT (rfd."id", rec."id")) FILTER (
+          WHERE CASE
+            WHEN rfd_rec."status" IS NULL THEN 'PENDING'
+            ELSE rfd_rec."status"::TEXT
+          END = 'DONE'
+        )::integer AS done,
+        COUNT(DISTINCT (rfd."id", rec."id")) FILTER (
+          WHERE CASE
+            WHEN rfd_rec."status" IS NULL THEN 'PENDING'
+            ELSE rfd_rec."status"::TEXT
+          END = 'CANCELED'
+        )::integer AS canceled
+      FROM
+        "RiskFactorData" rfd
+      JOIN
+        "RecMedOnRiskData" rec_to_rfd ON rec_to_rfd."risk_data_id" = rfd."id"
+      LEFT JOIN
+        "RecMed" rec ON rec."id" = rec_to_rfd."rec_med_id"
+      LEFT JOIN
+        "RiskFactors" risk ON risk."id" = rfd."riskId"
+      LEFT JOIN
+        "RiskToRiskSubType" risk_sub_type ON risk_sub_type."risk_id" = risk."id"
+      LEFT JOIN
+        "RiskSubType" risk_sub_type_table ON risk_sub_type_table."id" = risk_sub_type."sub_type_id"
+      LEFT JOIN
+        "RiskFactorDataRec" rfd_rec ON rfd_rec."riskFactorDataId" = rfd."id" AND rfd_rec."recMedId" = rec."id"
+      ${
+        includeResponsible
+          ? Prisma.sql`
+        LEFT JOIN "User" u_resp ON u_resp."id" = rfd_rec."responsibleId"
+      `
+          : Prisma.sql``
+      }
+      ${
+        includeResponsible
+          ? Prisma.sql`
+            LEFT JOIN "Task" task ON task."action_plan_id" = rfd_rec."id"
+            LEFT JOIN "TaskResponsible" task_resp ON task_resp."task_id" = task."id"
+          `
+          : Prisma.sql``
+      }
+      LEFT JOIN
+        "HomogeneousGroup" hg ON hg."id" = rfd."homogeneousGroupId"
+      ${
+        filters.workspaceIds?.length
+          ? Prisma.sql`
+        LEFT JOIN
+            "_HomogeneousGroupToWorkspace" hg_to_w ON hg_to_w."A" = hg."id"
+      `
+          : Prisma.sql``
+      }
+      LEFT JOIN
+        "HierarchyOnHomogeneous" hh ON hh."homogeneousGroupId" = hg."id" AND hh."endDate" IS NULL
+      LEFT JOIN
+        "Hierarchy" h ON h."id" = hh."hierarchyId"
+      ${
+        includeHierarchies
+          ? Prisma.sql`
+        LEFT JOIN
+          "Hierarchy" h_parent_1 ON h_parent_1."id" = h."parentId"
+        LEFT JOIN
+          "Hierarchy" h_parent_2 ON h_parent_2."id" = h_parent_1."parentId"
+        LEFT JOIN
+          "Hierarchy" h_parent_3 ON h_parent_3."id" = h_parent_2."parentId"
+        LEFT JOIN
+          "Hierarchy" h_parent_4 ON h_parent_4."id" = h_parent_3."parentId"
+        LEFT JOIN
+          "Hierarchy" h_parent_5 ON h_parent_5."id" = h_parent_4."parentId"
+        LEFT JOIN
+          "Hierarchy" h_children_1 ON h_children_1."parentId" = h."id"
+        LEFT JOIN
+          "Hierarchy" h_children_2 ON h_children_2."parentId" = h_children_1."id"
+        LEFT JOIN
+          "Hierarchy" h_children_3 ON h_children_3."parentId" = h_children_2."id"
+        LEFT JOIN
+          "Hierarchy" h_children_4 ON h_children_4."parentId" = h_children_3."id"
+        LEFT JOIN
+          "Hierarchy" h_children_5 ON h_children_5."parentId" = h_children_4."id"
+      `
+          : Prisma.sql``
+      }
+      LEFT JOIN
+        "CompanyCharacterization" cc ON cc."id" = hg."id"
+      LEFT JOIN
+        "Workspace" w ON w."companyId" = rfd."companyId"
+      LEFT JOIN
+        "DocumentData" dd ON dd."workspaceId" = w."id"
+      ${gerWhereRawPrisma(whereTotalParams)}
+    `;
+
+    return {
+      total: Number(result?.total ?? 0),
+      pending: Number(result?.pending ?? 0),
+      progress: Number(result?.progress ?? 0),
+      done: Number(result?.done ?? 0),
+      canceled: Number(result?.canceled ?? 0),
+    };
   }
 
   private browseWhere(filters: IActionPlanDAO.BrowseParams['filters']) {
@@ -856,6 +1000,7 @@ export class ActionPlanDAO {
           ELSE rfd."level"
         END
       `,
+      [ActionPlanOrderByEnum.EXPOSED_WORKERS]: 'exposed_workers_count',
     };
 
     const orderByRaw = orderBy.map<IOrderByRawPrisma>(({ field, order }) => ({ column: map[field], order }));
