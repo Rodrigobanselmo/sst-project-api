@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 
+import { FormModule } from '@/@v2/forms/forms.module';
 import { SharedModule } from '@/@v2/shared/shared.module';
 
 import {
@@ -19,13 +20,15 @@ import {
   HoSamplerService,
 } from './ho-method/ho-catalog.service';
 import { HoMethodImportService } from './ho-method/import/ho-method-import.service';
+import { HoMethodImportAiReviewPromptService } from './ho-method/import/ho-method-import-ai-review-prompt.service';
+import { HoMethodImportAiReviewUseCase } from './ho-method/import/ho-method-import-ai-review.usecase';
 import { HoMethodDAO } from './ho-method/ho-method.dao';
 import { HoMethodRepository } from './ho-method/ho-method.repository';
 import { HoMethodRiskSearchService } from './ho-method/ho-method-risk-search.service';
 import { HoMethodService } from './ho-method/ho-method.service';
 
 @Module({
-  imports: [SharedModule],
+  imports: [SharedModule, FormModule],
   controllers: [
     HoMethodController,
     HoMethodByIdController,
@@ -40,6 +43,8 @@ import { HoMethodService } from './ho-method/ho-method.service';
     HoMethodService,
     HoMethodRiskSearchService,
     HoMethodImportService,
+    HoMethodImportAiReviewPromptService,
+    HoMethodImportAiReviewUseCase,
     HoSamplerService,
     HoExtractionSolventService,
     HoLaboratoryService,

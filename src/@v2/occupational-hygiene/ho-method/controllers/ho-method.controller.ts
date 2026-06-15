@@ -31,7 +31,9 @@ import {
   HoMethodRiskSearchQuery,
   HoMethodWritePayload,
 } from './ho-method.dto';
+import { HoMethodImportAiReviewPayload } from './ho-method-import-ai-review.payload';
 import { HoMethodImportService } from '../import/ho-method-import.service';
+import { HoMethodImportAiReviewUseCase } from '../import/ho-method-import-ai-review.usecase';
 import { HoMethodRiskSearchService } from '../ho-method-risk-search.service';
 import { HoMethodService } from '../ho-method.service';
 import { HoMethodWriteInput } from '../ho-method.types';
@@ -62,6 +64,7 @@ export class HoMethodController {
     private readonly hoMethodService: HoMethodService,
     private readonly hoMethodRiskSearchService: HoMethodRiskSearchService,
     private readonly hoMethodImportService: HoMethodImportService,
+    private readonly hoMethodImportAiReviewUseCase: HoMethodImportAiReviewUseCase,
   ) {}
 
   @Get('risk-factors/search')
@@ -127,6 +130,29 @@ export class HoMethodController {
       buffer: file.buffer,
       filename: file.originalname,
       companyId: user.targetCompanyId || user.companyId,
+    });
+  }
+
+  @Post('import/ai-review')
+  @Permissions({
+    code: PermissionEnum.RISK,
+    crud: 'c',
+    isMember: true,
+    isContract: true,
+  })
+  reviewImportWithAi(
+    @Body() body: HoMethodImportAiReviewPayload,
+    @User() user: UserPayloadDto,
+  ) {
+    return this.hoMethodImportAiReviewUseCase.execute({
+      companyId: user.targetCompanyId || body.companyId || user.companyId,
+      originalFileName: body.originalFileName,
+      parserResult: body.parserResult,
+      extractedText: body.extractedText,
+      customPrompt: body.customPrompt,
+      model: body.model,
+      registeredSamplers: body.registeredSamplers,
+      registeredExtractionSolvents: body.registeredExtractionSolvents,
     });
   }
 

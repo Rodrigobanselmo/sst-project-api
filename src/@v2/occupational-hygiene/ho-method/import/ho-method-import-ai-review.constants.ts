@@ -1,0 +1,217 @@
+export const HO_METHOD_IMPORT_AI_REVIEW_MODEL =
+  process.env.HO_METHOD_IMPORT_AI_REVIEW_MODEL ||
+  process.env.RISK_FACTOR_AI_SUGGESTIONS_MODEL ||
+  'gpt-4o-mini';
+
+const confidenceSchema = { type: 'string', enum: ['low', 'medium', 'high'] };
+
+const nullableString = { type: ['string', 'null'] };
+
+export const HO_METHOD_IMPORT_AI_REVIEW_RESPONSE_SCHEMA = {
+  type: 'object',
+  properties: {
+    method: {
+      type: ['object', 'null'],
+      properties: {
+        institution: nullableString,
+        methodCode: nullableString,
+        issue: nullableString,
+        issueDate: nullableString,
+        displayName: nullableString,
+        analyticalMethod: nullableString,
+        evaluation: nullableString,
+      },
+      required: [
+        'institution',
+        'methodCode',
+        'issue',
+        'issueDate',
+        'displayName',
+        'analyticalMethod',
+        'evaluation',
+      ],
+      additionalProperties: false,
+    },
+    agents: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          name: { type: 'string' },
+          cas: nullableString,
+          synonyms: { type: 'array', items: { type: 'string' } },
+          translatedNamePtBr: nullableString,
+          technicalNotes: { type: 'array', items: { type: 'string' } },
+          occupationalLimits: {
+            type: ['object', 'null'],
+            properties: {
+              nr15Lt: nullableString,
+              acgihTwa: nullableString,
+              acgihStel: nullableString,
+              acgihCeiling: nullableString,
+              nioshRel: nullableString,
+              nioshStel: nullableString,
+              nioshCeiling: nullableString,
+              oshaPel: nullableString,
+              oshaStel: nullableString,
+              oshaCeiling: nullableString,
+              aihaWeel: nullableString,
+              aihaWeelCeiling: nullableString,
+              unit: nullableString,
+              notes: nullableString,
+            },
+            required: [
+              'nr15Lt',
+              'acgihTwa',
+              'acgihStel',
+              'acgihCeiling',
+              'nioshRel',
+              'nioshStel',
+              'nioshCeiling',
+              'oshaPel',
+              'oshaStel',
+              'oshaCeiling',
+              'aihaWeel',
+              'aihaWeelCeiling',
+              'unit',
+              'notes',
+            ],
+            additionalProperties: false,
+          },
+          sourceTrace: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                page: { type: ['integer', 'null'] },
+                table: nullableString,
+                field: { type: 'string' },
+                excerpt: { type: 'string' },
+              },
+              required: ['page', 'table', 'field', 'excerpt'],
+              additionalProperties: false,
+            },
+          },
+          confidence: confidenceSchema,
+          warnings: { type: 'array', items: { type: 'string' } },
+        },
+        required: [
+          'name',
+          'cas',
+          'synonyms',
+          'translatedNamePtBr',
+          'technicalNotes',
+          'occupationalLimits',
+          'sourceTrace',
+          'confidence',
+          'warnings',
+        ],
+        additionalProperties: false,
+      },
+    },
+    sampling: {
+      type: ['object', 'null'],
+      properties: {
+        samplerOriginal: nullableString,
+        samplerPtBr: nullableString,
+        flowMin: nullableString,
+        flowMax: nullableString,
+        flowUnit: nullableString,
+        volumeMin: nullableString,
+        volumeMax: nullableString,
+        volumeUnit: nullableString,
+        shipment: nullableString,
+      },
+      required: [
+        'samplerOriginal',
+        'samplerPtBr',
+        'flowMin',
+        'flowMax',
+        'flowUnit',
+        'volumeMin',
+        'volumeMax',
+        'volumeUnit',
+        'shipment',
+      ],
+      additionalProperties: false,
+    },
+    preparation: {
+      type: ['object', 'null'],
+      properties: {
+        stabilityDays: nullableString,
+        stabilityText: nullableString,
+        storageTemperature: nullableString,
+        storageTemperatureUnit: nullableString,
+        extractionSolventOriginal: nullableString,
+        extractionSolventPtBr: nullableString,
+      },
+      required: [
+        'stabilityDays',
+        'stabilityText',
+        'storageTemperature',
+        'storageTemperatureUnit',
+        'extractionSolventOriginal',
+        'extractionSolventPtBr',
+      ],
+      additionalProperties: false,
+    },
+    analytical: {
+      type: ['object', 'null'],
+      properties: {
+        technique: nullableString,
+        analyte: nullableString,
+        detector: nullableString,
+        lod: nullableString,
+        range: nullableString,
+      },
+      required: ['technique', 'analyte', 'detector', 'lod', 'range'],
+      additionalProperties: false,
+    },
+    observations: {
+      type: ['object', 'null'],
+      properties: {
+        applicability: nullableString,
+        interferences: nullableString,
+        notes: nullableString,
+      },
+      required: ['applicability', 'interferences', 'notes'],
+      additionalProperties: false,
+    },
+    diagnostics: {
+      type: 'object',
+      properties: {
+        detectedTables: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              label: nullableString,
+              title: nullableString,
+              page: { type: ['integer', 'null'] },
+              inferredPurpose: {
+                type: 'string',
+                enum: ['agents', 'limits', 'sampling', 'properties', 'unknown'],
+              },
+              confidence: confidenceSchema,
+            },
+            required: ['label', 'title', 'page', 'inferredPurpose', 'confidence'],
+            additionalProperties: false,
+          },
+        },
+        warnings: { type: 'array', items: { type: 'string' } },
+      },
+      required: ['detectedTables', 'warnings'],
+      additionalProperties: false,
+    },
+  },
+  required: [
+    'method',
+    'agents',
+    'sampling',
+    'preparation',
+    'analytical',
+    'observations',
+    'diagnostics',
+  ],
+  additionalProperties: false,
+} as const;

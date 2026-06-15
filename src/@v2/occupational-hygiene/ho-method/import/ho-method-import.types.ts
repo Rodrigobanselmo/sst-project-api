@@ -80,4 +80,5 @@ export type HoMethodImportParseResult = {
   agents: HoMethodImportAgentSuggestion[];
   canConfirm: boolean;
   confirmBlockReason: string | null;
+  extractedText?: string;
 };

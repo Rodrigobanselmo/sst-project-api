@@ -13,6 +13,7 @@ import {
   RISK_FACTOR_OTHER_AI_SUGGESTIONS_DEFAULT_PROMPT,
   RISK_FACTOR_PHYSICAL_AI_SUGGESTIONS_DEFAULT_PROMPT,
 } from '@/@v2/security/risk/application/risk-factor-ai-suggestions/constants/risk-factor-ai-suggestions-default-prompts.constant';
+import { HO_METHOD_IMPORT_AI_REVIEW_DEFAULT_PROMPT } from '@/@v2/occupational-hygiene/ho-method/import/ho-method-import-ai-review-default-prompt.constant';
 
 const DEFAULT_PROMPTS: Record<SystemAiPromptKeyEnum, string> = {
   [SystemAiPromptKeyEnum.RISK_SOURCES_RECOMMENDATIONS]: RISK_SOURCES_RECOMMENDATIONS_DEFAULT_PROMPT,
@@ -35,6 +36,8 @@ const DEFAULT_PROMPTS: Record<SystemAiPromptKeyEnum, string> = {
     RISK_FACTOR_ACCIDENT_AI_SUGGESTIONS_DEFAULT_PROMPT,
   [SystemAiPromptKeyEnum.RISK_FACTOR_OTHER_AI_SUGGESTIONS]:
     RISK_FACTOR_OTHER_AI_SUGGESTIONS_DEFAULT_PROMPT,
+  [SystemAiPromptKeyEnum.HO_METHOD_IMPORT_AI_REVIEW]:
+    HO_METHOD_IMPORT_AI_REVIEW_DEFAULT_PROMPT,
 };
 
 export const toPrismaSystemAiPromptKey = (key: SystemAiPromptKeyEnum): PrismaSystemAiPromptKeyEnum => {
