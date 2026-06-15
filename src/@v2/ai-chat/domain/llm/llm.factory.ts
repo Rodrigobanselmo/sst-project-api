@@ -9,7 +9,7 @@ export type AIMode = 'fast' | 'smarter';
 export type OpenAIModel = 'gpt-4o-mini' | 'gpt-4o' | 'gpt-4.1-mini' | 'gpt-4.1' | 'o4-mini';
 export type GeminiModel = 'gemini-2.5-flash' | 'gemini-2.5-pro';
 
-const DEFAULT_PROVIDER: LLMProvider = 'gemini';
+const DEFAULT_PROVIDER: LLMProvider = 'openai';
 const DEFAULT_AI_MODE: AIMode = 'fast';
 
 const MODE_CONFIG: Record<AIMode, { openaiModel: OpenAIModel; geminiModel: GeminiModel; maxOutputTokens: number }> = {
