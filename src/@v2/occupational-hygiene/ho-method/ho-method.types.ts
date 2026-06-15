@@ -163,6 +163,8 @@ export type HoMethodRiskFactorSnapshot = {
   oshaPel: string | null;
   oshaStel: string | null;
   oshaCeiling: string | null;
+  aihaWeel: string | null;
+  aihaWeelCeiling: string | null;
 };
 
 export type HoMethodRecord = {
@@ -258,6 +260,8 @@ export const hoMethodLegacyInclude = {
       oshaPel: true,
       oshaStel: true,
       oshaCeiling: true,
+      aihaWeel: true,
+      aihaWeelCeiling: true,
     },
   },
   evaluationConditions: {
@@ -299,6 +303,8 @@ export const hoMethodInclude = {
           oshaPel: true,
           oshaStel: true,
           oshaCeiling: true,
+          aihaWeel: true,
+          aihaWeelCeiling: true,
         },
       },
       evaluationConditions: {

@@ -154,6 +154,8 @@ const parseAgentsFromText = (
         synonyms,
         matchedRiskFactor: null,
         found: false,
+        matchConfidence: 'none',
+        candidateRiskFactors: [],
       });
     });
     return agents;
@@ -167,6 +169,8 @@ const parseAgentsFromText = (
         synonyms,
         matchedRiskFactor: null,
         found: false,
+        matchConfidence: 'none',
+        candidateRiskFactors: [],
       });
     });
     return agents;
@@ -179,6 +183,8 @@ const parseAgentsFromText = (
       synonyms,
       matchedRiskFactor: null,
       found: false,
+      matchConfidence: 'none',
+      candidateRiskFactors: [],
     });
   }
 

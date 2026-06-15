@@ -8,6 +8,12 @@ import {
   HO_METHOD_CHEMICAL_RISK_TYPE,
 } from './utils/ho-method-chemical.util';
 import { HoMethodRiskFactorSnapshot } from './ho-method.types';
+import {
+  collectAgentSearchTerms,
+  HoMethodAgentMatchInput,
+  HoMethodRiskMatchConfidence,
+  resolveBestRiskMatch,
+} from './utils/ho-method-risk-match.util';
 
 const riskSelect = {
   id: true,
@@ -27,6 +33,8 @@ const riskSelect = {
   oshaPel: true,
   oshaStel: true,
   oshaCeiling: true,
+  aihaWeel: true,
+  aihaWeelCeiling: true,
   json: true,
   search: true,
 } satisfies Prisma.RiskFactorsSelect;
@@ -119,6 +127,41 @@ export class HoMethodRiskSearchService {
     return record ? this.mapRow(record) : null;
   }
 
+  async resolveAgentMatch(params: {
+    companyId: string;
+    agent: HoMethodAgentMatchInput;
+  }): Promise<{
+    match: HoMethodRiskFactorSnapshot | null;
+    confidence: HoMethodRiskMatchConfidence;
+    candidateRiskFactors: HoMethodRiskFactorSnapshot[];
+  }> {
+    const searchTerms = collectAgentSearchTerms(params.agent);
+    if (!searchTerms.length) {
+      return {
+        match: null,
+        confidence: 'none',
+        candidateRiskFactors: [],
+      };
+    }
+
+    const candidateMap = new Map<string, HoMethodRiskFactorSnapshot>();
+
+    for (const term of searchTerms) {
+      const results = await this.search({
+        companyId: params.companyId,
+        search: term,
+        limit: 10,
+      });
+
+      results.forEach((result) => candidateMap.set(result.id, result));
+    }
+
+    return resolveBestRiskMatch(
+      params.agent,
+      Array.from(candidateMap.values()),
+    );
+  }
+
   private async findIdsBySynonymSearch(
     companyId: string,
     search: string,
@@ -192,6 +235,8 @@ export class HoMethodRiskSearchService {
       oshaPel: row.oshaPel,
       oshaStel: row.oshaStel,
       oshaCeiling: row.oshaCeiling,
+      aihaWeel: row.aihaWeel,
+      aihaWeelCeiling: row.aihaWeelCeiling,
     };
   }
 

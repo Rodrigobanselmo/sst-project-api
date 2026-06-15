@@ -93,25 +93,24 @@ export class HoMethodImportService {
   ) {
     return Promise.all(
       agents.map(async (agent) => {
-        const searchTerm = agent.cas || agent.substanceName;
-        const matches = await this.hoMethodRiskSearchService.search({
+        const resolved = await this.hoMethodRiskSearchService.resolveAgentMatch({
           companyId,
-          search: searchTerm,
-          limit: 5,
+          agent: {
+            substanceName: agent.substanceName,
+            cas: agent.cas,
+            synonyms: agent.synonyms,
+          },
         });
 
         const matched =
-          matches.find((item) =>
-            agent.cas
-              ? item.cas?.replace(/[-\s]/g, '') ===
-                agent.cas.replace(/[-\s]/g, '')
-              : item.name.toLowerCase() === agent.substanceName.toLowerCase(),
-          ) ?? matches[0];
+          resolved.confidence === 'high' ? resolved.match : null;
 
         return {
           ...agent,
-          matchedRiskFactor: matched ?? null,
+          matchedRiskFactor: matched,
           found: Boolean(matched),
+          matchConfidence: resolved.confidence,
+          candidateRiskFactors: resolved.candidateRiskFactors,
         };
       }),
     );
