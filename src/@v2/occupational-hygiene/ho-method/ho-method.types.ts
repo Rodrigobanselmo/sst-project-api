@@ -155,6 +155,14 @@ export type HoMethodRiskFactorSnapshot = {
   nr15lt: string | null;
   twa: string | null;
   stel: string | null;
+  acgihCeiling: string | null;
+  ipvs: string | null;
+  nioshRel: string | null;
+  nioshStel: string | null;
+  nioshCeiling: string | null;
+  oshaPel: string | null;
+  oshaStel: string | null;
+  oshaCeiling: string | null;
 };
 
 export type HoMethodRecord = {
@@ -242,6 +250,14 @@ export const hoMethodLegacyInclude = {
       nr15lt: true,
       twa: true,
       stel: true,
+      acgihCeiling: true,
+      ipvs: true,
+      nioshRel: true,
+      nioshStel: true,
+      nioshCeiling: true,
+      oshaPel: true,
+      oshaStel: true,
+      oshaCeiling: true,
     },
   },
   evaluationConditions: {
@@ -275,6 +291,14 @@ export const hoMethodInclude = {
           nr15lt: true,
           twa: true,
           stel: true,
+          acgihCeiling: true,
+          ipvs: true,
+          nioshRel: true,
+          nioshStel: true,
+          nioshCeiling: true,
+          oshaPel: true,
+          oshaStel: true,
+          oshaCeiling: true,
         },
       },
       evaluationConditions: {

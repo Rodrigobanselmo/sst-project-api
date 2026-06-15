@@ -57,8 +57,17 @@ export class RiskFactorsEntity implements RiskFactors {
   nr15lt: string;
   twa: string;
   stel: string;
+  acgihCeiling: string;
   vmp: string;
   ipvs: string;
+  nioshRel: string;
+  nioshStel: string;
+  nioshCeiling: string;
+  oshaPel: string;
+  oshaStel: string;
+  oshaCeiling: string;
+  aihaWeel: string;
+  aihaWeelCeiling: string;
   pv: string;
   pe: string;
   fraction: string;

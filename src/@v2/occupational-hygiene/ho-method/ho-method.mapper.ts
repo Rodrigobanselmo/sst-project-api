@@ -27,18 +27,36 @@ const toNumber = (value: unknown): number | null => {
   return Number.isFinite(parsed) ? parsed : null;
 };
 
+const riskFactorOccupationalLimitSelect = {
+  id: true,
+  name: true,
+  cas: true,
+  synonymous: true,
+  type: true,
+  unit: true,
+  nr15lt: true,
+  twa: true,
+  stel: true,
+  acgihCeiling: true,
+  ipvs: true,
+  nioshRel: true,
+  nioshStel: true,
+  nioshCeiling: true,
+  oshaPel: true,
+  oshaStel: true,
+  oshaCeiling: true,
+} as const;
+
+type RiskFactorOccupationalLimitPick = Pick<
+  RiskFactors,
+  keyof typeof riskFactorOccupationalLimitSelect
+>;
 type HoMethodWithRelations = HoMethod & {
   sampler?: HoSampler | null;
   extractionSolvent?: HoExtractionSolvent | null;
-  riskFactor?: Pick<
-    RiskFactors,
-    'id' | 'name' | 'cas' | 'synonymous' | 'type' | 'unit' | 'nr15lt' | 'twa' | 'stel'
-  > | null;
+  riskFactor?: RiskFactorOccupationalLimitPick | null;
   agents?: (HoMethodAgent & {
-    riskFactor?: Pick<
-      RiskFactors,
-      'id' | 'name' | 'cas' | 'synonymous' | 'type' | 'unit' | 'nr15lt' | 'twa' | 'stel'
-    > | null;
+    riskFactor?: RiskFactorOccupationalLimitPick | null;
     evaluationConditions?: HoMethodEvaluationCondition[];
   })[];
   evaluationConditions?: HoMethodEvaluationCondition[];
@@ -50,10 +68,7 @@ type HoMethodWithRelations = HoMethod & {
 };
 
 export const mapHoMethodRiskFactorSnapshot = (
-  record?: Pick<
-    RiskFactors,
-    'id' | 'name' | 'cas' | 'synonymous' | 'type' | 'unit' | 'nr15lt' | 'twa' | 'stel'
-  > | null,
+  record?: RiskFactorOccupationalLimitPick | null,
 ): HoMethodRiskFactorSnapshot | null => {
   if (!record) return null;
 
@@ -67,6 +82,14 @@ export const mapHoMethodRiskFactorSnapshot = (
     nr15lt: record.nr15lt,
     twa: record.twa,
     stel: record.stel,
+    acgihCeiling: record.acgihCeiling,
+    ipvs: record.ipvs,
+    nioshRel: record.nioshRel,
+    nioshStel: record.nioshStel,
+    nioshCeiling: record.nioshCeiling,
+    oshaPel: record.oshaPel,
+    oshaStel: record.oshaStel,
+    oshaCeiling: record.oshaCeiling,
   };
 };
 
@@ -89,10 +112,7 @@ export const mapHoMethodEvaluationCondition = (
 
 export const mapHoMethodAgent = (
   record: HoMethodAgent & {
-    riskFactor?: Pick<
-      RiskFactors,
-      'id' | 'name' | 'cas' | 'synonymous' | 'type' | 'unit' | 'nr15lt' | 'twa' | 'stel'
-    > | null;
+    riskFactor?: RiskFactorOccupationalLimitPick | null;
     evaluationConditions?: HoMethodEvaluationCondition[];
   },
 ): HoMethodAgentRecord => ({

@@ -4,6 +4,7 @@ import { HierarchyEntity } from '../../company/entities/hierarchy.entity';
 import { HomoGroupEntity } from '../../company/entities/homoGroup.entity';
 import { originRiskMap } from '../../../shared/constants/maps/origin-risk';
 import { getMatrizRisk } from '../../../shared/utils/matriz';
+import { hasAcgihCeilingMarker } from '../../../shared/utils/risk/has-acgih-ceiling-marker.util';
 import {
   IRiskDataJson,
   IRiskDataJsonHeat,
@@ -232,12 +233,15 @@ export class RiskFactorDataEntity implements RiskFactorData {
 
   private quiProb(data: IRiskDataJsonQui) {
     const isNr15Teto = data.nr15lt && data.nr15lt.includes('T');
-    const isStelTeto = data.stel && data.stel.includes('C');
-    const isTwaTeto = data.twa && data.twa.includes('C');
+    const stelLimitValue = data.acgihCeiling?.trim() || data.stel;
+    const isStelTeto =
+      Boolean(data.acgihCeiling?.trim()) ||
+      (data.stel && hasAcgihCeilingMarker(data.stel));
+    const isTwaTeto = data.twa && hasAcgihCeilingMarker(data.twa);
     const isVmpTeto = data.vmp && data.vmp.includes('T');
 
     const nr15ltProb = this.percentageCheck(data.nr15ltValue, data.nr15lt, isNr15Teto ? 1 : 5);
-    const stelProb = this.percentageCheck(data.stelValue, data.stel, isStelTeto ? 1 : 5);
+    const stelProb = this.percentageCheck(data.stelValue, stelLimitValue, isStelTeto ? 1 : 5);
     const twaProb = this.percentageCheck(data.twaValue, data.twa, isTwaTeto ? 1 : 5);
     const vmpProb = this.percentageCheck(data.vmpValue, data.vmp, 1);
 

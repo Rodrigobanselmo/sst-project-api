@@ -19,6 +19,14 @@ const riskSelect = {
   nr15lt: true,
   twa: true,
   stel: true,
+  acgihCeiling: true,
+  ipvs: true,
+  nioshRel: true,
+  nioshStel: true,
+  nioshCeiling: true,
+  oshaPel: true,
+  oshaStel: true,
+  oshaCeiling: true,
   json: true,
   search: true,
 } satisfies Prisma.RiskFactorsSelect;
@@ -176,6 +184,14 @@ export class HoMethodRiskSearchService {
       nr15lt: row.nr15lt,
       twa: row.twa,
       stel: row.stel,
+      acgihCeiling: row.acgihCeiling,
+      ipvs: row.ipvs,
+      nioshRel: row.nioshRel,
+      nioshStel: row.nioshStel,
+      nioshCeiling: row.nioshCeiling,
+      oshaPel: row.oshaPel,
+      oshaStel: row.oshaStel,
+      oshaCeiling: row.oshaCeiling,
     };
   }
 

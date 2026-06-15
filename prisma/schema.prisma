@@ -2084,7 +2084,16 @@ model RiskFactors {
   nr15lt                 String?
   twa                    String?
   stel                   String?
+  acgihCeiling           String?
   ipvs                   String?
+  nioshRel               String?
+  nioshStel              String?
+  nioshCeiling           String?
+  oshaPel                String?
+  oshaStel               String?
+  oshaCeiling            String?
+  aihaWeel               String?
+  aihaWeelCeiling        String?
   pv                     String?
   pe                     String?
   carnogenicityACGIH     String?

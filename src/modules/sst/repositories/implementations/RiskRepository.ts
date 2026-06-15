@@ -1,6 +1,6 @@
 import { prismaFilter } from '../../../../shared/utils/filters/prisma.filters';
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma, StatusEnum } from '@prisma/client';
 import { removeDuplicate } from '../../../../shared/utils/removeDuplicate';
 
@@ -566,6 +566,10 @@ export class RiskRepository implements IRiskRepository {
         },
         ...options,
       });
+    }
+
+    if (!risk) {
+      throw new NotFoundException('Risco não encontrado');
     }
 
     return new RiskFactorsEntity(risk as any);

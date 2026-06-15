@@ -6,6 +6,7 @@ import { AiPendingActionServiceEnum, AiPendingActionStatusEnum, type PrismaClien
 import Fuse from 'fuse.js';
 import { z } from 'zod';
 import { normalizeString } from '../../../../shared/utils/normalizeString';
+import { buildRiskCharacterizationTableLimitsDisplay } from '../../../../shared/utils/risk/build-risk-characterization-table-limits.util';
 import { CharacterizationTypeTranslation, HierarchyTypeTranslation, HomoTypeTranslation } from '../../translations/characterization.translation';
 import { withErrorHandling } from './tool-error-handler';
 
@@ -750,11 +751,16 @@ export function createCharacterizationTools(deps: CharacterizationToolsDeps) {
       if (Object.keys(dadosNormativos).length > 0) result.dadosNormativos = dadosNormativos;
 
       // Exposure limits and tolerance levels
+      const characterizationLimits = buildRiskCharacterizationTableLimitsDisplay(risk);
       const limitesExposicao: any = {};
       if (risk.tlv) limitesExposicao.TLV = risk.tlv; // Threshold Limit Value (ACGIH)
       if (risk.nr15lt) limitesExposicao.limiteToleranciaNR15 = risk.nr15lt;
-      if (risk.twa) limitesExposicao.TWA = risk.twa; // Time Weighted Average
-      if (risk.stel) limitesExposicao.STEL = risk.stel; // Short Term Exposure Limit
+      if (characterizationLimits.acgihTwaColumn) {
+        limitesExposicao.TWA = characterizationLimits.acgihTwaColumn;
+      }
+      if (characterizationLimits.acgihStelColumn) {
+        limitesExposicao.STEL = characterizationLimits.acgihStelColumn;
+      }
       if (risk.ipvs) limitesExposicao.IPVS = risk.ipvs; // Immediately Dangerous to Life or Health
       if (risk.pv) limitesExposicao.valorPico = risk.pv;
       if (risk.pe) limitesExposicao.exposicaoPermissivel = risk.pe;

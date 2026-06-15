@@ -238,6 +238,108 @@ const parseStability = (text: string, table?: ReturnType<typeof parseSamplingTab
   };
 };
 
+const parseOccupationalLimits = (text: string) => {
+  const oshaRaw = firstMatch(text, /OSHA:\s*([^\n]+)/i);
+  const nioshRaw = firstMatch(text, /NIOSH:\s*([^\n]+)/i);
+  const acgihRaw = firstMatch(text, /ACGIH:\s*([^\n]+)/i);
+  const aihaRaw =
+    firstMatch(text, /AIHA(?:\s+WEEL)?:\s*([^\n]+)/i) ??
+    firstMatch(text, /WEEL:\s*([^\n]+)/i);
+  const idlhRaw =
+    firstMatch(text, /IDLH:\s*([^\n]+)/i) ??
+    firstMatch(text, /IDHL:\s*([^\n]+)/i) ??
+    firstMatch(text, /IPVS:\s*([^\n]+)/i);
+
+  const splitOsha = splitLimitValues(oshaRaw, 'osha');
+  const splitNiosh = splitLimitValues(nioshRaw, 'niosh');
+  const splitAcgih = splitLimitValues(acgihRaw, 'acgih');
+  const splitAiha = splitLimitValues(aihaRaw, 'aiha');
+
+  return {
+    acgihTwa: field(splitAcgih.twa, splitAcgih.twa ? 'high' : 'low', acgihRaw),
+    acgihStel: field(
+      splitAcgih.stel,
+      splitAcgih.stel ? 'medium' : 'low',
+      acgihRaw,
+    ),
+    acgihCeiling: field(
+      splitAcgih.ceiling,
+      splitAcgih.ceiling ? 'medium' : 'low',
+      acgihRaw,
+    ),
+    aihaWeel: field(splitAiha.weel, splitAiha.weel ? 'high' : 'low', aihaRaw),
+    aihaWeelCeiling: field(
+      splitAiha.ceiling,
+      splitAiha.ceiling ? 'medium' : 'low',
+      aihaRaw,
+    ),
+    oshaPel: field(splitOsha.pel, splitOsha.pel ? 'high' : 'low', oshaRaw),
+    oshaStel: field(splitOsha.stel, splitOsha.stel ? 'medium' : 'low', oshaRaw),
+    oshaCeiling: field(
+      splitOsha.ceiling,
+      splitOsha.ceiling ? 'medium' : 'low',
+      oshaRaw,
+    ),
+    nioshRel: field(splitNiosh.rel, splitNiosh.rel ? 'high' : 'low', nioshRaw),
+    nioshStel: field(
+      splitNiosh.stel,
+      splitNiosh.stel ? 'medium' : 'low',
+      nioshRaw,
+    ),
+    nioshCeiling: field(
+      splitNiosh.ceiling,
+      splitNiosh.ceiling ? 'medium' : 'low',
+      nioshRaw,
+    ),
+    nioshIdlh: field(idlhRaw, idlhRaw ? 'medium' : 'low', idlhRaw),
+  };
+};
+
+const splitLimitValues = (
+  raw: string | null,
+  source: 'osha' | 'niosh' | 'acgih' | 'aiha',
+) => {
+  if (!raw?.trim()) {
+    return {
+      pel: null,
+      rel: null,
+      twa: null,
+      stel: null,
+      ceiling: null,
+      weel: null,
+    };
+  }
+
+  const normalized = raw.trim();
+  const stelMatch = normalized.match(/STEL[:\s]*([^;]+)/i);
+  const ceilingMatch = normalized.match(/(?:Ceiling|CEILING|Ceil\.?|WEEL-C)[:\s]*([^;]+)/i);
+  const twaMatch = normalized.match(/TWA[:\s]*([^;]+)/i);
+  const weelMatch = normalized.match(/WEEL[:\s]*([^;]+)/i);
+  const primaryLabel =
+    source === 'osha' ? 'PEL' : source === 'niosh' ? 'REL' : source === 'acgih' ? 'TWA' : 'WEEL';
+  const primaryMatch = normalized.match(
+    new RegExp(`${primaryLabel}[:\\s]*([^;]+)`, 'i'),
+  );
+
+  const stripMarkers = (value: string) =>
+    value
+      .replace(/^(PEL|REL|TWA|STEL|Ceiling|CEILING|WEEL|WEEL-C)\s*:?\s*/i, '')
+      .trim();
+
+  const primary =
+    primaryMatch?.[1]?.trim() ??
+    (!stelMatch && !ceilingMatch && !twaMatch && !weelMatch ? normalized : null);
+
+  return {
+    pel: source === 'osha' ? stripMarkers(primary ?? '') || null : null,
+    rel: source === 'niosh' ? stripMarkers(primary ?? '') || null : null,
+    twa: source === 'acgih' ? (twaMatch ? stripMarkers(twaMatch[1]) : stripMarkers(primary ?? '') || null) : null,
+    weel: source === 'aiha' ? (weelMatch ? stripMarkers(weelMatch[1]) : stripMarkers(primary ?? '') || null) : null,
+    stel: stelMatch ? stripMarkers(stelMatch[1]) : null,
+    ceiling: ceilingMatch ? stripMarkers(ceilingMatch[1]) : null,
+  };
+};
+
 export function parseNioshNmamPdfText(text: string): HoMethodImportParseResult {
   const isNioshManual = /NIOSH Manual of Analytical Methods/i.test(text);
   const detectedFormat = isNioshManual
@@ -293,6 +395,7 @@ export function parseNioshNmamPdfText(text: string): HoMethodImportParseResult {
   const otherMethods = firstMatch(text, /OTHER METHODS:\s*([^\n]+)/i);
   const synonyms = parseSynonyms(text);
   const stability = parseStability(text, samplingTable);
+  const occupationalLimits = parseOccupationalLimits(text);
 
   const substanceTitle = firstMatch(
     text,
@@ -415,6 +518,7 @@ export function parseNioshNmamPdfText(text: string): HoMethodImportParseResult {
         otherMethods,
       ),
     },
+    occupationalLimits,
     agents,
     canConfirm: false,
     confirmBlockReason: null,
