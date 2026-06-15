@@ -29,6 +29,7 @@ const baseSnapshot = (
   oshaCeiling: null,
   aihaWeel: null,
   aihaWeelCeiling: null,
+  coments: null,
   ...overrides,
 });
 

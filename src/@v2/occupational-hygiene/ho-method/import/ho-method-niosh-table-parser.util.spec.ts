@@ -2,10 +2,20 @@ import { describe, expect, it } from '@jest/globals';
 
 import {
   isInvalidAgentCandidate,
+  parseCompoundPropertiesTable,
   parseCompoundSynonymsTable,
   parseExposureLimitsTable,
+  parseNmamCompoundTable,
+  parseNmamExposureLimitsTable,
+  parsePpmExposureLimitsTable,
 } from './ho-method-niosh-table-parser.util';
 import { parseNioshNmamPdfText } from './ho-method-niosh-parser';
+import {
+  parseFlowRateValue,
+  parseSamplingBlock,
+  parseStabilityValue,
+  parseVolumeValues,
+} from './ho-method-niosh-sampling-parser.util';
 
 const TABLE_1_SNIPPET = `Table 1. CAS Numbers, RTECS Numbers, and Synonyms
 Compound
@@ -44,6 +54,83 @@ OSHA: 	Table 3
 NIOSH REL: 	Table 3
 SYNONYMS: Table 1
 ANALYTE: 	Table 1
+`;
+
+const METHOD_5528_SAMPLING = `SAMPLER:
+FLOW RATE:
+VOL-MIN:
+MAX:
+SHIPMENT:
+SAMPLE
+STABILITY:
+BLANKS:
+Filter + Sorbent tube (glass fiber filter, OVS-7 tube: 13-mm; XAD-7, 200 mg/100 mg)
+1 L/min
+1 L
+480 L
+routine
+at least 30 days at < 4°C
+2 field blanks per batch
+DESORPTION: toluene
+ACCURACY
+`;
+
+const METHOD_2027_HEADER = `KETONES: METHOD 2027, Issue 1, dated 17 July 2016 - Page 6 of 7
+NIOSH Manual of Analytical Methods (NMAM), Fifth Edition
+MW: Table 1 	CAS: Table 1 	RTECS: Table 1
+METHOD: 2027, Issue 1 	EVALUATION: FULL
+OSHA: Table 2
+NIOSH: Table 2
+SYNONYMS: See individual compounds in Table 1
+ANALYTE: see Table 1
+`;
+
+const METHOD_2027_TABLE_1 = `Table 1. Synonyms, Formulae, Molecular weights, Properties, CAS#, RTECS
+Compound/
+synonyms
+CAS#
+RTECS
+Acetone /
+2-Propanone
+67-64-1
+AL3150000
+2-Butanone
+Methylethyl ketone
+78-93-3
+EL6475000
+Cyclohexanone /
+Cyclohexyl ketone
+108-94-1
+GW1050000
+Cyclopentanone /
+Ketocyclopentane
+120-92-3
+GY4725000
+2-Hexanone /
+Butyl methyl ketone
+591-78-6
+MP1400000
+4-Methyl-2-
+pentanone /
+MIBK/Methyl
+isobutyl ketone
+108-10-1
+SA9275000
+2,6-Dimethyl-4-
+heptanone/
+Diisobutyl ketone
+108-83-8
+MJ5775000
+`;
+
+const METHOD_2027_TABLE_2 = `Table 2. Occupational exposure limits, ppm [9]
+Substance 	OSHA PELs 	NIOSH RELs
+TWA 	TWA 	STEL 	mg/m3 per ppm
+Acetone 	1000 	250 	2.41
+2-Butanone 	200 	200 	300 	2.95
+Cyclohexanone 	50 	25 	4.08
+Cyclopentanone 	3.50
+4-Methyl-2-pentanone 	100 	50 	75 	4.16
 `;
 
 const METHOD_2514_HEADER = `NIOSH Manual of Analytical Methods (NMAM), Fifth Edition
@@ -143,5 +230,142 @@ SYNONYMS: o-isomer: 2-aminoanisole; p-isomer: 4-aminoanisole`,
       expect.arrayContaining(['O-anisidine', 'P-anisidine']),
     );
     expect(parsed.occupationalLimits.oshaPel.value).toContain('0.5 mg/m');
+  });
+
+  it('extrai parâmetros de amostragem do NIOSH 5528', () => {
+    const parsed = parseNioshNmamPdfText(
+      `${METHOD_5528_HEADER}\n${METHOD_5528_SAMPLING}\n${TABLE_1_SNIPPET}\n${TABLE_3_SNIPPET}`,
+    );
+
+    expect(parsed.fields.minimumFlowRate.value).toBe(1);
+    expect(parsed.fields.maximumFlowRate.value).toBe(1);
+    expect(parsed.fields.flowRateUnit.value).toBe('L/min');
+    expect(parsed.fields.minimumVolume.value).toBe(1);
+    expect(parsed.fields.maximumVolume.value).toBe(480);
+    expect(parsed.fields.volumeUnit.value).toBe('L');
+    expect(parsed.fields.stabilityDays.value).toBe(30);
+    expect(parsed.fields.stabilityText.value).toContain('at least 30 days');
+    expect(parsed.fields.storageTemperature.value).toBe(4);
+    expect(parsed.fields.storageTemperatureUnit.value).toBe('°C');
+    expect(parsed.fields.extractionSolvent.value).toBe('toluene');
+    expect(parsed.fields.sampler.value).toContain('OVS-7');
+    expect(parsed.fields.sampler.value).toContain('XAD-7');
+    expect(parsed.fields.sampler.value).toContain('200 mg/100 mg');
+    expect(parsed.agents).toHaveLength(6);
+    expect(parsed.agents.some((agent) => agent.substanceName === 'Table 1')).toBe(
+      false,
+    );
+  });
+});
+
+describe('ho-method-niosh-sampling-parser.util', () => {
+  it('preenche vazão mínima e máxima com valor fixo', () => {
+    const flow = parseFlowRateValue('1 L/min');
+
+    expect(flow).toEqual(
+      expect.objectContaining({
+        minimum: 1,
+        maximum: 1,
+        unit: 'L/min',
+      }),
+    );
+  });
+
+  it('extrai faixa de vazão', () => {
+    const flow = parseFlowRateValue('0.5 to 1 L/min');
+
+    expect(flow?.minimum).toBe(0.5);
+    expect(flow?.maximum).toBe(1);
+  });
+
+  it('extrai volume mínimo e máximo', () => {
+    const volume = parseVolumeValues('1 L', '480 L');
+
+    expect(volume?.minimum).toBe(1);
+    expect(volume?.maximum).toBe(480);
+    expect(volume?.unit).toBe('L');
+  });
+
+  it('extrai estabilidade e temperatura com limite inferior', () => {
+    const stability = parseStabilityValue('at least 30 days at < 4°C');
+
+    expect(stability?.days).toBe(30);
+    expect(stability?.temperature).toBe(4);
+    expect(stability?.temperatureUnit).toBe('°C');
+  });
+
+  it('extrai bloco completo de amostragem', () => {
+    const block = parseSamplingBlock(METHOD_5528_SAMPLING);
+
+    expect(block?.sampler).toContain('tubo adsorvente');
+    expect(block?.sampler).toContain('OVS-7');
+    expect(block?.flow?.minimum).toBe(1);
+    expect(block?.volume?.maximum).toBe(480);
+    expect(block?.extractionSolvent).toBe('toluene');
+  });
+
+  it('extrai múltiplos agentes e limites do NIOSH 2027', () => {
+    const text = `${METHOD_2027_HEADER}\n${METHOD_2027_TABLE_1}\n${METHOD_2027_TABLE_2}`;
+    const parsed = parseNioshNmamPdfText(text);
+
+    expect(parsed.agents).toHaveLength(7);
+    expect(parsed.agents.map((agent) => agent.cas)).toEqual(
+      expect.arrayContaining([
+        '67-64-1',
+        '78-93-3',
+        '108-94-1',
+        '120-92-3',
+        '591-78-6',
+        '108-10-1',
+        '108-83-8',
+      ]),
+    );
+
+    const acetone = parsed.agents.find((agent) => agent.cas === '67-64-1');
+    const butanone = parsed.agents.find((agent) => agent.cas === '78-93-3');
+    const cyclohexanone = parsed.agents.find((agent) => agent.cas === '108-94-1');
+
+    expect(acetone?.substanceName).toBe('Acetone');
+    expect(acetone?.occupationalLimits?.oshaPel.value).toBe('1000 ppm');
+    expect(acetone?.occupationalLimits?.nioshRel.value).toBe('250 ppm');
+    expect(acetone?.technicalNotes).toEqual(
+      expect.arrayContaining([expect.stringContaining('2,41')]),
+    );
+    expect(butanone?.occupationalLimits?.nioshStel.value).toBe('300 ppm');
+    expect(cyclohexanone?.occupationalLimits?.oshaPel.value).toBe('50 ppm');
+    expect(cyclohexanone?.occupationalLimits?.nioshRel.value).toBe('25 ppm');
+    expect(parsed.occupationalLimits.oshaPel.value).toBeNull();
+  });
+});
+
+describe('ho-method-niosh-table-parser 2027 layouts', () => {
+  it('extrai compostos da tabela de propriedades', () => {
+    const rows = parseCompoundPropertiesTable(METHOD_2027_TABLE_1);
+
+    expect(rows).toHaveLength(7);
+    expect(rows[0]).toEqual(
+      expect.objectContaining({
+        compound: 'Acetone',
+        cas: '67-64-1',
+        synonyms: ['2-Propanone'],
+      }),
+    );
+  });
+
+  it('extrai limites ppm da tabela 2', () => {
+    const rows = parsePpmExposureLimitsTable(METHOD_2027_TABLE_2);
+    const acetone = rows.find((row) => row.compound === 'Acetone');
+
+    expect(acetone?.oshaPel).toBe('1000 ppm');
+    expect(acetone?.nioshRel).toBe('250 ppm');
+    expect(acetone?.mgPerPpmFactor).toBe('2.41');
+  });
+
+  it('prefere o parser com mais compostos válidos', () => {
+    const rows = parseNmamCompoundTable(
+      `${METHOD_5528_HEADER}\n${TABLE_1_SNIPPET}\n${METHOD_2027_TABLE_1}`,
+    );
+
+    expect(rows.length).toBeGreaterThanOrEqual(7);
   });
 });
