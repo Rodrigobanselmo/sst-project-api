@@ -21,7 +21,8 @@ import {
 } from '../constants/risk-factor-ai-suggestions.constants';
 import { IRiskFactorAiSuggestionsUseCase } from '../risk-factor-ai-suggestions.types';
 import { RiskFactorAiSuggestionsPromptService } from '../services/risk-factor-ai-suggestions-prompt.service';
-import { validateChemicalRiskSuggestedSeverity } from '../services/validate-chemical-risk-suggested-severity.service';
+import { validateRiskFactorSuggestedSeverity } from '../services/validate-risk-factor-suggested-severity.service';
+import { resolveRiskFactorAiSuggestionPromptKey } from '../shared/risk-factor-ai-suggestions-type.util';
 
 @Injectable()
 export class RiskFactorAiSuggestionsUseCase {
@@ -65,15 +66,17 @@ export class RiskFactorAiSuggestionsUseCase {
       );
     }
 
+    const promptKey = resolveRiskFactorAiSuggestionPromptKey(params.type);
+
     const resolvedPrompt = await this.systemAiPromptResolver.resolvePromptWithMeta(
-      SystemAiPromptKeyEnum.RISK_FACTOR_CHEMICAL_AI_SUGGESTIONS,
+      promptKey,
       isSystemMaster ? params.customPrompt : undefined,
     );
 
     const systemPrompt = resolvedPrompt.content?.trim();
     if (!systemPrompt) {
       throw new BadRequestException(
-        'Prompt de sugestão de fator de risco químico não configurado.',
+        `Prompt de sugestão de fator de risco (${params.type}) não configurado.`,
       );
     }
 
@@ -103,7 +106,7 @@ export class RiskFactorAiSuggestionsUseCase {
       });
 
       const parsed = this.parseStructuredResponse(result.analysis);
-      const severityValidation = validateChemicalRiskSuggestedSeverity({
+      const severityValidation = validateRiskFactorSuggestedSeverity({
         payload: params,
         aiResponse: parsed,
       });
