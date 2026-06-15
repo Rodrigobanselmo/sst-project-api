@@ -27,6 +27,9 @@ export class FindRiskService {
           synonymous: true,
           search: true,
           cas: true,
+          companyId: true,
+          system: true,
+          representAll: true,
 
           symptoms: true,
           risk: true,
