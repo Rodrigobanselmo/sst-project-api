@@ -24,6 +24,10 @@ import { CoverTypeEnum } from '@/@v2/shared/domain/enum/company/cover-type.enum'
 import { formatCoverCompanyName } from '../../../helpers/format-cover-company-name';
 import { activitiesPericulosidadeSections } from '../../../components/iterables/activities-periculosidade/activities-periculosidade.sections';
 import { activitiesInsalubridadeSections } from '../../../components/iterables/activities-insalubridade/activities-insalubridade.sections';
+import {
+  shouldSkipVersionControlValidityParagraph,
+  shouldSkipVersionControlValiditySpacer,
+} from '../../../components/tables/versionControl/version-control-validity.util';
 
 type IMapSectionDocumentType = Record<string, (arg: any) => ISectionOptions | ISectionOptions[] | Promise<ISectionOptions> | Promise<ISectionOptions[]>>;
 
@@ -181,7 +185,26 @@ export class SectionsMapClass {
   private convertToDocx(data: ISectionChildrenType[], variables = {} as IDocVariables) {
     if (!data) return [];
     return data
-      .map((child) => {
+      .map((child, index) => {
+        const previousChild = data[index - 1];
+        const previousPreviousChild = data[index - 2];
+
+        if (child.type === DocumentChildrenTypeEnum.PARAGRAPH) {
+          if (shouldSkipVersionControlValiditySpacer(child, previousChild)) {
+            return null;
+          }
+
+          if (
+            shouldSkipVersionControlValidityParagraph(
+              child,
+              previousChild,
+              previousPreviousChild,
+            )
+          ) {
+            return null;
+          }
+        }
+
         const childData = convertToDocxHelper(child, {
           ...this.variables,
           ...variables,

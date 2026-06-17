@@ -12,6 +12,7 @@ import {
   WidthType,
 } from 'docx';
 import { palette } from '../../../../constants/palette';
+import { RISK_INVENTORY_DEFAULT_CONTENT_FONT_PT } from '@/@v2/documents/libs/docx/components/tables/appr/risk-inventory-typography.constant';
 
 export interface bodyTableProps extends Partial<ITableCellOptions> {
   text: string;
@@ -23,6 +24,8 @@ export interface bodyTableProps extends Partial<ITableCellOptions> {
   spacing?: ISpacingProperties;
   alignment?: (typeof AlignmentType)[keyof typeof AlignmentType];
   isVertical?: boolean;
+  /** Tamanho da fonte do conteúdo em pontos (pt). Padrão: 6pt. */
+  fontSizePt?: number;
 }
 
 export const borderNoneStyle = {
@@ -48,10 +51,13 @@ export class TableBodyElements {
     alignment = AlignmentType.LEFT,
     color,
     isVertical = false,
+    fontSizePt,
     ...rest
   }: bodyTableProps) {
     const tex = text || '';
     const cellAlignment = isVertical ? AlignmentType.CENTER : alignment;
+    const contentFontHalfPoints = (fontSizePt ?? RISK_INVENTORY_DEFAULT_CONTENT_FONT_PT) * 2;
+    const titleFontHalfPoints = RISK_INVENTORY_DEFAULT_CONTENT_FONT_PT * 2;
 
     return new TableCell({
       children: [
@@ -59,7 +65,7 @@ export class TableBodyElements {
           const children = [
             new TextRun({
               text: value.replaceAll('**', ''),
-              size: 12,
+              size: contentFontHalfPoints,
               color: color || palette.text.main.string,
               bold: !!bold,
             }),
@@ -69,7 +75,7 @@ export class TableBodyElements {
             children.push(
               new TextRun({
                 text: title + ' ',
-                size: 12,
+                size: titleFontHalfPoints,
                 color: color || palette.text.main.string,
                 bold: true,
               }),

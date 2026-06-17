@@ -30,6 +30,10 @@ import { IMapElementDocumentType } from './elementTypeMap';
 import { allCharacterizationSections } from '../../../components/iterables/all-characterization/all-characterization.sections';
 import { APPRTableSection } from '../../../components/tables/appr/appr.section';
 import { actionPlanAnnexSectionHeadersFooters, actionPlanTableSection } from '../../../components/tables/actionPlan/actionPlan.section';
+import {
+  shouldSkipVersionControlValidityParagraph,
+  shouldSkipVersionControlValiditySpacer,
+} from '../../../components/tables/versionControl/version-control-validity.util';
 import { APPRByGroupTableSection } from '../../../components/tables/apprByGroup/appr-group.section';
 import { PGR_ANNEX_SUBCOVER_CHAPTER_LINES } from '../constants/pgr-annex-subcover-titles';
 import { VariablesPGREnum } from '../enums/variables.enum';
@@ -244,7 +248,26 @@ export class SectionsMapClass {
   private convertToDocx(data: ISectionChildrenType[], variables = {} as IDocVariables) {
     if (!data) return [];
     return data
-      .map((child) => {
+      .map((child, index) => {
+        const previousChild = data[index - 1];
+        const previousPreviousChild = data[index - 2];
+
+        if (child.type === DocumentSectionChildrenTypeEnum.PARAGRAPH) {
+          if (shouldSkipVersionControlValiditySpacer(child, previousChild)) {
+            return null;
+          }
+
+          if (
+            shouldSkipVersionControlValidityParagraph(
+              child,
+              previousChild,
+              previousPreviousChild,
+            )
+          ) {
+            return null;
+          }
+        }
+
         const childData = convertToDocxHelper(child, {
           ...this.variables,
           ...variables,

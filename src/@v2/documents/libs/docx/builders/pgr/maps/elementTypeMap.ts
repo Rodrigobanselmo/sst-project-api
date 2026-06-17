@@ -87,7 +87,16 @@ export class ElementsMapClass {
     },
     [DocumentChildrenTypeEnum.BULLET]: ({ level = 0, text, ...rest }: IBullet) => [bulletsNormal(text, level, rest)],
     [DocumentChildrenTypeEnum.BULLET_SPACE]: ({ text }: IBullet) => [bulletsSpace(text)],
-    [DocumentChildrenTypeEnum.TABLE_VERSION_CONTROL]: () => [versionControlTable(this.data.documentBase.versions)],
+    [DocumentChildrenTypeEnum.TABLE_VERSION_CONTROL]: () => [
+      versionControlTable(this.data.documentBase.versions, {
+        fallback: {
+          revisionBy: this.data.documentBase.revisionBy,
+          approvedBy: this.data.documentBase.approvedBy,
+          currentVersion: this.data.documentVersion.version,
+        },
+        validity: this.data.documentBase.validUntil,
+      }),
+    ],
     [DocumentChildrenTypeEnum.TABLE_GSE]: () =>
       hierarchyHomoOrgSection(this.OldHierarchy, this.OldHomogeneousGroup, {
         showDescription: false,
