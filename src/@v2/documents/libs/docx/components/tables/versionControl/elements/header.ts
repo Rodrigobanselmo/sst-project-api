@@ -22,7 +22,7 @@ export interface headerTableProps extends Partial<ITableCellOptions> {
 export class TableHeaderElements {
   headerRow(tableCell: TableCell[]) {
     return new TableRow({
-      height: { value: 600, rule: HeightRule.EXACT },
+      height: { value: 380, rule: HeightRule.EXACT },
       tableHeader: true,
       children: [...tableCell],
     });

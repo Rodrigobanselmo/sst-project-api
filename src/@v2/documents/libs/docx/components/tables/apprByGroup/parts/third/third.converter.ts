@@ -19,6 +19,10 @@ import {
   thirdRiskInventoryColumnWidth,
   thirdRiskInventoryVerticalColumns,
 } from '@/modules/documents/docx/components/tables/appr/parts/third/third.constant';
+import {
+  riskInventoryCompactContentFont,
+  riskInventorySeverityProbabilityBold,
+} from '@/@v2/documents/libs/docx/components/tables/appr/risk-inventory-typography.constant';
 
 export const dataConverter = (
   riskGroup: IDocumentRiskGroupDataConverter,
@@ -105,18 +109,21 @@ export const dataConverter = (
       cells[ThirdRiskInventoryColumnEnum.RISK_FACTOR] = {
         text: riskData.riskData.risk.name,
         size: colWidth(ThirdRiskInventoryColumnEnum.RISK_FACTOR),
+        ...riskInventoryCompactContentFont,
         ...base,
       };
 
       cells[ThirdRiskInventoryColumnEnum.RISK] = {
         text: riskData.riskData.risk.healthRisk || '',
         size: colWidth(ThirdRiskInventoryColumnEnum.RISK),
+        ...riskInventoryCompactContentFont,
         ...base,
       };
 
       cells[ThirdRiskInventoryColumnEnum.SOURCE] = {
         text: riskData.riskData.generateSources.map((gs) => gs.name).join('\n'),
         size: colWidth(ThirdRiskInventoryColumnEnum.SOURCE),
+        ...riskInventoryCompactContentFont,
         ...base,
       };
 
@@ -124,24 +131,28 @@ export const dataConverter = (
         //! EPI CA
         text: riskData.riskData.epis.map((epi) => (options.isHideCA ? epi.equipment : epi.name) || '').join('\n'),
         size: colWidth(ThirdRiskInventoryColumnEnum.EPI),
+        ...riskInventoryCompactContentFont,
         ...base,
       };
 
       cells[ThirdRiskInventoryColumnEnum.ENG] = {
         text: riskData.riskData.engineeringMeasures.map((eng) => eng.name).join('\n'),
         size: colWidth(ThirdRiskInventoryColumnEnum.ENG),
+        ...riskInventoryCompactContentFont,
         ...base,
       };
 
       cells[ThirdRiskInventoryColumnEnum.ADM] = {
         text: riskData.riskData.administrativeMeasures.map((adm) => adm.name).join('\n'),
         size: colWidth(ThirdRiskInventoryColumnEnum.ADM),
+        ...riskInventoryCompactContentFont,
         ...base,
       };
 
       cells[ThirdRiskInventoryColumnEnum.SEVERITY] = {
         text: String(riskData.riskData.risk.severity),
         size: colWidth(ThirdRiskInventoryColumnEnum.SEVERITY),
+        ...riskInventorySeverityProbabilityBold,
         ...base,
         ...fill,
       };
@@ -149,6 +160,7 @@ export const dataConverter = (
       cells[ThirdRiskInventoryColumnEnum.PROBABILITY] = {
         text: String(riskData.riskData.probability || '-'),
         size: colWidth(ThirdRiskInventoryColumnEnum.PROBABILITY),
+        ...riskInventorySeverityProbabilityBold,
         ...base,
         ...fill,
       };
@@ -173,12 +185,14 @@ export const dataConverter = (
           .map((rec) => rec.name)
           .join('\n'),
         size: colWidth(ThirdRiskInventoryColumnEnum.RECOMMENDATIONS),
+        ...riskInventoryCompactContentFont,
         ...base,
       };
 
       cells[ThirdRiskInventoryColumnEnum.SEVERITY_AFTER] = {
         text: String(riskData.riskData.risk.severity),
         size: colWidth(ThirdRiskInventoryColumnEnum.SEVERITY_AFTER),
+        ...riskInventorySeverityProbabilityBold,
         ...base,
         ...fill,
       };
@@ -186,6 +200,7 @@ export const dataConverter = (
       cells[ThirdRiskInventoryColumnEnum.PROBABILITY_AFTER] = {
         text: String(riskData.riskData.probabilityAfter || riskData.riskData.probability || '-'),
         size: colWidth(ThirdRiskInventoryColumnEnum.PROBABILITY_AFTER),
+        ...riskInventorySeverityProbabilityBold,
         ...base,
         ...fill,
       };

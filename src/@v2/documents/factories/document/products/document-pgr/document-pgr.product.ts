@@ -5,6 +5,15 @@ import { DocumentSectionTypeEnum } from '@/@v2/documents/domain/enums/document-s
 import { AttachmentModel } from '@/@v2/documents/domain/models/attachment.model';
 import { CharacterizationPhotoModel } from '@/@v2/documents/domain/models/characterization-photos.model';
 import { DocumentPGRModel } from '@/@v2/documents/domain/models/document-pgr.model';
+import {
+  DEFAULT_PGR_ANNEX_PROFILE,
+  filterAttachmentsForProfile,
+  formatAnnexSubcoverLine,
+  getPgrAnnexCatalogEntry,
+  PGR_ANNEX_PROFILE_KINDS,
+  type PgrAnnexKind,
+  type PgrAnnexProfile,
+} from '@/@v2/documents/libs/docx/builders/pgr/constants/pgr-annex-catalog.util';
 import { PGR_ANNEX_SUBCOVER_CHAPTER_LINES } from '@/@v2/documents/libs/docx/builders/pgr/constants/pgr-annex-subcover-titles';
 import { DocumentBuildPGR } from '@/@v2/documents/libs/docx/builders/pgr/create';
 import { pgrAnnexSubcoverSection } from '@/@v2/documents/libs/docx/builders/pgr/pgr-annex-subcover-section';
@@ -19,7 +28,7 @@ import { BadRequestException } from '@nestjs/common';
 import { ISectionOptions } from 'docx';
 import { v4 } from 'uuid';
 import { IDocumentFactoryProduct, IGetAttachments, IGetDocument, ISaveDocument, ISaveErrorDocument, IUnlinkPaths } from '../../types/document-factory.types';
-import { IProductDocumentPGR } from './document-pgr.types';
+import { IGetConsolidatedDocumentPGR, IProductDocumentPGR } from './document-pgr.types';
 
 export class ProductDocumentPGR implements IDocumentFactoryProduct<IProductDocumentPGR, DocumentPGRModel> {
   public unlinkPaths: IUnlinkPaths[] = [];
@@ -43,59 +52,11 @@ export class ProductDocumentPGR implements IDocumentFactoryProduct<IProductDocum
   public async getAttachments({ data }: IGetAttachments<IProductDocumentPGR, DocumentPGRModel>) {
     const version = this.getVersionName(data);
 
-    async function getDocumentAPRSections() {
-      async function createAPR(documentData: DocumentPGRModel) {
-        const apr = await new DocumentBuildPGR({
-          data: documentData,
-          version: version,
-          attachments: [],
-          variables: {},
-          sections: [{ data: [{ type: DocumentSectionTypeEnum.APR }] }],
-        }).build();
+    const documentAPRSections = await this.buildFunctionAprAttachmentSections(data, version);
 
-        return apr;
-      }
+    const documentAPRGroupSection = await this.buildGseAprSections(data, version);
 
-      async function getAPRSectionsByHierarchy(type: HierarchyTypeEnum) {
-        const sections: { sections: ISectionOptions[]; name: string; typeName: string }[] = [];
-
-        const aprByHierarchies = data.getHierarchiesByType(type);
-        for (const hierarchy of aprByHierarchies) {
-          const apr = await createAPR(data.getModifiedEntityFilteredByHierarchy(hierarchy));
-
-          const pathHierarchy = [...data.getHierarchyParents(hierarchy), hierarchy].map((hierarchy) => hierarchy.name);
-          sections.push({ sections: apr, name: `Inventário de Risco (APR) (${pathHierarchy})`, typeName: `PGR-APR-${pathHierarchy.join('-').replaceAll(' ', '_')}` });
-        }
-
-        return sections;
-      }
-
-      if (data.documentBase.data.aprTypeSeparation) {
-        const sections = await getAPRSectionsByHierarchy(data.documentBase.data.aprTypeSeparation);
-        return sections;
-      }
-
-      const apr = await createAPR(data);
-      return [{ sections: apr, name: 'Inventário de Risco por Função (APR)', typeName: 'PGR-APR' }];
-    }
-
-    const documentAPRSections = await getDocumentAPRSections();
-
-    const documentAPRGroupSection = await new DocumentBuildPGR({
-      data: data,
-      version: version,
-      attachments: [],
-      variables: {},
-      sections: [{ data: [{ type: DocumentSectionTypeEnum.APR_GROUP }] }],
-    }).build();
-
-    const documentActionPlanSection = await new DocumentBuildPGR({
-      data: data,
-      version: version,
-      attachments: [],
-      variables: {},
-      sections: [{ data: [{ type: DocumentSectionTypeEnum.ACTION_PLAN }] }],
-    }).build();
+    const documentActionPlanSection = await this.buildActionPlanSections(data, version);
 
     const docVersionId = data.documentVersion.id;
     const companyId = data.documentBase.company.id;
@@ -108,9 +69,9 @@ export class ProductDocumentPGR implements IDocumentFactoryProduct<IProductDocum
     const APRs = documentAPRSections
       .map(({ sections, name, typeName }) => {
         return createDocumentAttachments({
-          name: name,
-          typeName: typeName,
-          sections: sections,
+          name,
+          typeName,
+          sections,
           documentVersionId: docVersionId,
           companyId: companyId,
           leadingSections: [pgrAnnexSubcoverSection(data, version, sub01)],
@@ -118,8 +79,10 @@ export class ProductDocumentPGR implements IDocumentFactoryProduct<IProductDocum
       })
       .flat();
 
+    const gseAnnexName = getPgrAnnexCatalogEntry('gse').listName;
+
     const GroupsAPRs = createDocumentAttachments({
-      name: 'Inventário de Risco por GSE (APR)',
+      name: gseAnnexName,
       typeName: 'PGR-APR-GSE',
       sections: documentAPRGroupSection,
       documentVersionId: docVersionId,
@@ -157,25 +120,82 @@ export class ProductDocumentPGR implements IDocumentFactoryProduct<IProductDocum
   }
 
   /**
-   * Documento principal (capa ANEXOS + lista) + anexos com subcapa no início de cada bloco (APR, GSE, plano).
+   * Documento principal (capa ANEXOS + lista) + anexos com subcapa no início de cada bloco.
+   * A lista e os blocos respeitam o perfil (`full` ou `essential`).
    */
-  public async getConsolidatedSections({ data, attachments }: IGetDocument<IProductDocumentPGR, DocumentPGRModel>) {
+  public async getConsolidatedSections({
+    data,
+    attachments,
+    profile = DEFAULT_PGR_ANNEX_PROFILE,
+  }: IGetConsolidatedDocumentPGR) {
     const version = this.getVersionName(data);
+    const profileAttachments = filterAttachmentsForProfile(attachments, profile);
 
     const mainSections = await new DocumentBuildPGR({
       data,
       version,
-      attachments,
+      attachments: profileAttachments,
       sections: data.model.sections,
       variables: data.model.variables,
     }).build();
 
-    const annexSections = await this.buildStandardPgrAnnexSections(data, version);
+    const annexSections = await this.buildPgrAnnexSectionsForProfile(
+      data,
+      version,
+      profile,
+    );
 
     return [...mainSections, ...annexSections];
   }
 
-  private async buildStandardPgrAnnexSections(data: DocumentPGRModel, version: string): Promise<ISectionOptions[]> {
+  protected async buildFunctionAprAttachmentSections(
+    data: DocumentPGRModel,
+    version: string,
+  ): Promise<Array<{ sections: ISectionOptions[]; name: string; typeName: string }>> {
+    const functionAnnexName = getPgrAnnexCatalogEntry('function').listName;
+
+    async function createAPR(documentData: DocumentPGRModel) {
+      const apr = await new DocumentBuildPGR({
+        data: documentData,
+        version: version,
+        attachments: [],
+        variables: {},
+        sections: [{ data: [{ type: DocumentSectionTypeEnum.APR }] }],
+      }).build();
+
+      return apr;
+    }
+
+    async function getAPRSectionsByHierarchy(type: HierarchyTypeEnum) {
+      const sections: { sections: ISectionOptions[]; name: string; typeName: string }[] = [];
+
+      const aprByHierarchies = data.getHierarchiesByType(type);
+      for (const hierarchy of aprByHierarchies) {
+        const apr = await createAPR(data.getModifiedEntityFilteredByHierarchy(hierarchy));
+
+        const pathHierarchy = [...data.getHierarchyParents(hierarchy), hierarchy].map((hierarchy) => hierarchy.name);
+        sections.push({
+          sections: apr,
+          name: `${functionAnnexName} (${pathHierarchy.join(' / ')})`,
+          typeName: `PGR-APR-${pathHierarchy.join('-').replaceAll(' ', '_')}`,
+        });
+      }
+
+      return sections;
+    }
+
+    if (data.documentBase.data.aprTypeSeparation) {
+      return getAPRSectionsByHierarchy(data.documentBase.data.aprTypeSeparation);
+    }
+
+    const apr = await createAPR(data);
+    return [{ sections: apr, name: functionAnnexName, typeName: 'PGR-APR' }];
+  }
+
+  protected async buildFunctionAprConsolidatedSections(
+    data: DocumentPGRModel,
+    version: string,
+  ): Promise<ISectionOptions[]> {
     async function createAPR(documentData: DocumentPGRModel) {
       return new DocumentBuildPGR({
         data: documentData,
@@ -197,33 +217,70 @@ export class ProductDocumentPGR implements IDocumentFactoryProduct<IProductDocum
       aprSectionGroups.push(await createAPR(data));
     }
 
-    const aprGroupSection = await new DocumentBuildPGR({
-      data,
-      version,
+    return aprSectionGroups.flat();
+  }
+
+  protected async buildGseAprSections(
+    data: DocumentPGRModel,
+    version: string,
+  ): Promise<ISectionOptions[]> {
+    return new DocumentBuildPGR({
+      data: data,
+      version: version,
       attachments: [],
       variables: {},
       sections: [{ data: [{ type: DocumentSectionTypeEnum.APR_GROUP }] }],
     }).build();
+  }
 
-    const actionPlanSection = await new DocumentBuildPGR({
-      data,
-      version,
+  protected async buildActionPlanSections(
+    data: DocumentPGRModel,
+    version: string,
+  ): Promise<ISectionOptions[]> {
+    return new DocumentBuildPGR({
+      data: data,
+      version: version,
       attachments: [],
       variables: {},
       sections: [{ data: [{ type: DocumentSectionTypeEnum.ACTION_PLAN }] }],
     }).build();
+  }
 
-    const [sub01, sub02, sub03] = PGR_ANNEX_SUBCOVER_CHAPTER_LINES;
-    const aprFlat = aprSectionGroups.flat();
-    const sc = (line: string) => pgrAnnexSubcoverSection(data, version, line);
+  private async buildPgrAnnexSectionsForProfile(
+    data: DocumentPGRModel,
+    version: string,
+    profile: PgrAnnexProfile,
+  ): Promise<ISectionOptions[]> {
+    const sectionBuilders: Record<PgrAnnexKind, () => Promise<ISectionOptions[]>> = {
+      function: () => this.buildFunctionAprConsolidatedSections(data, version),
+      gse: () => this.buildGseAprSections(data, version),
+      action_plan: () => this.buildActionPlanSections(data, version),
+    };
 
-    return [
-      ...(aprFlat.length ? [sc(sub01), ...aprFlat] : []),
-      sc(sub02),
-      ...aprGroupSection,
-      sc(sub03),
-      ...actionPlanSection,
-    ];
+    const result: ISectionOptions[] = [];
+    let annexNumber = 0;
+
+    for (const kind of PGR_ANNEX_PROFILE_KINDS[profile]) {
+      const sections = await sectionBuilders[kind]();
+
+      if (kind === 'function' && sections.length === 0) {
+        continue;
+      }
+
+      const { subcoverTitle } = getPgrAnnexCatalogEntry(kind);
+      annexNumber += 1;
+
+      result.push(
+        pgrAnnexSubcoverSection(
+          data,
+          version,
+          formatAnnexSubcoverLine(annexNumber, subcoverTitle),
+        ),
+        ...sections,
+      );
+    }
+
+    return result;
   }
 
   public async save({ attachments, body, url }: ISaveDocument<IProductDocumentPGR, DocumentPGRModel>) {

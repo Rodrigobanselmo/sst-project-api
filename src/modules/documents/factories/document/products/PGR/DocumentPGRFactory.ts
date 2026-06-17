@@ -379,7 +379,7 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
         section: new DocumentBuildPGR(documentAprBuild).build(),
         type: 'PGR-APR',
         id: id1,
-        name: 'Inventário de Risco por Função (APR)',
+        name: 'Inventário de Risco por Função',
         link: `${process.env.APP_HOST}/download/pgr/anexos?ref1=${docId}&ref2=${id1}&ref3=${companyId}`,
       },
       {
@@ -387,7 +387,7 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
         section: new DocumentBuildPGR(documentAprGroupBuild).build(),
         type: 'PGR-APR-GSE',
         id: id2,
-        name: 'Inventário de Risco por GSE (APR)',
+        name: 'Inventário de Risco por GSE',
         link: `${process.env.APP_HOST}/download/pgr/anexos?ref1=${docId}&ref2=${id2}&ref3=${companyId}`,
       },
       {

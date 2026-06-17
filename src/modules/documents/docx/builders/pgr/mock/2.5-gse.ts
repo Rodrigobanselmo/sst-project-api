@@ -68,7 +68,7 @@ export const gseSection: IDocumentPGRSectionGroup = {
         },
         {
           type: DocumentSectionChildrenTypeEnum.PARAGRAPH,
-          text: 'As planilhas de “Inventário de Riscos (APR)”, apresentadas no Anexo I, estabelecem para cada função a quantidade de empregados, uma descrição de atividades e responsabilidades, a mobilidade, os Fatores de Risco, causas e fontes e medidas de controle existentes para eliminação ou atenuação das exposições com relação aos agentes identificados. Com estas informações foram definidos os Grupos Similares de Exposição, conforme apresentado na Tabela a seguir. A Tabela apresentada na sequência, relaciona os componentes (nomes e funções) de cada Grupo Homogêneo de Exposição.',
+          text: 'As planilhas de “Inventário de Riscos”, apresentadas no Anexo I, estabelecem para cada função a quantidade de empregados, uma descrição de atividades e responsabilidades, a mobilidade, os Fatores de Risco, causas e fontes e medidas de controle existentes para eliminação ou atenuação das exposições com relação aos agentes identificados. Com estas informações foram definidos os Grupos Similares de Exposição, conforme apresentado na Tabela a seguir. A Tabela apresentada na sequência, relaciona os componentes (nomes e funções) de cada Grupo Homogêneo de Exposição.',
         },
       ],
     },

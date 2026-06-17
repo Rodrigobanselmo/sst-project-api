@@ -5,6 +5,10 @@ import { ProductDocumentPGR } from '@/@v2/documents/factories/document/products/
 import { IProductDocumentPGR } from '@/@v2/documents/factories/document/products/document-pgr/document-pgr.types';
 import { createBaseDocument } from '@/@v2/documents/libs/docx/base/config/document';
 import { DownloadImageService } from '@/@v2/documents/services/download-image/download-image.service';
+import {
+  getPgrConsolidatedTypeLabel,
+  type PgrAnnexProfile,
+} from '@/@v2/documents/libs/docx/builders/pgr/constants/pgr-annex-catalog.util';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { DocumentTypeEnum } from '@prisma/client';
 import { Packer } from 'docx';
@@ -25,7 +29,11 @@ export class DownloadPgrConsolidatedDocxService {
     private readonly downloadImageService: DownloadImageService,
   ) {}
 
-  async execute(riskDocumentId: string, companyId: string) {
+  async execute(
+    riskDocumentId: string,
+    companyId: string,
+    profile: PgrAnnexProfile = 'full',
+  ) {
     const riskDoc = await this.riskDocumentRepository.findById(riskDocumentId, companyId, {
       include: { documentData: true },
     });
@@ -70,14 +78,15 @@ export class DownloadPgrConsolidatedDocxService {
         data,
         attachments: attachmentModels,
         body,
+        profile,
       });
 
       const Doc = createBaseDocument(sections);
       const b64 = await Packer.toBase64String(Doc);
       const buffer = Buffer.from(b64, 'base64');
 
-      const consolidatedLabel =
-        docType === DocumentTypeEnum.FRPS ? 'FRPS-COMPLETO' : 'PGR-COMPLETO';
+      const documentPrefix = docType === DocumentTypeEnum.FRPS ? 'FRPS' : 'PGR';
+      const consolidatedLabel = getPgrConsolidatedTypeLabel(profile, documentPrefix);
       const fileName = product.getFileName(data, consolidatedLabel);
 
       return { buffer, fileName };

@@ -7,6 +7,7 @@ import { Permissions } from '../../../shared/decorators/permissions.decorator';
 import { User } from '../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../shared/dto/user-payload.dto';
 import { UploadDocumentDto } from '../dto/document.dto';
+import { parsePgrAnnexProfile } from '@/@v2/documents/libs/docx/builders/pgr/constants/pgr-annex-catalog.util';
 import { AddQueueDocumentService } from '../services/document/document/add-queue-doc.service';
 import { DownloadAttachmentsService } from '../services/document/document/download-attachment-doc.service';
 import { DownloadDocumentService } from '../services/document/document/download-doc.service';
@@ -43,9 +44,15 @@ export class DocumentsBaseController {
     @Res() res: Response,
     @User() userPayloadDto: UserPayloadDto,
     @Param('docId') docId: string,
+    @Query('profile') profile?: string,
   ) {
     const companyId = userPayloadDto.targetCompanyId;
-    const { buffer, fileName } = await this.downloadPgrConsolidatedDocxService.execute(docId, companyId);
+    const { buffer, fileName } =
+      await this.downloadPgrConsolidatedDocxService.execute(
+        docId,
+        companyId,
+        parsePgrAnnexProfile(profile),
+      );
 
     res.setHeader(
       'Content-Type',

@@ -40,6 +40,7 @@ import { riskCharacterizationTableSection } from '../../../components/tables/ris
 import { versionControlTable } from '../../../components/tables/versionControl/versionControl.table';
 import { HierarchyMapData, IHierarchyData, IHierarchyMap, IHomoGroupMap, IRiskMap } from '../../../converter/hierarchy.converter';
 import { convertToDocxHelper } from '../functions/convertToDocx';
+import { VariablesPGREnum } from '../enums/variables.enum';
 import { IBreak, IBullet, IH1, IH2, IH3, IH4, IH5, IH6, IParagraph, ISectionChildrenType, ITitle, DocumentSectionChildrenTypeEnum, IImage } from '../types/elements.types';
 import { IDocVariables } from '../types/section.types';
 import { AttachmentEntity } from '../../../../../sst/entities/attachment.entity';
@@ -140,7 +141,16 @@ export class ElementsMapClass {
     [DocumentSectionChildrenTypeEnum.PARAGRAPH_FIGURE]: ({ text, ...rest }: IParagraph) => [paragraphFigure(text, rest)],
     [DocumentSectionChildrenTypeEnum.BULLET]: ({ level = 0, text, ...rest }: IBullet) => [bulletsNormal(text, level, rest)],
     [DocumentSectionChildrenTypeEnum.BULLET_SPACE]: ({ text }: IBullet) => [bulletsSpace(text)],
-    [DocumentSectionChildrenTypeEnum.TABLE_VERSION_CONTROL]: () => [versionControlTable(this.versions)],
+    [DocumentSectionChildrenTypeEnum.TABLE_VERSION_CONTROL]: () => [
+      versionControlTable(this.versions, {
+        fallback: {
+          revisionBy: this.document.revisionBy,
+          approvedBy: this.document.approvedBy,
+          currentVersion: this.versions[0]?.version || '',
+        },
+        validity: (this.variables[VariablesPGREnum.DOC_VALIDITY] as string) || '',
+      }),
+    ],
     [DocumentSectionChildrenTypeEnum.TABLE_GSE]: () =>
       hierarchyHomoOrgSection(this.hierarchy, this.homogeneousGroup, {
         showDescription: false,

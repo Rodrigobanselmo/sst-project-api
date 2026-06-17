@@ -11,7 +11,7 @@ export const attachmentsSection: IDocumentPGRSectionGroup = {
     },
     {
       type: DocumentSectionTypeEnum.CHAPTER,
-      text: `ANEXO 01 – Inventário de Risco por Função (APR)`,
+      text: `ANEXO 01 – Inventário de Risco por Função`,
     },
     {
       type: DocumentSectionTypeEnum.APR,
