@@ -31,14 +31,26 @@ export class DocumentVersionMapper {
   }
 
   static toModel(data: IDocumentVersionModelMapper): DocumentVersionModel {
+    const documentBase = DocumentBaseMapper.toModel(data.documentData);
+
+    if (data.documentCreatedAt && data.validityEndSnapshot) {
+      documentBase.validityStart = data.documentCreatedAt;
+      documentBase.validityEnd = data.validityEndSnapshot;
+    }
+
     return new DocumentVersionModel({
       id: data.id,
       createdAt: data.created_at,
+      documentDate: data.documentDate,
       description: data.description,
       fileUrl: data.fileUrl,
       version: data.version,
       name: data.name,
-      documentBase: DocumentBaseMapper.toModel(data.documentData),
+      officialRevisionSeries: data.officialRevisionSeries,
+      approvedBy: data.approvedBy,
+      revisionBy: data.revisionBy,
+      elaboratedBy: data.elaboratedBy,
+      documentBase,
       attachments: data.attachments.map((attachment, index) => {
         return new AttachmentModel({
           name: attachment.name || `Anexo ${index}`,

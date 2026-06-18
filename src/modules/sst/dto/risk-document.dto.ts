@@ -1,6 +1,6 @@
 import { StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
-import { IsEnum, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsDateString, IsEnum, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { StringCapitalizeParagraphTransform } from '../../../shared/transformers/string-capitalize-paragraph';
 
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
@@ -48,6 +48,40 @@ export class UpsertRiskDocumentDto {
   @IsOptional()
   @IsString()
   companyId: string;
+
+  /** Data de emissão formal exibida no documento (distinta de created_at). */
+  @IsOptional()
+  @IsDateString()
+  documentDate?: string;
+
+  @IsOptional()
+  officialRevisionSeries?: number | null;
+
+  @IsOptional()
+  @IsString()
+  approvedBy?: string | null;
+
+  @IsOptional()
+  @IsString()
+  revisionBy?: string | null;
+
+  @IsOptional()
+  @IsString()
+  elaboratedBy?: string | null;
+
+  @IsOptional()
+  @IsDateString()
+  documentCreatedAt?: string;
+
+  @IsOptional()
+  validityYears?: number | null;
+
+  @IsOptional()
+  validityMonths?: number | null;
+
+  @IsOptional()
+  @IsDateString()
+  validityEndSnapshot?: string;
 
   @ValidateNested({ each: true })
   @IsOptional()

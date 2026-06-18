@@ -101,6 +101,23 @@ export class DocumentDataRepository {
     return docs.map((data) => new DocumentDataEntity(data));
   }
 
+  async findById(id: string, companyId: string) {
+    const data = await this.prisma.documentData.findUnique({
+      where: { id_companyId: { id, companyId } },
+    });
+
+    return data ? new DocumentDataEntity(data) : null;
+  }
+
+  async incrementOfficialRevisionSeries(id: string, companyId: string) {
+    const data = await this.prisma.documentData.update({
+      where: { id_companyId: { id, companyId } },
+      data: { officialRevisionSeries: { increment: 1 } },
+    });
+
+    return new DocumentDataEntity(data);
+  }
+
   private async setProfessionalsSignatures(professionalsSignatures: ProfessionalDocumentDataEntity[]) {
     if (professionalsSignatures.length === 0) return [];
     const data = await this.prisma.$transaction(

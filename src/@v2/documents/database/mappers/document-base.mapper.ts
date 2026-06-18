@@ -33,11 +33,13 @@ export class DocumentBaseMapper {
       professionalSignatures: ProfessionalSignatureMapper.toModels(data.professionalsSignatures),
       versions: data.docs.map(doc => new VersionModel({
         createdAt: doc.created_at,
+        documentDate: doc.documentDate,
         description: doc.description,
         approvedBy: doc.approvedBy,
         elaboratedBy: doc.elaboratedBy,
         revisionBy: doc.revisionBy,
-        version: doc.version
+        version: doc.version,
+        officialRevisionSeries: doc.officialRevisionSeries,
       }))
     })
   }

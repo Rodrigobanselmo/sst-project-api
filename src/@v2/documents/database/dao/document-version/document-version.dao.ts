@@ -27,5 +27,10 @@ export class DocumentVersionDAO {
     return documentversion ? DocumentVersionMapper.toModel(documentversion) : null
   }
 
-
+  async updateDocumentDate(id: string, documentDate: Date) {
+    await this.prisma.riskFactorDocument.update({
+      where: { id },
+      data: { documentDate },
+    });
+  }
 }

@@ -19,8 +19,12 @@ export class ProductDocumentFRPS extends ProductDocumentPGR {
     super(documentDAO, documentVersionRepository, downloadImageService);
   }
 
-  public override async getData({ documentVersionId, homogeneousGroupsIds }: IProductDocumentFRPS) {
-    const document = await this.documentDAO.findDocumentFRPS({ documentVersionId, homogeneousGroupsIds });
+  public override async getData({ documentVersionId, homogeneousGroupsIds, documentDate }: IProductDocumentFRPS) {
+    const document = await this.documentDAO.findDocumentFRPS({
+      documentVersionId,
+      homogeneousGroupsIds,
+      documentDate,
+    });
     if (!document) throw new BadRequestException('Nenhum documento FRPS cadastrado');
 
     await this.downloadImages(document);

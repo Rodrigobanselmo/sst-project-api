@@ -80,6 +80,8 @@ import { FindRisksByCompanyService } from './services/risk/find-by-company/find-
 import { FindRiskService } from './services/risk/find/find.service';
 import { UpdateRiskService } from './services/risk/update-risk/update-risk.service';
 import { FindByIdDocumentDataService } from './services/documentData/find-by-id/find-by-id.service';
+import { ResetUnofficialDocumentVersionsService } from './services/documentData/reset-unofficial-versions/reset-unofficial-versions.service';
+import { ResetOfficialDocumentSeriesService } from './services/documentData/reset-official-series/reset-official-series.service';
 import { DocumentDataController } from './controller/document-data/document-data.controller';
 import { UpdateProtocolsService } from './services/protocol/update-protocol/update-protocol.service';
 import { CreateProtocolsService } from './services/protocol/create-protocol/create-protocol.service';
@@ -191,6 +193,8 @@ import { RiskCatalogEquivalenceModule } from '@/shared/risk-catalog-equivalence/
     DocumentDataRepository,
     UpsertDocumentDataService,
     FindByIdDocumentDataService,
+    ResetUnofficialDocumentVersionsService,
+    ResetOfficialDocumentSeriesService,
     UpdateProtocolsService,
     CreateProtocolsService,
     FindProtocolsService,

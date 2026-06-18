@@ -10,6 +10,7 @@ export class FrpsUploadService {
     return await this.creatorDocumentFRPS.execute({
       documentVersionId: body.id as string,
       homogeneousGroupsIds: body.ghoIds,
+      documentDate: body.documentDate,
     });
   }
 }

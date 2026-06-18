@@ -740,6 +740,8 @@ model DocumentData {
   workspaceId   String
   validityStart DateTime?
   validityEnd   DateTime?
+  validityYears  Int?
+  validityMonths Int?
   status        StatusEnum       @default(PROGRESS)
   type          DocumentTypeEnum
   modelId       Int?
@@ -764,6 +766,8 @@ model DocumentData {
 
   coordinator   User? @relation(fields: [coordinatorId], references: [id])
   coordinatorId Int?
+
+  officialRevisionSeries Int @default(1)
 
   @@unique([id, companyId])
   @@unique([type, workspaceId, companyId])
@@ -2190,7 +2194,12 @@ model RiskFactorDocument {
   workspaceName  String
   workspaceId    String
   status         StatusEnum    @default(ACTIVE)
-  created_at     DateTime      @default(now())
+  documentDate        DateTime?
+  documentCreatedAt   DateTime?
+  validityYears       Int?
+  validityMonths      Int?
+  validityEndSnapshot DateTime?
+  created_at          DateTime      @default(now())
   updated_at     DateTime      @updatedAt
   attachments    Attachments[]
   company        Company       @relation(fields: [companyId], references: [id])
@@ -2202,6 +2211,8 @@ model RiskFactorDocument {
   elaboratedBy String? //*not used
   revisionBy   String? //*not used
   validity     String? //*not used
+
+  officialRevisionSeries Int?
 
   @@unique([id, companyId])
 }

@@ -10,6 +10,7 @@ export class LtcatUploadService {
     return await this.creatorDocumentLTCAT.execute({
       documentVersionId: body.id as string,
       homogeneousGroupsIds: body.ghoIds,
+      documentDate: body.documentDate,
     });
   }
 }

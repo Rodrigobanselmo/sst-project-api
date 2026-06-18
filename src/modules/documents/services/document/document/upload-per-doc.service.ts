@@ -10,6 +10,7 @@ export class PerUploadService {
     return await this.creatorDocumentPER.execute({
       documentVersionId: body.id as string,
       homogeneousGroupsIds: body.ghoIds,
+      documentDate: body.documentDate,
     });
   }
 }

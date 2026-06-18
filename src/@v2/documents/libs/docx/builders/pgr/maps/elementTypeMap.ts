@@ -47,6 +47,7 @@ import { activitiesPericulosidadeElements } from '../../../components/iterables/
 import { activitiesInsalubridadeElements } from '../../../components/iterables/activities-insalubridade/activities-insalubridade.elements';
 import { workspaceBlockElements } from '../../../components/iterables/workspaceBlock/workspace-block.elements';
 import { scopeBlockElements } from '../../../components/iterables/scopeBlock/scope-block.elements';
+import { resolveRevisionTableVersions } from '../../../helpers/resolve-revision-table-versions.util';
 
 export type IMapElementDocumentType = Record<string, (arg: any) => (Paragraph | Table)[]>;
 
@@ -88,7 +89,12 @@ export class ElementsMapClass {
     [DocumentChildrenTypeEnum.BULLET]: ({ level = 0, text, ...rest }: IBullet) => [bulletsNormal(text, level, rest)],
     [DocumentChildrenTypeEnum.BULLET_SPACE]: ({ text }: IBullet) => [bulletsSpace(text)],
     [DocumentChildrenTypeEnum.TABLE_VERSION_CONTROL]: () => [
-      versionControlTable(this.data.documentBase.versions, {
+      versionControlTable(
+        resolveRevisionTableVersions(
+          this.data.documentVersion,
+          this.data.documentBase,
+        ),
+        {
         fallback: {
           revisionBy: this.data.documentBase.revisionBy,
           approvedBy: this.data.documentBase.approvedBy,

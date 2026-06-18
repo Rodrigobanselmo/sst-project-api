@@ -23,8 +23,12 @@ export class ProductDocumentPER implements IDocumentFactoryProduct<IProductDocum
     private readonly donwloadImageService: DownloadImageService,
   ) {}
 
-  public async getData({ documentVersionId, homogeneousGroupsIds }: IProductDocumentPER) {
-    const document = await this.documentDAO.findDocumentPGR({ documentVersionId, homogeneousGroupsIds });
+  public async getData({ documentVersionId, homogeneousGroupsIds, documentDate }: IProductDocumentPER) {
+    const document = await this.documentDAO.findDocumentPGR({
+      documentVersionId,
+      homogeneousGroupsIds,
+      documentDate,
+    });
     if (!document) throw new BadRequestException('Nenhum documento PER cadastrado');
 
     await this.downloadImages(document);

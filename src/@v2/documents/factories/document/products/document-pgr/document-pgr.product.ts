@@ -5,6 +5,7 @@ import { DocumentSectionTypeEnum } from '@/@v2/documents/domain/enums/document-s
 import { AttachmentModel } from '@/@v2/documents/domain/models/attachment.model';
 import { CharacterizationPhotoModel } from '@/@v2/documents/domain/models/characterization-photos.model';
 import { DocumentPGRModel } from '@/@v2/documents/domain/models/document-pgr.model';
+import { resolveDocumentEmissionDate } from '@/@v2/documents/libs/docx/helpers/document-emission-date.util';
 import {
   DEFAULT_PGR_ANNEX_PROFILE,
   filterAttachmentsForProfile,
@@ -40,8 +41,12 @@ export class ProductDocumentPGR implements IDocumentFactoryProduct<IProductDocum
     protected readonly downloadImageService: DownloadImageService,
   ) {}
 
-  public async getData({ documentVersionId, homogeneousGroupsIds }: IProductDocumentPGR) {
-    const document = await this.documentDAO.findDocumentPGR({ documentVersionId, homogeneousGroupsIds });
+  public async getData({ documentVersionId, homogeneousGroupsIds, documentDate }: IProductDocumentPGR) {
+    const document = await this.documentDAO.findDocumentPGR({
+      documentVersionId,
+      homogeneousGroupsIds,
+      documentDate,
+    });
     if (!document) throw new BadRequestException('Nenhum documento PGR cadastrado');
 
     await this.downloadImages(document);
@@ -307,12 +312,17 @@ export class ProductDocumentPGR implements IDocumentFactoryProduct<IProductDocum
   }
 
   public getFileName = (data: DocumentPGRModel, type = 'PGR') => {
+    const emissionDate = resolveDocumentEmissionDate({
+      createdAt: data.documentVersion.createdAt,
+      documentDate: data.documentVersion.documentDate,
+    });
+
     return getDocumentFileName({
       name: data.documentVersion.name || '',
       companyName: data.documentBase.company.indentificationName,
       version: data.documentVersion.version,
       typeName: type,
-      date: dateUtils().format('MMMM-YYYY'),
+      date: dateUtils(emissionDate).format('MMMM-YYYY'),
     });
   };
 

@@ -1,6 +1,6 @@
 import { DocumentTypeEnum, StatusEnum } from '@prisma/client';
 import { Transform } from 'class-transformer';
-import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsDateString, IsEnum, IsOptional, IsString } from 'class-validator';
 
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
@@ -44,6 +44,11 @@ export class UpsertDocumentDto {
 
   @IsString()
   workspaceName: string;
+
+  /** Data de emissão formal exibida no documento (distinta de created_at). */
+  @IsOptional()
+  @IsDateString()
+  documentDate?: string;
 }
 
 export class UploadDocumentDto extends UpsertDocumentDto {

@@ -12,6 +12,7 @@ interface ICompanyVariables {
   workspace: WorkspaceModel;
   employeeCount: number;
   legalResponsibleOverride?: string;
+  documentEmissionDate?: Date;
 }
 
 export const companyVariables = ({
@@ -19,15 +20,17 @@ export const companyVariables = ({
   company,
   workspace,
   legalResponsibleOverride,
+  documentEmissionDate,
 }: ICompanyVariables) => {
   const legalResponsible =
     legalResponsibleOverride?.trim() || company?.responsibleName?.trim() || '';
+  const emissionDate = documentEmissionDate ?? new Date();
   // const address = workspace.isOwner ? workspace?.address || company?.address : company?.address;
   const address = company?.address;
 
   return {
-    [VariablesPGREnum.CURRENT_DATE_LONG]: dateUtils().format('D [de] MMMM [de] YYYY [às] hh:mm').toLocaleLowerCase(),
-    [VariablesPGREnum.CURRENT_DATE_SHORT]: dateUtils().format('DD/MM/YYYY').toLocaleLowerCase(),
+    [VariablesPGREnum.CURRENT_DATE_LONG]: dateUtils(emissionDate).format('D [de] MMMM [de] YYYY [às] hh:mm').toLocaleLowerCase(),
+    [VariablesPGREnum.CURRENT_DATE_SHORT]: dateUtils(emissionDate).format('DD/MM/YYYY').toLocaleLowerCase(),
     [VariablesPGREnum.CONSULTANT_NAME]: company.consultant?.name || company.name,
     [VariablesPGREnum.COMPANY_SIGNER_CITY]: (company.consultant ? company.consultant.address?.formattedCity : company.address?.formattedCity) || '',
     [VariablesPGREnum.COMPANY_CNAE]: company.primaryActivity,

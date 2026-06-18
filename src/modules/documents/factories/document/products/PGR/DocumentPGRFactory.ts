@@ -43,6 +43,7 @@ import {
 } from '../../types/IDocumentFactory.types';
 import { IDocumentPGRBody } from './types/pgr.types';
 import { DocumentCoverEntity } from '@/modules/company/entities/document-cover.entity';
+import { getDocumentVersion } from '@/@v2/documents/libs/docx/helpers/get-document-version';
 
 @Injectable()
 export class DocumentPGRFactory extends DocumentFactoryAbstractionCreator<IDocumentPGRBody, any> {
@@ -159,6 +160,7 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
       approvedBy: documentData.approvedBy,
       revisionBy: documentData.revisionBy,
       created_at: new Date(),
+      documentDate: body.documentDate ? new Date(body.documentDate) : null,
     });
 
     const { consultantLogo, logo, workspaceLogo } = await this.downloadLogos(company, consultant, workspace);
@@ -528,16 +530,23 @@ export class DocumentPGRFactoryProduct implements IDocumentFactoryProduct {
     const version = data.versions?.[0];
 
     if (!version) return `${dayjs().format('DD/MM/YYYY')}`;
-    return `${dayjs(data.versions[0].created_at).format('DD/MM/YYYY')} — REV. ${version.version}`;
+
+    return getDocumentVersion({
+      createdAt: version.created_at,
+      documentDate: version.documentDate,
+      version: version.version,
+    });
   };
 
   public getFileName = (info: IDocumentPGRBody, type = 'PGR') => {
+    const emissionDate = info.documentDate ? new Date(info.documentDate) : new Date();
+
     return getDocxFileName({
       name: info.name,
       companyName: this.company.initials || this.company?.fantasy || this.company.name,
       version: info.version,
       typeName: type,
-      date: dayjs(new Date()).format('MMMM-YYYY'),
+      date: dayjs(emissionDate).format('MMMM-YYYY'),
     });
   };
 

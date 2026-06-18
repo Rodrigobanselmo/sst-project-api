@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { RiskDocumentEntity } from '../../../../../sst/entities/riskDocument.entity';
 import { dayjs } from '../../../../../../shared/providers/DateProvider/implementations/DayJSProvider';
+import { resolveDocumentEmissionDate } from '@/@v2/documents/libs/docx/helpers/document-emission-date.util';
 import { sortData } from '../../../../../../shared/utils/sorts/data.sort';
 import { bodyTableProps } from './elements/body';
 import { resolveVersionControlField } from './version-control-field.util';
@@ -27,7 +28,13 @@ export const versionControlConverter = (
       size: VERSION_CONTROL_COLUMN_WIDTHS[VersionControlColumnEnum.INDEX],
     };
     cells[VersionControlColumnEnum.DATE] = {
-      text: dayjs(version.created_at).format('DD/MM/YYYY') || '',
+      text:
+        dayjs(
+          resolveDocumentEmissionDate({
+            createdAt: version.created_at,
+            documentDate: version.documentDate,
+          }),
+        ).format('DD/MM/YYYY') || '',
       size: VERSION_CONTROL_COLUMN_WIDTHS[VersionControlColumnEnum.DATE],
     };
     cells[VersionControlColumnEnum.DESCRIPTION] = {
