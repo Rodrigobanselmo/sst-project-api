@@ -2,7 +2,7 @@ import { riskAllId } from './../../../../shared/constants/ids';
 import { prismaFilter } from './../../../../shared/utils/filters/prisma.filters';
 import { PaginationQueryDto } from './../../../../shared/dto/pagination.dto';
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { CreateCompanyDto, FindCompaniesDto, UpdateCompanyDto } from '../../dto/company.dto';
@@ -169,7 +169,10 @@ export class CompanyRepository implements ICompanyRepository {
       mergedMetadata = { ...currentMetadata, ...metadata };
     }
 
-    const companyPrisma = this.prisma.company.update({
+    const workspacesToUpdate = workspace.filter((w) => w.id);
+    const workspacesToCreate = workspace.filter((w) => !w.id);
+
+    const companyUpdateArgs = {
       where: { id: companyId },
       data: {
         ...updateCompanyDto,
@@ -221,28 +224,15 @@ export class CompanyRepository implements ICompanyRepository {
           ],
         },
         address: address ? { update: { ...address } } : undefined,
-        workspace: {
-          upsert: [
-            ...workspace.map(({ id, address, companyJson, ...work }) => ({
-              create: {
+        workspace: workspacesToCreate.length
+          ? {
+              create: workspacesToCreate.map(({ id, address, companyJson, ...work }) => ({
                 ...work,
                 address: { create: address },
                 companyJson: companyJson || undefined,
-              },
-              update: {
-                ...work,
-                companyJson: companyJson || undefined,
-                address: { update: address },
-              },
-              where: {
-                id_companyId: {
-                  companyId,
-                  id: id || 'no-id',
-                },
-              },
-            })),
-          ],
-        },
+              })),
+            }
+          : undefined,
         // TODO: should be connect only
         primary_activity: {
           connectOrCreate: [
@@ -267,7 +257,36 @@ export class CompanyRepository implements ICompanyRepository {
         group: true,
         employees: !!include.employees ? true : false,
       },
-    });
+    };
+
+    const applyWorkspaceUpdates = async (tx: Prisma.TransactionClient) => {
+      for (const { id, address, companyJson, abbreviation: _abbreviation, ...work } of workspacesToUpdate) {
+        const existing = await tx.workspace.findUnique({
+          where: { id_companyId: { companyId, id: id! } },
+        });
+
+        if (!existing) {
+          throw new BadRequestException('Estabelecimento não encontrado nesta empresa');
+        }
+
+        await tx.workspace.update({
+          where: { id_companyId: { companyId, id: id! } },
+          data: {
+            ...work,
+            companyJson: companyJson || undefined,
+            address: address ? { update: address } : undefined,
+          },
+        });
+      }
+    };
+
+    const companyPrisma =
+      workspacesToUpdate.length > 0
+        ? this.prisma.$transaction(async (tx) => {
+            await applyWorkspaceUpdates(tx);
+            return tx.company.update(companyUpdateArgs);
+          })
+        : this.prisma.company.update(companyUpdateArgs);
 
     // if (updateCompanyDto.phone || updateCompanyDto.email) {
     //   await this.prisma.contact.findFirst({

@@ -69,6 +69,15 @@ export class WorkspaceRepository {
     return [...workspaces.map((workspace) => new WorkspaceEntity(workspace))];
   }
 
+  async findAllByCompanyForAbbreviation(companyId: string) {
+    const workspaces = await this.prisma.workspace.findMany({
+      where: { companyId },
+      select: { id: true, abbreviation: true },
+    });
+
+    return workspaces.map((workspace) => new WorkspaceEntity(workspace as WorkspaceEntity));
+  }
+
   async findNude(options: Prisma.WorkspaceFindManyArgs = {}) {
     const workspaces = await this.prisma.workspace.findMany({
       ...options,
