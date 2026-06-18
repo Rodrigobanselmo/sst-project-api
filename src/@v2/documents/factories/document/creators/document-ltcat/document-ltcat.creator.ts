@@ -16,10 +16,10 @@ export class CreatorDocumentLTCAT {
     protected readonly donwloadImageService: DownloadImageService,
   ) {}
 
-  async execute({ documentVersionId, homogeneousGroupsIds }: ICreatorDocumentLTCAT.Params) {
+  async execute({ documentVersionId, homogeneousGroupsIds, documentDate }: ICreatorDocumentLTCAT.Params) {
     this.documentCreationService.execute({
       product: this.factoryMethod(),
-      body: { documentVersionId, homogeneousGroupsIds },
+      body: { documentVersionId, homogeneousGroupsIds, documentDate },
     });
   }
 

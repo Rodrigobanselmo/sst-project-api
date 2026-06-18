@@ -10,6 +10,7 @@ export class PgrUploadService {
     return await this.creatorDocumentPGR.execute({
       documentVersionId: body.id as string,
       homogeneousGroupsIds: body.ghoIds,
+      documentDate: body.documentDate,
     });
   }
 }

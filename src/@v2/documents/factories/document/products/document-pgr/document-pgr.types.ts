@@ -5,6 +5,7 @@ import type { IGetDocument } from '../../types/document-factory.types';
 export interface IProductDocumentPGR {
   documentVersionId: string;
   homogeneousGroupsIds?: string[];
+  documentDate?: string;
 }
 
 export type { PgrAnnexProfile };

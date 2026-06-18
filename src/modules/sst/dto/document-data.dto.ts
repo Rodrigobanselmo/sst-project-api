@@ -75,6 +75,14 @@ export class UpsertDocumentDataDto {
   @Type(() => Date)
   validityStart?: Date;
 
+  @IsOptional()
+  @IsInt()
+  validityYears?: number;
+
+  @IsOptional()
+  @IsInt()
+  validityMonths?: number;
+
   @ValidateNested({ each: true })
   @IsOptional()
   @Type(() => ProfessionalDocumentDataDto)

@@ -10,6 +10,7 @@ export class InsalUploadService {
     return await this.creatorDocumentINSAL.execute({
       documentVersionId: body.id as string,
       homogeneousGroupsIds: body.ghoIds,
+      documentDate: body.documentDate,
     });
   }
 }

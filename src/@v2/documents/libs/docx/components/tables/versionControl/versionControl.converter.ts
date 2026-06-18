@@ -1,6 +1,7 @@
 import { VersionModel } from '@/@v2/documents/domain/models/version.model';
 import { sortData } from '@/@v2/shared/utils/sorts/data.sort';
 import dayjs from 'dayjs';
+import { resolveDocumentEmissionDate } from '../../../helpers/document-emission-date.util';
 import { bodyTableProps } from './elements/body';
 import { resolveVersionControlField } from './version-control-field.util';
 import { VersionControlFallback } from './version-control.types';
@@ -26,7 +27,13 @@ export const versionControlConverter = (
       size: VERSION_CONTROL_COLUMN_WIDTHS[VersionControlColumnEnum.INDEX],
     };
     cells[VersionControlColumnEnum.DATE] = {
-      text: dayjs(version.createdAt).format('DD/MM/YYYY') || '',
+      text:
+        dayjs(
+          resolveDocumentEmissionDate({
+            createdAt: version.createdAt,
+            documentDate: version.documentDate,
+          }),
+        ).format('DD/MM/YYYY') || '',
       size: VERSION_CONTROL_COLUMN_WIDTHS[VersionControlColumnEnum.DATE],
     };
     cells[VersionControlColumnEnum.DESCRIPTION] = {

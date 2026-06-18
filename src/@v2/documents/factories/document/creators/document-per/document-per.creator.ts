@@ -16,10 +16,10 @@ export class CreatorDocumentPER {
     protected readonly donwloadImageService: DownloadImageService,
   ) {}
 
-  async execute({ documentVersionId, homogeneousGroupsIds }: ICreatorDocumentPER.Params) {
+  async execute({ documentVersionId, homogeneousGroupsIds, documentDate }: ICreatorDocumentPER.Params) {
     this.documentCreationService.execute({
       product: this.factoryMethod(),
-      body: { documentVersionId, homogeneousGroupsIds },
+      body: { documentVersionId, homogeneousGroupsIds, documentDate },
     });
   }
 

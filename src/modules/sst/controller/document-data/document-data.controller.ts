@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 
 import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
@@ -9,12 +9,16 @@ import { FindOneDocumentDataDto } from '../../dto/document-data.dto';
 import { FindByIdDocumentDataService } from '../../services/documentData/find-by-id/find-by-id.service';
 import { UpsertDocumentDataService } from '../../services/documentData/upsert-document-data/upsert-document-data.service';
 import { UpsertDocumentDataPCMSODto } from '../../dto/document-data-pcmso.dto';
+import { ResetUnofficialDocumentVersionsService } from '../../services/documentData/reset-unofficial-versions/reset-unofficial-versions.service';
+import { ResetOfficialDocumentSeriesService } from '../../services/documentData/reset-official-series/reset-official-series.service';
 
 @Controller('document-data/:companyId')
 export class DocumentDataController {
   constructor(
     private readonly upsertDocumentDataService: UpsertDocumentDataService,
     private readonly findByIdService: FindByIdDocumentDataService,
+    private readonly resetUnofficialDocumentVersionsService: ResetUnofficialDocumentVersionsService,
+    private readonly resetOfficialDocumentSeriesService: ResetOfficialDocumentSeriesService,
   ) {}
 
   @Permissions({
@@ -92,5 +96,51 @@ export class DocumentDataController {
   async findById(@Query() query: FindOneDocumentDataDto, @User() userPayloadDto: UserPayloadDto) {
     const companyId = userPayloadDto.targetCompanyId;
     return await this.findByIdService.execute(query, companyId);
+  }
+
+  @Permissions(
+    {
+      code: PermissionEnum.PGR,
+      isMember: true,
+      isContract: true,
+    },
+    {
+      code: PermissionEnum.PCMSO,
+      isMember: true,
+      isContract: true,
+    },
+  )
+  @Post(':documentDataId/reset-unofficial-versions')
+  async resetUnofficialVersions(
+    @Param('documentDataId') documentDataId: string,
+    @User() userPayloadDto: UserPayloadDto,
+  ) {
+    return this.resetUnofficialDocumentVersionsService.execute(
+      documentDataId,
+      userPayloadDto,
+    );
+  }
+
+  @Permissions(
+    {
+      code: PermissionEnum.PGR,
+      isMember: true,
+      isContract: true,
+    },
+    {
+      code: PermissionEnum.PCMSO,
+      isMember: true,
+      isContract: true,
+    },
+  )
+  @Post(':documentDataId/reset-official-series')
+  async resetOfficialSeries(
+    @Param('documentDataId') documentDataId: string,
+    @User() userPayloadDto: UserPayloadDto,
+  ) {
+    return this.resetOfficialDocumentSeriesService.execute(
+      documentDataId,
+      userPayloadDto,
+    );
   }
 }

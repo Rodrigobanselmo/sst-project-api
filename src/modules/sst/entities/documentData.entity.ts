@@ -23,6 +23,8 @@ export class DocumentDataEntity implements DocumentData {
   validity: string;
   validityStart: Date;
   validityEnd: Date;
+  validityYears: number | null;
+  validityMonths: number | null;
 
   type: DocumentTypeEnum;
   json: Prisma.JsonValue;
@@ -38,6 +40,7 @@ export class DocumentDataEntity implements DocumentData {
   months_period_level_4: number;
   months_period_level_5: number;
   coordinatorId: number;
+  officialRevisionSeries: number;
 
   constructor(partial: Partial<DocumentDataEntity>) {
     Object.assign(this, partial);

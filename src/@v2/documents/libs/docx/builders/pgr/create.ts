@@ -6,6 +6,7 @@ import { IAllDocumentSectionType } from '../../../../domain/types/section.types'
 import { VariablesPGREnum } from './enums/variables.enum';
 import { booleanVariables } from './functions/getVariables/boolean.variables';
 import { companyVariables } from './functions/getVariables/company.variables';
+import { resolveDocumentEmissionDate } from '../../helpers/document-emission-date.util';
 import { ElementsMapClass } from './maps/elementTypeMap';
 import { SectionsMapClass } from './maps/sectionTypeMap';
 import { AttachmentModel } from '@/@v2/documents/domain/models/attachment.model';
@@ -53,6 +54,10 @@ export class DocumentBuildPGR {
         company: this.data.documentBase.company,
         workspace: this.data.documentBase.workspace,
         legalResponsibleOverride: this.data.documentBase.data.legalResponsibleBy,
+        documentEmissionDate: resolveDocumentEmissionDate({
+          createdAt: this.data.documentVersion.createdAt,
+          documentDate: this.data.documentVersion.documentDate,
+        }),
       }),
       ...booleanVariables(this.data),
       ...variables,

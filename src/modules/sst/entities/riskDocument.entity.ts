@@ -9,6 +9,11 @@ export class RiskDocumentEntity implements RiskFactorDocument {
   companyId: string;
   status: StatusEnum;
   created_at: Date;
+  documentDate: Date | null;
+  documentCreatedAt: Date | null;
+  validityYears: number | null;
+  validityMonths: number | null;
+  validityEndSnapshot: Date | null;
   company?: Partial<CompanyEntity>;
 
   fileUrl: string;
@@ -26,6 +31,7 @@ export class RiskDocumentEntity implements RiskFactorDocument {
 
   documentData?: DocumentDataEntity;
   documentDataId: string;
+  officialRevisionSeries: number | null;
 
   constructor(partial: Partial<RiskDocumentEntity>) {
     Object.assign(this, partial);

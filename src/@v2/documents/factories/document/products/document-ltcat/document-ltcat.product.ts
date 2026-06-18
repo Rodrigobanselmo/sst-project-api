@@ -23,8 +23,12 @@ export class ProductDocumentLTCAT implements IDocumentFactoryProduct<IProductDoc
     private readonly donwloadImageService: DownloadImageService,
   ) {}
 
-  public async getData({ documentVersionId, homogeneousGroupsIds }: IProductDocumentLTCAT) {
-    const document = await this.documentDAO.findDocumentPGR({ documentVersionId, homogeneousGroupsIds });
+  public async getData({ documentVersionId, homogeneousGroupsIds, documentDate }: IProductDocumentLTCAT) {
+    const document = await this.documentDAO.findDocumentPGR({
+      documentVersionId,
+      homogeneousGroupsIds,
+      documentDate,
+    });
     if (!document) throw new BadRequestException('Nenhum documento LTCAT cadastrado');
 
     await this.downloadImages(document);

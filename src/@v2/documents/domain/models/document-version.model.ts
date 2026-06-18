@@ -8,6 +8,11 @@ export type IDocumentVersionModel = {
   version: string;
   fileUrl: string | null;
   createdAt: Date;
+  documentDate: Date | null;
+  officialRevisionSeries: number | null;
+  approvedBy: string | null;
+  revisionBy: string | null;
+  elaboratedBy: string | null;
   attachments: AttachmentModel[];
   documentBase: DocumentBaseModel;
 }
@@ -19,6 +24,11 @@ export class DocumentVersionModel {
   version: string;
   fileUrl: string | null;
   createdAt: Date;
+  documentDate: Date | null;
+  officialRevisionSeries: number | null;
+  approvedBy: string | null;
+  revisionBy: string | null;
+  elaboratedBy: string | null;
   attachments: AttachmentModel[];
   documentBase: DocumentBaseModel;
 
@@ -29,6 +39,11 @@ export class DocumentVersionModel {
     this.version = params.version;
     this.fileUrl = params.fileUrl;
     this.createdAt = params.createdAt
+    this.documentDate = params.documentDate
+    this.officialRevisionSeries = params.officialRevisionSeries
+    this.approvedBy = params.approvedBy
+    this.revisionBy = params.revisionBy
+    this.elaboratedBy = params.elaboratedBy
     this.attachments = params.attachments;
     this.documentBase = params.documentBase;
   }

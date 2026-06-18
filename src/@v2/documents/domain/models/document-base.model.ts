@@ -1,4 +1,4 @@
-import { dateUtils } from "@/@v2/shared/utils/helpers/date-utils";
+import { formatDocumentValidityRange } from "../../libs/docx/helpers/format-document-validity.util";
 import { DocumentTypeEnum } from "../../../shared/domain/enum/documents/document-type.enum";
 import { DocumentBaseDataVO } from "../values-object/document-base-data.vo";
 import { CompanyModel } from "./company.model";
@@ -65,15 +65,12 @@ export class DocumentBaseModel {
 
 
   get validUntil(): string {
-    if (this.validityStart && this.validityEnd) {
-      return dateUtils(this.validityStart).format('MM/YYYY') + ' a ' + dateUtils(this.validityEnd).format('MM/YYYY');
-    }
-
-    return '';
+    return formatDocumentValidityRange(this.validityStart, this.validityEnd);
   }
 
-  get versions() {
-    return this._versions.filter(version => version.version.includes('.0.0'));
+  /** Todas as versões persistidas do documento (sem filtro). */
+  get allVersions(): VersionModel[] {
+    return this._versions;
   }
 
   get mainLogoPath(): string | null {

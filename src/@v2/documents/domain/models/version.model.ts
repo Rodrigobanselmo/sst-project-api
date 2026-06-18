@@ -6,6 +6,8 @@ export type IVersionModel = {
   elaboratedBy: string | null
   revisionBy: string | null
   createdAt: Date;
+  documentDate: Date | null;
+  officialRevisionSeries?: number | null;
 }
 
 export class VersionModel {
@@ -15,6 +17,8 @@ export class VersionModel {
   elaboratedBy: string | null
   revisionBy: string | null
   createdAt: Date;
+  documentDate: Date | null;
+  officialRevisionSeries: number | null;
 
   constructor(params: IVersionModel) {
     this.version = params.version
@@ -23,5 +27,7 @@ export class VersionModel {
     this.elaboratedBy = params.elaboratedBy
     this.revisionBy = params.revisionBy
     this.createdAt = params.createdAt
+    this.documentDate = params.documentDate
+    this.officialRevisionSeries = params.officialRevisionSeries ?? null
   }
 }

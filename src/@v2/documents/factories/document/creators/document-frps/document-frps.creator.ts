@@ -16,10 +16,10 @@ export class CreatorDocumentFRPS {
     protected readonly donwloadImageService: DownloadImageService,
   ) {}
 
-  async execute({ documentVersionId, homogeneousGroupsIds }: ICreatorDocumentFRPS.Params) {
+  async execute({ documentVersionId, homogeneousGroupsIds, documentDate }: ICreatorDocumentFRPS.Params) {
     await this.documentCreationService.execute({
       product: this.factoryMethod(),
-      body: { documentVersionId, homogeneousGroupsIds },
+      body: { documentVersionId, homogeneousGroupsIds, documentDate },
     });
   }
 

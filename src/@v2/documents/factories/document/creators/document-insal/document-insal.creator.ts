@@ -16,10 +16,10 @@ export class CreatorDocumentINSAL {
     protected readonly donwloadImageService: DownloadImageService,
   ) {}
 
-  async execute({ documentVersionId, homogeneousGroupsIds }: ICreatorDocumentINSAL.Params) {
+  async execute({ documentVersionId, homogeneousGroupsIds, documentDate }: ICreatorDocumentINSAL.Params) {
     this.documentCreationService.execute({
       product: this.factoryMethod(),
-      body: { documentVersionId, homogeneousGroupsIds },
+      body: { documentVersionId, homogeneousGroupsIds, documentDate },
     });
   }
 

@@ -11,6 +11,9 @@ import { RiskDataExamModel } from './risk-data-exam.model';
 import { RiskDataModel } from './risk-data.model';
 import { DocumentModelModel } from './document-model.model';
 
+import { resolveRevisionTableVersions } from '@/@v2/documents/libs/docx/helpers/resolve-revision-table-versions.util';
+import { VersionModel } from './version.model';
+
 export type IDocumentPGRModel = {
   documentVersion: DocumentVersionModel;
   hierarchies: HierarchyModel[];
@@ -53,6 +56,13 @@ export class DocumentPGRModel {
 
   set model(model: DocumentModelModel) {
     this.documentVersion.documentBase.model = model;
+  }
+
+  getRevisionTableVersions(): VersionModel[] {
+    return resolveRevisionTableVersions(
+      this.documentVersion,
+      this.documentVersion.documentBase,
+    );
   }
 
   get risksData() {

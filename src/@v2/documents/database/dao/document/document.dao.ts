@@ -1,5 +1,9 @@
 import { isFrpsRisk } from '@/@v2/documents/domain/functions/is-frps-risk.func';
 import { DocumentPGRModel } from '@/@v2/documents/domain/models/document-pgr.model';
+import {
+  applyDocumentEmissionDateToPgrModel,
+  parseDocumentEmissionDate,
+} from '@/@v2/documents/libs/docx/helpers/document-emission-date.util';
 import { HomogeneousGroupModel } from '@/@v2/documents/domain/models/homogeneous-group.model';
 import { Injectable } from '@nestjs/common';
 import { DocumentVersionDAO } from '../document-version/document-version.dao';
@@ -41,7 +45,27 @@ export class DocumentDAO {
       scopeOfSelectedGroupIds: params.homogeneousGroupsIds || [],
     });
 
+    await this.applyEmissionDate(documentModel, params.documentDate);
+
     return documentModel;
+  }
+
+  private async applyEmissionDate(
+    document: DocumentPGRModel,
+    documentDateFromPayload?: string,
+  ) {
+    const parsed = parseDocumentEmissionDate(documentDateFromPayload);
+    if (!parsed) return;
+
+    const hadPersistedDate = !!document.documentVersion.documentDate;
+    applyDocumentEmissionDateToPgrModel(document, parsed);
+
+    if (!hadPersistedDate) {
+      await this.documentVersionDAO.updateDocumentDate(
+        document.documentVersion.id,
+        parsed,
+      );
+    }
   }
 
   async findDocumentFRPS(params: IDocumentDAO.FindByIdParams) {

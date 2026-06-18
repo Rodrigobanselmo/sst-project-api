@@ -23,8 +23,12 @@ export class ProductDocumentINSAL implements IDocumentFactoryProduct<IProductDoc
     private readonly donwloadImageService: DownloadImageService,
   ) {}
 
-  public async getData({ documentVersionId, homogeneousGroupsIds }: IProductDocumentINSAL) {
-    const document = await this.documentDAO.findDocumentPGR({ documentVersionId, homogeneousGroupsIds });
+  public async getData({ documentVersionId, homogeneousGroupsIds, documentDate }: IProductDocumentINSAL) {
+    const document = await this.documentDAO.findDocumentPGR({
+      documentVersionId,
+      homogeneousGroupsIds,
+      documentDate,
+    });
     if (!document) throw new BadRequestException('Nenhum documento INSALUBRIDADE cadastrado');
 
     await this.downloadImages(document);
