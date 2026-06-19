@@ -53,15 +53,8 @@ jobs:
             echo "==> Rodando migrations"
             npx prisma migrate deploy
 
-            echo "==> Registrando SHA do deploy no .env"
-            DEPLOY_SHA="$(git rev-parse HEAD)"
-            if grep -q '^DEPLOY_GIT_SHA=' .env; then
-              sed -i "s/^DEPLOY_GIT_SHA=.*/DEPLOY_GIT_SHA=${DEPLOY_SHA}/" .env
-            else
-              echo "DEPLOY_GIT_SHA=${DEPLOY_SHA}" >> .env
-            fi
-
             echo "==> Reiniciando aplicação (PM2)"
+            export DEPLOY_GIT_SHA="$(git rev-parse HEAD)"
             if pm2 describe "$APP_NAME" > /dev/null 2>&1; then
               pm2 restart "$APP_NAME" --update-env
             else

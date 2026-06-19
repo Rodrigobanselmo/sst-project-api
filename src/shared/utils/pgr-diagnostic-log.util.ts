@@ -14,7 +14,7 @@ export function logPgrDiagnostic(phase: string, payload: PgrDiagnosticPayload) {
       host: hostname(),
       pid: process.pid,
       pm2Name: process.env.name || process.env.pm_id || null,
-      gitSha: process.env.DEPLOY_GIT_SHA || null,
+      gitSha: process.env.DEPLOY_GIT_SHA || process.env.GIT_SHA || null,
       at: new Date().toISOString(),
       ...payload,
     }),
