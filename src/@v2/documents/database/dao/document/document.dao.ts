@@ -11,6 +11,7 @@ import { ExamDAO } from '../exam/exam.dao';
 import { HierarchyDAO } from '../hierarchy/hierarchy.dao';
 import { HomogeneousGroupDAO } from '../homogeneous-group/homogeneous-group.dao';
 import { IDocumentDAO } from './document.types';
+import { logPgrDiagnostic } from '@/shared/utils/pgr-diagnostic-log.util';
 
 @Injectable()
 export class DocumentDAO {
@@ -43,6 +44,14 @@ export class DocumentDAO {
       exams,
       hierarchies,
       scopeOfSelectedGroupIds: params.homogeneousGroupsIds || [],
+    });
+
+    logPgrDiagnostic('pgr_model', {
+      documentVersionId: params.documentVersionId,
+      scopeOfSelectedGroupIdsCount: params.homogeneousGroupsIds?.length ?? 0,
+      scopeOfSelectedGroupIds: params.homogeneousGroupsIds ?? [],
+      homogeneousGroupsInModel: homogeneousGroups.length,
+      hierarchiesInModel: hierarchies.length,
     });
 
     await this.applyEmissionDate(documentModel, params.documentDate);

@@ -1,0 +1,134 @@
+name: Diagnose PGR Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      since_hours:
+        description: 'Horas para trás ao buscar logs CloudWatch / PM2'
+        required: false
+        default: '24'
+
+concurrency:
+  group: diag-pgr-production
+  cancel-in-progress: false
+
+jobs:
+  diagnose:
+    name: Collect PGR production evidence
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run diagnostics on Magalu VM
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          port: ${{ secrets.SSH_PORT }}
+          key: ${{ secrets.SSH_KEY }}
+          command_timeout: 20m
+          script_stop: true
+          script: |
+            set -euo pipefail
+            export PATH="$PATH:/usr/local/bin:/usr/bin"
+
+            APP_DIR="/home/ubuntu/sst-project-api"
+            APP_NAME="simplesst-api"
+            SINCE_HOURS="${{ github.event.inputs.since_hours || '24' }}"
+            START_MS=$(( ($(date +%s) - SINCE_HOURS * 3600) * 1000 ))
+
+            echo "========== HOST / PROCESS =========="
+            hostname -f || hostname
+            uname -a
+            date -u
+
+            echo "========== GIT SHA (deployed code) =========="
+            cd "$APP_DIR"
+            git rev-parse HEAD
+            git log -1 --oneline
+
+            echo "========== PM2 =========="
+            pm2 status || true
+            pm2 describe "$APP_NAME" 2>/dev/null | sed -n '1,40p' || true
+            echo "--- all node processes ---"
+            ps aux | grep -E '[n]ode|[p]m2' || true
+
+            echo "========== ENV (sanitized) =========="
+            if [ -f "$APP_DIR/.env" ]; then
+              grep -E '^(APP_HOST|NODE_ENV|AWS_SQS_REGION|AWS_SQS_PGR_URL|DATABASE_URL|CLOUDWATCH_GROUP_NAME|CLOUDWATCH_LOG_NAME)=' "$APP_DIR/.env" \
+                | sed -E 's#(DATABASE_URL=postgresql://[^:]+:)[^@]+#\1***#; s#(AWS_SECRET_ACCESS_KEY=).*#\1***#'
+            else
+              echo "WARN: .env not found"
+            fi
+
+            echo "========== QUEUE URL host =========="
+            QUEUE_URL=$(grep '^AWS_SQS_PGR_URL=' "$APP_DIR/.env" | cut -d= -f2- | tr -d '"' || true)
+            echo "AWS_SQS_PGR_URL=$QUEUE_URL"
+
+            echo "========== DATABASE host =========="
+            DB_URL=$(grep '^DATABASE_URL=' "$APP_DIR/.env" | cut -d= -f2- | tr -d '"' || true)
+            echo "$DB_URL" | sed -E 's#(postgresql://[^:]+:)[^@]+#\1***#'
+
+            echo "========== PM2 logs (PGR_DIAG / add-queue / Message received) =========="
+            pm2 logs "$APP_NAME" --lines 5000 --nostream 2>/dev/null \
+              | grep -E 'PGR_DIAG|add-queue/pgr|Message received' \
+              | tail -n 80 || echo "(no matching pm2 lines)"
+
+            echo "========== Recent PGR jobs (DB) =========="
+            set -a
+            # shellcheck disable=SC1091
+            source "$APP_DIR/.env"
+            set +a
+            node - <<'NODE'
+            const { PrismaClient } = require('@prisma/client');
+            const prisma = new PrismaClient();
+            (async () => {
+              const rows = await prisma.riskFactorDocument.findMany({
+                where: { type: 'PGR' },
+                orderBy: { created_at: 'desc' },
+                take: 8,
+                select: {
+                  id: true,
+                  name: true,
+                  status: true,
+                  fileUrl: true,
+                  created_at: true,
+                  updated_at: true,
+                  companyId: true,
+                  workspaceId: true,
+                },
+              });
+              console.log(JSON.stringify(rows, null, 2));
+              await prisma.$disconnect();
+            })().catch((e) => {
+              console.error('DB query failed:', e.message);
+              process.exit(1);
+            });
+            NODE
+
+            echo "========== CloudWatch HTTP logs (add-queue/pgr) =========="
+            if command -v aws >/dev/null 2>&1; then
+              export AWS_DEFAULT_REGION="${CLOUDWATCH_AWS_REGION:-sa-east-1}"
+              aws logs filter-log-events \
+                --log-group-name "${CLOUDWATCH_GROUP_NAME:-api-simplesst}" \
+                --log-stream-names "${CLOUDWATCH_LOG_NAME:-api-logs}" \
+                --filter-pattern "add-queue/pgr" \
+                --start-time "$START_MS" \
+                --limit 15 \
+                --query 'events[*].message' \
+                --output text 2>/dev/null | tail -n 15 || echo "(cloudwatch query failed or empty)"
+            else
+              echo "(aws cli not installed on server)"
+            fi
+
+            echo "========== CloudWatch PGR_DIAG logs =========="
+            if command -v aws >/dev/null 2>&1; then
+              aws logs filter-log-events \
+                --log-group-name "${CLOUDWATCH_GROUP_NAME:-api-simplesst}" \
+                --log-stream-names "${CLOUDWATCH_LOG_NAME:-api-logs}" \
+                --filter-pattern "PGR_DIAG" \
+                --start-time "$START_MS" \
+                --limit 20 \
+                --query 'events[*].message' \
+                --output text 2>/dev/null | tail -n 20 || echo "(no PGR_DIAG in cloudwatch)"
+            fi
+
+            echo "========== DONE =========="

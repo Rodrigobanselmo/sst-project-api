@@ -6,6 +6,7 @@ import { RiskDocumentRepository } from '../../../../sst/repositories/implementat
 import { SendMessageCommand, SQSClient } from '@aws-sdk/client-sqs';
 import { StatusEnum } from '@prisma/client';
 import { isOfficialDocumentVersion } from '@/@v2/documents/domain/functions/is-revision-controlled-version.func';
+import { logPgrDiagnostic } from '../../../../../shared/utils/pgr-diagnostic-log.util';
 
 @Injectable()
 export class AddQueueDocumentService {
@@ -79,6 +80,17 @@ export class AddQueueDocumentService {
       ...upsertPgrDto,
       id: riskDoc.id,
     };
+
+    logPgrDiagnostic('http_enqueue', {
+      endpoint: 'POST /documents/base/add-queue/pgr',
+      documentVersionId: riskDoc.id,
+      queueUrl: this.queueUrl,
+      ghoIdsCount: payload.ghoIds?.length ?? 0,
+      ghoIds: payload.ghoIds ?? [],
+      companyId,
+      workspaceId: payload.workspaceId,
+      documentDataId: payload.documentDataId,
+    });
 
     const command = new SendMessageCommand({
       QueueUrl: this.queueUrl,

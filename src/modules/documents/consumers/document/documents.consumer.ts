@@ -12,6 +12,7 @@ import { PerUploadService } from '../../services/document/document/upload-per-do
 import { LtcatUploadService } from '../../services/document/document/upload-ltcat-doc.service';
 import { InsalUploadService } from '../../services/document/document/upload-insal-doc.service';
 import { FrpsUploadService } from '../../services/document/document/upload-frps-doc.service';
+import { logPgrDiagnostic } from '../../../../shared/utils/pgr-diagnostic-log.util';
 
 @Injectable()
 export class PgrConsumer implements OnModuleInit {
@@ -46,6 +47,15 @@ export class PgrConsumer implements OnModuleInit {
 
   private async consume(message: MessageSQS): Promise<void> {
     const body: UploadDocumentDto = JSON.parse(message.Body);
+
+    logPgrDiagnostic('consumer_received', {
+      sqsMessageId: message.MessageId,
+      type: body.type,
+      documentVersionId: body.id,
+      ghoIdsCount: body.ghoIds?.length ?? 0,
+      ghoIds: body.ghoIds ?? [],
+      queueUrl: process.env.AWS_SQS_PGR_URL,
+    });
 
     try {
       if (body.type == DocumentTypeEnum.PGR) {
