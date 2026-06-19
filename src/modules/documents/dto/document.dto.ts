@@ -1,6 +1,6 @@
 import { DocumentTypeEnum, StatusEnum } from '@prisma/client';
 import { Transform } from 'class-transformer';
-import { IsDateString, IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsDateString, IsEnum, IsOptional, IsString } from 'class-validator';
 
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
@@ -14,6 +14,7 @@ export class UpsertDocumentDto {
   documentDataId: string;
 
   @IsOptional()
+  @IsArray()
   @IsString({ each: true })
   ghoIds?: string[];
 

@@ -4,6 +4,8 @@ import { Prisma } from '@prisma/client';
 import { IHomogeneousGroupDAO } from './homogeneous-group.types';
 import { HomogeneousGroupMapper } from '../../mappers/homogeneous-group.mapper';
 import { RiskDataDAO } from '../risk-data/risk-data.dao';
+import { buildHomogeneousGroupExpandedFilterWhere } from './homogeneous-group-expanded-filter.where';
+import { resolveHomogeneousGroupFilterMode } from './resolve-homogeneous-group-filter-mode.util';
 
 @Injectable()
 export class HomogeneousGroupDAO {
@@ -24,96 +26,38 @@ export class HomogeneousGroupDAO {
   }
 
   async findMany(params: IHomogeneousGroupDAO.FindByIdParams) {
+    const homogeneousGroupsFilter = await this.buildHomogeneousGroupsFilter(params);
+
     const homogeneousGroups = await this.prisma.homogeneousGroup.findMany({
       where: {
         workspaces: { some: { id: params.workspaceId } },
         status: 'ACTIVE',
-        ...(params?.homogeneousGroupsIds?.length
-          ? {
-              OR: [
-                {
-                  id: { in: params.homogeneousGroupsIds },
-                },
-                {
-                  hierarchyOnHomogeneous: {
-                    some: {
-                      hierarchy: {
-                        OR: [
-                          {
-                            id: { in: params.homogeneousGroupsIds },
-                          },
-                          {
-                            parent: { id: { in: params.homogeneousGroupsIds } },
-                          },
-                          {
-                            parent: { parent: { id: { in: params.homogeneousGroupsIds } } },
-                          },
-                          {
-                            parent: { parent: { parent: { id: { in: params.homogeneousGroupsIds } } } },
-                          },
-                          {
-                            parent: { parent: { parent: { parent: { id: { in: params.homogeneousGroupsIds } } } } },
-                          },
-                          {
-                            parent: {
-                              parent: { parent: { parent: { parent: { id: { in: params.homogeneousGroupsIds } } } } },
-                            },
-                          },
-                          {
-                            children: { some: { id: { in: params.homogeneousGroupsIds } } },
-                          },
-                          {
-                            children: { some: { children: { some: { id: { in: params.homogeneousGroupsIds } } } } },
-                          },
-                          {
-                            children: {
-                              some: {
-                                children: { some: { children: { some: { id: { in: params.homogeneousGroupsIds } } } } },
-                              },
-                            },
-                          },
-                          {
-                            children: {
-                              some: {
-                                children: {
-                                  some: {
-                                    children: {
-                                      some: { children: { some: { id: { in: params.homogeneousGroupsIds } } } },
-                                    },
-                                  },
-                                },
-                              },
-                            },
-                          },
-                          {
-                            children: {
-                              some: {
-                                children: {
-                                  some: {
-                                    children: {
-                                      some: {
-                                        children: {
-                                          some: { children: { some: { id: { in: params.homogeneousGroupsIds } } } },
-                                        },
-                                      },
-                                    },
-                                  },
-                                },
-                              },
-                            },
-                          },
-                        ],
-                      },
-                    },
-                  },
-                },
-              ],
-            }
-          : {}),
+        ...homogeneousGroupsFilter,
       },
       ...HomogeneousGroupDAO.selectOptions(params),
     });
 
     return HomogeneousGroupMapper.toModels(homogeneousGroups);
+  }
+
+  private async buildHomogeneousGroupsFilter(
+    params: IHomogeneousGroupDAO.FindByIdParams,
+  ): Promise<Prisma.HomogeneousGroupWhereInput> {
+    if (!params.homogeneousGroupsIds?.length) {
+      return {};
+    }
+
+    const filterMode = await resolveHomogeneousGroupFilterMode(this.prisma, {
+      workspaceId: params.workspaceId,
+      homogeneousGroupsIds: params.homogeneousGroupsIds,
+    });
+
+    if (filterMode === 'strict') {
+      return {
+        id: { in: params.homogeneousGroupsIds },
+      };
+    }
+
+    return buildHomogeneousGroupExpandedFilterWhere(params.homogeneousGroupsIds);
   }
 }

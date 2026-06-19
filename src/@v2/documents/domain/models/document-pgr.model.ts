@@ -39,6 +39,7 @@ export class DocumentPGRModel {
     this.hierarchies = params.hierarchies;
     this.homogeneousGroups = params.homogeneousGroups;
     this.exams = params.exams;
+    this.scopeOfSelectedGroupIds = params.scopeOfSelectedGroupIds ?? [];
 
     this.homogeneousGroupsMap = this.getHomogeneousGroupsMap();
     this.hierarchiesMap = this.getHierarchiesMap(this.hierarchies);

@@ -267,13 +267,19 @@ export const allCharacterizationSections = (
   const sectionProfiles: Record<string, (Paragraph | Table)[]> = {};
 
   (type === 'char' ? characterizationTypes : environmentTypes).forEach(({ type, title: titleSection, desc }) => {
+    const selectedIds = new Set(homogeneousGroup.map((group) => group.id));
+
     const environments = homogeneousGroup.filter((e) => {
       if (!e.characterization) return false;
 
       const sameType = e.characterization.type === type;
-      const isProfile = !!e.characterization.profileParentId;
+      const profileParentId = e.characterization.profileParentId;
 
-      return sameType || isProfile;
+      if (profileParentId) {
+        return sameType && selectedIds.has(profileParentId);
+      }
+
+      return sameType;
     });
 
     if (!environments?.length) return;
