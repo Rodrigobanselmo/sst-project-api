@@ -2213,6 +2213,7 @@ model RiskFactorDocument {
   validity     String? //*not used
 
   officialRevisionSeries Int?
+  generationSnapshot     Json?
 
   @@unique([id, companyId])
 }

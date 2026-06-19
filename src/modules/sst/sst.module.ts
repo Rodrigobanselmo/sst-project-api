@@ -56,6 +56,7 @@ import { UpdateGenerateSourceService } from './services/generate-source/update-g
 import { FindByIdDocumentsService } from './services/docVersion/find-by-id-documents/find-by-id-documents.service';
 import { FindDocumentsService } from './services/docVersion/find-documents/find-documents.service';
 import { DeleteDocumentVersionService } from './services/docVersion/delete-document-version/delete-document-version.service';
+import { RegenerateDocumentVersionService } from './services/docVersion/regenerate-document-version/regenerate-document-version.service';
 import { CreateRecMedService } from './services/rec-med/create-rec-med/create-rec-med.service';
 import { DeleteSoftRecMedService } from './services/rec-med/delete-soft-rec-med/delete-soft-rec-med.service';
 import { SyncMissingDerivedMeasureAfterRecMedUpdateService } from './services/rec-med/sync-missing-derived-measure-after-rec-med-update/sync-missing-derived-measure-after-rec-med-update.service';
@@ -158,6 +159,7 @@ import { RiskCatalogEquivalenceModule } from '@/shared/risk-catalog-equivalence/
     FindChecklistDataService,
     FindDocumentsService,
     DeleteDocumentVersionService,
+    RegenerateDocumentVersionService,
     FindEpiService,
     FindExamService,
     FindExamToClinicService,
@@ -219,6 +221,7 @@ import { RiskCatalogEquivalenceModule } from '@/shared/risk-catalog-equivalence/
     RiskRepository,
     RiskGroupDataRepository,
     RiskDocumentRepository,
+    RegenerateDocumentVersionService,
     UpsertManyRiskDataService,
     UpsertRiskDataService,
     RiskDataRepository,

@@ -2,8 +2,11 @@ import { DocumentVersionModel } from '@/@v2/documents/domain/models/document-ver
 import { getMatrizRisk } from '@/@v2/shared/domain/functions/security/get-matrix-risk.func';
 import { sortNumber } from '@/@v2/shared/utils/sorts/number.sort';
 import { sortString } from '@/@v2/shared/utils/sorts/string.sort';
-import dayjs from 'dayjs';
 import { borderStyleGlobal } from '../../../base/config/styles';
+import {
+  formatActionPlanDueText,
+  resolveActionPlanDueDate,
+} from './action-plan-due.util';
 import { matrixRiskMap } from '../../../constants/matriz-risk-map';
 import { originRiskMap } from '../../../constants/origin-risk';
 import { palette } from '../../../constants/palette';
@@ -104,22 +107,16 @@ export const actionPlanConverter = (riskGroup: IRiskGroupDataConverter[], docume
         const dataRecFound = dataRecs?.find((dataRec) => dataRec.recommendationId == rec.id);
         const responsibleName = dataRecFound?.responsibleName || '';
         const statusText = formatStatusLabel(dataRecFound?.status);
-        const level = riskData.riskData.level;
 
-        const getDue = () => {
-          const months = documentVersion.documentBase.data.getMonthsPeriodLevel(level);
+        const { dueDate, resolvedLevel } = resolveActionPlanDueDate({
+          severity: riskData.riskData.risk.severity,
+          probability: riskData.riskData.probability,
+          storedLevel: riskData.riskData.level,
+          endDate: dataRecFound?.endDate ?? null,
+          documentVersion,
+        });
 
-          if (dataRecFound && dataRecFound.endDate) {
-            return dayjs(dataRecFound.endDate);
-          }
-
-          if (months) return dayjs(documentVersion.documentBase.validityStart).add(months + 1, 'months');
-
-          return false;
-        };
-
-        const due = getDue();
-        const dueText = due ? due.format('DD/MM/YY') : level === 6 ? 'ação imediata' : 'sem prazo';
+        const dueText = formatActionPlanDueText(dueDate, resolvedLevel);
 
         cells[ActionPlanColumnEnum.ITEM] = {
           text: '',

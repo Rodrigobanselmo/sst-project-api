@@ -109,6 +109,17 @@ export class DocumentDataRepository {
     return data ? new DocumentDataEntity(data) : null;
   }
 
+  async findByIdForGenerationSnapshot(id: string, companyId: string) {
+    const data = await this.prisma.documentData.findUnique({
+      where: { id_companyId: { id, companyId } },
+      include: {
+        professionalsSignatures: true,
+      },
+    });
+
+    return data ? new DocumentDataEntity(data) : null;
+  }
+
   async incrementOfficialRevisionSeries(id: string, companyId: string) {
     const data = await this.prisma.documentData.update({
       where: { id_companyId: { id, companyId } },

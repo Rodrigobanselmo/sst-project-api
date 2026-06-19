@@ -32,6 +32,7 @@ export class DocumentVersionRepository {
       where: { id: entity.id },
       data: {
         attachments: {
+          deleteMany: {},
           createMany: {
             data: entity.attachments.map(attachment => ({
               url: attachment.url,

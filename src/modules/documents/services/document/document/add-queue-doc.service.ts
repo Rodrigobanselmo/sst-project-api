@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { UploadDocumentDto } from '../../../dto/document.dto';
 import { RiskDocumentRepository } from '../../../../sst/repositories/implementations/RiskDocumentRepository';
+import { RegenerateDocumentVersionService } from '../../../../sst/services/docVersion/regenerate-document-version/regenerate-document-version.service';
 import { SendMessageCommand, SQSClient } from '@aws-sdk/client-sqs';
 import { StatusEnum } from '@prisma/client';
 import { isOfficialDocumentVersion } from '@/@v2/documents/domain/functions/is-revision-controlled-version.func';
@@ -13,7 +14,10 @@ export class AddQueueDocumentService {
   private readonly sqs: SQSClient;
   private readonly queueUrl: string;
 
-  constructor(private readonly riskDocumentRepository: RiskDocumentRepository) {
+  constructor(
+    private readonly riskDocumentRepository: RiskDocumentRepository,
+    private readonly regenerateDocumentVersionService: RegenerateDocumentVersionService,
+  ) {
     this.sqs = new SQSClient({ region: process.env.AWS_SQS_REGION });
     this.queueUrl = process.env.AWS_SQS_PGR_URL;
   }
@@ -38,6 +42,17 @@ export class AddQueueDocumentService {
       ),
     ]);
 
+    const generationSnapshot =
+      await this.regenerateDocumentVersionService.buildSnapshotFromDocumentData(
+        upsertPgrDto.documentDataId,
+        companyId,
+        {
+          ghoIds: upsertPgrDto.ghoIds,
+          filterViewType: upsertPgrDto.filterViewType,
+          selectedFilters: upsertPgrDto.selectedFilters,
+        },
+      );
+
     const riskDoc = await this.riskDocumentRepository.upsert({
       id: upsertPgrDto.id,
       name: upsertPgrDto.name,
@@ -52,6 +67,7 @@ export class AddQueueDocumentService {
       approvedBy: revisionSnapshot?.approvedBy ?? null,
       revisionBy: revisionSnapshot?.revisionBy ?? null,
       elaboratedBy: revisionSnapshot?.elaboratedBy ?? null,
+      generationSnapshot,
       ...(upsertPgrDto.documentDate
         ? { documentDate: upsertPgrDto.documentDate }
         : {}),

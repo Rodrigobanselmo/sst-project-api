@@ -95,6 +95,7 @@ export class RiskDocumentRepository {
     validityMonths,
     validityEndSnapshot,
     officialRevisionSeries,
+    generationSnapshot,
     ...createDto
   }: UpsertRiskDocumentDto): Promise<RiskDocumentEntity> {
     const data = {
@@ -111,6 +112,7 @@ export class RiskDocumentRepository {
       ...(officialRevisionSeries !== undefined
         ? { officialRevisionSeries }
         : {}),
+      ...(generationSnapshot !== undefined ? { generationSnapshot } : {}),
     };
 
     const riskFactorDocEntity = await this.prisma.riskFactorDocument.upsert({
@@ -307,5 +309,40 @@ export class RiskDocumentRepository {
     });
 
     return result.count;
+  }
+
+  async deleteAttachmentsByDocumentVersionId(documentVersionId: string) {
+    await this.prisma.attachments.deleteMany({
+      where: { riskFactorDocumentId: documentVersionId },
+    });
+  }
+
+  async updateForRegeneration(params: {
+    id: string;
+    companyId: string;
+    name: string;
+    description: string;
+    documentDate?: string;
+    approvedBy?: string | null;
+    elaboratedBy?: string | null;
+    revisionBy?: string | null;
+    generationSnapshot: Prisma.InputJsonValue;
+  }) {
+    const riskFactorDocEntity = await this.prisma.riskFactorDocument.update({
+      where: { id_companyId: { id: params.id, companyId: params.companyId } },
+      data: {
+        name: params.name,
+        description: params.description,
+        approvedBy: params.approvedBy,
+        elaboratedBy: params.elaboratedBy,
+        revisionBy: params.revisionBy,
+        generationSnapshot: params.generationSnapshot,
+        status: StatusEnum.PROCESSING,
+        fileUrl: null,
+        ...(params.documentDate ? { documentDate: new Date(params.documentDate) } : {}),
+      },
+    });
+
+    return new RiskDocumentEntity(riskFactorDocEntity);
   }
 }

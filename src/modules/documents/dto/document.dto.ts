@@ -18,6 +18,13 @@ export class UpsertDocumentDto {
   @IsString({ each: true })
   ghoIds?: string[];
 
+  @IsOptional()
+  @IsString()
+  filterViewType?: string;
+
+  @IsOptional()
+  selectedFilters?: Array<{ id: string; name?: string }>;
+
   @IsString()
   name: string;
 

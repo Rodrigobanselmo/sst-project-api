@@ -34,10 +34,14 @@ export class DocumentBaseDataMapper {
       complementarySystems: documentData?.complementarySystems,
       source: documentData?.source,
       visitDate: documentData?.visitDate,
-      monthsPeriodLevel_2: documentData?.months_period_level_2,
-      monthsPeriodLevel_3: documentData?.months_period_level_3,
-      monthsPeriodLevel_4: documentData?.months_period_level_4,
-      monthsPeriodLevel_5: documentData?.months_period_level_5,
+      monthsPeriodLevel_2:
+        data.months_period_level_2 ?? documentData?.months_period_level_2,
+      monthsPeriodLevel_3:
+        data.months_period_level_3 ?? documentData?.months_period_level_3,
+      monthsPeriodLevel_4:
+        data.months_period_level_4 ?? documentData?.months_period_level_4,
+      monthsPeriodLevel_5:
+        data.months_period_level_5 ?? documentData?.months_period_level_5,
       legalResponsibleBy: documentData?.legalResponsibleBy,
     });
   }

@@ -4,6 +4,10 @@ import { Prisma } from '@prisma/client'
 import { IDocumentVersionRepository } from './document-version.types'
 import { DocumentBaseDAO } from '../document-base/document-base.dao'
 import { DocumentVersionMapper } from '../../mappers/document-version.mapper'
+import {
+  applyGenerationSnapshotToDocumentData,
+  resolveSnapshotModelId,
+} from '../../utils/apply-generation-snapshot.util'
 
 
 @Injectable()
@@ -24,7 +28,30 @@ export class DocumentVersionDAO {
       ...DocumentVersionDAO.selectOptions()
     })
 
-    return documentversion ? DocumentVersionMapper.toModel(documentversion) : null
+    if (!documentversion) return null
+
+    const snapshotModelId = resolveSnapshotModelId(
+      documentversion.generationSnapshot,
+      documentversion.documentData.modelId,
+    )
+
+    if (snapshotModelId && snapshotModelId !== documentversion.documentData.modelId) {
+      const model = await this.prisma.documentModel.findUnique({
+        where: { id: snapshotModelId },
+      })
+
+      if (model) {
+        documentversion.documentData.model = model
+        documentversion.documentData.modelId = model.id
+      }
+    }
+
+    applyGenerationSnapshotToDocumentData(
+      documentversion.documentData,
+      documentversion.generationSnapshot,
+    )
+
+    return DocumentVersionMapper.toModel(documentversion)
   }
 
   async updateDocumentDate(id: string, documentDate: Date) {

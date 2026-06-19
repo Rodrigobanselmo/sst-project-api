@@ -1,6 +1,7 @@
 import { StatusEnum } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import { IsDateString, IsEnum, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { Prisma } from '@prisma/client';
 import { StringCapitalizeParagraphTransform } from '../../../shared/transformers/string-capitalize-paragraph';
 
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
@@ -82,6 +83,9 @@ export class UpsertRiskDocumentDto {
   @IsOptional()
   @IsDateString()
   validityEndSnapshot?: string;
+
+  @IsOptional()
+  generationSnapshot?: Prisma.InputJsonValue;
 
   @ValidateNested({ each: true })
   @IsOptional()

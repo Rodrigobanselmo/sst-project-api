@@ -1,4 +1,4 @@
-import { RiskFactorDocument, StatusEnum } from '@prisma/client';
+import { Prisma, RiskFactorDocument, StatusEnum } from '@prisma/client';
 import { CompanyEntity } from '../../company/entities/company.entity';
 import { AttachmentEntity } from './attachment.entity';
 import { DocumentDataEntity } from './documentData.entity';
@@ -32,6 +32,7 @@ export class RiskDocumentEntity implements RiskFactorDocument {
   documentData?: DocumentDataEntity;
   documentDataId: string;
   officialRevisionSeries: number | null;
+  generationSnapshot: Prisma.JsonValue | null;
 
   constructor(partial: Partial<RiskDocumentEntity>) {
     Object.assign(this, partial);
