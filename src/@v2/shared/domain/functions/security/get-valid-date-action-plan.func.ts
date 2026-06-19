@@ -18,6 +18,7 @@ export const getValidDateActionPlan = ({ endDate, level, periods, validityStart 
   if (endDate) return endDate;
   if (!validityStart) return null;
 
+  if (level == 1) return dateUtils(validityStart).addMonths(periods.monthsLevel_2);
   if (level == 2) return dateUtils(validityStart).addMonths(periods.monthsLevel_2);
   if (level == 3) return dateUtils(validityStart).addMonths(periods.monthsLevel_3);
   if (level == 4) return dateUtils(validityStart).addMonths(periods.monthsLevel_4);

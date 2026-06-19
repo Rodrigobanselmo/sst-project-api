@@ -26,6 +26,7 @@ const RESOLVED_ACTION_PLAN_VALID_DATE_EXPRESSION = `
   CASE
     WHEN rfd_rec."endDate" IS NOT NULL THEN rfd_rec."endDate"
     WHEN dd."validityStart" IS NULL THEN NULL::timestamp
+    WHEN (${RESOLVED_OCCUPATIONAL_RISK_LEVEL_EXPRESSION}) = 1 THEN dd."validityStart" + dd.months_period_level_2 * INTERVAL '1 month'
     WHEN (${RESOLVED_OCCUPATIONAL_RISK_LEVEL_EXPRESSION}) = 2 THEN dd."validityStart" + dd.months_period_level_2 * INTERVAL '1 month'
     WHEN (${RESOLVED_OCCUPATIONAL_RISK_LEVEL_EXPRESSION}) = 3 THEN dd."validityStart" + dd.months_period_level_3 * INTERVAL '1 month'
     WHEN (${RESOLVED_OCCUPATIONAL_RISK_LEVEL_EXPRESSION}) = 4 THEN dd."validityStart" + dd.months_period_level_4 * INTERVAL '1 month'

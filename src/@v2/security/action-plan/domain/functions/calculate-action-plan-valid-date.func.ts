@@ -1,4 +1,4 @@
-import { dateUtils } from '@/@v2/shared/utils/helpers/date-utils';
+import { getValidDateActionPlan } from '@/@v2/shared/domain/functions/security/get-valid-date-action-plan.func';
 
 export const calculateActionPlanValidDate = (data: {
   level: number | null;
@@ -8,15 +8,15 @@ export const calculateActionPlanValidDate = (data: {
   monthsPeriodLevel_4: number;
   monthsPeriodLevel_5: number;
   validityStart: Date | null;
-}): Date | null => {
-  if (data.validDate) return data.validDate;
-  if (!data.level) return null;
-  if (!data.validityStart) return null;
-
-  if (data.level === 2) return dateUtils(data.validityStart).addMonths(data.monthsPeriodLevel_2);
-  if (data.level === 3) return dateUtils(data.validityStart).addMonths(data.monthsPeriodLevel_3);
-  if (data.level === 4) return dateUtils(data.validityStart).addMonths(data.monthsPeriodLevel_4);
-  if (data.level === 5) return dateUtils(data.validityStart).addMonths(data.monthsPeriodLevel_5);
-
-  return null;
-};
+}): Date | null =>
+  getValidDateActionPlan({
+    endDate: data.validDate,
+    level: data.level,
+    validityStart: data.validityStart,
+    periods: {
+      monthsLevel_2: data.monthsPeriodLevel_2,
+      monthsLevel_3: data.monthsPeriodLevel_3,
+      monthsLevel_4: data.monthsPeriodLevel_4,
+      monthsLevel_5: data.monthsPeriodLevel_5,
+    },
+  });
