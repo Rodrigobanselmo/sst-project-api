@@ -8,6 +8,7 @@ import { CharacterizationTypeEnum } from '@/@v2/shared/domain/enum/security/char
 import { HomoTypeEnum } from '@/@v2/shared/domain/enum/security/homo-type.enum';
 import { RecommendationTypeEnum } from '@/@v2/shared/domain/enum/security/recommendation-type.enum';
 import { RiskTypeEnum } from '@/@v2/shared/domain/enum/security/risk-type.enum';
+import { resolveOccupationalRiskLevel } from '@/@v2/shared/domain/functions/security/resolve-occupational-risk-level.func';
 import { IRiskLevelValues } from '@/@v2/shared/domain/types/security/risk-level-values.type';
 import {
   RiskFactorsEnum,
@@ -24,6 +25,8 @@ export type IActionPlanBrowseResultModelMapper = {
   rfd_id: string;
   rfd_created_at: Date;
   rfd_level: number | null;
+  rfd_probability: number | null;
+  risk_severity: number | null;
   rfd_rec_id: string | null;
   rfd_rec_updated_at: Date | null;
   rfd_rec_start_date: Date | null;
@@ -82,7 +85,11 @@ export class ActionPlanBrowseResultModelMapper {
       canceledDate: prisma.rfd_rec_canceled_date,
       createdAt: prisma.rfd_created_at,
       doneDate: prisma.rfd_rec_done_date,
-      ocupationalRisk: prisma.rfd_level as IRiskLevelValues,
+      ocupationalRisk: resolveOccupationalRiskLevel(
+        prisma.risk_severity,
+        prisma.rfd_probability,
+        prisma.rfd_level,
+      ) as IRiskLevelValues | null,
       startDate: prisma.rfd_rec_start_date,
       status: prisma.rfd_rec_status ? ActionPlanStatusEnum[prisma.rfd_rec_status] : ActionPlanStatusEnum.PENDING,
       updatedAt: prisma.rfd_rec_updated_at,

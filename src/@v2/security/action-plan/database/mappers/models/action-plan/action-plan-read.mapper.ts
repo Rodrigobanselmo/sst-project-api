@@ -2,7 +2,8 @@ import { ActionPlanReadPhotoModel } from '@/@v2/security/action-plan/domain/mode
 import { ActionPlanReadModel } from '@/@v2/security/action-plan/domain/models/action-plan/action-plan-read.model';
 import { ActionPlanStatusEnum } from '@/@v2/security/action-plan/domain/enums/action-plan-status.enum';
 import { EffectivenessStatusEnum } from '@/@v2/security/action-plan/domain/enums/effectiveness-status.enum';
-import { calculateActionPlanValidDate } from '@/@v2/security/action-plan/domain/functions/calculate-action-plan-valid-date.func';
+import { resolveOccupationalRiskLevel } from '@/@v2/shared/domain/functions/security/resolve-occupational-risk-level.func';
+import { getValidDateActionPlan } from '@/@v2/shared/domain/functions/security/get-valid-date-action-plan.func';
 import { HierarchyTypeEnum } from '@/@v2/shared/domain/enum/company/hierarchy-type.enum';
 import { CharacterizationTypeEnum } from '@/@v2/shared/domain/enum/security/characterization-type.enum';
 import { HomoTypeEnum } from '@/@v2/shared/domain/enum/security/homo-type.enum';
@@ -85,6 +86,8 @@ export type IActionPlanReadMapper = {
   } | null;
 
   riskLevel: number | null;
+  riskProbability: number | null;
+  riskSeverity: number | null;
   exposedWorkersCount: number;
 
   params: IActionPlanDAO.FindParams;
@@ -98,6 +101,8 @@ export class ActionPlanReadMapper {
     generateSources,
     documentData,
     riskLevel,
+    riskProbability,
+    riskSeverity,
     exposedWorkersCount,
     params,
   }: IActionPlanReadMapper): ActionPlanReadModel {
@@ -118,14 +123,18 @@ export class ActionPlanReadMapper {
       type: homogeneousGroup.type as HomoTypeEnum,
     });
 
-    const validDate = calculateActionPlanValidDate({
-      level: riskLevel,
-      monthsPeriodLevel_2: documentData?.months_period_level_2 ?? 24,
-      monthsPeriodLevel_3: documentData?.months_period_level_3 ?? 12,
-      monthsPeriodLevel_4: documentData?.months_period_level_4 ?? 6,
-      monthsPeriodLevel_5: documentData?.months_period_level_5 ?? 3,
+    const resolvedLevel = resolveOccupationalRiskLevel(riskSeverity, riskProbability, riskLevel);
+
+    const validDate = getValidDateActionPlan({
+      level: resolvedLevel,
+      endDate: actionPlan?.endDate ?? null,
       validityStart: documentData?.validityStart ?? null,
-      validDate: actionPlan?.endDate ?? null,
+      periods: {
+        monthsLevel_2: documentData?.months_period_level_2 ?? 24,
+        monthsLevel_3: documentData?.months_period_level_3 ?? 12,
+        monthsLevel_4: documentData?.months_period_level_4 ?? 6,
+        monthsLevel_5: documentData?.months_period_level_5 ?? 3,
+      },
     });
 
     return new ActionPlanReadModel({

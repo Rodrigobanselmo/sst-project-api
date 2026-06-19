@@ -9,6 +9,7 @@ import { PrismaService } from '../../../../prisma/prisma.service';
 import { FindRiskDataDto, UpsertManyRiskDataDto, UpsertRiskDataDto } from '../../dto/risk-data.dto';
 import { IRiskFactorDataEntity, RiskFactorDataEntity } from '../../entities/riskData.entity';
 import { Prisma, PrismaPromise, StatusEnum } from '@prisma/client';
+import { isPersistableOccupationalRiskLevel } from '@/@v2/shared/domain/functions/security/resolve-occupational-risk-level.func';
 import { getMatrizRisk } from '../../../../shared/utils/matriz';
 import { EpiRiskDataEntity } from '../../entities/epiRiskData.entity';
 import { EpiRoRiskDataDto } from '../../dto/epi-risk-data.dto';
@@ -123,7 +124,7 @@ export class RiskDataRepository {
 
   async upsert(upsertRiskDataDto: Omit<UpsertRiskDataDto, 'keepEmpty' | 'type'>): Promise<RiskFactorDataEntity> {
     const level = await this.addLevel(upsertRiskDataDto);
-    if (level) upsertRiskDataDto.level = level;
+    if (isPersistableOccupationalRiskLevel(level)) upsertRiskDataDto.level = level;
 
     const riskFactorData = await this.upsertPrisma(upsertRiskDataDto);
 
@@ -138,7 +139,7 @@ export class RiskDataRepository {
       delete upsertManyRiskDataDto.riskIds;
 
       const level = await this.addLevel(upsertManyRiskDataDto);
-      if (level) upsertManyRiskDataDto.level = level;
+      if (isPersistableOccupationalRiskLevel(level)) upsertManyRiskDataDto.level = level;
 
       const data = await Promise.all(
         homogeneousGroupIds.map(async (homogeneousGroupId) =>
@@ -162,7 +163,7 @@ export class RiskDataRepository {
       delete upsertManyRiskDataDto.riskIds;
 
       const level = await this.addLevel(upsertManyRiskDataDto);
-      if (level) upsertManyRiskDataDto.level = level;
+      if (isPersistableOccupationalRiskLevel(level)) upsertManyRiskDataDto.level = level;
 
       const data = await Promise.all(
         homogeneousGroupIds.map(async (homogeneousGroupId) =>
@@ -871,7 +872,9 @@ export class RiskDataRepository {
       if (risk && risk.severity) {
         const matriz = getMatrizRisk(risk.severity, realProbability);
 
-        level = matriz.level;
+        if (isPersistableOccupationalRiskLevel(matriz.level)) {
+          level = matriz.level;
+        }
       }
     }
 

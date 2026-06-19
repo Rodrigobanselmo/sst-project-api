@@ -18,6 +18,11 @@ import { LocalContext, UserContext } from '@/@v2/shared/adapters/context';
 import { SharedTokens } from '@/@v2/shared/constants/tokens';
 import { ContextKey } from '@/@v2/shared/adapters/context/types/enum/context-key.enum';
 import { buildGhoExposedWorkersCte, getExposedWorkersCountByGhoIds } from '../../utils/get-exposed-workers-count-by-gho-ids.util';
+import {
+  resolvedActionPlanValidDateSql,
+  resolvedOccupationalRiskLevelOrderByExpression,
+  resolvedOccupationalRiskLevelSql,
+} from '../../utils/action-plan-resolved-level.sql.util';
 
 @Injectable()
 export class ActionPlanDAO {
@@ -198,6 +203,12 @@ export class ActionPlanDAO {
       },
       select: {
         level: true,
+        probability: true,
+        riskFactor: {
+          select: {
+            severity: true,
+          },
+        },
       },
     });
 
@@ -252,6 +263,8 @@ export class ActionPlanDAO {
           generateSources: generateSourcesData?.generateSources || [],
           documentData,
           riskLevel: riskFactorData?.level ?? null,
+          riskProbability: riskFactorData?.probability ?? null,
+          riskSeverity: riskFactorData?.riskFactor?.severity ?? null,
           exposedWorkersCount: exposedWorkersByGho[homogeneousGroup.id] ?? 0,
           params,
         })
@@ -287,6 +300,7 @@ export class ActionPlanDAO {
         rfd."id" AS rfd_id,
         rfd."createdAt" AS rfd_created_at, 
         rfd."level" AS rfd_level,
+        rfd."probability" AS rfd_probability,
         rfd_rec."id" AS rfd_rec_id,
         rfd_rec."updated_at" AS rfd_rec_updated_at,
         rfd_rec."startDate" AS rfd_rec_start_date,
@@ -313,6 +327,7 @@ export class ActionPlanDAO {
         risk."id" AS risk_id,
         risk."name" AS risk_name,
         risk."type" AS risk_type,
+        risk."severity" AS risk_severity,
         hg."type" AS hg_type,
         hg."id" AS hg_id,
         hg."name" AS hg_name,
@@ -331,16 +346,7 @@ export class ActionPlanDAO {
           END
         ))[1] AS origin,
         (array_agg(
-          CASE 
-            WHEN rfd_rec."endDate" IS NOT NULL THEN rfd_rec."endDate" 
-            WHEN dd."validityStart" IS NULL THEN NULL::timestamp 
-            WHEN rfd."level" = 2 THEN dd."validityStart" + dd.months_period_level_2 * INTERVAL '1 month' 
-            WHEN rfd."level" = 3 THEN dd."validityStart" + dd.months_period_level_3 * INTERVAL '1 month' 
-            WHEN rfd."level" = 4 THEN dd."validityStart" + dd.months_period_level_4 * INTERVAL '1 month' 
-            WHEN rfd."level" = 5 THEN dd."validityStart" + dd.months_period_level_5 * INTERVAL '1 month' 
-            WHEN rfd."level" = 6 THEN dd."validityStart"
-            ELSE NULL::timestamp 
-          END
+          ${resolvedActionPlanValidDateSql}
         ))[1] AS valid_date,
         COALESCE(
           JSON_AGG(DISTINCT JSONB_BUILD_OBJECT('name', gs."name", 'id', gs."id")) 
@@ -450,6 +456,7 @@ export class ActionPlanDAO {
         rfd."id",
         rfd."createdAt",
         rfd."level",
+        rfd."probability",
         rec."recName",
         rfd_rec."id",
         rfd_rec."updated_at",
@@ -477,6 +484,7 @@ export class ActionPlanDAO {
         risk."id",
         risk."name",
         risk."type",
+        risk."severity",
         hg."id",
         hg."type",
         hg."name",
@@ -804,7 +812,7 @@ export class ActionPlanDAO {
     }
 
     if (filters.occupationalRisks?.length) {
-      where.push(Prisma.sql`rfd."level" IN (${Prisma.join(filters.occupationalRisks)})`);
+      where.push(Prisma.sql`(${resolvedOccupationalRiskLevelSql}) IN (${Prisma.join(filters.occupationalRisks)})`);
     }
 
     if (filters.status?.length) {
@@ -830,17 +838,8 @@ export class ActionPlanDAO {
     }
 
     if (typeof filters.isExpired === 'boolean') {
-      having.push(Prisma.sql` 
-        CASE 
-          WHEN rfd_rec."endDate" IS NOT NULL THEN rfd_rec."endDate" 
-          WHEN dd."validityStart" IS NULL THEN NULL::timestamp 
-          WHEN rfd."level" = 2 THEN dd."validityStart" + dd.months_period_level_2 * INTERVAL '1 month' 
-          WHEN rfd."level" = 3 THEN dd."validityStart" + dd.months_period_level_3 * INTERVAL '1 month' 
-          WHEN rfd."level" = 4 THEN dd."validityStart" + dd.months_period_level_4 * INTERVAL '1 month' 
-          WHEN rfd."level" = 5 THEN dd."validityStart" + dd.months_period_level_5 * INTERVAL '1 month' 
-          WHEN rfd."level" = 6 THEN dd."validityStart"
-          ELSE NULL::timestamp 
-        END 
+      having.push(Prisma.sql`
+        (${resolvedActionPlanValidDateSql})
         ${filters.isExpired ? Prisma.sql`<=` : Prisma.sql`>`} NOW()`);
     }
 
@@ -994,12 +993,7 @@ export class ActionPlanDAO {
       `,
       [ActionPlanOrderByEnum.ORIGIN]: 'origin',
       [ActionPlanOrderByEnum.VALID_DATE]: `valid_date`,
-      [ActionPlanOrderByEnum.LEVEL]: `
-        CASE
-          WHEN rfd."level" IS NULL THEN 0
-          ELSE rfd."level"
-        END
-      `,
+      [ActionPlanOrderByEnum.LEVEL]: resolvedOccupationalRiskLevelOrderByExpression,
       [ActionPlanOrderByEnum.EXPOSED_WORKERS]: 'exposed_workers_count',
     };
 
