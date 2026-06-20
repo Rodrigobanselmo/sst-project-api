@@ -66,6 +66,7 @@ export class TableBodyElements {
             size: 6,
             color: palette.text.main.string,
             alignment: AlignmentType.CENTER,
+            lineHeight: 1,
             spacing: {
               before: 0,
               after: 0,

@@ -255,22 +255,20 @@ export const textLink = (text: string, options = {} as ParagraphProps) => {
 export const paragraphTable = (text: string, options = {} as ParagraphProps) =>
   paragraphNewNormal(normalizeDocxTableCaptionText(text), {
     ...options,
+    style: 'Caption',
     children: [
       new TextRun({
         text: 'Tabela ',
         size: 16,
       }),
-      new TextRun({
-        size: 16,
-        children: [new SequentialIdentifier('Table')],
-      }),
+      new SequentialIdentifier('Table'),
       new TextRun({
         text: ': ',
         size: 16,
       }),
     ],
     size: 8,
-    spacing: { after: 70 },
+    spacing: { after: 70, ...options.spacing },
   });
 
 export const paragraphTableLegend = (text: string, options = {} as ParagraphProps) =>
@@ -285,21 +283,19 @@ export const paragraphFigure = (text: string, options = {} as ParagraphProps & {
   text
     ? paragraphNewNormal(text, {
         ...options,
+        style: 'Caption',
         children: [
           new TextRun({
             text: 'Figura ',
             size: 16,
           }),
-          new TextRun({
-            size: 16,
-            children: [new SequentialIdentifier('Figure')],
-          }),
+          new SequentialIdentifier('Figure'),
           new TextRun({
             text: ': ',
             size: 16,
           }),
         ],
         size: 8,
-        spacing: { after: options?.spacingAfter ?? 70 },
+        spacing: { after: options?.spacingAfter ?? 70, ...options.spacing },
       })
     : undefined;

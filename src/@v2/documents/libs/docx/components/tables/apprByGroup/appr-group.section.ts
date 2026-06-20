@@ -12,6 +12,7 @@ import { firstRiskInventoryTableSection } from './parts/first/first.table';
 import { secondRiskInventoryTableSection } from './parts/second/second.table';
 import { thirdRiskInventoryTableSection } from './parts/third/third.table';
 import { epiRiskInventoryTableSection } from './parts/epi/epi.table';
+import { resolveHomogeneousGroupInventoryDescription } from '../appr/resolve-homogeneous-group-description.util';
 
 export interface IAPPRTableOptions {
   isHideCA: boolean;
@@ -189,13 +190,13 @@ export const getHomoGroupName = (homo: IGHODataConverter, hierarchyTree?: IHiera
 
   if (homo.gho.isEnviroment && homo.gho.characterization) {
     typeOrigin = 'GSE Desenvolvido (Ambiente)';
-    desc = homo.gho.characterization.description || '';
+    desc = resolveHomogeneousGroupInventoryDescription(homo.gho, hierarchyTree);
     nameOrigin = `${homo.gho.characterization.name} (${originRiskMap[homo.gho.characterization.type].name})`;
   }
 
   if (homo.gho.isCharacterization && homo.gho.characterization) {
     typeOrigin = `GSE Desenvolvido (${originRiskMap[homo.gho.characterization.type].name})`;
-    desc = homo.gho.characterization.description || '';
+    desc = resolveHomogeneousGroupInventoryDescription(homo.gho, hierarchyTree);
     nameOrigin = `${homo.gho.characterization.name} `;
   }
 
@@ -205,18 +206,18 @@ export const getHomoGroupName = (homo: IGHODataConverter, hierarchyTree?: IHiera
     if (hierarchy) {
       typeOrigin = `GSE Desenvolvido (${originRiskMap[hierarchy.type].name})`;
       nameOrigin = `${hierarchy.name}`;
-      desc = hierarchy.realDescription;
+      desc = resolveHomogeneousGroupInventoryDescription(homo.gho, hierarchyTree);
       descRh = hierarchy.description;
     } else {
       typeOrigin = 'GSE Desenvolvido';
       nameOrigin = homo.gho.name || homo.gho.id;
-      desc = homo.gho.description || '';
+      desc = resolveHomogeneousGroupInventoryDescription(homo.gho, hierarchyTree);
     }
   }
 
   if (!homo.gho.type) {
     typeOrigin = 'GSE';
-    desc = homo.gho.description;
+    desc = resolveHomogeneousGroupInventoryDescription(homo.gho, hierarchyTree);
     nameOrigin = homo.gho.name;
   }
 

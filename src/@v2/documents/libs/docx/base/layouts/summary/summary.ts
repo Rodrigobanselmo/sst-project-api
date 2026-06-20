@@ -8,6 +8,7 @@ const summaryText = (text: string) =>
       new TextRun({
         text: text,
         size: 24,
+        bold: true,
       }),
     ],
     alignment: AlignmentType.CENTER,
@@ -37,8 +38,8 @@ export const summarySections = (): ISectionOptions[] => [
   },
   {
     children: [
-      summaryText('Índice de imagens'),
-      new TableOfContents('Imagens', {
+      summaryText('Índice de figuras'),
+      new TableOfContents('Figuras', {
         hyperlink: true,
         captionLabelIncludingNumbers: 'Figure',
       }),

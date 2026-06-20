@@ -1,4 +1,4 @@
-import dayjs from 'dayjs';
+import { formatVisitDateForDocument } from '@/@v2/documents/libs/docx/helpers/format-visit-date.util';
 import { AlignmentType } from 'docx';
 
 import { HierarchyMapData, IDocumentRiskGroupDataConverter, IHomoGroupMap } from '../../../../../converter/hierarchy.converter';
@@ -24,7 +24,8 @@ export const documentConverter = (riskFactorGroupData: IDocumentRiskGroupDataCon
   docData[FirstRiskInventoryColumnEnum.REVIEW] = riskFactorGroupData.documentVersion.documentBase.revisionBy || '';
   docData[FirstRiskInventoryColumnEnum.ELABORATION_BY] = riskFactorGroupData.documentVersion.documentBase.elaboratedBy || '';
   docData[FirstRiskInventoryColumnEnum.APPROVE_BY] = riskFactorGroupData.documentVersion.documentBase.approvedBy || '';
-  docData[FirstRiskInventoryColumnEnum.DATA] = dayjs(riskFactorGroupData.documentVersion.documentBase.data.visitDate).format('DD/MM/YYYY') || '';
+  docData[FirstRiskInventoryColumnEnum.DATA] =
+    formatVisitDateForDocument(riskFactorGroupData.documentVersion.documentBase.data.visitDate);
   docData[FirstRiskInventoryColumnEnum.UNIT] = hierarchy.workspace || '';
 
   rows.push(
