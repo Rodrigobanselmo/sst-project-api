@@ -1,5 +1,7 @@
 import { Prisma } from '@prisma/client';
 
+import { DocumentGenerationRiskFilterSnapshot } from './document-generation-risk-filter.type';
+
 export type DocumentGenerationProfessionalSnapshot = {
   professionalId: number;
   isSigner?: boolean;
@@ -20,6 +22,7 @@ export type DocumentGenerationSnapshot = {
   legalResponsibleBy?: string;
   json?: Prisma.JsonValue;
   professionalSignatures?: DocumentGenerationProfessionalSnapshot[];
+  riskFilter?: DocumentGenerationRiskFilterSnapshot;
 };
 
 export const parseDocumentGenerationSnapshot = (
@@ -41,6 +44,7 @@ export const buildDocumentGenerationSnapshot = (params: {
   legalResponsibleBy?: string;
   json?: Prisma.JsonValue;
   professionalSignatures?: DocumentGenerationProfessionalSnapshot[];
+  riskFilter?: DocumentGenerationRiskFilterSnapshot;
 }): DocumentGenerationSnapshot => ({
   ...(params.ghoIds?.length ? { ghoIds: params.ghoIds } : {}),
   ...(params.filterViewType ? { filterViewType: params.filterViewType } : {}),
@@ -57,4 +61,5 @@ export const buildDocumentGenerationSnapshot = (params: {
   ...(params.professionalSignatures?.length
     ? { professionalSignatures: params.professionalSignatures }
     : {}),
+  ...(params.riskFilter ? { riskFilter: params.riskFilter } : {}),
 });

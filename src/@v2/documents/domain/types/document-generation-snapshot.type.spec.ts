@@ -6,7 +6,7 @@ import {
 } from '@/@v2/documents/domain/types/document-generation-snapshot.type';
 
 describe('document generation snapshot', () => {
-  it('builds snapshot with filters and model metadata', () => {
+  it('builds snapshot with filters, model metadata and risk filter', () => {
     const snapshot = buildDocumentGenerationSnapshot({
       ghoIds: ['gho-1', 'gho-2'],
       filterViewType: 'ENVIRONMENT',
@@ -16,6 +16,10 @@ describe('document generation snapshot', () => {
       legalResponsibleBy: 'Responsável',
       json: { source: 'Fonte' },
       professionalSignatures: [{ professionalId: 1, isSigner: true }],
+      riskFilter: {
+        mode: 'EXCLUDE',
+        excludedCategoryIds: ['FIS' as any],
+      },
     });
 
     expect(snapshot).toEqual({
@@ -27,6 +31,10 @@ describe('document generation snapshot', () => {
       legalResponsibleBy: 'Responsável',
       json: { source: 'Fonte' },
       professionalSignatures: [{ professionalId: 1, isSigner: true }],
+      riskFilter: {
+        mode: 'EXCLUDE',
+        excludedCategoryIds: ['FIS'],
+      },
     });
   });
 

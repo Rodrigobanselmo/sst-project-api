@@ -1,9 +1,10 @@
 import { DocumentTypeEnum, StatusEnum } from '@prisma/client';
-import { Transform } from 'class-transformer';
-import { IsArray, IsDateString, IsEnum, IsOptional, IsString } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import { IsArray, IsDateString, IsEnum, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
+import { DocumentGenerationRiskFilterDto } from './document-generation-risk-filter.dto';
 
 export class UpsertDocumentDto {
   @IsString()
@@ -24,6 +25,11 @@ export class UpsertDocumentDto {
 
   @IsOptional()
   selectedFilters?: Array<{ id: string; name?: string }>;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => DocumentGenerationRiskFilterDto)
+  riskFilter?: DocumentGenerationRiskFilterDto;
 
   @IsString()
   name: string;

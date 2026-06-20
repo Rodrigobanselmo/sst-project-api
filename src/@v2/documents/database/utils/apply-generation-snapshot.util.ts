@@ -4,6 +4,10 @@ import {
   DocumentGenerationSnapshot,
   parseDocumentGenerationSnapshot,
 } from '@/@v2/documents/domain/types/document-generation-snapshot.type';
+import {
+  DocumentGenerationRiskFilterSnapshot,
+  parseDocumentGenerationRiskFilter,
+} from '@/@v2/documents/domain/types/document-generation-risk-filter.type';
 
 type DocumentDataWithRelations = DocumentData & {
   professionalsSignatures?: Array<{
@@ -77,4 +81,11 @@ export const getSnapshotGhoIds = (snapshotValue: unknown): string[] | undefined 
   return snapshot?.ghoIds?.length ? snapshot.ghoIds : undefined;
 };
 
-export type { DocumentGenerationSnapshot };
+export const getSnapshotRiskFilter = (
+  snapshotValue: unknown,
+): DocumentGenerationRiskFilterSnapshot | undefined => {
+  const snapshot = parseDocumentGenerationSnapshot(snapshotValue);
+  return parseDocumentGenerationRiskFilter(snapshot?.riskFilter);
+};
+
+export type { DocumentGenerationSnapshot, DocumentGenerationRiskFilterSnapshot };

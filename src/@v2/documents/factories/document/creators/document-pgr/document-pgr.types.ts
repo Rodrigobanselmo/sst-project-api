@@ -3,5 +3,6 @@ export namespace ICreatorDocumentPGR {
     documentVersionId: string;
     homogeneousGroupsIds?: string[];
     documentDate?: string;
+    riskFilter?: import('@/@v2/documents/domain/types/document-generation-risk-filter.type').DocumentGenerationRiskFilterSnapshot;
   };
 }

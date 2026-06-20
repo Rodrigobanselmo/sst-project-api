@@ -1,11 +1,15 @@
 import { isFrpsRisk } from '@/@v2/documents/domain/functions/is-frps-risk.func';
+import {
+  applyDocumentRiskFilterToPgrModel,
+  countDocumentPgrRiskData,
+} from '@/@v2/documents/domain/functions/apply-document-risk-filter.util';
 import { DocumentPGRModel } from '@/@v2/documents/domain/models/document-pgr.model';
 import {
   applyDocumentEmissionDateToPgrModel,
   parseDocumentEmissionDate,
 } from '@/@v2/documents/libs/docx/helpers/document-emission-date.util';
 import { HomogeneousGroupModel } from '@/@v2/documents/domain/models/homogeneous-group.model';
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { DocumentVersionDAO } from '../document-version/document-version.dao';
 import { ExamDAO } from '../exam/exam.dao';
 import { HierarchyDAO } from '../hierarchy/hierarchy.dao';
@@ -46,17 +50,33 @@ export class DocumentDAO {
       scopeOfSelectedGroupIds: params.homogeneousGroupsIds || [],
     });
 
+    const filteredDocumentModel = applyDocumentRiskFilterToPgrModel(
+      documentModel,
+      params.riskFilter,
+    );
+
+    if (
+      params.riskFilter &&
+      countDocumentPgrRiskData(filteredDocumentModel) === 0
+    ) {
+      throw new BadRequestException(
+        'O filtro de riscos removeu todos os fatores de risco do escopo selecionado.',
+      );
+    }
+
     logPgrDiagnostic('pgr_model', {
       documentVersionId: params.documentVersionId,
       scopeOfSelectedGroupIdsCount: params.homogeneousGroupsIds?.length ?? 0,
       scopeOfSelectedGroupIds: params.homogeneousGroupsIds ?? [],
       homogeneousGroupsInModel: homogeneousGroups.length,
       hierarchiesInModel: hierarchies.length,
+      riskFilterApplied: Boolean(params.riskFilter),
+      risksAfterFilter: countDocumentPgrRiskData(filteredDocumentModel),
     });
 
-    await this.applyEmissionDate(documentModel, params.documentDate);
+    await this.applyEmissionDate(filteredDocumentModel, params.documentDate);
 
-    return documentModel;
+    return filteredDocumentModel;
   }
 
   private async applyEmissionDate(

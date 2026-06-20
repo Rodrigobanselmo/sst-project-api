@@ -16,10 +16,10 @@ export class CreatorDocumentPGR {
     protected readonly donwloadImageService: DownloadImageService,
   ) {}
 
-  async execute({ documentVersionId, homogeneousGroupsIds, documentDate }: ICreatorDocumentPGR.Params) {
+  async execute({ documentVersionId, homogeneousGroupsIds, documentDate, riskFilter }: ICreatorDocumentPGR.Params) {
     await this.documentCreationService.execute({
       product: this.factoryMethod(),
-      body: { documentVersionId, homogeneousGroupsIds, documentDate },
+      body: { documentVersionId, homogeneousGroupsIds, documentDate, riskFilter },
     });
   }
 

@@ -10,6 +10,7 @@ import {
   buildDocumentGenerationSnapshot,
   DocumentGenerationSnapshot,
 } from '@/@v2/documents/domain/types/document-generation-snapshot.type';
+import { parseDocumentGenerationRiskFilter } from '@/@v2/documents/domain/types/document-generation-risk-filter.type';
 import { isUnofficialDocumentVersion } from '@/@v2/documents/domain/functions/is-revision-controlled-version.func';
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { UploadDocumentDto } from '../../../../documents/dto/document.dto';
@@ -96,6 +97,7 @@ export class RegenerateDocumentVersionService {
       companyId,
       ghoIds: generationSnapshot.ghoIds,
       filterViewType: generationSnapshot.filterViewType,
+      riskFilter: generationSnapshot.riskFilter,
       documentDate: body.documentDate,
       type: documentData.type,
       status: StatusEnum.PROCESSING,
@@ -120,6 +122,7 @@ export class RegenerateDocumentVersionService {
       ghoIds?: string[];
       filterViewType?: string;
       selectedFilters?: Array<{ id: string; name?: string }>;
+      riskFilter?: RegenerateDocumentVersionDto['riskFilter'];
     },
   ): Promise<DocumentGenerationSnapshot> {
     const documentData = await this.documentDataRepository.findByIdForGenerationSnapshot(
@@ -135,6 +138,7 @@ export class RegenerateDocumentVersionService {
       ghoIds: params.ghoIds,
       filterViewType: params.filterViewType,
       selectedFilters: params.selectedFilters,
+      riskFilter: parseDocumentGenerationRiskFilter(params.riskFilter),
       modelId: documentData.modelId,
       coordinatorBy: documentData.coordinatorBy,
       legalResponsibleBy: this.extractLegalResponsibleBy(documentData.json),
@@ -156,6 +160,7 @@ export class RegenerateDocumentVersionService {
       ghoIds: body.ghoIds,
       filterViewType: body.filterViewType,
       selectedFilters: body.selectedFilters,
+      riskFilter: parseDocumentGenerationRiskFilter(body.riskFilter),
       modelId: body.modelId,
       coordinatorBy: body.coordinatorBy,
       legalResponsibleBy: body.legalResponsibleBy,

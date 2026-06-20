@@ -4,5 +4,6 @@ export namespace IDocumentDAO {
     homogeneousGroupsIds?: string[];
     /** Fallback da fila quando o registro ainda não tem documentDate persistido. */
     documentDate?: string;
+    riskFilter?: import('@/@v2/documents/domain/types/document-generation-risk-filter.type').DocumentGenerationRiskFilterSnapshot;
   };
 }

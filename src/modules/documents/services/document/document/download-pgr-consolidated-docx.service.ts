@@ -15,6 +15,10 @@ import { Packer } from 'docx';
 import { unlinkSync } from 'fs';
 
 import { RiskDocumentRepository } from '../../../../sst/repositories/implementations/RiskDocumentRepository';
+import {
+  getSnapshotGhoIds,
+  getSnapshotRiskFilter,
+} from '@/@v2/documents/database/utils/apply-generation-snapshot.util';
 
 /**
  * Deve ficar em DocumentsModule (com SSTModule + exports do DocumentModule v2).
@@ -53,7 +57,8 @@ export class DownloadPgrConsolidatedDocxService {
 
     const body: IProductDocumentPGR = {
       documentVersionId: riskDocumentId,
-      homogeneousGroupsIds: undefined,
+      homogeneousGroupsIds: getSnapshotGhoIds(riskDoc.generationSnapshot),
+      riskFilter: getSnapshotRiskFilter(riskDoc.generationSnapshot),
     };
 
     const product =

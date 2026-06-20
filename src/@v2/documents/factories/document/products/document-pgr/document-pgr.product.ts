@@ -41,11 +41,12 @@ export class ProductDocumentPGR implements IDocumentFactoryProduct<IProductDocum
     protected readonly downloadImageService: DownloadImageService,
   ) {}
 
-  public async getData({ documentVersionId, homogeneousGroupsIds, documentDate }: IProductDocumentPGR) {
+  public async getData({ documentVersionId, homogeneousGroupsIds, documentDate, riskFilter }: IProductDocumentPGR) {
     const document = await this.documentDAO.findDocumentPGR({
       documentVersionId,
       homogeneousGroupsIds,
       documentDate,
+      riskFilter,
     });
     if (!document) throw new BadRequestException('Nenhum documento PGR cadastrado');
 

@@ -50,6 +50,7 @@ export class AddQueueDocumentService {
           ghoIds: upsertPgrDto.ghoIds,
           filterViewType: upsertPgrDto.filterViewType,
           selectedFilters: upsertPgrDto.selectedFilters,
+          riskFilter: upsertPgrDto.riskFilter,
         },
       );
 

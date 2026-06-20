@@ -9,6 +9,7 @@ import {
 } from 'class-validator';
 
 import { StringCapitalizeParagraphTransform } from '../../../shared/transformers/string-capitalize-paragraph';
+import { DocumentGenerationRiskFilterDto } from '../../documents/dto/document-generation-risk-filter.dto';
 
 export class RegenerateDocumentProfessionalSnapshotDto {
   @IsNumber()
@@ -71,6 +72,11 @@ export class RegenerateDocumentVersionDto {
   @IsOptional()
   @IsArray()
   selectedFilters?: Array<{ id: string; name?: string }>;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => DocumentGenerationRiskFilterDto)
+  riskFilter?: DocumentGenerationRiskFilterDto;
 
   @IsOptional()
   json?: Record<string, unknown>;
