@@ -29,7 +29,9 @@ export const companyVariables = ({
   const address = company?.address;
 
   return {
-    [VariablesPGREnum.CURRENT_DATE_LONG]: dateUtils(emissionDate).format('D [de] MMMM [de] YYYY [às] hh:mm').toLocaleLowerCase(),
+    [VariablesPGREnum.CURRENT_DATE_LONG]: dateUtils(emissionDate)
+      .format('D [de] MMMM [de] YYYY')
+      .toLocaleLowerCase(),
     [VariablesPGREnum.CURRENT_DATE_SHORT]: dateUtils(emissionDate).format('DD/MM/YYYY').toLocaleLowerCase(),
     [VariablesPGREnum.CONSULTANT_NAME]: company.consultant?.name || company.name,
     [VariablesPGREnum.COMPANY_SIGNER_CITY]: (company.consultant ? company.consultant.address?.formattedCity : company.address?.formattedCity) || '',
