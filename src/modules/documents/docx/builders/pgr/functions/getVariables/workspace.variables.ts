@@ -4,6 +4,9 @@ import { VariablesPGREnum } from '../../enums/variables.enum';
 import { formatCNPJ } from '@brazilian-utils/brazilian-utils';
 import { formatCnae } from '../../../../../../../shared/utils/formats';
 
+export const safeFormatCNPJ = (value?: string | null) =>
+  value ? formatCNPJ(value) || '' : '';
+
 const getWorkspaceCompanyJson = (workspace: WorkspaceEntity) =>
   (workspace?.companyJson as Record<string, any>) || {};
 
@@ -41,7 +44,7 @@ export const workspaceVariables = (
 
   return {
     [VariablesPGREnum.WORKSPACE_CNPJ]:
-      formatCNPJ(workspace?.cnpj) || formatCNPJ(company?.cnpj) || '',
+      safeFormatCNPJ(workspace?.cnpj) || safeFormatCNPJ(company?.cnpj) || '',
     [VariablesPGREnum.WORKSPACE_NAME]: workspace?.name || '',
     [VariablesPGREnum.WORKSPACE_LEGAL_NAME]:
       json.name || workspace?.name || '',

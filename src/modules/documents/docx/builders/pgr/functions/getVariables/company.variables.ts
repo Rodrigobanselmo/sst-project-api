@@ -2,10 +2,9 @@ import { WorkspaceEntity } from '../../../../../../company/entities/workspace.en
 import { AddressEntity } from '../../../../../../company/entities/address.entity';
 import { CompanyEntity } from '../../../../../../company/entities/company.entity';
 import { VariablesPGREnum } from '../../enums/variables.enum';
-import { formatCNPJ } from '@brazilian-utils/brazilian-utils';
 import { formatCnae, formatPhoneNumber } from '../../../../../../../shared/utils/formats';
 
-import { workspaceVariables } from './workspace.variables';
+import { safeFormatCNPJ, workspaceVariables } from './workspace.variables';
 
 export const companyVariables = (
   company: CompanyEntity,
@@ -26,7 +25,7 @@ export const companyVariables = (
     [VariablesPGREnum.COMPANY_RISK_DEGREE]:
       company?.primary_activity && company?.primary_activity[0] ? String(company?.primary_activity[0].riskDegree) : '',
     [VariablesPGREnum.COMPANY_INITIAL]: `(${company?.initials})` || '',
-    [VariablesPGREnum.COMPANY_CNPJ]: formatCNPJ(company?.cnpj) || '',
+    [VariablesPGREnum.COMPANY_CNPJ]: safeFormatCNPJ(company?.cnpj) || '',
     [VariablesPGREnum.COMPANY_EMAIL]: company?.email || '',
     [VariablesPGREnum.COMPANY_NAME]: company?.name || '',
     [VariablesPGREnum.COMPANY_TELEPHONE]: formatPhoneNumber(company?.phone) || '',
