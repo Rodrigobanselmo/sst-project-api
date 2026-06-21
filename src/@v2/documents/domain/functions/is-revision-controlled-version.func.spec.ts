@@ -6,10 +6,12 @@ import {
   filterUnofficialVersions,
   getNextOfficialVersion,
   getNextUnofficialVersion,
+  getOfficialVersionFromUnofficial,
   isOfficialDocumentVersion,
   isRevisionControlledDocumentVersion,
   isUnofficialDocumentVersion,
   normalizeDocumentVersion,
+  validatePromoteTestToOfficial,
 } from './is-revision-controlled-version.func';
 
 describe('isUnofficialDocumentVersion', () => {
@@ -136,5 +138,52 @@ describe('getNextOfficialVersion', () => {
 describe('normalizeDocumentVersion', () => {
   it('remove prefixo do seletor', () => {
     expect(normalizeDocumentVersion('+ 1.0.0')).toBe('1.0.0');
+  });
+});
+
+describe('getOfficialVersionFromUnofficial', () => {
+  it('mapeia 0.0.N para (N+1).0.0', () => {
+    expect(getOfficialVersionFromUnofficial('0.0.0')).toBe('1.0.0');
+    expect(getOfficialVersionFromUnofficial('0.0.2')).toBe('3.0.0');
+  });
+});
+
+describe('validatePromoteTestToOfficial', () => {
+  it('permite converter REV. 01 quando não há oficial equivalente', () => {
+    expect(validatePromoteTestToOfficial('0.0.0', [])).toEqual({
+      ok: true,
+      targetOfficialVersion: '1.0.0',
+    });
+  });
+
+  it('bloqueia duplicidade de oficial equivalente', () => {
+    const result = validatePromoteTestToOfficial('0.0.0', [
+      { version: '1.0.0', officialRevisionSeries: 1 },
+    ]);
+
+    expect(result).toEqual({
+      ok: false,
+      message: expect.stringContaining('REV. 01'),
+    });
+  });
+
+  it('bloqueia conversão quando faltam oficiais anteriores', () => {
+    const result = validatePromoteTestToOfficial('0.0.2', []);
+
+    expect(result).toEqual({
+      ok: false,
+      message: expect.stringContaining('REV. 01'),
+    });
+  });
+
+  it('permite converter REV. 02 quando REV. 01 oficial existe', () => {
+    expect(
+      validatePromoteTestToOfficial('0.0.1', [
+        { version: '1.0.0', officialRevisionSeries: 1 },
+      ]),
+    ).toEqual({
+      ok: true,
+      targetOfficialVersion: '2.0.0',
+    });
   });
 });

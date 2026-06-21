@@ -23,6 +23,7 @@ export type DocumentGenerationSnapshot = {
   json?: Prisma.JsonValue;
   professionalSignatures?: DocumentGenerationProfessionalSnapshot[];
   riskFilter?: DocumentGenerationRiskFilterSnapshot;
+  promotedFromTestVersionId?: string;
 };
 
 export const parseDocumentGenerationSnapshot = (

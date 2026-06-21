@@ -6,6 +6,7 @@ import { FindByIdDocumentsService } from '../../services/docVersion/find-by-id-d
 import { FindDocumentsService } from '../../services/docVersion/find-documents/find-documents.service';
 import { DeleteDocumentVersionService } from '../../services/docVersion/delete-document-version/delete-document-version.service';
 import { RegenerateDocumentVersionService } from '../../services/docVersion/regenerate-document-version/regenerate-document-version.service';
+import { PromoteTestToOfficialDocumentVersionService } from '../../services/docVersion/promote-test-to-official-document-version/promote-test-to-official-document-version.service';
 import { RegenerateDocumentVersionDto } from '../../dto/regenerate-document-version.dto';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
 import { PermissionEnum } from '../../../../shared/constants/enum/authorization';
@@ -17,6 +18,7 @@ export class DocumentPgrController {
     private readonly findByIdDocumentsService: FindByIdDocumentsService,
     private readonly deleteDocumentVersionService: DeleteDocumentVersionService,
     private readonly regenerateDocumentVersionService: RegenerateDocumentVersionService,
+    private readonly promoteTestToOfficialDocumentVersionService: PromoteTestToOfficialDocumentVersionService,
   ) {}
 
   @Permissions(
@@ -92,5 +94,30 @@ export class DocumentPgrController {
     @User() userPayloadDto: UserPayloadDto,
   ) {
     return this.regenerateDocumentVersionService.execute(id, body, userPayloadDto);
+  }
+
+  @Permissions(
+    {
+      code: PermissionEnum.PGR,
+      isMember: true,
+      isContract: true,
+      crud: true,
+    },
+    {
+      code: PermissionEnum.PCMSO,
+      isMember: true,
+      isContract: true,
+      crud: true,
+    },
+  )
+  @Post('/:id/promote-to-official')
+  promoteToOfficial(
+    @Param('id') id: string,
+    @User() userPayloadDto: UserPayloadDto,
+  ) {
+    return this.promoteTestToOfficialDocumentVersionService.execute(
+      id,
+      userPayloadDto,
+    );
   }
 }

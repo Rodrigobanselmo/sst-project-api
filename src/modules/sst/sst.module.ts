@@ -57,6 +57,7 @@ import { FindByIdDocumentsService } from './services/docVersion/find-by-id-docum
 import { FindDocumentsService } from './services/docVersion/find-documents/find-documents.service';
 import { DeleteDocumentVersionService } from './services/docVersion/delete-document-version/delete-document-version.service';
 import { RegenerateDocumentVersionService } from './services/docVersion/regenerate-document-version/regenerate-document-version.service';
+import { PromoteTestToOfficialDocumentVersionService } from './services/docVersion/promote-test-to-official-document-version/promote-test-to-official-document-version.service';
 import { CreateRecMedService } from './services/rec-med/create-rec-med/create-rec-med.service';
 import { DeleteSoftRecMedService } from './services/rec-med/delete-soft-rec-med/delete-soft-rec-med.service';
 import { SyncMissingDerivedMeasureAfterRecMedUpdateService } from './services/rec-med/sync-missing-derived-measure-after-rec-med-update/sync-missing-derived-measure-after-rec-med-update.service';
@@ -160,6 +161,7 @@ import { RiskCatalogEquivalenceModule } from '@/shared/risk-catalog-equivalence/
     FindDocumentsService,
     DeleteDocumentVersionService,
     RegenerateDocumentVersionService,
+    PromoteTestToOfficialDocumentVersionService,
     FindEpiService,
     FindExamService,
     FindExamToClinicService,

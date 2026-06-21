@@ -59,6 +59,75 @@ export const getOfficialVersionMajor = (version: string): number => {
   return match ? Number(match[1]) : -1;
 };
 
+/** Mapeia versão de teste 0.0.N para oficial (N+1).0.0 (REV. equivalente). */
+export const getOfficialVersionFromUnofficial = (
+  version: string,
+): string | null => {
+  const patch = getUnofficialVersionPatch(version);
+  if (patch < 0) return null;
+  return `${patch + 1}.0.0`;
+};
+
+export const formatRevisionDisplayNumber = (version: string): string => {
+  const normalized = normalizeDocumentVersion(version);
+
+  if (isUnofficialDocumentVersion(normalized)) {
+    return String(getUnofficialVersionPatch(normalized) + 1).padStart(2, '0');
+  }
+
+  if (isOfficialDocumentVersion(normalized)) {
+    return String(getOfficialVersionMajor(normalized)).padStart(2, '0');
+  }
+
+  return normalized;
+};
+
+export const formatRevisionDisplayLabel = (version?: string | null): string => {
+  const normalized = normalizeDocumentVersion(version ?? '');
+  if (!normalized) return 'REV. 01';
+  return `REV. ${formatRevisionDisplayNumber(normalized)}`;
+};
+
+export type PromoteTestToOfficialValidation =
+  | { ok: true; targetOfficialVersion: string }
+  | { ok: false; message: string };
+
+export const validatePromoteTestToOfficial = (
+  testVersion: string,
+  activeOfficialVersions: DocumentVersionSeriesRow[],
+): PromoteTestToOfficialValidation => {
+  const targetOfficialVersion = getOfficialVersionFromUnofficial(testVersion);
+
+  if (!targetOfficialVersion) {
+    return { ok: false, message: 'Versão de teste inválida para conversão.' };
+  }
+
+  const targetMajor = getOfficialVersionMajor(targetOfficialVersion);
+  const existingMajors = new Set(
+    activeOfficialVersions.map((version) =>
+      getOfficialVersionMajor(version.version),
+    ),
+  );
+
+  if (existingMajors.has(targetMajor)) {
+    return {
+      ok: false,
+      message: `Já existe uma versão oficial ${formatRevisionDisplayLabel(targetOfficialVersion)}. A conversão não pode ser duplicada.`,
+    };
+  }
+
+  for (let major = 1; major < targetMajor; major++) {
+    if (!existingMajors.has(major)) {
+      return {
+        ok: false,
+        message: `Para converter para ${formatRevisionDisplayLabel(targetOfficialVersion)}, é necessário que ${formatRevisionDisplayLabel(`${major}.0.0`)} oficial já exista.`,
+      };
+    }
+  }
+
+  return { ok: true, targetOfficialVersion };
+};
+
 export const getNextUnofficialVersion = (
   versions: { version: string }[],
 ): string => {
