@@ -20,6 +20,7 @@ import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
 import { UploadDocumentDto } from '../../../../documents/dto/document.dto';
 import { DocumentDataRepository } from '../../../repositories/implementations/DocumentDataRepository';
 import { RiskDocumentRepository } from '../../../repositories/implementations/RiskDocumentRepository';
+import { buildDocumentQueueMessageIds } from '../../../../../shared/utils/document-queue-message.util';
 
 @Injectable()
 export class PromoteTestToOfficialDocumentVersionService {
@@ -171,8 +172,7 @@ export class PromoteTestToOfficialDocumentVersionService {
     const command = new SendMessageCommand({
       QueueUrl: this.queueUrl,
       MessageBody: JSON.stringify(payload),
-      MessageGroupId: 'DOCUMENT',
-      MessageDeduplicationId: `${newOfficialVersion.id}-promote-${Date.now()}`,
+      ...buildDocumentQueueMessageIds({ documentVersionId: newOfficialVersion.id }),
     });
 
     await this.sqs.send(command);

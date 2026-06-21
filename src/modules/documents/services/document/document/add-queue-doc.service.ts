@@ -8,6 +8,7 @@ import { SendMessageCommand, SQSClient } from '@aws-sdk/client-sqs';
 import { StatusEnum } from '@prisma/client';
 import { isOfficialDocumentVersion } from '@/@v2/documents/domain/functions/is-revision-controlled-version.func';
 import { logPgrDiagnostic } from '../../../../../shared/utils/pgr-diagnostic-log.util';
+import { buildDocumentQueueMessageIds } from '../../../../../shared/utils/document-queue-message.util';
 
 @Injectable()
 export class AddQueueDocumentService {
@@ -112,8 +113,7 @@ export class AddQueueDocumentService {
     const command = new SendMessageCommand({
       QueueUrl: this.queueUrl,
       MessageBody: JSON.stringify(payload),
-      MessageGroupId: 'DOCUMENT',
-      MessageDeduplicationId: riskDoc.id,
+      ...buildDocumentQueueMessageIds({ documentVersionId: riskDoc.id }),
     });
 
     await this.sqs.send(command);

@@ -17,6 +17,7 @@ import { UploadDocumentDto } from '../../../../documents/dto/document.dto';
 import { DocumentDataRepository } from '../../../repositories/implementations/DocumentDataRepository';
 import { RiskDocumentRepository } from '../../../repositories/implementations/RiskDocumentRepository';
 import { RegenerateDocumentVersionDto } from '../../../dto/regenerate-document-version.dto';
+import { buildDocumentQueueMessageIds } from '../../../../../shared/utils/document-queue-message.util';
 
 @Injectable()
 export class RegenerateDocumentVersionService {
@@ -106,8 +107,7 @@ export class RegenerateDocumentVersionService {
     const command = new SendMessageCommand({
       QueueUrl: this.queueUrl,
       MessageBody: JSON.stringify(payload),
-      MessageGroupId: 'DOCUMENT',
-      MessageDeduplicationId: `${updated.id}-regenerate-${Date.now()}`,
+      ...buildDocumentQueueMessageIds({ documentVersionId: updated.id }),
     });
 
     await this.sqs.send(command);
