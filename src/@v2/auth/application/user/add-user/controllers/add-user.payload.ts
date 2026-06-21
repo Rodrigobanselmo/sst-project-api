@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class AddUserPayload {
   @IsString()
@@ -25,4 +25,9 @@ export class AddUserPayload {
   @IsString()
   @IsOptional()
   cpf?: string | null;
+
+  @IsOptional()
+  @IsArray()
+  @IsUUID('4', { each: true })
+  companiesIds?: string[];
 }

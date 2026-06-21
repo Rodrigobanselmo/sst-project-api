@@ -7,6 +7,7 @@ export namespace IAddUserUseCase {
     phone?: string;
     employeeId?: number;
     groupId: number;
+    companiesIds?: string[];
   };
 
   export type Result = {

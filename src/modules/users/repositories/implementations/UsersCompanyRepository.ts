@@ -113,6 +113,33 @@ export class UsersCompanyRepository implements IUsersCompanyRepository {
    * Remove vínculos do usuário cujo companyId não está em companiesIdsToKeep,
    * limitando ao conjunto gerenciável pela listagem da edição (ids retornados pelo mesmo escopo que GET /company).
    */
+  /**
+   * Remove vínculos do usuário dentro de um grupo empresarial cujo companyId não está em companiesIdsToKeep.
+   * Não afeta vínculos fora do grupo (consultoria, contrato, outras empresas).
+   */
+  async deleteBusinessGroupScopedLinksNotInCompaniesIds(
+    userId: number,
+    groupMemberIds: string[],
+    companiesIdsToKeep: string[],
+  ) {
+    if (!groupMemberIds.length) {
+      return { count: 0 };
+    }
+
+    const scopedMemberIds = groupMemberIds.filter((id) => !companiesIdsToKeep.includes(id));
+
+    if (!scopedMemberIds.length) {
+      return { count: 0 };
+    }
+
+    return this.prisma.userCompany.deleteMany({
+      where: {
+        userId,
+        companyId: { in: scopedMemberIds },
+      },
+    });
+  }
+
   async deleteManageableUserCompanyLinksNotInCompaniesIds(
     userId: number,
     companiesIdsToKeep: string[],

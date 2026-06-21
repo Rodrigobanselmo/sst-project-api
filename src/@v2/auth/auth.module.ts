@@ -1,5 +1,6 @@
 import { SharedModule } from '@/@v2/shared/shared.module';
 import { Module } from '@nestjs/common';
+import { UsersModule } from '@/modules/users/users.module';
 import { AuthUserMailAdapter } from './adapters/mail/auth-user-mail.adapter.ts';
 import { SignInController } from './application/session/signin/controllers/sign-in.controller';
 import { SignInUseCase } from './application/session/signin/use-cases/sign-in.usecase';
@@ -14,7 +15,7 @@ import { UserRepository } from './database/repositories/entities/user/user.repos
 import { EmployeeRepository } from './database/repositories/entities/employee/employee.repository.js';
 
 @Module({
-  imports: [SharedModule],
+  imports: [SharedModule, UsersModule],
   controllers: [AddUserController, SignInController],
   providers: [
     // Database

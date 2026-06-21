@@ -45,6 +45,7 @@ import { UpdatePermissionsRolesService } from './services/users/update-permissio
 import { UpdateUserService } from './services/users/update-user/update-user.service';
 import { UserHistoryRepository } from './repositories/implementations/UserHistoryRepository';
 import { FindUserHistorysService } from './services/user-history/find-user-history/find-user-history.service';
+import { BusinessGroupUserScopeService } from './services/shared/business-group-user-scope.service';
 
 @Module({
   controllers: [
@@ -94,7 +95,14 @@ import { FindUserHistorysService } from './services/user-history/find-user-histo
     CreateCouncilService,
     UserHistoryRepository,
     FindUserHistorysService,
+    BusinessGroupUserScopeService,
   ],
-  exports: [UsersRepository, UserHistoryRepository, ProfessionalRepository],
+  exports: [
+    UsersRepository,
+    UserHistoryRepository,
+    ProfessionalRepository,
+    UsersCompanyRepository,
+    BusinessGroupUserScopeService,
+  ],
 })
 export class UsersModule {}

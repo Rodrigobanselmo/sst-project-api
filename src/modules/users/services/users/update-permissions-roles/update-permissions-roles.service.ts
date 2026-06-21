@@ -7,6 +7,7 @@ import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/com
 import { UpdateUserCompanyDto } from '../../../dto/update-user-company.dto';
 import { UsersCompanyRepository } from '../../../repositories/implementations/UsersCompanyRepository';
 import { PrismaService } from '../../../../../prisma/prisma.service';
+import { BusinessGroupUserScopeService } from '../../shared/business-group-user-scope.service';
 
 @Injectable()
 export class UpdatePermissionsRolesService {
@@ -15,6 +16,7 @@ export class UpdatePermissionsRolesService {
     private readonly authGroupRepository: AuthGroupRepository,
     private readonly companyRepository: CompanyRepository,
     private readonly prisma: PrismaService,
+    private readonly businessGroupUserScopeService: BusinessGroupUserScopeService,
   ) {}
 
   async execute(updateUserCompanyDto: UpdateUserCompanyDto, userPayloadDto: UserPayloadDto) {
@@ -24,7 +26,12 @@ export class UpdatePermissionsRolesService {
     const company = await this.companyRepository.findById(updateUserCompanyDto.companyId);
 
     const isConsulting = company.isConsulting;
-    if (!isConsulting) updateUserCompanyDto.companiesIds = [];
+    const groupContext = await this.businessGroupUserScopeService.resolveGroupContext(
+      updateUserCompanyDto.companyId,
+    );
+    const isBusinessGroup = !isConsulting && !!groupContext;
+
+    if (!isConsulting && !isBusinessGroup) updateUserCompanyDto.companiesIds = [];
 
     const companyIdForGroup =
       userPayloadDto.targetCompanyId ?? userPayloadDto.companyId ?? updateUserCompanyDto.companyId;
@@ -63,6 +70,30 @@ export class UpdatePermissionsRolesService {
     const listingScopeCompanyId = userPayloadDto.isMaster
       ? ''
       : userPayloadDto.companyId ?? updateUserCompanyDto.companyId;
+
+    if (isBusinessGroup && updateUserCompanyDto.companiesIds !== undefined) {
+      const { validatedCompanyIds, groupContext: validatedGroupContext } =
+        await this.businessGroupUserScopeService.validateFromUserPayload({
+          baseCompanyId: updateUserCompanyDto.companyId,
+          requestedCompanyIds: updateUserCompanyDto.companiesIds,
+          user: userPayloadDto,
+        });
+
+      await this.usersCompanyRepository.deleteBusinessGroupScopedLinksNotInCompaniesIds(
+        updateUserCompanyDto.userId,
+        validatedGroupContext.memberIds,
+        validatedCompanyIds,
+      );
+
+      if (validatedCompanyIds.length > 0) {
+        return await this.usersCompanyRepository.upsertMany({
+          ...updateUserCompanyDto,
+          companiesIds: validatedCompanyIds,
+        });
+      }
+
+      return await this.usersCompanyRepository.update(updateUserCompanyDto);
+    }
 
     if (isConsulting) {
       const requestedCompanyIdsRaw = updateUserCompanyDto?.companiesIds || [];
