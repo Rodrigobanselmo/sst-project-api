@@ -27,6 +27,7 @@ export class BrowseFormQuestionsAnswersRisksUseCase {
       entityRiskMap: result.entityRiskMap,
       riskMap: result.riskMap,
       entityMap: result.entityMap,
+      eligibleEntityMap: result.eligibleEntityMap,
       groupedEntityRiskMap: result.groupedEntityRiskMap,
       groupedEntityMap: result.groupedEntityMap,
       hierarchyGroups: result.hierarchyGroups,

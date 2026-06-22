@@ -1,4 +1,4 @@
-import { HierarchyEnum, RiskFactorsEnum } from '@prisma/client';
+import { HierarchyEnum, RiskFactorsEnum, StatusEnum } from '@prisma/client';
 
 export namespace IFormQuestionsAnswersRisksService {
   export type Params = {
@@ -20,7 +20,10 @@ export namespace IFormQuestionsAnswersRisksService {
     type: HierarchyEnum;
     /** Empresa operacional do setor (matriz ou convertida). */
     companyId: string;
+    status: StatusEnum;
   };
+
+  export type PublicHierarchyData = Omit<HierarchyData, 'status'>;
 
   export type OptionData = {
     id: string;
@@ -77,6 +80,15 @@ export namespace IFormQuestionsAnswersRisksService {
     type: string;
   };
 
+  export type EligibleHierarchyEntity = {
+    id: string;
+    name: string;
+    type: HierarchyEnum;
+    companyId: string;
+    establishment?: string;
+    companyName?: string;
+  };
+
   export type Result = {
     hierarchyRiskMap: Record<string, Record<string, HierarchyRiskSummary>>;
     hierarchyMap: Record<string, HierarchyData>;
@@ -85,7 +97,9 @@ export namespace IFormQuestionsAnswersRisksService {
 
     // Individual sector data (used in risk analysis to list each sector separately)
     entityRiskMap: Record<string, Record<string, { values: number[]; probability: number }>>;
-    entityMap: Record<string, HierarchyData>;
+    entityMap: Record<string, PublicHierarchyData>;
+    /** Setores elegíveis para novos agrupamentos (ACTIVE + uso no escopo da campanha). */
+    eligibleEntityMap: Record<string, EligibleHierarchyEntity>;
 
     // Grouped data (merged sectors shown as single entities in indicators/PDF)
     groupedEntityRiskMap: Record<string, Record<string, { values: number[]; probability: number }>>;

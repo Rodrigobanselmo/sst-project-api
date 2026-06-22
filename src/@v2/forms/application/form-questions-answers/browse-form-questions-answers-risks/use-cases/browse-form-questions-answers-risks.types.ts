@@ -8,7 +8,18 @@ export namespace IBrowseFormQuestionsAnswersRisksUseCase {
 
   export type Result = {
     entityRiskMap: Record<string, Record<string, { values: number[]; probability: number }>>;
-    entityMap: Record<string, { id: string; type: HierarchyEnum; name: string }>;
+    entityMap: Record<string, { id: string; type: HierarchyEnum; name: string; companyId: string }>;
+    eligibleEntityMap: Record<
+      string,
+      {
+        id: string;
+        type: HierarchyEnum;
+        name: string;
+        companyId: string;
+        establishment?: string;
+        companyName?: string;
+      }
+    >;
     riskMap: Record<
       string,
       {

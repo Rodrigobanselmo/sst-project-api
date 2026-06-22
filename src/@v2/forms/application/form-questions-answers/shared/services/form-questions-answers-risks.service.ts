@@ -10,6 +10,10 @@ import { participantWorkspaceLateralJoin } from '@/@v2/forms/database/dao/form-p
 import { FormParticipantsDAO } from '@/@v2/forms/database/dao/form-participants/form-participants.dao';
 import { CryptoAdapter } from '@/@v2/shared/adapters/crypto/models/crypto.interface';
 import { SharedTokens } from '@/@v2/shared/constants/tokens';
+import {
+  buildEligibleHierarchyEntityMap,
+  collectHierarchyIdsUsedInCampaignScope,
+} from '../utils/build-eligible-hierarchy-entity-map.util';
 
 const RISKS_SCOPE_PARTICIPANTS_MAX = 10_000;
 
@@ -218,8 +222,20 @@ export class FormQuestionsAnswersRisksService {
         name: true,
         type: true,
         companyId: true,
+        status: true,
       },
     });
+
+    const companyNameById: Record<string, string> = {};
+    if (participantCompanyIds.length > 0) {
+      const companies = await this.prisma.company.findMany({
+        where: { id: { in: participantCompanyIds } },
+        select: { id: true, name: true },
+      });
+      companies.forEach((company) => {
+        companyNameById[company.id] = company.name;
+      });
+    }
 
     const hierarchyMap: Record<string, IFormQuestionsAnswersRisksService.HierarchyData> = {};
     hierarchy.forEach((h) => {
@@ -473,6 +489,27 @@ export class FormQuestionsAnswersRisksService {
       hierarchyIds: g.hierarchies.map((h) => h.hierarchy_id),
     }));
 
+    const usedHierarchyIds = collectHierarchyIdsUsedInCampaignScope({
+      hierarchyType,
+      scopedParticipants: scopedParticipants.results,
+      participantAnswers: Array.from(participantAnswersMap.values()),
+    });
+
+    const eligibleEntityMap = buildEligibleHierarchyEntityMap({
+      usedHierarchyIds,
+      hierarchyMap,
+      entityEstablishmentMap,
+      companyNameById,
+    });
+
+    const publicEntityMap: Record<string, IFormQuestionsAnswersRisksService.PublicHierarchyData> =
+      Object.fromEntries(
+        Object.entries(hierarchyMap).map(([id, h]) => [
+          id,
+          { id: h.id, name: h.name, type: h.type, companyId: h.companyId },
+        ]),
+      );
+
     return {
       hierarchyRiskMap,
       hierarchyMap,
@@ -485,7 +522,8 @@ export class FormQuestionsAnswersRisksService {
           Object.fromEntries(Object.entries(risks).map(([riskId, riskData]) => [riskId, { values: riskData.values, probability: riskData.probability }])),
         ]),
       ),
-      entityMap: hierarchyMap,
+      entityMap: publicEntityMap,
+      eligibleEntityMap,
       // Grouped data (merged sectors shown as single entities in indicators/PDF)
       groupedEntityRiskMap: Object.fromEntries(
         Object.entries(groupedHierarchyRiskMap).map(([targetId, risks]) => [
