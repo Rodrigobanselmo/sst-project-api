@@ -12,6 +12,7 @@ import { CryptoAdapter } from '@/@v2/shared/adapters/crypto/models/crypto.interf
 import { SharedTokens } from '@/@v2/shared/constants/tokens';
 import {
   buildEligibleHierarchyEntityMap,
+  buildParticipantCountByHierarchyId,
   collectHierarchyIdsUsedInCampaignScope,
 } from '../utils/build-eligible-hierarchy-entity-map.util';
 
@@ -495,11 +496,17 @@ export class FormQuestionsAnswersRisksService {
       participantAnswers: Array.from(participantAnswersMap.values()),
     });
 
+    const participantCountByHierarchyId = buildParticipantCountByHierarchyId({
+      hierarchyType,
+      scopedParticipants: scopedParticipants.results,
+    });
+
     const eligibleEntityMap = buildEligibleHierarchyEntityMap({
       usedHierarchyIds,
       hierarchyMap,
       entityEstablishmentMap,
       companyNameById,
+      participantCountByHierarchyId,
     });
 
     const publicEntityMap: Record<string, IFormQuestionsAnswersRisksService.PublicHierarchyData> =

@@ -18,6 +18,7 @@ export namespace IBrowseFormQuestionsAnswersRisksUseCase {
         companyId: string;
         establishment?: string;
         companyName?: string;
+        participantCount: number;
       }
     >;
     riskMap: Record<

@@ -85,6 +85,7 @@ export namespace IFormQuestionsAnswersRisksService {
     name: string;
     type: HierarchyEnum;
     companyId: string;
+    participantCount: number;
     establishment?: string;
     companyName?: string;
   };

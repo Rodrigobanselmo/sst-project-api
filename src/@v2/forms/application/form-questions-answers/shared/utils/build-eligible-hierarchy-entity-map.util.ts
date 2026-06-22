@@ -39,11 +39,31 @@ export function collectHierarchyIdsUsedInCampaignScope(params: {
   return usedIds;
 }
 
+export function buildParticipantCountByHierarchyId(params: {
+  hierarchyType: HierarchyEnum;
+  scopedParticipants: FormParticipantsBrowseResultModel[];
+}): Map<string, number> {
+  const counts = new Map<string, number>();
+
+  for (const participant of params.scopedParticipants) {
+    const hierarchyId = resolveParticipantHierarchyIdForType(
+      participant.hierarchies,
+      params.hierarchyType,
+    );
+    if (!hierarchyId) continue;
+
+    counts.set(hierarchyId, (counts.get(hierarchyId) ?? 0) + 1);
+  }
+
+  return counts;
+}
+
 export function buildEligibleHierarchyEntityMap(params: {
   usedHierarchyIds: Set<string>;
   hierarchyMap: Record<string, IFormQuestionsAnswersRisksService.HierarchyData>;
   entityEstablishmentMap: Record<string, string>;
   companyNameById: Record<string, string>;
+  participantCountByHierarchyId?: Map<string, number>;
 }): Record<string, EligibleHierarchyEntity> {
   const eligibleEntityMap: Record<string, EligibleHierarchyEntity> = {};
 
@@ -59,6 +79,7 @@ export function buildEligibleHierarchyEntityMap(params: {
       name: hierarchy.name,
       type: hierarchy.type,
       companyId: hierarchy.companyId,
+      participantCount: params.participantCountByHierarchyId?.get(hierarchyId) ?? 0,
       ...(establishment ? { establishment } : {}),
       ...(companyName ? { companyName } : {}),
     };
