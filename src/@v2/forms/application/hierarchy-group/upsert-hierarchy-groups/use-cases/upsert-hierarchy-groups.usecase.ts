@@ -7,6 +7,7 @@ export namespace IUpsertHierarchyGroupsUseCase {
   export type GroupInput = {
     id?: string;
     name: string;
+    description?: string | null;
     hierarchyIds: string[];
   };
 
@@ -87,6 +88,7 @@ export class UpsertHierarchyGroupsUseCase {
         const created = await tx.formApplicationHierarchyGroup.create({
           data: {
             name: group.name,
+            description: group.description?.trim() || null,
             form_application_id: params.applicationId,
             hierarchies: {
               create: group.hierarchyIds.map((hierarchyId) => ({
@@ -97,6 +99,7 @@ export class UpsertHierarchyGroupsUseCase {
           select: {
             id: true,
             name: true,
+            description: true,
             hierarchies: {
               select: {
                 hierarchy_id: true,
@@ -108,6 +111,7 @@ export class UpsertHierarchyGroupsUseCase {
         createdGroups.push({
           id: created.id,
           name: created.name,
+          description: created.description,
           hierarchyIds: created.hierarchies.map((h) => h.hierarchy_id),
         });
       }

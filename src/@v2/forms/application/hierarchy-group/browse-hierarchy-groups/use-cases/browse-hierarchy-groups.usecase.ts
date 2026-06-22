@@ -22,6 +22,7 @@ export class BrowseHierarchyGroupsUseCase {
       select: {
         id: true,
         name: true,
+        description: true,
         hierarchies: {
           select: {
             hierarchy_id: true,
@@ -34,6 +35,7 @@ export class BrowseHierarchyGroupsUseCase {
     return groups.map((group) => ({
       id: group.id,
       name: group.name,
+      description: group.description,
       hierarchyIds: group.hierarchies.map((h) => h.hierarchy_id),
     }));
   }

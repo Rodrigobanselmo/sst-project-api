@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { ArrayMinSize, IsArray, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { ArrayMinSize, IsArray, IsOptional, IsString, MaxLength, ValidateNested } from 'class-validator';
 
 export class HierarchyGroupItemBody {
   @IsOptional()
@@ -8,6 +8,11 @@ export class HierarchyGroupItemBody {
 
   @IsString()
   name!: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  description?: string | null;
 
   @IsArray()
   @IsString({ each: true })

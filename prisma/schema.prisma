@@ -1438,6 +1438,7 @@ model FormApplicationRiskLog {
 model FormApplicationHierarchyGroup {
   id                  String   @id @default(cuid())
   name                String
+  description         String?  @db.VarChar(500)
   form_application_id String
   created_at          DateTime @default(now())
   updated_at          DateTime @updatedAt
