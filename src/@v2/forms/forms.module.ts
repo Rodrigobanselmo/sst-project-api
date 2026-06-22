@@ -71,6 +71,8 @@ import { BrowseFormQuestionsAnswersAnalysisController } from './application/form
 import { BrowseFormQuestionsAnswersAnalysisUseCase } from './application/form-questions-answers/browse-form-questions-answers-analysis/use-cases/browse-form-questions-answers-analysis.usecase';
 import { EditFormQuestionsAnswersAnalysisController } from './application/form-questions-answers/edit-form-questions-answers-analysis/controllers/edit-form-questions-answers-analysis.controller';
 import { EditFormQuestionsAnswersAnalysisUseCase } from './application/form-questions-answers/edit-form-questions-answers-analysis/use-cases/edit-form-questions-answers-analysis.usecase';
+import { ClearFormQuestionsAnswersAnalysisController } from './application/form-questions-answers/clear-form-questions-answers-analysis/controllers/clear-form-questions-answers-analysis.controller';
+import { ClearFormQuestionsAnswersAnalysisUseCase } from './application/form-questions-answers/clear-form-questions-answers-analysis/use-cases/clear-form-questions-answers-analysis.usecase';
 import { PublicFormParticipantLoginController } from './application/form-application/public-form-participant-login/controllers/public-form-participant-login.controller';
 import { PublicFormParticipantLoginUseCase } from './application/form-application/public-form-participant-login/use-cases/public-form-participant-login.usecase';
 import { BrowseFormPreliminaryLibraryBlocksUseCase } from './application/form-preliminary-library/browse-form-preliminary-library-blocks/use-cases/browse-form-preliminary-library-blocks.usecase';
@@ -142,6 +144,7 @@ import { FormIndicatorsNarrativeDiagnosticRepository } from './database/reposito
     SendFormReminderController,
     AiAnalyzeFormQuestionsRisksController,
     BrowseFormQuestionsAnswersAnalysisController,
+    ClearFormQuestionsAnswersAnalysisController,
     EditFormQuestionsAnswersAnalysisController,
     PublicFormParticipantLoginController,
     FormPreliminaryLibraryQuestionsController,
@@ -196,6 +199,7 @@ import { FormIndicatorsNarrativeDiagnosticRepository } from './database/reposito
     SendFormReminderUseCase,
     AiAnalyzeFormQuestionsRisksUseCase,
     BrowseFormQuestionsAnswersAnalysisUseCase,
+    ClearFormQuestionsAnswersAnalysisUseCase,
     EditFormQuestionsAnswersAnalysisUseCase,
     PublicFormParticipantLoginUseCase,
     // Services

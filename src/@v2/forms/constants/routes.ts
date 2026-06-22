@@ -20,6 +20,8 @@ export const FormRoutes = {
     PATH_RISKS: 'v2/companies/:companyId/forms/applications/:applicationId/questions-answers/risks/',
     AI_ANALYZE_RISKS: 'v2/companies/:companyId/forms/applications/:applicationId/questions-answers/ai-analyze-risks',
     BROWSE_ANALYSIS: 'v2/companies/:companyId/forms/applications/:applicationId/questions-answers-analysis',
+    CLEAR_ANALYSIS:
+      'v2/companies/:companyId/forms/applications/:applicationId/questions-answers-analysis/clear',
     EDIT_ANALYSIS: 'v2/companies/:companyId/forms/applications/:applicationId/questions-answers-analysis/:analysisId',
     RISK_NARRATIVE_DIAGNOSTIC:
       'v2/companies/:companyId/forms/applications/:applicationId/questions-answers/risk-narrative-diagnostic',
