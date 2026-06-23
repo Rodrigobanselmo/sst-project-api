@@ -40,12 +40,16 @@ export class ApplyAiAnalysisAsRiskDataUseCase {
       hierarchyId: params.hierarchyId,
     });
 
-    const riskFactorGroupData = await this.prisma.riskFactorGroupData.findFirst({
+    let riskFactorGroupData = await this.prisma.riskFactorGroupData.findFirst({
       where: { companyId: operationalCompanyId },
     });
 
     if (!riskFactorGroupData) {
-      throw new NotFoundException('Risk factor group data not found');
+      riskFactorGroupData = await this.prisma.riskFactorGroupData.create({
+        data: {
+          companyId: operationalCompanyId,
+        },
+      });
     }
 
     const mapRecMed = (items?: IApplyAiAnalysisAsRiskDataUseCase.RecMedItem[]) =>
