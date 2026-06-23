@@ -73,6 +73,8 @@ import { EditFormQuestionsAnswersAnalysisController } from './application/form-q
 import { EditFormQuestionsAnswersAnalysisUseCase } from './application/form-questions-answers/edit-form-questions-answers-analysis/use-cases/edit-form-questions-answers-analysis.usecase';
 import { ClearFormQuestionsAnswersAnalysisController } from './application/form-questions-answers/clear-form-questions-answers-analysis/controllers/clear-form-questions-answers-analysis.controller';
 import { ClearFormQuestionsAnswersAnalysisUseCase } from './application/form-questions-answers/clear-form-questions-answers-analysis/use-cases/clear-form-questions-answers-analysis.usecase';
+import { RecoverStuckFormQuestionsAnswersAnalysisController } from './application/form-questions-answers/recover-stuck-form-questions-answers-analysis/controllers/recover-stuck-form-questions-answers-analysis.controller';
+import { RecoverStuckFormQuestionsAnswersAnalysisUseCase } from './application/form-questions-answers/recover-stuck-form-questions-answers-analysis/use-cases/recover-stuck-form-questions-answers-analysis.usecase';
 import { PublicFormParticipantLoginController } from './application/form-application/public-form-participant-login/controllers/public-form-participant-login.controller';
 import { PublicFormParticipantLoginUseCase } from './application/form-application/public-form-participant-login/use-cases/public-form-participant-login.usecase';
 import { BrowseFormPreliminaryLibraryBlocksUseCase } from './application/form-preliminary-library/browse-form-preliminary-library-blocks/use-cases/browse-form-preliminary-library-blocks.usecase';
@@ -145,6 +147,7 @@ import { FormIndicatorsNarrativeDiagnosticRepository } from './database/reposito
     AiAnalyzeFormQuestionsRisksController,
     BrowseFormQuestionsAnswersAnalysisController,
     ClearFormQuestionsAnswersAnalysisController,
+    RecoverStuckFormQuestionsAnswersAnalysisController,
     EditFormQuestionsAnswersAnalysisController,
     PublicFormParticipantLoginController,
     FormPreliminaryLibraryQuestionsController,
@@ -200,6 +203,7 @@ import { FormIndicatorsNarrativeDiagnosticRepository } from './database/reposito
     AiAnalyzeFormQuestionsRisksUseCase,
     BrowseFormQuestionsAnswersAnalysisUseCase,
     ClearFormQuestionsAnswersAnalysisUseCase,
+    RecoverStuckFormQuestionsAnswersAnalysisUseCase,
     EditFormQuestionsAnswersAnalysisUseCase,
     PublicFormParticipantLoginUseCase,
     // Services
