@@ -12,7 +12,8 @@ import { IAiAnalyzeFormQuestionsRisksUseCase } from './ai-analyze-form-questions
 import { FormQuestionsAnswersRisksService } from '../../shared/services/form-questions-answers-risks.service';
 import { IFormQuestionsAnswersRisksService } from '../../shared/services/form-questions-answers-risks.types';
 import { resolveEffectiveRiskProbability } from '../../shared/utils/resolve-effective-risk-probability.util';
-import { materializeHierarchyGroupRiskPairs } from '../../shared/utils/materialize-hierarchy-group-risk-pairs.util';
+import { buildGroupHierarchyRiskDataList } from '../../shared/utils/build-group-hierarchy-risk-data.util';
+import { buildHierarchyToGroupMap } from '../../shared/utils/merge-group-hierarchy-risk-summary.util';
 import { AiRiskAnalysisResponse } from '@/@v2/shared/types/ai-risk-analysis-response.types';
 import { FormAiAnalysisStatusEnum } from '@prisma/client';
 import { LocalContext, UserContext } from '@/@v2/shared/adapters/context';
@@ -29,6 +30,16 @@ import {
   parseStoredAnalysisResponse,
   shouldSkipCompleteAnalysis,
 } from './ai-risk-analysis-merge.helpers';
+import {
+  HIERARCHY_GROUP_ANALYSIS_SCOPE,
+  buildGroupReplicationMetadata,
+  expandFailedAnalysisTargets,
+  expandResolvedAnalysisKeys,
+  findEligibleHierarchyRiskTarget,
+  getReplicationTargetHierarchyIds,
+  mergeExcludedItemsFromGroupMembers,
+  resolveGroupIncrementalSkipDecision,
+} from './hierarchy-group-ai-analysis.helpers';
 
 @Injectable()
 export class AiAnalyzeFormQuestionsRisksUseCase {
@@ -115,17 +126,6 @@ export class AiAnalyzeFormQuestionsRisksUseCase {
     // Transform the data into hierarchy-risk combinations for analysis
     const hierarchyRiskData = this.transformToHierarchyRiskData(formData, availableRisks);
 
-    if (hierarchyRiskData.length === 0) {
-      console.warn('[AI Analysis] No risk data found for analysis', {
-        companyId: paramsWithPrompt.companyId,
-        formApplicationId: paramsWithPrompt.formApplicationId,
-        hierarchiesCount: Object.keys(formData.hierarchyRiskMap).length,
-        risksCount: Object.keys(formData.riskMap).length,
-        availableRisksCount: availableRisks.length,
-      });
-      throw new BadRequestException('No risk data found for analysis. Please ensure the form has responses and risks are properly configured.');
-    }
-
     // Filter only the pairs that are eligible to be analyzed by the AI.
     // Skippable pairs (no questions, zero probability, missing risk metadata) used to
     // create PROCESSING records that were never resolved — they would stay forever as
@@ -138,24 +138,29 @@ export class AiAnalyzeFormQuestionsRisksUseCase {
 
     const availableRisksMap = new Map(availableRisks.map((risk) => [risk.id, risk]));
 
-    const existingPairKeys = new Set(
-      hierarchyRiskData.map((item) =>
-        this.buildPairKey(item.hierarchyId, item.riskId),
-      ),
-    );
-
-    const syntheticPairs = materializeHierarchyGroupRiskPairs({
+    const groupHierarchyRiskData = buildGroupHierarchyRiskDataList({
       formData,
       availableRisksMap,
-      existingPairKeys,
       minOccupationalRiskLevel: MIN_OCCUPATIONAL_RISK_LEVEL,
     });
 
-    if (syntheticPairs.length > 0) {
+    if (groupHierarchyRiskData.length > 0) {
       console.log(
-        `[AI Analysis] Materialized ${syntheticPairs.length} hierarchy-group synthetic pair(s)`,
+        `[AI Analysis] Built ${groupHierarchyRiskData.length} hierarchy-group aggregated job(s)`,
       );
-      hierarchyRiskData.push(...syntheticPairs);
+      hierarchyRiskData.push(...groupHierarchyRiskData);
+    }
+
+    if (hierarchyRiskData.length === 0) {
+      console.warn('[AI Analysis] No risk data found for analysis', {
+        companyId: paramsWithPrompt.companyId,
+        formApplicationId: paramsWithPrompt.formApplicationId,
+        hierarchiesCount: Object.keys(formData.hierarchyRiskMap).length,
+        risksCount: Object.keys(formData.riskMap).length,
+        availableRisksCount: availableRisks.length,
+        hierarchyGroupsCount: formData.hierarchyGroups.length,
+      });
+      throw new BadRequestException('No risk data found for analysis. Please ensure the form has responses and risks are properly configured.');
     }
 
     const eligibleHierarchyRiskData = this.filterEligibleHierarchyRiskData(
@@ -173,10 +178,10 @@ export class AiAnalyzeFormQuestionsRisksUseCase {
         );
       }
 
-      const targetPair = scopedEligibleHierarchyRiskData.find(
-        (item) =>
-          item.riskId === paramsWithPrompt.riskId &&
-          item.hierarchyId === paramsWithPrompt.hierarchyId,
+      const targetPair = findEligibleHierarchyRiskTarget(
+        scopedEligibleHierarchyRiskData,
+        paramsWithPrompt.riskId,
+        paramsWithPrompt.hierarchyId,
       );
 
       if (!targetPair) {
@@ -343,6 +348,56 @@ export class AiAnalyzeFormQuestionsRisksUseCase {
     let analysesComplemented = 0;
 
     for (const hierarchyRisk of params.eligibleHierarchyRiskData) {
+      const isGroupJob =
+        hierarchyRisk.analysisScope === HIERARCHY_GROUP_ANALYSIS_SCOPE;
+
+      if (isGroupJob) {
+        const memberIds = getReplicationTargetHierarchyIds(hierarchyRisk);
+        const skipDecision = resolveGroupIncrementalSkipDecision({
+          hierarchyRisk,
+          existingRecordsByKey: params.existingRecordsByKey,
+          isIncremental: params.isIncremental,
+        });
+
+        if (skipDecision.action === 'skip') {
+          analysesSkipped += 1;
+          continue;
+        }
+
+        const excludedItems = mergeExcludedItemsFromGroupMembers({
+          memberHierarchyIds: memberIds,
+          riskId: hierarchyRisk.riskId,
+          existingRecordsByKey: params.existingRecordsByKey,
+        });
+
+        const canonicalKey = this.buildPairKey(
+          hierarchyRisk.hierarchyId,
+          hierarchyRisk.riskId,
+        );
+        const existingMetadata =
+          (params.existingRecordsByKey.get(canonicalKey)?.metadata as
+            | Record<string, unknown>
+            | null) ?? {};
+
+        if (
+          params.isIncremental &&
+          skipDecision.existingAnalysis &&
+          (skipDecision.quotas.missingSources < 4 ||
+            skipDecision.quotas.missingRecommendations < 4)
+        ) {
+          analysesComplemented += 1;
+        }
+
+        jobs.push({
+          hierarchyRisk,
+          existingAnalysis: skipDecision.existingAnalysis,
+          existingMetadata,
+          excludedItems,
+          quotas: skipDecision.quotas,
+        });
+        continue;
+      }
+
       const pairKey = this.buildPairKey(
         hierarchyRisk.hierarchyId,
         hierarchyRisk.riskId,
@@ -461,7 +516,9 @@ export class AiAnalyzeFormQuestionsRisksUseCase {
       if (failedAnalysesData.length > 0) {
         try {
           await this.storeFailedAnalysesToDatabase(
-            failedAnalysesData,
+            failedAnalysesData.flatMap((failed) =>
+              expandFailedAnalysisTargets(failed, jobs),
+            ),
             params,
             isIncremental,
           );
@@ -470,25 +527,42 @@ export class AiAnalyzeFormQuestionsRisksUseCase {
         }
       }
 
-      const resolvedKeys = new Set<string>([
-        ...successfulAnalyses.map((a) => `${a.hierarchyId}:${a.riskId}`),
-        ...failedAnalysesData.map((a) => `${a.hierarchyId}:${a.riskId}`),
-      ]);
-      const orphanData = jobs.filter(
-        (job) =>
-          !resolvedKeys.has(
-            `${job.hierarchyRisk.hierarchyId}:${job.hierarchyRisk.riskId}`,
-          ),
+      const resolvedKeys = new Set<string>(
+        successfulAnalyses.flatMap((analysis) =>
+          expandResolvedAnalysisKeys(analysis),
+        ),
       );
+
+      const expandedFailedAnalyses = failedAnalysesData.flatMap((failed) =>
+        expandFailedAnalysisTargets(failed, jobs),
+      );
+
+      for (const failed of expandedFailedAnalyses) {
+        resolvedKeys.add(this.buildPairKey(failed.hierarchyId, failed.riskId));
+      }
+
+      const orphanData = jobs.filter((job) => {
+        const targets = getReplicationTargetHierarchyIds(job.hierarchyRisk);
+        return targets.every(
+          (hierarchyId) =>
+            !resolvedKeys.has(
+              this.buildPairKey(hierarchyId, job.hierarchyRisk.riskId),
+            ),
+        );
+      });
       if (orphanData.length > 0) {
         console.warn(`[AI Analysis] ${orphanData.length} orphan PROCESSING records detected, marking as FAILED`);
         try {
           await this.storeFailedAnalysesToDatabase(
-            orphanData.map((job) => ({
-              hierarchyId: job.hierarchyRisk.hierarchyId,
-              riskId: job.hierarchyRisk.riskId,
-              error: 'Analysis returned no result',
-            })),
+            orphanData.flatMap((job) =>
+              getReplicationTargetHierarchyIds(job.hierarchyRisk).map(
+                (hierarchyId) => ({
+                  hierarchyId,
+                  riskId: job.hierarchyRisk.riskId,
+                  error: 'Analysis returned no result',
+                }),
+              ),
+            ),
             params,
             isIncremental,
           );
@@ -500,11 +574,15 @@ export class AiAnalyzeFormQuestionsRisksUseCase {
       console.error('[AI Analysis] Catastrophic background error, marking all eligible records as FAILED:', error);
       try {
         await this.storeFailedAnalysesToDatabase(
-          jobs.map((job) => ({
-            hierarchyId: job.hierarchyRisk.hierarchyId,
-            riskId: job.hierarchyRisk.riskId,
-            error: error instanceof Error ? error.message : 'Unknown background error',
-          })),
+          jobs.flatMap((job) =>
+            getReplicationTargetHierarchyIds(job.hierarchyRisk).map(
+              (hierarchyId) => ({
+                hierarchyId,
+                riskId: job.hierarchyRisk.riskId,
+                error: error instanceof Error ? error.message : 'Unknown background error',
+              }),
+            ),
+          ),
           params,
           isIncremental,
         );
@@ -520,8 +598,22 @@ export class AiAnalyzeFormQuestionsRisksUseCase {
     processingTimeMs: number,
     isIncremental: boolean,
   ): Promise<void> {
+    const expandedAnalyses = analyses.flatMap((analysis) => {
+      const targets =
+        analysis.replicateToHierarchyIds?.length
+          ? analysis.replicateToHierarchyIds
+          : [analysis.hierarchyId];
+
+      return targets.map((hierarchyId) => ({
+        ...analysis,
+        hierarchyId,
+        hierarchyName:
+          analysis.memberHierarchyNameById?.[hierarchyId] ?? analysis.hierarchyName,
+      }));
+    });
+
     await Promise.all(
-      analyses.map(async (analysis) => {
+      expandedAnalyses.map(async (analysis) => {
         const existingRecord = await this.prisma.formAiAnalysis.findUnique({
           where: {
             formApplicationId_hierarchyId_riskId: {
@@ -650,13 +742,22 @@ export class AiAnalyzeFormQuestionsRisksUseCase {
     params: IAiAnalyzeFormQuestionsRisksUseCase.Params,
     isIncremental: boolean,
   ): Promise<void> {
+    const expandedJobs = jobs.flatMap((job) => {
+      const targets = getReplicationTargetHierarchyIds(job.hierarchyRisk);
+
+      return targets.map((hierarchyId) => ({
+        job,
+        hierarchyId,
+      }));
+    });
+
     await Promise.all(
-      jobs.map(async (job) => {
+      expandedJobs.map(async ({ job, hierarchyId }) => {
         const existingRecord = await this.prisma.formAiAnalysis.findUnique({
           where: {
             formApplicationId_hierarchyId_riskId: {
               formApplicationId: params.formApplicationId,
-              hierarchyId: job.hierarchyRisk.hierarchyId,
+              hierarchyId,
               riskId: job.hierarchyRisk.riskId,
             },
           },
@@ -667,16 +768,16 @@ export class AiAnalyzeFormQuestionsRisksUseCase {
         const data = {
           companyId: params.companyId,
           formApplicationId: params.formApplicationId,
-          hierarchyId: job.hierarchyRisk.hierarchyId,
+          hierarchyId,
           riskId: job.hierarchyRisk.riskId,
           status: FormAiAnalysisStatusEnum.PROCESSING,
           probability: isIncremental ? existingRecord?.probability ?? null : null,
           confidence: isIncremental ? existingRecord?.confidence ?? null : null,
           analysis: isIncremental ? existingRecord?.analysis ?? null : null,
-          metadata: {
+          metadata: buildGroupReplicationMetadata(job.hierarchyRisk, {
             ...existingMetadata,
             startedAt: new Date().toISOString(),
-          },
+          }) as any,
           model: params.model,
           processingTimeMs: null,
         };
@@ -748,9 +849,12 @@ export class AiAnalyzeFormQuestionsRisksUseCase {
   ): IAiAnalyzeFormQuestionsRisksUseCase.HierarchyRiskData[] {
     const hierarchyRiskData: IAiAnalyzeFormQuestionsRisksUseCase.HierarchyRiskData[] = [];
     const availableRisksMap = new Map(availableRisks.map((risk) => [risk.id, risk]));
+    const memberToGroup = buildHierarchyToGroupMap(formData.hierarchyGroups);
 
     // Iterate through each hierarchy using the new detailed data structure
     Object.entries(formData.hierarchyRiskMap).forEach(([hierarchyId, risks]) => {
+      if (memberToGroup.has(hierarchyId)) return;
+
       const hierarchy = formData.hierarchyMap[hierarchyId];
       if (!hierarchy) return;
 
@@ -800,6 +904,7 @@ export class AiAnalyzeFormQuestionsRisksUseCase {
           probabilitySource: effective.source,
           hierarchyGroupId: effective.groupId,
           hierarchyGroupName: effective.groupName,
+          analysisScope: 'individual',
         });
       });
     });
@@ -876,6 +981,25 @@ export class AiAnalyzeFormQuestionsRisksUseCase {
 
       console.log(`[AI Analysis] Completed analysis for: ${analysisId} (confidence: ${result.confidence})`);
 
+      const replicateToHierarchyIds = getReplicationTargetHierarchyIds(hierarchyRisk);
+      const memberHierarchyNameById = hierarchyRisk.memberHierarchyIds?.reduce(
+        (acc, memberId, index) => {
+          const name =
+            hierarchyRisk.memberHierarchyNames?.[index] ?? hierarchyRisk.hierarchyName;
+          acc[memberId] = name;
+          return acc;
+        },
+        {} as Record<string, string>,
+      );
+
+      const groupMetadata = buildGroupReplicationMetadata(hierarchyRisk, {
+        ...job.existingMetadata,
+        ...result.metadata,
+        analysisId,
+        timestamp: new Date().toISOString(),
+        excludedItems: job.excludedItems,
+      });
+
       return {
         hierarchyId: hierarchyRisk.hierarchyId,
         hierarchyName: hierarchyRisk.hierarchyName,
@@ -886,13 +1010,9 @@ export class AiAnalyzeFormQuestionsRisksUseCase {
         analysis,
         confidence: result.confidence,
         questionsAnalyzed: hierarchyRisk.questions.length,
-        metadata: {
-          ...job.existingMetadata,
-          ...result.metadata,
-          analysisId,
-          timestamp: new Date().toISOString(),
-          excludedItems: job.excludedItems,
-        },
+        metadata: groupMetadata,
+        replicateToHierarchyIds,
+        memberHierarchyNameById,
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -920,15 +1040,31 @@ export class AiAnalyzeFormQuestionsRisksUseCase {
         ? ` (probabilidade oficial calculada pelo agrupamento de setores "${hierarchyRisk.hierarchyGroupName}")`
         : '';
 
-    // Add sector and risk information
-    content.push({
-      type: 'text' as const,
-      text: `SETOR AVALIADO: ${hierarchyRisk.hierarchyName}
+    if (hierarchyRisk.analysisScope === HIERARCHY_GROUP_ANALYSIS_SCOPE) {
+      const memberLabels =
+        hierarchyRisk.memberHierarchyNames?.length
+          ? hierarchyRisk.memberHierarchyNames.join(', ')
+          : hierarchyRisk.hierarchyName;
+
+      content.push({
+        type: 'text' as const,
+        text: `AGRUPAMENTO DE SETORES: ${hierarchyRisk.hierarchyGroupName ?? hierarchyRisk.hierarchyName}
+SETORES MEMBROS: ${memberLabels}
+FRPS: ${hierarchyRisk.riskName}
+PROBABILIDADE CALCULADA (AGRUPAMENTO): ${hierarchyRisk.probability}${probabilityNote}
+
+PERGUNTAS RELACIONADAS AO FRPS COM INDICADORES DE RESULTADO (DADOS AGREGADOS DO AGRUPAMENTO):`,
+      });
+    } else {
+      content.push({
+        type: 'text' as const,
+        text: `SETOR AVALIADO: ${hierarchyRisk.hierarchyName}
 FRPS: ${hierarchyRisk.riskName}
 PROBABILIDADE CALCULADA: ${hierarchyRisk.probability}${probabilityNote}
 
 PERGUNTAS RELACIONADAS AO FRPS COM INDICADORES DE RESULTADO:`,
-    });
+      });
+    }
 
     // Add questions and their results with indicators
     hierarchyRisk.questions.forEach((question, index) => {
@@ -999,10 +1135,20 @@ ${index + 1}. ${question.text}
       return evidenceScore >= 1.0;
     }).length;
 
+    const summaryTitle =
+      hierarchyRisk.analysisScope === HIERARCHY_GROUP_ANALYSIS_SCOPE
+        ? 'RESUMO DA ANÁLISE DO AGRUPAMENTO'
+        : 'RESUMO DA ANÁLISE DO SETOR';
+
+    const contextLabel =
+      hierarchyRisk.analysisScope === HIERARCHY_GROUP_ANALYSIS_SCOPE
+        ? `agrupamento "${hierarchyRisk.hierarchyGroupName ?? hierarchyRisk.hierarchyName}"`
+        : `setor: ${hierarchyRisk.hierarchyName}`;
+
     content.push({
       type: 'text' as const,
       text: `
-RESUMO DA ANÁLISE DO SETOR:
+${summaryTitle}:
 - Total de perguntas analisadas: ${totalQuestions}
 - Perguntas com nível Alto/Muito Alto: ${highRiskQuestions}
 - Percentual de risco elevado: ${totalQuestions > 0 ? ((highRiskQuestions / totalQuestions) * 100).toFixed(1) : 0}%
@@ -1019,7 +1165,7 @@ ${riskData.administrativeMeasures.map((adm, index) => `${index + 1}. ${adm.name}
 INSTRUÇÕES PARA ASSOCIAÇÃO:
 - Analise semanticamente cada pergunta e associe às fontes geradoras e medidas mais relevantes
 - Use o score de evidência como critério principal de ordenação
-- Considere o contexto específico do setor: ${hierarchyRisk.hierarchyName}
+- Considere o contexto específico do ${contextLabel}
 - Priorize itens com múltiplas perguntas de apoio
 - RECOMENDAÇÕES de Medidas de Engenharia: foque em modificações físicas/equipamentos para isolar/remover perigo
 - RECOMENDAÇÕES de Medidas Administrativas: foque em organização do trabalho para reduzir exposição`,

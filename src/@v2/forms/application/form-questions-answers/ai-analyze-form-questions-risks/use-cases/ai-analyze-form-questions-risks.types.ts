@@ -26,6 +26,8 @@ export namespace IAiAnalyzeFormQuestionsRisksUseCase {
     values: number[];
   };
 
+  export type HierarchyRiskAnalysisScope = 'individual' | 'hierarchy_group';
+
   export type HierarchyRiskData = {
     hierarchyId: string;
     hierarchyName: string;
@@ -38,6 +40,9 @@ export namespace IAiAnalyzeFormQuestionsRisksUseCase {
     probabilitySource?: 'individual' | 'hierarchy_group';
     hierarchyGroupId?: string;
     hierarchyGroupName?: string;
+    analysisScope?: HierarchyRiskAnalysisScope;
+    memberHierarchyIds?: string[];
+    memberHierarchyNames?: string[];
   };
 
   export type AvailableRiskData = {
@@ -78,6 +83,8 @@ export namespace IAiAnalyzeFormQuestionsRisksUseCase {
     confidence: number;
     questionsAnalyzed: number;
     metadata?: Record<string, any>;
+    replicateToHierarchyIds?: string[];
+    memberHierarchyNameById?: Record<string, string>;
   };
 
   export type Result = {
