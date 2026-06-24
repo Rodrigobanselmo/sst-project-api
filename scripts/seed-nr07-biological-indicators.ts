@@ -3,13 +3,20 @@ import * as path from 'path';
 
 import {
   BiologicalIndicatorStatusEnum,
+  BiologicalNormativeSourceEnum,
   PrismaClient,
 } from '@prisma/client';
 import * as XLSX from 'xlsx';
 
 import {
+  hasNormativeContentChanges,
+  IndicatorNormativePayload,
+  toIndicatorNormativePayload,
+} from '../src/@v2/medicine/biological-indicator/biological-indicator-import.util';
+import {
   NORMATIVE_SUBSTANCE_GROUPS,
 } from '../src/@v2/medicine/biological-indicator/biological-indicator-groups.constant';
+import { BiologicalIndicatorMatchService } from '../src/@v2/medicine/biological-indicator/biological-indicator-match.service';
 import {
   parseSpreadsheetIndicatorRow,
   SpreadsheetIndicatorRow,
@@ -35,10 +42,20 @@ type ImportStats = {
   created: number;
   updated: number;
   skipped: number;
+  deprecated: number;
   errors: number;
   groupsCreated: number;
   groupsReused: number;
+  batchReused: boolean;
+  batchId?: string;
   errorMessages: string[];
+};
+
+type PlannedRow = {
+  parsed: ReturnType<typeof parseSpreadsheetIndicatorRow>;
+  payload: IndicatorNormativePayload;
+  action: 'create' | 'update' | 'skip';
+  existingId?: string;
 };
 
 function parseArgs(argv: string[]): CliOptions {
@@ -121,6 +138,130 @@ async function ensureSubstanceGroups(
   return { created, reused, groupIdByName };
 }
 
+function buildPayload(
+  row: ReturnType<typeof parseSpreadsheetIndicatorRow>,
+  options: CliOptions,
+  substanceGroupId: string | null,
+): IndicatorNormativePayload {
+  return toIndicatorNormativePayload({
+    normativeSource: row.normativeSource,
+    annex: row.annex,
+    tableNumber: row.tableNumber,
+    indicatorType: row.indicatorType,
+    normativeVersion: options.normativeVersion,
+    substanceName: row.substanceName,
+    substanceNameNormalized: row.substanceNameNormalized,
+    casPrimary: row.casPrimary,
+    casNumbers: row.casNumbers,
+    substanceGroupId,
+    isSubstanceGroup: row.isSubstanceGroup,
+    biologicalIndicatorOriginal: row.biologicalIndicatorOriginal,
+    biologicalIndicatorNormalized: row.biologicalIndicatorNormalized,
+    biologicalMatrix: row.biologicalMatrix,
+    collectionMoment: row.collectionMoment,
+    referenceValue: row.referenceValue,
+    referenceValueRaw: row.referenceValueRaw,
+    unit: row.unit,
+    technicalObservations: row.technicalObservations,
+    technicalObservationsRaw: row.technicalObservationsRaw,
+    defaultValidityMonths: row.defaultValidityMonths,
+    collectionToleranceDays: row.collectionToleranceDays,
+    occupationalApplicability: row.occupationalApplicability,
+    requiresNormativeReview: row.requiresNormativeReview,
+    generalApplicabilityNotes: row.generalApplicabilityNotes,
+    status: row.status,
+    dataOrigin: row.dataOrigin,
+    idempotencyKey: row.idempotencyKey,
+  });
+}
+
+async function planImportRows(
+  prisma: PrismaClient,
+  parsedRows: ReturnType<typeof parseSpreadsheetIndicatorRow>[],
+  options: CliOptions,
+  groupIdByName: Map<string, string>,
+): Promise<PlannedRow[]> {
+  const planned: PlannedRow[] = [];
+
+  for (const row of parsedRows) {
+    const substanceGroupId = row.groupDefinition
+      ? groupIdByName.get(row.groupDefinition.name) ?? null
+      : null;
+
+    const payload = buildPayload(row, options, substanceGroupId);
+    const existing = await prisma.occupationalBiologicalIndicator.findUnique({
+      where: { idempotencyKey: row.idempotencyKey },
+    });
+
+    if (!existing) {
+      planned.push({ parsed: row, payload, action: 'create' });
+      continue;
+    }
+
+    if (hasNormativeContentChanges(existing, payload)) {
+      planned.push({
+        parsed: row,
+        payload,
+        action: 'update',
+        existingId: existing.id,
+      });
+      continue;
+    }
+
+    planned.push({
+      parsed: row,
+      payload,
+      action: 'skip',
+      existingId: existing.id,
+    });
+  }
+
+  return planned;
+}
+
+async function deprecateOrphanIndicators(
+  prisma: PrismaClient,
+  parsedRows: ReturnType<typeof parseSpreadsheetIndicatorRow>[],
+  normativeVersion: string,
+): Promise<number> {
+  const activeKeys = new Set(parsedRows.map((row) => row.idempotencyKey));
+
+  const orphans = await prisma.occupationalBiologicalIndicator.findMany({
+    where: {
+      deleted_at: null,
+      normativeSource: BiologicalNormativeSourceEnum.NR_07,
+      normativeVersion,
+      idempotencyKey: { notIn: Array.from(activeKeys) },
+    },
+    select: { id: true, substanceName: true },
+  });
+
+  if (!orphans.length) return 0;
+
+  const now = new Date();
+  const orphanIds = orphans.map((row) => row.id);
+
+  await prisma.$transaction([
+    prisma.biologicalIndicatorToRisk.updateMany({
+      where: { indicatorId: { in: orphanIds }, deleted_at: null },
+      data: { deleted_at: now },
+    }),
+    prisma.biologicalIndicatorToExam.updateMany({
+      where: { indicatorId: { in: orphanIds }, deleted_at: null },
+      data: { deleted_at: now },
+    }),
+    prisma.occupationalBiologicalIndicator.updateMany({
+      where: { id: { in: orphanIds } },
+      data: {
+        deleted_at: now,
+        reviewNotes: `Depreciado por ausência na planilha normativa em ${now.toISOString()}`,
+      },
+    }),
+  ]);
+
+  return orphans.length;
+}
+
 async function runImport(options: CliOptions): Promise<{
   stats: ImportStats;
   parsedRows: ReturnType<typeof parseSpreadsheetIndicatorRow>[];
@@ -131,9 +272,11 @@ async function runImport(options: CliOptions): Promise<{
     created: 0,
     updated: 0,
     skipped: 0,
+    deprecated: 0,
     errors: 0,
     groupsCreated: 0,
     groupsReused: 0,
+    batchReused: false,
     errorMessages: [],
   };
 
@@ -166,108 +309,106 @@ async function runImport(options: CliOptions): Promise<{
   }
 
   const prisma = new PrismaClient();
+  const matchService = new BiologicalIndicatorMatchService(prisma);
 
   try {
     const groups = await ensureSubstanceGroups(prisma, false);
     stats.groupsCreated = groups.created;
     stats.groupsReused = groups.reused;
 
-    const batch = await prisma.biologicalIndicatorImportBatch.create({
-      data: {
-        normativeSource: 'NR_07',
-        normativeVersion: options.normativeVersion,
-        sourceFileName: path.basename(options.filePath),
-        sourceFileHash,
-        importedById: options.importedById,
-        notes: 'Importação inicial NR-07 Anexo I',
-      },
+    const plannedRows = await planImportRows(
+      prisma,
+      parsedRows,
+      options,
+      groups.groupIdByName,
+    );
+
+    stats.created = plannedRows.filter((row) => row.action === 'create').length;
+    stats.updated = plannedRows.filter((row) => row.action === 'update').length;
+    stats.skipped = plannedRows.filter((row) => row.action === 'skip').length;
+
+    const reusableBatch = await matchService.findReusableImportBatch({
+      normativeSource: BiologicalNormativeSourceEnum.NR_07,
+      normativeVersion: options.normativeVersion,
+      sourceFileHash,
     });
 
-    for (const row of parsedRows) {
-      const substanceGroupId = row.groupDefinition
-        ? groups.groupIdByName.get(row.groupDefinition.name) ?? null
-        : null;
+    let batch = reusableBatch;
+    stats.batchReused = !!reusableBatch;
+
+    if (stats.created > 0 || stats.updated > 0) {
+      if (!batch) {
+        batch = await prisma.biologicalIndicatorImportBatch.create({
+          data: {
+            normativeSource: BiologicalNormativeSourceEnum.NR_07,
+            normativeVersion: options.normativeVersion,
+            sourceFileName: path.basename(options.filePath),
+            sourceFileHash,
+            importedById: options.importedById,
+            notes: 'Importação NR-07 Anexo I',
+          },
+        });
+        stats.batchReused = false;
+      }
+    } else if (!batch && stats.skipped > 0) {
+      batch = await matchService.findReusableImportBatch({
+        normativeSource: BiologicalNormativeSourceEnum.NR_07,
+        normativeVersion: options.normativeVersion,
+        sourceFileHash,
+      });
+      stats.batchReused = !!batch;
+      stats.batchId = batch?.id;
+    }
+
+    stats.batchId = batch?.id ?? stats.batchId;
+
+    for (const planned of plannedRows) {
+      if (planned.action === 'skip') continue;
 
       const data = {
-        normativeSource: row.normativeSource,
-        annex: row.annex,
-        tableNumber: row.tableNumber,
-        indicatorType: row.indicatorType,
-        normativeVersion: options.normativeVersion,
-        substanceName: row.substanceName,
-        substanceNameNormalized: row.substanceNameNormalized,
-        casPrimary: row.casPrimary,
-        casNumbers: row.casNumbers,
-        substanceGroupId,
-        isSubstanceGroup: row.isSubstanceGroup,
-        biologicalIndicatorOriginal: row.biologicalIndicatorOriginal,
-        biologicalIndicatorNormalized: row.biologicalIndicatorNormalized,
-        biologicalMatrix: row.biologicalMatrix,
-        collectionMoment: row.collectionMoment,
-        referenceValue: row.referenceValue,
-        referenceValueRaw: row.referenceValueRaw,
-        unit: row.unit,
-        technicalObservations: row.technicalObservations,
-        technicalObservationsRaw: row.technicalObservationsRaw,
-        defaultValidityMonths: row.defaultValidityMonths,
-        collectionToleranceDays: row.collectionToleranceDays,
-        occupationalApplicability: row.occupationalApplicability,
-        requiresNormativeReview: row.requiresNormativeReview,
-        generalApplicabilityNotes: row.generalApplicabilityNotes,
-        status: row.status,
-        dataOrigin: row.dataOrigin,
-        importBatchId: batch.id,
-        idempotencyKey: row.idempotencyKey,
+        ...planned.payload,
+        importBatchId: batch?.id ?? null,
       };
 
-      const existing = await prisma.occupationalBiologicalIndicator.findUnique({
-        where: { idempotencyKey: row.idempotencyKey },
-      });
-
-      if (!existing) {
+      if (planned.action === 'create') {
         await prisma.occupationalBiologicalIndicator.create({ data });
-        stats.created += 1;
-        continue;
-      }
-
-      const hasChanges =
-        existing.substanceName !== data.substanceName ||
-        existing.referenceValue !== data.referenceValue ||
-        existing.unit !== data.unit ||
-        existing.collectionToleranceDays !== data.collectionToleranceDays ||
-        JSON.stringify(existing.occupationalApplicability) !==
-          JSON.stringify(data.occupationalApplicability);
-
-      if (!hasChanges) {
-        stats.skipped += 1;
         continue;
       }
 
       await prisma.occupationalBiologicalIndicator.update({
-        where: { id: existing.id },
+        where: { id: planned.existingId },
         data: {
           ...data,
           reviewNotes: `Atualizado por reimportação em ${new Date().toISOString()}`,
         },
       });
-      stats.updated += 1;
     }
 
-    await prisma.biologicalIndicatorImportBatch.update({
-      where: { id: batch.id },
-      data: {
-        stats: {
-          totalRows: stats.totalRows,
-          parsed: stats.parsed,
-          created: stats.created,
-          updated: stats.updated,
-          skipped: stats.skipped,
-          errors: stats.errors,
-          groupsCreated: stats.groupsCreated,
-          groupsReused: stats.groupsReused,
+    stats.deprecated = await deprecateOrphanIndicators(
+      prisma,
+      parsedRows,
+      options.normativeVersion,
+    );
+
+    if (batch) {
+      await prisma.biologicalIndicatorImportBatch.update({
+        where: { id: batch.id },
+        data: {
+          stats: {
+            totalRows: stats.totalRows,
+            parsed: stats.parsed,
+            created: stats.created,
+            updated: stats.updated,
+            skipped: stats.skipped,
+            deprecated: stats.deprecated,
+            errors: stats.errors,
+            groupsCreated: stats.groupsCreated,
+            groupsReused: stats.groupsReused,
+            batchReused: stats.batchReused,
+          },
         },
-      },
-    });
+      });
+    }
 
     return { stats, parsedRows };
   } finally {
@@ -335,20 +476,67 @@ async function main() {
 
   const prisma = new PrismaClient();
   try {
-    const count = await prisma.occupationalBiologicalIndicator.count();
+    const activeWhere = { deleted_at: null };
+    const count = await prisma.occupationalBiologicalIndicator.count({
+      where: activeWhere,
+    });
     const draftCount = await prisma.occupationalBiologicalIndicator.count({
-      where: { status: 'DRAFT' },
+      where: { ...activeWhere, status: 'DRAFT' },
     });
     const tolerance45Count = await prisma.occupationalBiologicalIndicator.count({
-      where: { collectionToleranceDays: 45 },
+      where: { ...activeWhere, collectionToleranceDays: 45 },
+    });
+    const quadro1Count = await prisma.occupationalBiologicalIndicator.count({
+      where: { ...activeWhere, tableNumber: 'QUADRO_1' },
+    });
+    const quadro2Count = await prisma.occupationalBiologicalIndicator.count({
+      where: { ...activeWhere, tableNumber: 'QUADRO_2' },
+    });
+    const ibeEeCount = await prisma.occupationalBiologicalIndicator.count({
+      where: { ...activeWhere, indicatorType: 'IBE_EE' },
+    });
+    const ibeScCount = await prisma.occupationalBiologicalIndicator.count({
+      where: { ...activeWhere, indicatorType: 'IBE_SC' },
+    });
+    const tdiIndicators = await prisma.occupationalBiologicalIndicator.findMany({
+      where: {
+        ...activeWhere,
+        substanceName: { contains: 'Tolueno diisocianato', mode: 'insensitive' },
+      },
+      select: {
+        substanceName: true,
+        casNumbers: true,
+        biologicalIndicatorNormalized: true,
+      },
+      orderBy: { substanceName: 'asc' },
     });
     const groupCount = await prisma.biologicalIndicatorSubstanceGroup.count();
+    const batchCount = await prisma.biologicalIndicatorImportBatch.count();
 
     console.log('\nPós-importação no banco:');
-    console.log(`Total indicadores: ${count}`);
+    console.log(`Total indicadores ativos: ${count}`);
     console.log(`DRAFT: ${draftCount}`);
     console.log(`collectionToleranceDays=45: ${tolerance45Count}`);
+    console.log(`Quadro 1: ${quadro1Count}`);
+    console.log(`Quadro 2: ${quadro2Count}`);
+    console.log(`IBE/EE: ${ibeEeCount}`);
+    console.log(`IBE/SC: ${ibeScCount}`);
     console.log(`Grupos normativos: ${groupCount}`);
+    console.log(`Import batches: ${batchCount}`);
+    console.log('\nRegistros TDI ativos:');
+    tdiIndicators.forEach((row) => {
+      console.log(
+        JSON.stringify(
+          {
+            substanceName: row.substanceName,
+            casNumbers: row.casNumbers,
+            biologicalIndicatorNormalized: row.biologicalIndicatorNormalized,
+          },
+          null,
+          2,
+        ),
+      );
+    });
   } finally {
     await prisma.$disconnect();
   }
