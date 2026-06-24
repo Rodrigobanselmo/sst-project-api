@@ -28,6 +28,8 @@ export const getActivationPendencies = (params: {
   indicator: IndicatorSnapshot;
   riskLinks: RiskLinkSnapshot[];
   examLinks: ExamLinkSnapshot[];
+  /** Notas enviadas no request de ativação (antes de persistir reviewedAt). */
+  activationReviewNotes?: string;
 }): BiologicalIndicatorActivationPendency[] => {
   const pendencies: BiologicalIndicatorActivationPendency[] = [];
 
@@ -81,11 +83,16 @@ export const getActivationPendencies = (params: {
   }
 
   if (params.indicator.requiresNormativeReview && !params.indicator.reviewedAt) {
-    pendencies.push({
-      code: 'NORMATIVE_REVIEW_REQUIRED',
-      message:
-        'Revisão normativa/médica obrigatória ainda não foi registrada para este indicador.',
-    });
+    const hasActivationReviewNotes = Boolean(
+      params.activationReviewNotes?.trim(),
+    );
+    if (!hasActivationReviewNotes) {
+      pendencies.push({
+        code: 'NORMATIVE_REVIEW_REQUIRED',
+        message:
+          'Revisão normativa/médica obrigatória ainda não foi registrada para este indicador.',
+      });
+    }
   }
 
   return pendencies;

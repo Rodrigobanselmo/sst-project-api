@@ -56,6 +56,36 @@ describe('biological-indicator-activation.validator', () => {
     expect(pendencies.some((item) => item.code === 'NORMATIVE_REVIEW_REQUIRED')).toBe(true);
   });
 
+  it('aceita notas de revisão no request de ativação sem reviewedAt prévio', () => {
+    const pendencies = getActivationPendencies({
+      indicator: {
+        ...baseIndicator(),
+        requiresNormativeReview: true,
+        reviewedAt: null,
+      },
+      riskLinks: [{ deleted_at: null, isConfirmed: true, isPrimary: true }],
+      examLinks: [{ deleted_at: null, isConfirmed: true, isDefault: true }],
+      activationReviewNotes: 'Revisão normativa/médica realizada com base na NR-07.',
+    });
+
+    expect(pendencies).toHaveLength(0);
+  });
+
+  it('bloqueia ativação com notas de revisão vazias', () => {
+    const pendencies = getActivationPendencies({
+      indicator: {
+        ...baseIndicator(),
+        requiresNormativeReview: true,
+        reviewedAt: null,
+      },
+      riskLinks: [{ deleted_at: null, isConfirmed: true, isPrimary: true }],
+      examLinks: [{ deleted_at: null, isConfirmed: true, isDefault: true }],
+      activationReviewNotes: '   ',
+    });
+
+    expect(pendencies.some((item) => item.code === 'NORMATIVE_REVIEW_REQUIRED')).toBe(true);
+  });
+
   it('permite ativação quando critérios mínimos são atendidos', () => {
     const pendencies = getActivationPendencies({
       indicator: {

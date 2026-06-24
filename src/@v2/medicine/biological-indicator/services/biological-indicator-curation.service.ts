@@ -10,6 +10,9 @@ import {
 } from '@prisma/client';
 
 import { PrismaService } from '@/prisma/prisma.service';
+import { simpleCompanyId } from '@/shared/constants/ids';
+
+import { buildExamCatalogWhere } from '../biological-indicator-exam-provision.util';
 
 import { BiologicalIndicatorDAO } from '../database/dao/biological-indicator.dao';
 import { getActivationPendencies } from './biological-indicator-activation.validator';
@@ -85,8 +88,7 @@ export class BiologicalIndicatorCurationService {
     const limit = params.limit ?? 30;
 
     const where = {
-      deleted_at: null,
-      system: true,
+      ...buildExamCatalogWhere(simpleCompanyId),
       AND: [
         search
           ? {
@@ -341,12 +343,30 @@ export class BiologicalIndicatorCurationService {
         indicator,
         riskLinks: indicator.riskLinks,
         examLinks: indicator.examLinks,
+        activationReviewNotes: params.reviewNotes,
       });
 
       if (pendencies.length) {
         throw new BadRequestException({
           message: 'Indicador não atende aos critérios mínimos para ativação.',
           pendencies,
+        });
+      }
+
+      if (
+        indicator.requiresNormativeReview &&
+        !indicator.reviewedAt &&
+        !params.reviewNotes?.trim()
+      ) {
+        throw new BadRequestException({
+          message: 'Notas de revisão normativa/médica são obrigatórias para ativação.',
+          pendencies: [
+            {
+              code: 'NORMATIVE_REVIEW_REQUIRED',
+              message:
+                'Revisão normativa/médica obrigatória ainda não foi registrada para este indicador.',
+            },
+          ],
         });
       }
     }
