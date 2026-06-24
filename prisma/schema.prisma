@@ -1132,9 +1132,10 @@ model Exam {
   obsProc          String?
   employeesHistory EmployeeExamsHistory[]
   company          Company                @relation(fields: [companyId], references: [id])
-  examToClinic     ExamToClinic[]
-  examToRisk       ExamToRisk[]
-  examToRiskData   ExamToRiskData[]
+  examToClinic             ExamToClinic[]
+  examToRisk               ExamToRisk[]
+  examToRiskData           ExamToRiskData[]
+  biologicalIndicatorLinks BiologicalIndicatorToExam[]
 
   @@unique([id, companyId])
   @@index([companyId])
@@ -2136,6 +2137,7 @@ model RiskFactors {
   formAiAnalyses         FormAiAnalysis[]
   hoMethods              HoMethod[]
   hoMethodAgents         HoMethodAgent[]
+  biologicalIndicatorLinks BiologicalIndicatorToRisk[]
 
   @@unique([id, companyId])
   @@index([name])
@@ -2593,6 +2595,10 @@ model User {
   systemAiPromptsUpdated              SystemAiPrompt[]              @relation("SystemAiPromptUpdatedBy")
   formRiskNarrativeDiagnosticsCreated       FormRiskNarrativeDiagnostic[]       @relation("FormRiskNarrativeDiagnosticGeneratedBy")
   formIndicatorsNarrativeDiagnosticsCreated FormIndicatorsNarrativeDiagnostic[] @relation("FormIndicatorsNarrativeDiagnosticGeneratedBy")
+  biologicalIndicatorImports              BiologicalIndicatorImportBatch[]      @relation("BiologicalIndicatorImportedBy")
+  biologicalIndicatorsReviewed            OccupationalBiologicalIndicator[]     @relation("BiologicalIndicatorReviewedBy")
+  biologicalIndicatorRisksConfirmed       BiologicalIndicatorToRisk[]           @relation("BiologicalIndicatorRiskConfirmedBy")
+  biologicalIndicatorExamsConfirmed       BiologicalIndicatorToExam[]           @relation("BiologicalIndicatorExamConfirmedBy")
 
   @@unique([id, name])
   @@index([email])
@@ -3658,6 +3664,267 @@ model RiskCatalogEquivalence {
   @@index([kind, riskId, aliasId])
   @@index([kind, riskId, normalizedKey])
   @@map("risk_catalog_equivalence")
+}
+
+// ── NR-07 Anexo I — Indicadores Biológicos Ocupacionais ─────────────────────
+
+enum BiologicalNormativeSourceEnum {
+  NR_07
+}
+
+enum BiologicalIndicatorAnnexEnum {
+  ANNEX_I
+}
+
+enum BiologicalIndicatorTableEnum {
+  QUADRO_1
+  QUADRO_2
+}
+
+enum BiologicalIndicatorTypeEnum {
+  IBE_EE
+  IBE_SC
+}
+
+enum BiologicalCollectionMomentEnum {
+  AJ
+  FJ
+  FJFS
+  AJFS
+  AJ48
+  NC
+  FS
+  AJ_FJ
+}
+
+enum BiologicalIndicatorStatusEnum {
+  DRAFT
+  ACTIVE
+  DEPRECATED
+  REVOKED
+}
+
+enum BiologicalIndicatorDataOriginEnum {
+  SPREADSHEET_IMPORT
+  MANUAL
+  AI_REVIEW
+  NORMATIVE_UPDATE
+}
+
+enum BiologicalIndicatorMatchConfidenceEnum {
+  HIGH
+  PROBABLE
+  LOW
+  MANUAL
+  NONE
+}
+
+enum BiologicalIndicatorMatchMethodEnum {
+  CAS_EXACT
+  CAS_MULTI_ANY
+  NAME_EXACT
+  SYNONYM_EXACT
+  NAME_FUZZY
+  GROUP_RULE
+  GROUP_EXPAND
+  CATALOG_EQUIVALENCE
+  AI_SUGGESTED
+  MANUAL
+}
+
+enum BiologicalIndicatorSubstanceGroupTypeEnum {
+  METHEMOGLOBIN_INDUCTORS
+  CHOLINESTERASE_INHIBITORS
+  INORGANIC_FLUORIDES
+  COMPOUND_FAMILY
+  ISOMER_MIXTURE
+  OTHER
+}
+
+enum BiologicalIndicatorTechnicalObservationEnum {
+  NE
+  EPNE
+  NF
+  H
+  SH
+}
+
+enum BiologicalNormativeApplicationSourceEnum {
+  NR_07_ANNEX_I
+  MANUAL
+  MIXED
+}
+
+model BiologicalIndicatorImportBatch {
+  id               String                        @id @default(cuid())
+  normativeSource  BiologicalNormativeSourceEnum
+  normativeVersion String
+  sourceFileName   String?
+  sourceFileHash   String?
+  importedAt       DateTime                      @default(now())
+  importedById     Int?
+  importedBy       User?                         @relation("BiologicalIndicatorImportedBy", fields: [importedById], references: [id], onDelete: SetNull)
+  notes            String?
+  stats            Json?
+
+  indicators OccupationalBiologicalIndicator[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@index([normativeSource, normativeVersion])
+  @@index([sourceFileHash])
+  @@map("BiologicalIndicatorImportBatch")
+}
+
+model BiologicalIndicatorSubstanceGroup {
+  id          String                                    @id @default(cuid())
+  groupType   BiologicalIndicatorSubstanceGroupTypeEnum
+  name        String
+  description String?
+  matchRules  Json?
+  status      BiologicalIndicatorStatusEnum             @default(DRAFT)
+
+  indicators OccupationalBiologicalIndicator[]
+
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+
+  @@unique([groupType, name])
+  @@index([status])
+  @@map("BiologicalIndicatorSubstanceGroup")
+}
+
+model OccupationalBiologicalIndicator {
+  id String @id @default(cuid())
+
+  normativeSource   BiologicalNormativeSourceEnum
+  annex             BiologicalIndicatorAnnexEnum
+  tableNumber       BiologicalIndicatorTableEnum
+  indicatorType     BiologicalIndicatorTypeEnum
+  normativeVersion  String
+
+  substanceName             String
+  substanceNameNormalized   String
+  casPrimary                String?
+  casNumbers                String[]
+  substanceGroupId          String?
+  substanceGroup            BiologicalIndicatorSubstanceGroup? @relation(fields: [substanceGroupId], references: [id], onDelete: SetNull)
+  isSubstanceGroup          Boolean                          @default(false)
+
+  biologicalIndicatorOriginal   String
+  biologicalIndicatorNormalized String
+
+  biologicalMatrix             String
+  collectionMoment             BiologicalCollectionMomentEnum
+  referenceValue               String?
+  referenceValueRaw            String?
+  unit                         String?
+  technicalObservations        BiologicalIndicatorTechnicalObservationEnum[] @default([])
+  technicalObservationsRaw     String?
+
+  defaultValidityMonths     Int   @default(6)
+  collectionToleranceDays   Int   @default(45)
+  occupationalApplicability Json
+  requiresNormativeReview   Boolean @default(false)
+  generalApplicabilityNotes String?
+
+  status         BiologicalIndicatorStatusEnum     @default(DRAFT)
+  dataOrigin     BiologicalIndicatorDataOriginEnum
+  importBatchId  String?
+  importBatch    BiologicalIndicatorImportBatch? @relation(fields: [importBatchId], references: [id], onDelete: SetNull)
+  idempotencyKey String
+  supersededById String?
+  supersededBy   OccupationalBiologicalIndicator?  @relation("IndicatorSupersession", fields: [supersededById], references: [id], onDelete: SetNull)
+  supersedes     OccupationalBiologicalIndicator[] @relation("IndicatorSupersession")
+  reviewedById   Int?
+  reviewedBy     User?                             @relation("BiologicalIndicatorReviewedBy", fields: [reviewedById], references: [id], onDelete: SetNull)
+  reviewedAt     DateTime?
+  reviewNotes    String?
+
+  riskLinks BiologicalIndicatorToRisk[]
+  examLinks BiologicalIndicatorToExam[]
+
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+
+  @@unique([idempotencyKey])
+  @@index([normativeSource, annex, tableNumber, indicatorType])
+  @@index([substanceNameNormalized])
+  @@index([casPrimary])
+  @@index([biologicalIndicatorNormalized])
+  @@index([status])
+  @@index([normativeVersion])
+  @@index([substanceGroupId])
+  @@index([requiresNormativeReview])
+  @@map("OccupationalBiologicalIndicator")
+}
+
+model BiologicalIndicatorToRisk {
+  id String @id @default(cuid())
+
+  indicatorId  String
+  indicator    OccupationalBiologicalIndicator @relation(fields: [indicatorId], references: [id], onDelete: Cascade)
+  riskFactorId String
+  riskFactor   RiskFactors                     @relation(fields: [riskFactorId], references: [id], onDelete: Restrict)
+
+  matchConfidence BiologicalIndicatorMatchConfidenceEnum
+  matchMethod     BiologicalIndicatorMatchMethodEnum
+  isPrimary       Boolean                              @default(false)
+  requiresReview  Boolean                              @default(true)
+  isConfirmed     Boolean                              @default(false)
+  confirmedById   Int?
+  confirmedBy     User?                                @relation("BiologicalIndicatorRiskConfirmedBy", fields: [confirmedById], references: [id], onDelete: SetNull)
+  confirmedAt     DateTime?
+  notes           String?
+
+  riskNameSnapshot String?
+  riskCasSnapshot  String?
+
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+
+  @@unique([indicatorId, riskFactorId])
+  @@index([riskFactorId])
+  @@index([matchConfidence])
+  @@index([isConfirmed])
+  @@index([isPrimary])
+  @@map("BiologicalIndicatorToRisk")
+}
+
+model BiologicalIndicatorToExam {
+  id String @id @default(cuid())
+
+  indicatorId String
+  indicator   OccupationalBiologicalIndicator @relation(fields: [indicatorId], references: [id], onDelete: Cascade)
+  examId      Int
+  exam        Exam                            @relation(fields: [examId], references: [id], onDelete: Restrict)
+
+  matchConfidence BiologicalIndicatorMatchConfidenceEnum
+  matchMethod     BiologicalIndicatorMatchMethodEnum
+  isDefault       Boolean                              @default(false)
+  requiresReview  Boolean                              @default(true)
+  isConfirmed     Boolean                              @default(false)
+  confirmedById   Int?
+  confirmedBy     User?                                @relation("BiologicalIndicatorExamConfirmedBy", fields: [confirmedById], references: [id], onDelete: SetNull)
+  confirmedAt     DateTime?
+  notes           String?
+
+  examNameSnapshot     String?
+  examMaterialSnapshot String?
+
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+
+  @@unique([indicatorId, examId])
+  @@index([examId])
+  @@index([isDefault])
+  @@index([isConfirmed])
+  @@map("BiologicalIndicatorToExam")
 }
 
 model WorkspaceToCompanyConversionLog {
