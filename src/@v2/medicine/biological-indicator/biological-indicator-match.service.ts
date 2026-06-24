@@ -10,7 +10,9 @@ import {
   BiologicalIndicatorMatchReport,
   BiologicalIndicatorRiskMatchResult,
 } from './biological-indicator-match.types';
+import { buildExamCatalogWhere } from './biological-indicator-exam-provision.util';
 import { matchIndicatorToExams } from './biological-indicator-exam-match.util';
+import { simpleCompanyId } from '@/shared/constants/ids';
 import {
   buildCatalogNameAliasMap,
   matchIndicatorToRisks,
@@ -54,10 +56,7 @@ export class BiologicalIndicatorMatchService {
     });
 
     const exams = await this.prisma.exam.findMany({
-      where: {
-        system: true,
-        deleted_at: null,
-      },
+      where: buildExamCatalogWhere(simpleCompanyId),
       select: {
         id: true,
         name: true,
