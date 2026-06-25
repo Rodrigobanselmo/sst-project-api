@@ -20,9 +20,15 @@ import { createFileValidator } from '@/@v2/shared/utils/file/create-file-validat
 import { RoleEnum } from '@/shared/constants/enum/authorization';
 import { Roles } from '@/shared/decorators/roles.decorator';
 
-import { BiologicalIndicatorImportPreviewBody } from './biological-indicator-maintenance.dto';
+import {
+  BiologicalIndicatorImportApplyBody,
+  BiologicalIndicatorImportPreviewBody,
+} from './biological-indicator-maintenance.dto';
+import { BiologicalIndicatorImportApplyService } from '../../services/biological-indicator-import-apply.service';
 import { BiologicalIndicatorImportPreviewService } from '../../services/biological-indicator-import-preview.service';
 import { BiologicalIndicatorSpreadsheetExportService } from '../../services/biological-indicator-spreadsheet-export.service';
+import { User } from '@/shared/decorators/user.decorator';
+import { UserPayloadDto } from '@/shared/dto/user-payload.dto';
 
 const XLSX_CONTENT_TYPE =
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
@@ -34,6 +40,7 @@ export class BiologicalIndicatorMaintenanceController {
   constructor(
     private readonly exportService: BiologicalIndicatorSpreadsheetExportService,
     private readonly previewService: BiologicalIndicatorImportPreviewService,
+    private readonly applyService: BiologicalIndicatorImportApplyService,
   ) {}
 
   @Get(MedicineRoutes.BIOLOGICAL_INDICATORS.EXPORT)
@@ -70,6 +77,39 @@ export class BiologicalIndicatorMaintenanceController {
       buffer: file.buffer,
       fileName: file.originalname ?? 'planilha.xlsx',
       normativeVersion: body.normativeVersion,
+    });
+  }
+
+  @Post(MedicineRoutes.BIOLOGICAL_INDICATORS.IMPORT_APPLY)
+  @UseInterceptors(FileInterceptor('file'))
+  async importApply(
+    @Body() body: BiologicalIndicatorImportApplyBody,
+    @User() user: UserPayloadDto,
+    @UploadedFile(
+      createFileValidator({
+        maxSize: MAX_DOCUMENT_SIZE,
+        fileType: ALLOWED_UPLOAD_XLSX_TYPES,
+        required: true,
+        invalidFileTypeMessage: 'Envie uma planilha Excel .xlsx.',
+      }),
+    )
+    file: { buffer: Buffer; originalname?: string },
+  ) {
+    if (!file?.buffer?.length) {
+      throw new BadRequestException('Arquivo vazio ou inválido.');
+    }
+
+    if (body.confirmApply !== 'true') {
+      throw new BadRequestException(
+        'Confirmação explícita (confirmApply) é obrigatória para aplicar a atualização.',
+      );
+    }
+
+    return this.applyService.apply({
+      buffer: file.buffer,
+      fileName: file.originalname ?? 'planilha.xlsx',
+      normativeVersion: body.normativeVersion,
+      userId: user.userId,
     });
   }
 

@@ -7,6 +7,7 @@ export const MedicineRoutes = {
     EXPORT: 'export',
     TEMPLATE: 'template',
     IMPORT_PREVIEW: 'import/preview',
+    IMPORT_APPLY: 'import/apply',
     RISK_LINKS: {
       CONFIRM: 'risk-links/:id/confirm',
       REJECT: 'risk-links/:id/reject',

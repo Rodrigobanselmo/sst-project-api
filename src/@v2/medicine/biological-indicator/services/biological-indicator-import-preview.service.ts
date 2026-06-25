@@ -74,7 +74,7 @@ export type ImportPreviewResult = {
   deprecatedCandidates: Array<{ indicatorId: string; substanceName: string }>;
 };
 
-const existingSelect = {
+export const existingSelect = {
   id: true,
   idempotencyKey: true,
   normativeSource: true,
@@ -106,9 +106,33 @@ const existingSelect = {
   dataOrigin: true,
 } satisfies Prisma.OccupationalBiologicalIndicatorSelect;
 
-type ExistingIndicator = Prisma.OccupationalBiologicalIndicatorGetPayload<{
+export type ExistingIndicator = Prisma.OccupationalBiologicalIndicatorGetPayload<{
   select: typeof existingSelect;
 }>;
+
+/** Per-row outcome enriched with the data the apply step needs (incoming
+ *  payload + matched existing record). Used by the apply service so that the
+ *  classification logic stays single-sourced with the preview. */
+export type PreviewPlanItem = {
+  line: PreviewLine;
+  payload: IndicatorNormativePayload | null;
+  existing: ExistingIndicator | null;
+};
+
+export type ImportPreviewModel = {
+  fileName: string;
+  normativeVersion: string;
+  totals: ImportPreviewResult['totals'];
+  lines: PreviewLine[];
+  deprecatedCandidates: ImportPreviewResult['deprecatedCandidates'];
+  plan: PreviewPlanItem[];
+};
+
+type ClassifiedRow = {
+  line: PreviewLine;
+  payload: IndicatorNormativePayload | null;
+  existing: ExistingIndicator | null;
+};
 
 @Injectable()
 export class BiologicalIndicatorImportPreviewService {
@@ -119,6 +143,22 @@ export class BiologicalIndicatorImportPreviewService {
     fileName: string;
     normativeVersion?: string;
   }): Promise<ImportPreviewResult> {
+    const model = await this.buildModel(params);
+    return {
+      fileName: model.fileName,
+      totals: model.totals,
+      lines: model.lines,
+      deprecatedCandidates: model.deprecatedCandidates,
+    };
+  }
+
+  /** Full preview model including the per-row apply plan. The apply service
+   *  reuses this so classification rules stay single-sourced. */
+  async buildModel(params: {
+    buffer: Buffer;
+    fileName: string;
+    normativeVersion?: string;
+  }): Promise<ImportPreviewModel> {
     const normativeVersion = params.normativeVersion ?? DEFAULT_NORMATIVE_VERSION;
     const rows = this.readRows(params.buffer);
 
@@ -138,7 +178,7 @@ export class BiologicalIndicatorImportPreviewService {
     );
 
     const matchedExistingIds = new Set<string>();
-    const lines: PreviewLine[] = parsedRows.map((parsed) =>
+    const classified: ClassifiedRow[] = parsedRows.map((parsed) =>
       this.classifyRow(parsed, {
         byId,
         byKey,
@@ -148,12 +188,19 @@ export class BiologicalIndicatorImportPreviewService {
       }),
     );
 
+    const lines: PreviewLine[] = classified.map((c) => c.line);
+    const plan: PreviewPlanItem[] = classified.map((c) => ({
+      line: c.line,
+      payload: c.payload,
+      existing: c.existing,
+    }));
+
     const deprecatedCandidates = existing
       .filter((e) => !matchedExistingIds.has(e.id))
       .map((e) => ({ indicatorId: e.id, substanceName: e.substanceName }));
 
     deprecatedCandidates.forEach((candidate) => {
-      lines.push({
+      const line: PreviewLine = {
         rowNumber: -1,
         classification: Classification.DEPRECATED_CANDIDATE,
         anchorUsed: 'indicatorId',
@@ -163,14 +210,22 @@ export class BiologicalIndicatorImportPreviewService {
         changedFields: [],
         fieldChanges: [],
         errors: [],
+      };
+      lines.push(line);
+      plan.push({
+        line,
+        payload: null,
+        existing: byId.get(candidate.indicatorId) ?? null,
       });
     });
 
     return {
       fileName: params.fileName,
+      normativeVersion,
       totals: this.buildTotals(lines),
       lines,
       deprecatedCandidates,
+      plan,
     };
   }
 
@@ -183,7 +238,7 @@ export class BiologicalIndicatorImportPreviewService {
       seenKeys: Map<string, number>;
       matchedExistingIds: Set<string>;
     },
-  ): PreviewLine {
+  ): ClassifiedRow {
     const base: PreviewLine = {
       rowNumber: parsed.rowNumber,
       classification: Classification.NEW,
@@ -197,17 +252,25 @@ export class BiologicalIndicatorImportPreviewService {
     };
 
     if (parsed.errors.length || !parsed.payload) {
-      return { ...base, classification: Classification.INVALID };
+      return {
+        line: { ...base, classification: Classification.INVALID },
+        payload: null,
+        existing: null,
+      };
     }
 
     // Duplicate anchors within the sheet => CONFLICT
     if (parsed.indicatorId && (ctx.seenIds.get(parsed.indicatorId) ?? 0) > 1) {
       return {
-        ...base,
-        classification: Classification.CONFLICT,
-        errors: [
-          { field: 'indicatorId', message: 'indicatorId duplicado na planilha.' },
-        ],
+        line: {
+          ...base,
+          classification: Classification.CONFLICT,
+          errors: [
+            { field: 'indicatorId', message: 'indicatorId duplicado na planilha.' },
+          ],
+        },
+        payload: null,
+        existing: null,
       };
     }
     if (
@@ -215,11 +278,18 @@ export class BiologicalIndicatorImportPreviewService {
       (ctx.seenKeys.get(parsed.idempotencyKey) ?? 0) > 1
     ) {
       return {
-        ...base,
-        classification: Classification.CONFLICT,
-        errors: [
-          { field: 'idempotencyKey', message: 'idempotencyKey duplicado na planilha.' },
-        ],
+        line: {
+          ...base,
+          classification: Classification.CONFLICT,
+          errors: [
+            {
+              field: 'idempotencyKey',
+              message: 'idempotencyKey duplicado na planilha.',
+            },
+          ],
+        },
+        payload: null,
+        existing: null,
       };
     }
 
@@ -228,19 +298,32 @@ export class BiologicalIndicatorImportPreviewService {
       const existing = ctx.byId.get(parsed.indicatorId);
       if (!existing) {
         return {
-          ...base,
-          classification: Classification.CONFLICT,
-          anchorUsed: 'indicatorId',
-          errors: [
-            {
-              field: 'indicatorId',
-              message: 'indicatorId não encontrado na base atual.',
-            },
-          ],
+          line: {
+            ...base,
+            classification: Classification.CONFLICT,
+            anchorUsed: 'indicatorId',
+            errors: [
+              {
+                field: 'indicatorId',
+                message: 'indicatorId não encontrado na base atual.',
+              },
+            ],
+          },
+          payload: null,
+          existing: null,
         };
       }
       ctx.matchedExistingIds.add(existing.id);
-      return this.diffAgainstExisting(base, parsed.payload, existing, 'indicatorId');
+      return {
+        line: this.diffAgainstExisting(
+          base,
+          parsed.payload,
+          existing,
+          'indicatorId',
+        ),
+        payload: parsed.payload,
+        existing,
+      };
     }
 
     // Anchor by idempotencyKey
@@ -248,12 +331,16 @@ export class BiologicalIndicatorImportPreviewService {
       const existing = ctx.byKey.get(parsed.idempotencyKey);
       if (existing) {
         ctx.matchedExistingIds.add(existing.id);
-        return this.diffAgainstExisting(
-          base,
-          parsed.payload,
+        return {
+          line: this.diffAgainstExisting(
+            base,
+            parsed.payload,
+            existing,
+            'idempotencyKey',
+          ),
+          payload: parsed.payload,
           existing,
-          'idempotencyKey',
-        );
+        };
       }
     }
 
@@ -261,15 +348,23 @@ export class BiologicalIndicatorImportPreviewService {
     const implicit = ctx.byKey.get(parsed.payload.idempotencyKey);
     if (implicit) {
       ctx.matchedExistingIds.add(implicit.id);
-      return this.diffAgainstExisting(
-        base,
-        parsed.payload,
-        implicit,
-        'idempotencyKey',
-      );
+      return {
+        line: this.diffAgainstExisting(
+          base,
+          parsed.payload,
+          implicit,
+          'idempotencyKey',
+        ),
+        payload: parsed.payload,
+        existing: implicit,
+      };
     }
 
-    return { ...base, classification: Classification.NEW, anchorUsed: 'none' };
+    return {
+      line: { ...base, classification: Classification.NEW, anchorUsed: 'none' },
+      payload: parsed.payload,
+      existing: null,
+    };
   }
 
   private diffAgainstExisting(

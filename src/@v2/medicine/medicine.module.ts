@@ -9,6 +9,7 @@ import { BiologicalIndicatorMaintenanceController } from './biological-indicator
 import { BiologicalIndicatorDAO } from './biological-indicator/database/dao/biological-indicator.dao';
 import { BiologicalIndicatorApplicationService } from './biological-indicator/services/biological-indicator-application.service';
 import { BiologicalIndicatorCurationService } from './biological-indicator/services/biological-indicator-curation.service';
+import { BiologicalIndicatorImportApplyService } from './biological-indicator/services/biological-indicator-import-apply.service';
 import { BiologicalIndicatorImportPreviewService } from './biological-indicator/services/biological-indicator-import-preview.service';
 import { BiologicalIndicatorSpreadsheetExportService } from './biological-indicator/services/biological-indicator-spreadsheet-export.service';
 
@@ -25,6 +26,7 @@ import { BiologicalIndicatorSpreadsheetExportService } from './biological-indica
     BiologicalIndicatorApplicationService,
     BiologicalIndicatorSpreadsheetExportService,
     BiologicalIndicatorImportPreviewService,
+    BiologicalIndicatorImportApplyService,
   ],
 })
 export class MedicineModule {}
