@@ -7,6 +7,8 @@ import { Prisma } from '@prisma/client';
 import { FindEsocialTable24Dto } from '../../dto/event.dto';
 import { onlyNumbers } from '@brazilian-utils/brazilian-utils';
 import { normalizeString } from '../../../../shared/utils/normalizeString';
+import { Roles } from '../../../../shared/decorators/roles.decorator';
+import { RoleEnum } from '../../../../shared/constants/enum/authorization';
 
 @Controller('esocial')
 export class TablesController {
@@ -232,9 +234,10 @@ export class TablesController {
     return { data };
   }
 
-  //not been used
+  @Roles(RoleEnum.MASTER)
   @Get('table-27')
-  find27() {
-    return this.findAllTable27Service.execute();
+  async find27() {
+    const data = await this.findAllTable27Service.execute();
+    return { data, count: data.length };
   }
 }

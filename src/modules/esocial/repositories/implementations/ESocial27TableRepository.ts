@@ -1,11 +1,16 @@
 import { Injectable } from '@nestjs/common';
 
+export type ESocialTable27Item = {
+  code: string;
+  name: string;
+};
+
 @Injectable()
 export class ESocial27TableRepository {
   // constructor(private prisma: PrismaService) {}
 
-  async findAll() {
-    return [
+  async findAll(): Promise<ESocialTable27Item[]> {
+    const raw = [
       {
         code: '0001',
         'name ': '1,1-dicloro-2,2-bis (P-clorofeniletileno)',
@@ -5705,5 +5710,10 @@ export class ESocial27TableRepository {
         'name ': 'Outros procedimentos diagnósticos não descritos anteriormente',
       },
     ];
+
+    return raw.map((item) => ({
+      code: String(item.code).trim(),
+      name: String(item['name '] ?? '').trim(),
+    }));
   }
 }
