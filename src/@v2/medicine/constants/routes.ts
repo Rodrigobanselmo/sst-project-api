@@ -4,6 +4,9 @@ export const MedicineRoutes = {
     EXAM_CANDIDATES: 'exam-candidates',
     APPLICATION_PREVIEW: 'application-preview',
     APPLY: 'apply',
+    EXPORT: 'export',
+    TEMPLATE: 'template',
+    IMPORT_PREVIEW: 'import/preview',
     RISK_LINKS: {
       CONFIRM: 'risk-links/:id/confirm',
       REJECT: 'risk-links/:id/reject',

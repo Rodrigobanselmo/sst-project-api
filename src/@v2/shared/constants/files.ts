@@ -5,3 +5,6 @@ export const MAX_DOCUMENT_SIZE = 200 * MEGA_BYTE;
 export const IMAGE_ALLOWED_TYPES = /(jpg|jpeg|png|webp|jpe|bmp|raw)$/;
 export const ALLOWED_ALL_TYPES = /.*/;
 export const ALLOWED_UPLOAD_XML_TYPES = /(xml|xlsx)$/;
+/** MIME types for Excel .xlsx (and legacy .xls when needed). */
+export const ALLOWED_UPLOAD_XLSX_TYPES =
+  /(spreadsheetml\.sheet|vnd\.ms-excel)$/i;
