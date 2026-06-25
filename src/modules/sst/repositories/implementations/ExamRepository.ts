@@ -5,7 +5,12 @@ import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto';
 
 import { PrismaService } from '../../../../prisma/prisma.service';
 import { CreateExamDto, FindExamDto, UpdateExamDto, UpsertExamDto } from '../../dto/exam.dto';
-import { Prisma } from '@prisma/client';
+import { BiologicalNormativeSourceEnum, Prisma } from '@prisma/client';
+import {
+  buildExamOrderBy,
+  buildExamOriginConstraint,
+  resolveExamOrigin,
+} from '../../services/exam/find-exam/exam-origin.util';
 
 let i = 0;
 
@@ -52,7 +57,12 @@ export class ExamRepository {
     return data.map((exam) => new ExamEntity(exam));
   }
 
-  async find(query: Partial<FindExamDto>, pagination: PaginationQueryDto, options: Prisma.ExamFindManyArgs = {}) {
+  async find(
+    query: Partial<FindExamDto>,
+    pagination: PaginationQueryDto,
+    options: Prisma.ExamFindManyArgs = {},
+    extra: { withOrigin?: boolean } = {},
+  ) {
     const whereInit = {
       AND: [],
       ...options.where,
@@ -61,7 +71,7 @@ export class ExamRepository {
 
     const { where } = prismaFilter(whereInit, {
       query,
-      skip: ['search', 'clinicId', 'companyId'],
+      skip: ['search', 'clinicId', 'companyId', 'origin'],
     });
 
     if ('companyId' in query) {
@@ -86,23 +96,73 @@ export class ExamRepository {
       } as typeof options.where);
     }
 
-    const response = await this.prisma.$transaction([
-      this.prisma.exam.count({
-        where,
-      }),
-      this.prisma.exam.findMany({
-        where: { OR: [where, { system: true }] },
-        include: Object.keys(include).length > 0 ? include : undefined,
-        take: pagination.take || 20,
-        skip: pagination.skip || 0,
-        orderBy: { name: 'asc' },
-      }),
-    ]);
+    // Origin support (opt-in). Keeps legacy behavior untouched when withOrigin
+    // is not requested (e.g. clinic exam picker).
+    const nr07ExamIds = extra.withOrigin
+      ? await this.getNr07ExamIds()
+      : new Set<number>();
+    const originConstraint = extra.withOrigin
+      ? buildExamOriginConstraint(query.origin, nr07ExamIds)
+      : null;
+    const orderBy = buildExamOrderBy(query.orderBy, query.orderByDirection);
+
+    let response: [number, any[]];
+
+    if (originConstraint) {
+      // When filtering by origin, count and data must share the same where so
+      // totals stay consistent with the visible rows.
+      const consistentWhere = {
+        AND: [{ OR: [where, { system: true }] }, originConstraint],
+      };
+      response = await this.prisma.$transaction([
+        this.prisma.exam.count({ where: consistentWhere }),
+        this.prisma.exam.findMany({
+          where: consistentWhere,
+          include: Object.keys(include).length > 0 ? include : undefined,
+          take: pagination.take || 20,
+          skip: pagination.skip || 0,
+          orderBy,
+        }),
+      ]);
+    } else {
+      response = await this.prisma.$transaction([
+        this.prisma.exam.count({ where }),
+        this.prisma.exam.findMany({
+          where: { OR: [where, { system: true }] },
+          include: Object.keys(include).length > 0 ? include : undefined,
+          take: pagination.take || 20,
+          skip: pagination.skip || 0,
+          orderBy,
+        }),
+      ]);
+    }
 
     return {
-      data: response[1].map((exam) => new ExamEntity(exam as any)),
+      data: response[1].map(
+        (exam) =>
+          new ExamEntity({
+            ...(exam as any),
+            ...(extra.withOrigin
+              ? { origin: resolveExamOrigin(exam, nr07ExamIds) }
+              : {}),
+          }),
+      ),
       count: response[0],
     };
+  }
+
+  private async getNr07ExamIds(): Promise<Set<number>> {
+    const links = await this.prisma.biologicalIndicatorToExam.findMany({
+      where: {
+        deleted_at: null,
+        indicator: {
+          deleted_at: null,
+          normativeSource: BiologicalNormativeSourceEnum.NR_07,
+        },
+      },
+      select: { examId: true },
+    });
+    return new Set(links.map((link) => link.examId));
   }
 
   async findNude(options: Prisma.ExamFindManyArgs = {}) {

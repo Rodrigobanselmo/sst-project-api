@@ -9,6 +9,15 @@ import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
 import { StringCapitalizeParagraphTransform } from '../../../shared/transformers/string-capitalize-paragraph';
 import { StringUppercaseTransform } from '../../../shared/transformers/string-uppercase.transform';
 import { KeysOfEnum } from '../../../shared/utils/keysOfEnum.utils';
+import { ExamOriginEnum } from '../services/exam/find-exam/exam-origin.util';
+
+export enum FindExamOrderByEnum {
+  NAME = 'name',
+  ANALYSES = 'analyses',
+  MATERIAL = 'material',
+  STATUS = 'status',
+  CREATED_AT = 'created_at',
+}
 
 export class CreateExamDto {
   @IsString()
@@ -117,6 +126,23 @@ export class FindExamDto extends PaginationQueryDto {
     each: true,
   })
   status?: StatusEnum;
+
+  @IsOptional()
+  @IsEnum(ExamOriginEnum, {
+    message: `origin must be one of: ${KeysOfEnum(ExamOriginEnum)}`,
+  })
+  origin?: ExamOriginEnum;
+
+  @IsOptional()
+  @IsEnum(FindExamOrderByEnum, {
+    message: `orderBy must be one of: ${KeysOfEnum(FindExamOrderByEnum)}`,
+  })
+  orderBy?: FindExamOrderByEnum;
+
+  @IsOptional()
+  @IsString()
+  @IsEnum(['asc', 'desc'], { message: `orderByDirection must be asc or desc` })
+  orderByDirection?: 'asc' | 'desc';
 }
 
 export class FindExamHierarchyDto {

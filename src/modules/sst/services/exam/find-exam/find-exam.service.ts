@@ -9,8 +9,19 @@ export class FindExamService {
   constructor(private readonly examRepository: ExamRepository) {}
 
   async execute({ skip, take, ...query }: FindExamDto, user: UserPayloadDto) {
-    const Exam = await this.examRepository.find({ companyId: user.targetCompanyId, ...query }, { skip, take });
+    const result = await this.examRepository.find(
+      { companyId: user.targetCompanyId, ...query },
+      { skip, take },
+      {},
+      { withOrigin: true },
+    );
 
-    return Exam;
+    return {
+      count: result.count,
+      data: result.data.map((exam) => ({
+        ...exam,
+        origin: exam.origin,
+      })),
+    };
   }
 }

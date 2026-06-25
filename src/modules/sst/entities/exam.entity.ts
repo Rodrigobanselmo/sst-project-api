@@ -57,6 +57,7 @@ export class ExamEntity implements Exam {
   examsRiskData?: ExamRiskDataEntity;
   examToRiskData?: ExamRiskDataEntity[];
   examToRisk?: ExamRiskEntity[];
+  origin?: string;
   // origins?: IExamOriginData[];
 
   constructor(partial: Partial<ExamEntity>) {
