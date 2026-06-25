@@ -1,7 +1,7 @@
 import { QueryArray } from '../../../shared/transformers/query-array';
 import { PaginationQueryDto } from '../../../shared/dto/pagination.dto';
 import { PartialType } from '@nestjs/swagger';
-import { ExamTypeEnum, StatusEnum, HomogeneousGroup } from '@prisma/client';
+import { ExamTypeEnum, StatusEnum, HomogeneousGroup, RiskFactorsEnum } from '@prisma/client';
 import { Transform } from 'class-transformer';
 import { IsBoolean, IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
 import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
@@ -143,6 +143,21 @@ export class FindExamDto extends PaginationQueryDto {
   @IsString()
   @IsEnum(['asc', 'desc'], { message: `orderByDirection must be asc or desc` })
   orderByDirection?: 'asc' | 'desc';
+
+  // Risk applicability context (Fase 1). Optional and backward-compatible:
+  // when riskType is provided, the exam list hides exams incompatible with the
+  // risk category (currently only NR-07 exams for non-chemical/biological
+  // risks), unless includeIncompatible is true ("Mostrar todos os exames").
+  @IsOptional()
+  @IsEnum(RiskFactorsEnum, {
+    message: `riskType must be one of: ${KeysOfEnum(RiskFactorsEnum)}`,
+  })
+  riskType?: RiskFactorsEnum;
+
+  @IsBoolean()
+  @ToBoolean()
+  @IsOptional()
+  includeIncompatible?: boolean;
 }
 
 export class FindExamHierarchyDto {

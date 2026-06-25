@@ -9,6 +9,7 @@ import { BiologicalNormativeSourceEnum, Prisma } from '@prisma/client';
 import {
   buildExamOrderBy,
   buildExamOriginConstraint,
+  buildRiskApplicabilityConstraint,
   resolveExamOrigin,
 } from '../../services/exam/find-exam/exam-origin.util';
 
@@ -71,7 +72,14 @@ export class ExamRepository {
 
     const { where } = prismaFilter(whereInit, {
       query,
-      skip: ['search', 'clinicId', 'companyId', 'origin'],
+      skip: [
+        'search',
+        'clinicId',
+        'companyId',
+        'origin',
+        'riskType',
+        'includeIncompatible',
+      ],
     });
 
     if ('companyId' in query) {
@@ -104,15 +112,28 @@ export class ExamRepository {
     const originConstraint = extra.withOrigin
       ? buildExamOriginConstraint(query.origin, nr07ExamIds)
       : null;
+    // Risk applicability filter (Fase 1): hides exams incompatible with the
+    // selected risk category. Opt-in via riskType, only when withOrigin.
+    const applicabilityConstraint = extra.withOrigin
+      ? buildRiskApplicabilityConstraint(
+          query.riskType,
+          query.includeIncompatible,
+          nr07ExamIds,
+        )
+      : null;
+    const extraConstraints = [originConstraint, applicabilityConstraint].filter(
+      (constraint): constraint is Prisma.ExamWhereInput => Boolean(constraint),
+    );
     const orderBy = buildExamOrderBy(query.orderBy, query.orderByDirection);
 
     let response: [number, any[]];
 
-    if (originConstraint) {
-      // When filtering by origin, count and data must share the same where so
-      // totals stay consistent with the visible rows.
+    if (extraConstraints.length > 0) {
+      // When applying extra constraints (origin and/or risk applicability),
+      // count and data must share the same where so totals stay consistent
+      // with the visible rows.
       const consistentWhere = {
-        AND: [{ OR: [where, { system: true }] }, originConstraint],
+        AND: [{ OR: [where, { system: true }] }, ...extraConstraints],
       };
       response = await this.prisma.$transaction([
         this.prisma.exam.count({ where: consistentWhere }),

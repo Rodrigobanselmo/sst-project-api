@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma, RiskFactorsEnum } from '@prisma/client';
 
 import { simpleCompanyId } from '../../../../../shared/constants/ids';
 
@@ -63,6 +63,40 @@ export const buildExamOriginConstraint = (
     default:
       return null;
   }
+};
+
+/**
+ * Risk categories for which NR-07 biological-indicator exams are naturally
+ * applicable. NR-07 Anexo I exams monitor chemical/biological agents, so they
+ * are offered by default only for chemical (QUI) and biological (BIO) risks.
+ */
+const NR07_COMPATIBLE_RISK_TYPES = new Set<RiskFactorsEnum>([
+  RiskFactorsEnum.QUI,
+  RiskFactorsEnum.BIO,
+]);
+
+/**
+ * Builds a Prisma where-constraint that hides exams incompatible with the
+ * selected risk category. Phase 1 scope: only NR-07 exams are filtered (they
+ * are the ones that surface as noise for non-chemical risks). Returns null
+ * (no filtering) when:
+ *  - no riskType context is provided;
+ *  - includeIncompatible is requested ("Mostrar todos os exames");
+ *  - the risk is chemical/biological (NR-07 exams are compatible);
+ *  - there are no NR-07 exams to exclude.
+ */
+export const buildRiskApplicabilityConstraint = (
+  riskType: RiskFactorsEnum | undefined,
+  includeIncompatible: boolean | undefined,
+  nr07ExamIds: Set<number>,
+): Prisma.ExamWhereInput | null => {
+  if (!riskType || includeIncompatible) return null;
+  if (NR07_COMPATIBLE_RISK_TYPES.has(riskType)) return null;
+
+  const ids = Array.from(nr07ExamIds);
+  if (ids.length === 0) return null;
+
+  return { id: { notIn: ids } };
 };
 
 const SORTABLE_FIELDS = new Set([
