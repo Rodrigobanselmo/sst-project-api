@@ -14,6 +14,7 @@ import { tryPromoteResidualToCurrentWhenPlanFullyImplemented } from '../../../..
 import {
   findGenerateSourceByNormalizedName,
   findRecMedByNormalizedName,
+  sanitizeRecAddOnlyItems,
 } from '@/shared/utils/normalize-inventory-item-name.util';
 import { RiskCatalogEquivalenceService } from '@/shared/risk-catalog-equivalence/risk-catalog-equivalence.service';
 import {
@@ -255,9 +256,10 @@ export class UpsertRiskDataService {
         ])
       : [new Map<string, string>(), new Map<string, string>()];
 
-    // Handle recAddOnly
-    if (recAddOnly && recAddOnly.length > 0) {
-      for (const recData of recAddOnly) {
+    // Handle recAddOnly — descarta recomendações sem texto válido em recName
+    const sanitizedRecAddOnly = sanitizeRecAddOnlyItems(recAddOnly);
+    if (sanitizedRecAddOnly.length > 0) {
+      for (const recData of sanitizedRecAddOnly) {
         let recMed = findRecMedByNormalizedName(
           recMedCandidates,
           recData,

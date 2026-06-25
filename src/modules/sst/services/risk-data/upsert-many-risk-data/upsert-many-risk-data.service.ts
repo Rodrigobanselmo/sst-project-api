@@ -14,6 +14,7 @@ import { SyncMissingDerivedMeasureAfterRecMedUpdateService } from '../../rec-med
 import {
   findGenerateSourceByNormalizedName,
   findRecMedByNormalizedName,
+  sanitizeRecAddOnlyItems,
 } from '@/shared/utils/normalize-inventory-item-name.util';
 import {
   resolveGenerateSourceEntityToCanonical,
@@ -275,9 +276,10 @@ export class UpsertManyRiskDataService {
         ])
       : [new Map<string, string>(), new Map<string, string>()];
 
-    // Handle recAddOnly (Recommendations)
-    if (recAddOnly && recAddOnly.length > 0) {
-      for (const recData of recAddOnly) {
+    // Handle recAddOnly (Recommendations) — descarta recomendações sem texto válido em recName
+    const sanitizedRecAddOnly = sanitizeRecAddOnlyItems(recAddOnly) as typeof recAddOnly;
+    if (sanitizedRecAddOnly.length > 0) {
+      for (const recData of sanitizedRecAddOnly) {
         let recMed = findRecMedByNormalizedName(recMedCandidates, recData, companyId);
 
         if (!recMed) {

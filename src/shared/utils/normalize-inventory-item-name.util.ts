@@ -138,6 +138,24 @@ export function recMedInputMatchesRecord(
   return inputKeys.some((key) => recordKeys.includes(key));
 }
 
+/**
+ * Recomendações em `recAddOnly` só são válidas quando possuem texto em `recName`.
+ * Remove itens nulos, vazios ou compostos apenas por espaços e aplica `trim()` nos
+ * válidos, evitando a criação de `RecMed`/`RecMedOnRiskData` órfãos (cartões de
+ * recomendação vazios). Não usa `medName` como fallback de recomendação.
+ */
+export function sanitizeRecAddOnlyItems<T extends { recName?: string | null }>(
+  items: T[] | undefined | null,
+): T[] {
+  if (!items?.length) return [];
+
+  return items.reduce<T[]>((acc, item) => {
+    const recName = item?.recName?.trim();
+    if (recName) acc.push({ ...item, recName });
+    return acc;
+  }, []);
+}
+
 export function findGenerateSourceByNormalizedName<
   T extends { id: string; name: string; companyId: string; system: boolean },
 >(candidates: T[], name: string, scopeCompanyId: string): T | undefined {
