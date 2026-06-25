@@ -58,8 +58,25 @@ export class ExamRiskRepository {
 
     const { where } = prismaFilter(whereInit, {
       query,
-      skip: ['search', 'targetCompanyId', 'workspaceId'],
+      skip: ['search', 'targetCompanyId', 'workspaceId', 'orderBy', 'orderByDirection'],
     });
+
+    const defaultOrderBy: Prisma.ExamToRiskOrderByWithRelationInput[] = [
+      { risk: { representAll: 'desc' } },
+      { risk: { name: 'asc' } },
+      { exam: { name: 'asc' } },
+    ];
+
+    const direction: Prisma.SortOrder = query.orderByDirection === 'desc' ? 'desc' : 'asc';
+
+    const orderByMap: Record<string, Prisma.ExamToRiskOrderByWithRelationInput[]> = {
+      risk: [{ risk: { name: direction } }, { exam: { name: 'asc' } }],
+      exam: [{ exam: { name: direction } }, { risk: { name: 'asc' } }],
+      validity: [{ validityInMonths: direction }, { risk: { name: 'asc' } }, { exam: { name: 'asc' } }],
+    };
+
+    const orderBy =
+      query.orderBy && orderByMap[query.orderBy] ? orderByMap[query.orderBy] : defaultOrderBy;
 
     if ('workspaceId' in query && query.workspaceId) {
       const companyIdFilter = query.targetCompanyId
@@ -98,7 +115,7 @@ export class ExamRiskRepository {
         include: Object.keys(include).length > 0 ? include : undefined,
         take: pagination.take || 20,
         skip: pagination.skip || 0,
-        orderBy: [{ risk: { representAll: 'desc' } }, { risk: { name: 'asc' } }, { exam: { name: 'asc' } }],
+        orderBy,
       }),
     ]);
 
