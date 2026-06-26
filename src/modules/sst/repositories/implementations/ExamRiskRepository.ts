@@ -176,4 +176,31 @@ export class ExamRiskRepository {
 
     return new ExamRiskEntity(riskFactors);
   }
+
+  /**
+   * Atualiza em lote apenas campos escalares dos vínculos da empresa (Fase 2).
+   * Restrito a id ∈ ids + companyId + não deletados. Retorna a contagem afetada.
+   */
+  async updateManyFields(
+    ids: number[],
+    companyId: string,
+    data: Prisma.ExamToRiskUpdateManyMutationInput,
+  ): Promise<number> {
+    const result = await this.prisma.examToRisk.updateMany({
+      where: { id: { in: ids }, companyId, deletedAt: null },
+      data,
+    });
+
+    return result.count;
+  }
+
+  /** Soft delete em lote dos vínculos da empresa (Fase 2). */
+  async deleteManySoft(ids: number[], companyId: string): Promise<number> {
+    const result = await this.prisma.examToRisk.updateMany({
+      where: { id: { in: ids }, companyId, deletedAt: null },
+      data: { deletedAt: new Date() },
+    });
+
+    return result.count;
+  }
 }

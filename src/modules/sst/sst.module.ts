@@ -106,6 +106,8 @@ import { FindGenerateSourceService } from './services/generate-source/find-gener
 import { ReloadEmployeeExamTimeService } from './services/exam/reload-employee-exam-time/reload-employee-exam-time.service';
 import { DeleteExamToClinicService } from './services/examToClinic/delete-exam-to-clinic/find-exam-to-clinic.service';
 import { DeleteSoftExamRiskService } from './services/examToRisk/delete-soft-exam-risk/delete-soft-exam-risk.service';
+import { BulkUpdateExamRiskService } from './services/examToRisk/bulk-update-exam-risk/bulk-update-exam-risk.service';
+import { BulkDeleteExamRiskService } from './services/examToRisk/bulk-delete-exam-risk/bulk-delete-exam-risk.service';
 import { CacheModule } from '@nestjs/cache-manager';
 import { RiskCatalogEquivalenceModule } from '@/shared/risk-catalog-equivalence/risk-catalog-equivalence.module';
 
@@ -218,6 +220,8 @@ import { RiskCatalogEquivalenceModule } from '@/shared/risk-catalog-equivalence/
     ReloadEmployeeExamTimeService,
     DeleteExamToClinicService,
     DeleteSoftExamRiskService,
+    BulkUpdateExamRiskService,
+    BulkDeleteExamRiskService,
   ],
   exports: [
     RiskRepository,

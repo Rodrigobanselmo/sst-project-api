@@ -4,7 +4,16 @@ import { PermissionEnum } from '../../../../shared/constants/enum/authorization'
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
 import { User } from '../../../../shared/decorators/user.decorator';
 import { UserPayloadDto } from '../../../../shared/dto/user-payload.dto';
-import { CopyExamsRiskDto, CreateExamsRiskDto, FindExamRiskDto, UpdateExamRiskDto } from '../../dto/exam-risk.dto';
+import {
+  BulkDeleteExamRiskDto,
+  BulkUpdateExamRiskDto,
+  CopyExamsRiskDto,
+  CreateExamsRiskDto,
+  FindExamRiskDto,
+  UpdateExamRiskDto,
+} from '../../dto/exam-risk.dto';
+import { BulkDeleteExamRiskService } from '../../services/examToRisk/bulk-delete-exam-risk/bulk-delete-exam-risk.service';
+import { BulkUpdateExamRiskService } from '../../services/examToRisk/bulk-update-exam-risk/bulk-update-exam-risk.service';
 import { CopyExamRiskService } from '../../services/examToRisk/copy-exam/copy-exam.service';
 import { CreateExamRiskService } from '../../services/examToRisk/create-exam/create-exam.service';
 import { DeleteSoftExamRiskService } from '../../services/examToRisk/delete-soft-exam-risk/delete-soft-exam-risk.service';
@@ -19,6 +28,8 @@ export class ExamRiskController {
     private readonly updateExamService: UpdateExamRiskService,
     private readonly copyExamRiskService: CopyExamRiskService,
     private readonly deleteSoftExamRiskService: DeleteSoftExamRiskService,
+    private readonly bulkUpdateExamRiskService: BulkUpdateExamRiskService,
+    private readonly bulkDeleteExamRiskService: BulkDeleteExamRiskService,
   ) {}
 
   @Permissions({
@@ -41,6 +52,28 @@ export class ExamRiskController {
   @Post('copy')
   copy(@User() userPayloadDto: UserPayloadDto, @Body() createExamDto: CopyExamsRiskDto) {
     return this.copyExamRiskService.execute(createExamDto, userPayloadDto);
+  }
+
+  @Permissions({
+    code: PermissionEnum.EXAM_RISK,
+    crud: 'u',
+    isMember: true,
+    isContract: true,
+  })
+  @Post('bulk/update/:companyId')
+  bulkUpdate(@User() userPayloadDto: UserPayloadDto, @Body() bulkUpdateDto: BulkUpdateExamRiskDto) {
+    return this.bulkUpdateExamRiskService.execute(bulkUpdateDto, userPayloadDto);
+  }
+
+  @Permissions({
+    code: PermissionEnum.EXAM_RISK,
+    crud: 'd',
+    isMember: true,
+    isContract: true,
+  })
+  @Post('bulk/delete/:companyId')
+  bulkDelete(@User() userPayloadDto: UserPayloadDto, @Body() bulkDeleteDto: BulkDeleteExamRiskDto) {
+    return this.bulkDeleteExamRiskService.execute(bulkDeleteDto, userPayloadDto);
   }
 
   @Permissions({

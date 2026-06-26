@@ -1,6 +1,17 @@
 import { PaginationQueryDto } from '../../../shared/dto/pagination.dto';
 import { DateFormat } from '../../../shared/transformers/date-format';
-import { IsBoolean, IsDate, IsEnum, IsInt, IsOptional, IsString, ValidateIf } from 'class-validator';
+import {
+  ArrayNotEmpty,
+  IsArray,
+  IsBoolean,
+  IsDate,
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsString,
+  ValidateIf,
+  ValidateNested,
+} from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 import { PartialType } from '@nestjs/swagger';
 import { ToBoolean } from './../../../shared/decorators/boolean.decorator';
@@ -119,6 +130,105 @@ export class CopyExamsRiskDto {
 export class UpsertManyExamsRiskDto {
   data: UpdateExamRiskDto[];
   companyId: string;
+}
+
+/**
+ * Campos do vínculo Exame × Risco que podem ser alterados em lote (Fase 2).
+ * Todos opcionais: somente os campos enviados são aplicados aos vínculos
+ * selecionados. Não inclui examId/riskId — o lote não troca exame nem risco.
+ * Campos numéricos aceitam null para "limpar" (ex.: faixa etária).
+ */
+export class BulkPatchExamRiskDto {
+  @IsBoolean()
+  @ToBoolean()
+  @IsOptional()
+  isMale?: boolean;
+
+  @IsBoolean()
+  @ToBoolean()
+  @IsOptional()
+  isFemale?: boolean;
+
+  @IsBoolean()
+  @ToBoolean()
+  @IsOptional()
+  isPeriodic?: boolean;
+
+  @IsBoolean()
+  @ToBoolean()
+  @IsOptional()
+  isChange?: boolean;
+
+  @IsBoolean()
+  @ToBoolean()
+  @IsOptional()
+  isAdmission?: boolean;
+
+  @IsBoolean()
+  @ToBoolean()
+  @IsOptional()
+  isReturn?: boolean;
+
+  @IsBoolean()
+  @ToBoolean()
+  @IsOptional()
+  isDismissal?: boolean;
+
+  @ValidateIf((_, value) => value !== null)
+  @IsInt()
+  @IsOptional()
+  validityInMonths?: number | null;
+
+  @ValidateIf((_, value) => value !== null)
+  @IsInt()
+  @IsOptional()
+  considerBetweenDays?: number | null;
+
+  @ValidateIf((_, value) => value !== null)
+  @IsInt()
+  @IsOptional()
+  fromAge?: number | null;
+
+  @ValidateIf((_, value) => value !== null)
+  @IsInt()
+  @IsOptional()
+  toAge?: number | null;
+
+  @ValidateIf((_, value) => value !== null)
+  @IsInt()
+  @IsOptional()
+  minRiskDegree?: number | null;
+
+  @ValidateIf((_, value) => value !== null)
+  @IsInt()
+  @IsOptional()
+  minRiskDegreeQuantity?: number | null;
+}
+
+export class BulkUpdateExamRiskDto {
+  @IsArray()
+  @ArrayNotEmpty()
+  @IsInt({ each: true })
+  ids: number[];
+
+  @ValidateNested()
+  @Type(() => BulkPatchExamRiskDto)
+  patch: BulkPatchExamRiskDto;
+
+  @IsOptional()
+  @IsString()
+  companyId?: string;
+}
+
+export class BulkDeleteExamRiskDto {
+  @IsArray()
+  @ArrayNotEmpty()
+  @IsInt({ each: true })
+  ids: number[];
+
+  @IsOptional()
+  @IsString()
+  companyId?: string;
 }
 
 export enum FindExamRiskOrderByEnum {
