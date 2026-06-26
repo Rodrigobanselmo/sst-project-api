@@ -36,4 +36,12 @@ export const MedicineRoutes = {
       STATUS: ':id/status',
     },
   },
+  ESOCIAL_PROCEDURES: {
+    BASE: 'v2/master/esocial-procedures',
+    BY_CODE: ':procedureCode',
+    BY_ID: {
+      PATH: ':id',
+      STATUS: ':id/status',
+    },
+  },
 } as const;

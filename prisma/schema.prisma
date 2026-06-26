@@ -4051,3 +4051,59 @@ model PcmsoExamRiskRuleExam {
   @@index([examId])
   @@map("PcmsoExamRiskRuleExam")
 }
+
+enum PcmsoEsocialProcedureStatusEnum {
+  DRAFT
+  ACTIVE
+  DEPRECATED
+}
+
+enum PcmsoEsocialProcedureSourceEnum {
+  ESOCIAL_TABLE_27
+  SIMPLE_SST
+  TECHNICAL
+  OTHER
+}
+
+enum PcmsoEsocialProcedureTypeEnum {
+  CLINICAL
+  LABORATORY
+  IMAGING
+  AUDIOMETRY
+  SPIROMETRY
+  TOXICOLOGICAL
+  OTHER
+}
+
+// Camada de curadoria SimpleSST sobre procedimentos da Tabela 27 do eSocial.
+// É aditiva e desacoplada: NÃO altera a Tabela 27 oficial (catálogo in-memory
+// usado pelo S-2220) nem o Exam. A ligação com o catálogo oficial é apenas por
+// procedureCode (string), com snapshot do nome para legibilidade.
+model PcmsoEsocialProcedure {
+  id String @id @default(cuid())
+
+  // Referência ao procedimento oficial da Tabela 27 (sem FK: catálogo in-memory).
+  procedureCode         String
+  procedureNameSnapshot String?
+
+  // Curadoria SimpleSST.
+  status                 PcmsoEsocialProcedureStatusEnum @default(DRAFT)
+  isOccupationalRelevant Boolean                         @default(false)
+  technicalType          PcmsoEsocialProcedureTypeEnum? // null = não classificado
+  internalNotes          String?
+  source                 PcmsoEsocialProcedureSourceEnum @default(ESOCIAL_TABLE_27)
+
+  createdById Int?
+  updatedById Int?
+
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+
+  @@unique([procedureCode])
+  @@index([status])
+  @@index([isOccupationalRelevant])
+  @@index([technicalType])
+  @@index([source])
+  @@map("PcmsoEsocialProcedure")
+}
