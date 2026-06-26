@@ -12,6 +12,10 @@ import { BiologicalIndicatorCurationService } from './biological-indicator/servi
 import { BiologicalIndicatorImportApplyService } from './biological-indicator/services/biological-indicator-import-apply.service';
 import { BiologicalIndicatorImportPreviewService } from './biological-indicator/services/biological-indicator-import-preview.service';
 import { BiologicalIndicatorSpreadsheetExportService } from './biological-indicator/services/biological-indicator-spreadsheet-export.service';
+import { ExamRiskRuleNr07SyncService } from './exam-risk-rule/exam-risk-rule-nr07-sync.service';
+import { ExamRiskRuleController } from './exam-risk-rule/exam-risk-rule.controller';
+import { ExamRiskRuleRepository } from './exam-risk-rule/exam-risk-rule.repository';
+import { ExamRiskRuleService } from './exam-risk-rule/exam-risk-rule.service';
 
 @Module({
   imports: [SharedModule, PrismaModule],
@@ -19,6 +23,7 @@ import { BiologicalIndicatorSpreadsheetExportService } from './biological-indica
     BiologicalIndicatorApplicationController,
     BiologicalIndicatorMaintenanceController,
     BiologicalIndicatorCurationController,
+    ExamRiskRuleController,
   ],
   providers: [
     BiologicalIndicatorDAO,
@@ -27,6 +32,9 @@ import { BiologicalIndicatorSpreadsheetExportService } from './biological-indica
     BiologicalIndicatorSpreadsheetExportService,
     BiologicalIndicatorImportPreviewService,
     BiologicalIndicatorImportApplyService,
+    ExamRiskRuleRepository,
+    ExamRiskRuleService,
+    ExamRiskRuleNr07SyncService,
   ],
 })
 export class MedicineModule {}

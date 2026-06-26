@@ -3944,3 +3944,110 @@ model WorkspaceToCompanyConversionLog {
   @@index([source_workspace_id])
   @@index([created_at])
 }
+
+// ── Biblioteca SimpleSST de regras Exame × Risco (MASTER) ───────────────────
+
+enum PcmsoExamRiskRuleScopeEnum {
+  RISK
+  GROUP
+  CATEGORY
+  AGENT
+}
+
+enum PcmsoExamRiskRuleSourceEnum {
+  NR_07
+  SIMPLE_SST
+  TECHNICAL
+  OTHER
+}
+
+enum PcmsoExamRiskRuleStatusEnum {
+  DRAFT
+  ACTIVE
+  DEPRECATED
+}
+
+model PcmsoExamRiskRule {
+  id    String                     @id @default(cuid())
+  scope PcmsoExamRiskRuleScopeEnum
+
+  // Referência conforme o scope (apenas a coluna correspondente é preenchida).
+  riskFactorId        String? // scope = RISK (risco system/global SimpleSST)
+  riskCategory        RiskFactorsEnum? // scope = CATEGORY
+  riskSubTypeId       Int? // scope = GROUP (RiskSubType global)
+  agentCas            String? // scope = AGENT
+  agentName           String? // scope = AGENT (rótulo livre)
+  agentNameNormalized String? // scope = AGENT (busca)
+
+  // Snapshots para preservar legibilidade mesmo se a referência sumir.
+  riskNameSnapshot    String?
+  subTypeNameSnapshot String?
+
+  source    PcmsoExamRiskRuleSourceEnum
+  status    PcmsoExamRiskRuleStatusEnum @default(DRAFT)
+  rationale String? // justificativa técnica
+
+  // Proveniência: id do registro normativo de origem (ex.: OccupationalBiologicalIndicator)
+  // que gerou esta regra via sync. Null para regras criadas manualmente.
+  sourceIndicatorId String?
+  // Marca regra editada manualmente pelo MASTER; o sync não a sobrescreve.
+  isCurated         Boolean @default(false)
+
+  createdById Int?
+
+  exams PcmsoExamRiskRuleExam[]
+
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+
+  @@unique([source, sourceIndicatorId])
+  @@index([scope])
+  @@index([status])
+  @@index([source])
+  @@index([riskFactorId])
+  @@index([riskCategory])
+  @@index([riskSubTypeId])
+  @@index([agentCas])
+  @@index([agentNameNormalized])
+  @@index([sourceIndicatorId])
+  @@map("PcmsoExamRiskRule")
+}
+
+model PcmsoExamRiskRuleExam {
+  id     String            @id @default(cuid())
+  ruleId String
+  rule   PcmsoExamRiskRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+
+  examId           Int? // exame system/global sugerido
+  examNameSnapshot String?
+
+  // Config sugerida (espelha os campos de ExamToRisk).
+  isAdmission Boolean @default(false)
+  isPeriodic  Boolean @default(false)
+  isChange    Boolean @default(false)
+  isReturn    Boolean @default(false)
+  isDismissal Boolean @default(false)
+  isMale      Boolean @default(true)
+  isFemale    Boolean @default(true)
+
+  validityInMonths    Int?
+  considerBetweenDays Int? // janela de aproveitamento ocupacional (≠ tolerância normativa)
+  fromAge             Int?
+  toAge               Int?
+  minRiskDegree         Int?
+  minRiskDegreeQuantity Int?
+
+  // Campos normativos de coleta (origem: indicador biológico). Estruturados e
+  // exibíveis; não confundir com considerBetweenDays.
+  collectionToleranceDays Int?
+  collectionMoment        String?
+
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+
+  @@index([ruleId])
+  @@index([examId])
+  @@map("PcmsoExamRiskRuleExam")
+}

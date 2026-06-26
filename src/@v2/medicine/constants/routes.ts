@@ -26,4 +26,14 @@ export const MedicineRoutes = {
       PENDENCIES: ':id/pendencies',
     },
   },
+  EXAM_RISK_RULES: {
+    BASE: 'v2/master/exam-risk-rules',
+    RISK_CANDIDATES: 'risk-candidates',
+    EXAM_CANDIDATES: 'exam-candidates',
+    SYNC_NR07: 'sync-nr07',
+    BY_ID: {
+      PATH: ':id',
+      STATUS: ':id/status',
+    },
+  },
 } as const;
