@@ -88,6 +88,7 @@ import { FindCompanyService } from './services/company/find-one-company/find-com
 import { SetCompanyClinicsService } from './services/company/set-company-clinics/set-company-clinics.service';
 import { UpdateApplyServiceCompanyService } from './services/company/update-apply-service-company/update-apply-service-company.service';
 import { UpdateCompanyService } from './services/company/update-company/update-company.service';
+import { PcmsoExamDefaultsService } from './services/company/pcmso-exam-defaults/pcmso-exam-defaults.service';
 import { CreateContactsService } from './services/contact/create-contact/create-contact.service';
 import { DeleteContactsService } from './services/contact/delete-contact/delete-contact.service';
 import { FindContactsService } from './services/contact/find-contact/find-company-groups-group.service';
@@ -221,6 +222,7 @@ import { PreviewDocumentCoverService } from './services/document-cover/preview-d
   providers: [
     CreateCompanyService,
     UpdateCompanyService,
+    PcmsoExamDefaultsService,
     CreateContractService,
     WorkspaceRepository,
     CompanyRepository,

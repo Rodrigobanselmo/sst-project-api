@@ -1,5 +1,5 @@
 import { Public } from './../../../../shared/decorators/public.decorator';
-import { BadRequestException, Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Put, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 import { User } from '../../../../shared/decorators/user.decorator';
@@ -21,6 +21,8 @@ import { FindCnpjService } from '../../services/company/find-cnpj/find-cnpj.serv
 import { FindCompanyService } from '../../services/company/find-one-company/find-company.service';
 import { SetCompanyClinicsService } from '../../services/company/set-company-clinics/set-company-clinics.service';
 import { UpdateCompanyService } from '../../services/company/update-company/update-company.service';
+import { PcmsoExamDefaultsService } from '../../services/company/pcmso-exam-defaults/pcmso-exam-defaults.service';
+import { PcmsoExamDefaultsDto } from '../../dto/pcmso-exam-defaults.dto';
 import { Permissions } from '../../../../shared/decorators/permissions.decorator';
 import { PermissionEnum, RoleEnum } from '../../../../shared/constants/enum/authorization';
 import { Roles } from '../../../../shared/decorators/roles.decorator';
@@ -53,7 +55,32 @@ export class CompanyController {
     private readonly deleteCompanyService: DeleteCompanyService,
     private readonly deleteWorkspaceService: DeleteWorkspaceService,
     private readonly addWorkspacePhotoService: AddWorkspacePhotoService,
+    private readonly pcmsoExamDefaultsService: PcmsoExamDefaultsService,
   ) {}
+
+  @Permissions({
+    code: PermissionEnum.EXAM_RISK,
+    isContract: true,
+    isMember: true,
+  })
+  @Get('/:companyId/pcmso-exam-defaults')
+  getPcmsoExamDefaults(@User() userPayloadDto: UserPayloadDto) {
+    return this.pcmsoExamDefaultsService.get(userPayloadDto);
+  }
+
+  @Permissions({
+    code: PermissionEnum.EXAM_RISK,
+    crud: 'u',
+    isContract: true,
+    isMember: true,
+  })
+  @Put('/:companyId/pcmso-exam-defaults')
+  updatePcmsoExamDefaults(
+    @Body() body: PcmsoExamDefaultsDto,
+    @User() userPayloadDto: UserPayloadDto,
+  ) {
+    return this.pcmsoExamDefaultsService.update(body, userPayloadDto);
+  }
 
   @Roles(RoleEnum.COMPANY, RoleEnum.CONTRACTS, RoleEnum.CLINICS, RoleEnum.USER, RoleEnum.DOCTOR)
   @Permissions({ isContract: true, isMember: true })
