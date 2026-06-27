@@ -63,4 +63,8 @@ export const MedicineRoutes = {
       STATUS: ':id/status',
     },
   },
+  ACGIH_BEI_COMPARISON: {
+    BASE: 'v2/master/acgih-bei-comparison',
+    EXPORT: 'export',
+  },
 } as const;

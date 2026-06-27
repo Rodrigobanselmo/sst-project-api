@@ -5,6 +5,10 @@ import { ESocial27TableRepository } from '@/modules/esocial/repositories/impleme
 import { FindAllTable27Service } from '@/modules/esocial/services/tables/find-all-27.service';
 import { PrismaModule } from '@/prisma/prisma.module';
 
+import { AcgihBeiComparisonController } from './acgih-bei-comparison/acgih-bei-comparison.controller';
+import { AcgihBeiComparisonRepository } from './acgih-bei-comparison/acgih-bei-comparison.repository';
+import { AcgihBeiComparisonSpreadsheetExportService } from './acgih-bei-comparison/acgih-bei-comparison-spreadsheet-export.service';
+import { AcgihBeiComparisonService } from './acgih-bei-comparison/acgih-bei-comparison.service';
 import { AcgihBeiIndicatorImportApplyService } from './acgih-bei-indicator/acgih-bei-indicator-import-apply.service';
 import { AcgihBeiIndicatorImportPreviewService } from './acgih-bei-indicator/acgih-bei-indicator-import-preview.service';
 import { AcgihBeiIndicatorSpreadsheetExportService } from './acgih-bei-indicator/acgih-bei-indicator-spreadsheet-export.service';
@@ -43,6 +47,7 @@ import { ExamRiskRuleService } from './exam-risk-rule/exam-risk-rule.service';
     ExamRiskRuleController,
     EsocialProcedureController,
     AcgihBeiIndicatorController,
+    AcgihBeiComparisonController,
   ],
   providers: [
     BiologicalIndicatorDAO,
@@ -67,6 +72,9 @@ import { ExamRiskRuleService } from './exam-risk-rule/exam-risk-rule.service';
     AcgihBeiIndicatorSpreadsheetExportService,
     AcgihBeiIndicatorImportPreviewService,
     AcgihBeiIndicatorImportApplyService,
+    AcgihBeiComparisonRepository,
+    AcgihBeiComparisonService,
+    AcgihBeiComparisonSpreadsheetExportService,
     // Leitura apenas do catálogo oficial da Tabela 27 (não altera eSocial).
     FindAllTable27Service,
     ESocial27TableRepository,
