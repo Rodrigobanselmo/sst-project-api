@@ -3846,6 +3846,9 @@ model OccupationalBiologicalIndicator {
   riskLinks BiologicalIndicatorToRisk[]
   examLinks BiologicalIndicatorToExam[]
 
+  // Fontes complementares (4I) que referenciam este indicador NR-7.
+  examRiskRuleReferences PcmsoExamRiskRuleReference[]
+
   created_at DateTime  @default(now())
   updated_at DateTime  @updatedAt
   deleted_at DateTime?
@@ -3995,7 +3998,8 @@ model PcmsoExamRiskRule {
 
   createdById Int?
 
-  exams PcmsoExamRiskRuleExam[]
+  exams      PcmsoExamRiskRuleExam[]
+  references PcmsoExamRiskRuleReference[]
 
   created_at DateTime  @default(now())
   updated_at DateTime  @updatedAt
@@ -4050,6 +4054,64 @@ model PcmsoExamRiskRuleExam {
   @@index([ruleId])
   @@index([examId])
   @@map("PcmsoExamRiskRuleExam")
+}
+
+// ── Fontes/evidências complementares das Regras Exame × Risco (4I) ───────────
+// Camada ADITIVA: NÃO substitui PcmsoExamRiskRule.source (origem principal).
+// Permite que uma regra (ex.: origem principal NR_07) registre fontes técnicas
+// complementares (ex.: ACGIH_BEI) sem duplicar regra e sem perder rastreio.
+enum PcmsoExamRiskRuleReferenceSourceEnum {
+  ACGIH_BEI
+  NR_07
+  SIMPLE_SST
+  TECHNICAL
+  OTHER
+}
+
+enum PcmsoExamRiskRuleReferenceStatusEnum {
+  ACTIVE
+  INACTIVE
+}
+
+model PcmsoExamRiskRuleReference {
+  id     String            @id @default(cuid())
+  ruleId String
+  rule   PcmsoExamRiskRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+
+  sourceType PcmsoExamRiskRuleReferenceSourceEnum
+
+  // Vínculos opcionais à base de origem da evidência (apenas a coluna do
+  // tipo correspondente é preenchida). onDelete SetNull preserva a referência
+  // (com snapshot) mesmo que a base de origem seja removida.
+  acgihBeiIndicatorId String?
+  acgihBeiIndicator   PcmsoAcgihBeiIndicator? @relation(fields: [acgihBeiIndicatorId], references: [id], onDelete: SetNull)
+  nr7IndicatorId      String?
+  nr7Indicator        OccupationalBiologicalIndicator? @relation(fields: [nr7IndicatorId], references: [id], onDelete: SetNull)
+
+  // Snapshot legível e metadados da evidência.
+  referenceLabel String?
+  referenceYear  Int?
+  description    String?
+  notes          String?
+
+  status PcmsoExamRiskRuleReferenceStatusEnum @default(ACTIVE)
+
+  createdById Int?
+  updatedById Int?
+  deletedById Int?
+
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+
+  @@unique([ruleId, acgihBeiIndicatorId])
+  @@unique([ruleId, nr7IndicatorId])
+  @@index([ruleId])
+  @@index([sourceType])
+  @@index([acgihBeiIndicatorId])
+  @@index([nr7IndicatorId])
+  @@index([status])
+  @@map("PcmsoExamRiskRuleReference")
 }
 
 enum PcmsoEsocialProcedureStatusEnum {
@@ -4161,6 +4223,9 @@ model PcmsoAcgihBeiIndicator {
 
   createdById Int?
   updatedById Int?
+
+  // Regras Exame × Risco que registram este indicador como fonte complementar (4I).
+  examRiskRuleReferences PcmsoExamRiskRuleReference[]
 
   created_at DateTime  @default(now())
   updated_at DateTime  @updatedAt

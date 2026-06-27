@@ -35,6 +35,8 @@ export const MedicineRoutes = {
     TEMPLATE: 'template',
     IMPORT_PREVIEW: 'import/preview',
     IMPORT_APPLY: 'import/apply',
+    REFERENCES: ':ruleId/references',
+    REFERENCE_BY_ID: ':ruleId/references/:referenceId',
     BY_ID: {
       PATH: ':id',
       STATUS: ':id/status',
@@ -66,5 +68,6 @@ export const MedicineRoutes = {
   ACGIH_BEI_COMPARISON: {
     BASE: 'v2/master/acgih-bei-comparison',
     EXPORT: 'export',
+    REFERENCES: 'references',
   },
 } as const;

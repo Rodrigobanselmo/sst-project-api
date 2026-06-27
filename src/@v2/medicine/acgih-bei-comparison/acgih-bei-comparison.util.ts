@@ -91,6 +91,12 @@ export type ComparisonResult = {
   suggestedAction: AcgihBeiSuggestedAction;
   technicalDiff: string;
   reviewNotes: string;
+  // Estado persistente da fonte complementar (Fase 4I) — preenchido após o
+  // cálculo puro, a partir de PcmsoExamRiskRuleReference. Não afeta o veredito
+  // nem a elegibilidade; serve apenas para refletir o vínculo já registrado.
+  hasComplementaryReference?: boolean;
+  complementaryReferenceId?: string | null;
+  complementaryReferenceStatus?: string | null;
 };
 
 // ── Normalização ────────────────────────────────────────────────────────────

@@ -1,7 +1,9 @@
 import {
+  Body,
   Controller,
   Get,
   HttpStatus,
+  Post,
   Query,
   Res,
   UseGuards,
@@ -12,7 +14,11 @@ import { MedicineRoutes } from '@/@v2/medicine/constants/routes';
 import { JwtAuthGuard } from '@/@v2/shared/guards/jwt-auth.guard';
 import { RoleEnum } from '@/shared/constants/enum/authorization';
 import { Roles } from '@/shared/decorators/roles.decorator';
+import { User } from '@/shared/decorators/user.decorator';
+import { UserPayloadDto } from '@/shared/dto/user-payload.dto';
 
+import { ApplyAcgihReferenceBody } from '../exam-risk-rule-reference/exam-risk-rule-reference.dto';
+import { ExamRiskRuleReferenceService } from '../exam-risk-rule-reference/exam-risk-rule-reference.service';
 import {
   BrowseAcgihBeiComparisonQuery,
   ExportAcgihBeiComparisonQuery,
@@ -24,8 +30,10 @@ const XLSX_CONTENT_TYPE =
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
 
 /**
- * Fase 4E — Comparação ACGIH/BEI × NR-7 × Regras Exame × Risco.
- * SOMENTE LEITURA. Não cria, não altera e não aplica nada em nenhuma base.
+ * Fase 4E — Comparação ACGIH/BEI × NR-7 × Regras Exame × Risco (SOMENTE LEITURA
+ * nos GET). Fase 4I — único ponto de escrita: registrar a ACGIH/BEI como fonte
+ * complementar de uma regra EXISTENTE (POST references). Não cria regra, não
+ * toca ExamToRisk/empresas/XML/eSocial nem as bases NR-7/ACGIH/BEI.
  */
 @Controller(MedicineRoutes.ACGIH_BEI_COMPARISON.BASE)
 @UseGuards(JwtAuthGuard)
@@ -34,7 +42,19 @@ export class AcgihBeiComparisonController {
   constructor(
     private readonly service: AcgihBeiComparisonService,
     private readonly exportService: AcgihBeiComparisonSpreadsheetExportService,
+    private readonly referenceService: ExamRiskRuleReferenceService,
   ) {}
+
+  @Post(MedicineRoutes.ACGIH_BEI_COMPARISON.REFERENCES)
+  addReference(
+    @Body() body: ApplyAcgihReferenceBody,
+    @User() user: UserPayloadDto,
+  ) {
+    return this.referenceService.applyAcgihReference({
+      acgihBeiIndicatorId: body.acgihBeiIndicatorId,
+      userId: user.userId,
+    });
+  }
 
   @Get(MedicineRoutes.ACGIH_BEI_COMPARISON.EXPORT)
   async export(

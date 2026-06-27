@@ -39,6 +39,27 @@ export class AcgihBeiComparisonRepository {
     });
   }
 
+  /**
+   * Fontes complementares ACGIH/BEI ativas (4I), para refletir o vínculo já
+   * registrado na comparação. Read-only; não altera nenhuma base.
+   */
+  findActiveAcgihReferences() {
+    return this.prisma.pcmsoExamRiskRuleReference.findMany({
+      where: {
+        deleted_at: null,
+        status: 'ACTIVE',
+        sourceType: 'ACGIH_BEI',
+        acgihBeiIndicatorId: { not: null },
+      },
+      select: {
+        id: true,
+        ruleId: true,
+        acgihBeiIndicatorId: true,
+        status: true,
+      },
+    });
+  }
+
   /** Regras Exame × Risco ativas com seus exames (read-only). */
   findExamRiskRules() {
     return this.prisma.pcmsoExamRiskRule.findMany({

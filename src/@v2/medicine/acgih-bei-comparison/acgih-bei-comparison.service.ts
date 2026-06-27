@@ -43,11 +43,26 @@ export class AcgihBeiComparisonService {
 
   /** Calcula a comparação completa (sem paginação) — base p/ tela e export. */
   async computeAll(): Promise<ComparisonResult[]> {
-    const [acgihRows, nr7Rows, ruleRows] = await Promise.all([
+    const [acgihRows, nr7Rows, ruleRows, activeReferences] = await Promise.all([
       this.repository.findAcgihBeiIndicators(),
       this.repository.findNr07Indicators(),
       this.repository.findExamRiskRules(),
+      this.repository.findActiveAcgihReferences(),
     ]);
+
+    // Indexa referências ACGIH ativas por regra+indicador, para refletir o
+    // vínculo persistente em cada linha (sem afetar o veredito/elegibilidade).
+    const referenceByRuleAndAcgih = new Map<
+      string,
+      { id: string; status: string }
+    >();
+    for (const reference of activeReferences) {
+      if (!reference.acgihBeiIndicatorId) continue;
+      referenceByRuleAndAcgih.set(
+        `${reference.ruleId}::${reference.acgihBeiIndicatorId}`,
+        { id: reference.id, status: reference.status },
+      );
+    }
 
     const nr7List: Nr7IndicatorInput[] = nr7Rows.map((n) => ({
       id: n.id,
@@ -102,15 +117,26 @@ export class AcgihBeiComparisonService {
       confidence: a.confidence,
     }));
 
-    return acgihItems.map((item) =>
-      compareItem(
+    return acgihItems.map((item) => {
+      const row = compareItem(
         item,
         nr7List,
         rulesBySourceIndicatorId,
         rulesByAgentCas,
         rulesByAgentName,
-      ),
-    );
+      );
+      const reference = row.examRiskRuleId
+        ? referenceByRuleAndAcgih.get(
+            `${row.examRiskRuleId}::${row.acgihBeiId}`,
+          )
+        : undefined;
+      return {
+        ...row,
+        hasComplementaryReference: Boolean(reference),
+        complementaryReferenceId: reference?.id ?? null,
+        complementaryReferenceStatus: reference?.status ?? null,
+      };
+    });
   }
 
   applyFilters(

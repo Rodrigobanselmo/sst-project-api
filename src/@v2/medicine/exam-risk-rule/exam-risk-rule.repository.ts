@@ -26,6 +26,23 @@ const ruleInclude = {
     where: { deleted_at: null },
     orderBy: { created_at: 'asc' as const },
   },
+  // Fontes complementares ativas (4I) — read-only, para selo/contagem na UI.
+  references: {
+    where: {
+      deleted_at: null,
+      status: 'ACTIVE' as const,
+    },
+    orderBy: { created_at: 'asc' as const },
+    select: {
+      id: true,
+      sourceType: true,
+      acgihBeiIndicatorId: true,
+      nr7IndicatorId: true,
+      referenceLabel: true,
+      referenceYear: true,
+      created_at: true,
+    },
+  },
 } satisfies Prisma.PcmsoExamRiskRuleInclude;
 
 @Injectable()

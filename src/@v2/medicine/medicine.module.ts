@@ -37,6 +37,9 @@ import { ExamRiskRuleSpreadsheetExportService } from './exam-risk-rule/exam-risk
 import { ExamRiskRuleController } from './exam-risk-rule/exam-risk-rule.controller';
 import { ExamRiskRuleRepository } from './exam-risk-rule/exam-risk-rule.repository';
 import { ExamRiskRuleService } from './exam-risk-rule/exam-risk-rule.service';
+import { ExamRiskRuleReferenceController } from './exam-risk-rule-reference/exam-risk-rule-reference.controller';
+import { ExamRiskRuleReferenceRepository } from './exam-risk-rule-reference/exam-risk-rule-reference.repository';
+import { ExamRiskRuleReferenceService } from './exam-risk-rule-reference/exam-risk-rule-reference.service';
 
 @Module({
   imports: [SharedModule, PrismaModule],
@@ -45,6 +48,7 @@ import { ExamRiskRuleService } from './exam-risk-rule/exam-risk-rule.service';
     BiologicalIndicatorMaintenanceController,
     BiologicalIndicatorCurationController,
     ExamRiskRuleController,
+    ExamRiskRuleReferenceController,
     EsocialProcedureController,
     AcgihBeiIndicatorController,
     AcgihBeiComparisonController,
@@ -62,6 +66,8 @@ import { ExamRiskRuleService } from './exam-risk-rule/exam-risk-rule.service';
     ExamRiskRuleSpreadsheetExportService,
     ExamRiskRuleImportPreviewService,
     ExamRiskRuleImportApplyService,
+    ExamRiskRuleReferenceRepository,
+    ExamRiskRuleReferenceService,
     EsocialProcedureRepository,
     EsocialProcedureService,
     EsocialProcedureSpreadsheetExportService,
