@@ -14,6 +14,9 @@ import { BiologicalIndicatorCurationService } from './biological-indicator/servi
 import { BiologicalIndicatorImportApplyService } from './biological-indicator/services/biological-indicator-import-apply.service';
 import { BiologicalIndicatorImportPreviewService } from './biological-indicator/services/biological-indicator-import-preview.service';
 import { BiologicalIndicatorSpreadsheetExportService } from './biological-indicator/services/biological-indicator-spreadsheet-export.service';
+import { EsocialProcedureImportApplyService } from './esocial-procedure/esocial-procedure-import-apply.service';
+import { EsocialProcedureImportPreviewService } from './esocial-procedure/esocial-procedure-import-preview.service';
+import { EsocialProcedureSpreadsheetExportService } from './esocial-procedure/esocial-procedure-spreadsheet-export.service';
 import { EsocialProcedureController } from './esocial-procedure/esocial-procedure.controller';
 import { EsocialProcedureRepository } from './esocial-procedure/esocial-procedure.repository';
 import { EsocialProcedureService } from './esocial-procedure/esocial-procedure.service';
@@ -43,6 +46,9 @@ import { ExamRiskRuleService } from './exam-risk-rule/exam-risk-rule.service';
     ExamRiskRuleNr07SyncService,
     EsocialProcedureRepository,
     EsocialProcedureService,
+    EsocialProcedureSpreadsheetExportService,
+    EsocialProcedureImportPreviewService,
+    EsocialProcedureImportApplyService,
     // Leitura apenas do catálogo oficial da Tabela 27 (não altera eSocial).
     FindAllTable27Service,
     ESocial27TableRepository,

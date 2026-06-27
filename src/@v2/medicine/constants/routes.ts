@@ -38,6 +38,10 @@ export const MedicineRoutes = {
   },
   ESOCIAL_PROCEDURES: {
     BASE: 'v2/master/esocial-procedures',
+    EXPORT: 'export',
+    TEMPLATE: 'template',
+    IMPORT_PREVIEW: 'import/preview',
+    IMPORT_APPLY: 'import/apply',
     BY_CODE: ':procedureCode',
     BY_ID: {
       PATH: ':id',

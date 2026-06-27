@@ -1,10 +1,12 @@
 import { Type } from 'class-transformer';
 import {
   IsBoolean,
+  IsBooleanString,
   IsEnum,
   IsInt,
   IsOptional,
   IsString,
+  Matches,
   Max,
   Min,
 } from 'class-validator';
@@ -87,4 +89,18 @@ export class UpsertEsocialProcedureBody {
 export class UpdateEsocialProcedureStatusBody {
   @IsEnum(PcmsoEsocialProcedureStatusEnum)
   status!: PcmsoEsocialProcedureStatusEnum;
+}
+
+/** Frase de dupla confirmação que o MASTER deve digitar para aplicar o import. */
+export const ESOCIAL_PROCEDURE_APPLY_CONFIRM_TEXT = 'APLICAR CURADORIA TABELA 27';
+
+export class ImportEsocialProcedureApplyBody {
+  /** Multipart envia booleano como string — deve ser o literal "true". */
+  @IsBooleanString()
+  confirmApply!: string;
+
+  @Matches(new RegExp(`^${ESOCIAL_PROCEDURE_APPLY_CONFIRM_TEXT}$`), {
+    message: `confirmText deve ser exatamente "${ESOCIAL_PROCEDURE_APPLY_CONFIRM_TEXT}".`,
+  })
+  confirmText!: string;
 }
