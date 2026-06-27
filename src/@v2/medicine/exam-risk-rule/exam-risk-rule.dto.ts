@@ -2,10 +2,12 @@ import { Type } from 'class-transformer';
 import {
   IsArray,
   IsBoolean,
+  IsBooleanString,
   IsEnum,
   IsInt,
   IsOptional,
   IsString,
+  Matches,
   Max,
   Min,
   ValidateIf,
@@ -263,4 +265,18 @@ export class UpdateExamRiskRuleBody {
 export class UpdateExamRiskRuleStatusBody {
   @IsEnum(PcmsoExamRiskRuleStatusEnum)
   status!: PcmsoExamRiskRuleStatusEnum;
+}
+
+/** Frase de dupla confirmação que o MASTER deve digitar para aplicar o import. */
+export const EXAM_RISK_RULE_APPLY_CONFIRM_TEXT = 'APLICAR CURADORIA EXAME X RISCO';
+
+export class ImportExamRiskRuleApplyBody {
+  /** Multipart envia booleano como string — deve ser o literal "true". */
+  @IsBooleanString()
+  confirmApply!: string;
+
+  @Matches(new RegExp(`^${EXAM_RISK_RULE_APPLY_CONFIRM_TEXT}$`), {
+    message: `confirmText deve ser exatamente "${EXAM_RISK_RULE_APPLY_CONFIRM_TEXT}".`,
+  })
+  confirmText!: string;
 }

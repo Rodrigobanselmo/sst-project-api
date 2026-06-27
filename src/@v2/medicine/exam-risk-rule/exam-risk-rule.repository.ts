@@ -237,4 +237,95 @@ export class ExamRiskRuleRepository {
       select: { id: true, name: true, type: true, esocial27Code: true },
     });
   }
+
+  // ── Suporte a export/import Excel (4A.1) ────────────────────────────────
+
+  /** Todas as regras ativas (não deletadas) com seus exames, para export. */
+  findAllRulesWithExams() {
+    return this.prisma.pcmsoExamRiskRule.findMany({
+      where: { deleted_at: null },
+      orderBy: [{ scope: 'asc' }, { updated_at: 'desc' }],
+      include: {
+        exams: {
+          where: { deleted_at: null },
+          orderBy: { created_at: 'asc' },
+        },
+      },
+    });
+  }
+
+  /**
+   * Regras por id INCLUINDO soft-deleted e exames soft-deleted — usado por
+   * preview/apply para resolver âncoras e detectar restauração.
+   */
+  findRulesByIdsRaw(ids: string[]) {
+    if (!ids.length) return Promise.resolve([]);
+    return this.prisma.pcmsoExamRiskRule.findMany({
+      where: { id: { in: ids } },
+      include: { exams: true },
+    });
+  }
+
+  /** Exames system/global por id (read-only) — valida examId e dá snapshot. */
+  findExamsByIds(ids: number[]) {
+    if (!ids.length) return Promise.resolve([]);
+    return this.prisma.exam.findMany({
+      where: { id: { in: ids }, deleted_at: null },
+      select: { id: true, name: true, system: true, esocial27Code: true },
+    });
+  }
+
+  /** Nomes curados da Tabela 27 por código (read-only, apenas informativo). */
+  findEsocialProcedureNamesByCodes(codes: string[]) {
+    if (!codes.length) return Promise.resolve([]);
+    return this.prisma.pcmsoEsocialProcedure.findMany({
+      where: { procedureCode: { in: codes }, deleted_at: null },
+      select: { procedureCode: true, procedureNameSnapshot: true },
+    });
+  }
+
+  /**
+   * Aplica o lote de curadoria em transação atômica. Toca SOMENTE
+   * PcmsoExamRiskRule e PcmsoExamRiskRuleExam. Nunca escreve ExamToRisk,
+   * empresas, Exam, RiskFactors, RiskSubType, Tabela 27 ou eSocial.
+   */
+  applyImportBatch(params: {
+    ruleUpdates: { id: string; data: Prisma.PcmsoExamRiskRuleUpdateInput }[];
+    examCreates: {
+      ruleId: string;
+      data: Prisma.PcmsoExamRiskRuleExamCreateWithoutRuleInput;
+    }[];
+    examUpdates: {
+      id: string;
+      data: Prisma.PcmsoExamRiskRuleExamUpdateInput;
+    }[];
+  }) {
+    const { ruleUpdates, examCreates, examUpdates } = params;
+    if (!ruleUpdates.length && !examCreates.length && !examUpdates.length) {
+      return Promise.resolve();
+    }
+
+    return this.prisma.$transaction(async (tx) => {
+      for (const update of ruleUpdates) {
+        await tx.pcmsoExamRiskRule.update({
+          where: { id: update.id },
+          data: update.data,
+        });
+      }
+      for (const create of examCreates) {
+        await tx.pcmsoExamRiskRuleExam.create({
+          data: {
+            ...create.data,
+            rule: { connect: { id: create.ruleId } },
+          },
+        });
+      }
+      for (const update of examUpdates) {
+        await tx.pcmsoExamRiskRuleExam.update({
+          where: { id: update.id },
+          data: update.data,
+        });
+      }
+    });
+  }
 }

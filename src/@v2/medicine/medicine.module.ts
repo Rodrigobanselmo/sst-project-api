@@ -20,7 +20,10 @@ import { EsocialProcedureSpreadsheetExportService } from './esocial-procedure/es
 import { EsocialProcedureController } from './esocial-procedure/esocial-procedure.controller';
 import { EsocialProcedureRepository } from './esocial-procedure/esocial-procedure.repository';
 import { EsocialProcedureService } from './esocial-procedure/esocial-procedure.service';
+import { ExamRiskRuleImportApplyService } from './exam-risk-rule/exam-risk-rule-import-apply.service';
+import { ExamRiskRuleImportPreviewService } from './exam-risk-rule/exam-risk-rule-import-preview.service';
 import { ExamRiskRuleNr07SyncService } from './exam-risk-rule/exam-risk-rule-nr07-sync.service';
+import { ExamRiskRuleSpreadsheetExportService } from './exam-risk-rule/exam-risk-rule-spreadsheet-export.service';
 import { ExamRiskRuleController } from './exam-risk-rule/exam-risk-rule.controller';
 import { ExamRiskRuleRepository } from './exam-risk-rule/exam-risk-rule.repository';
 import { ExamRiskRuleService } from './exam-risk-rule/exam-risk-rule.service';
@@ -44,6 +47,9 @@ import { ExamRiskRuleService } from './exam-risk-rule/exam-risk-rule.service';
     ExamRiskRuleRepository,
     ExamRiskRuleService,
     ExamRiskRuleNr07SyncService,
+    ExamRiskRuleSpreadsheetExportService,
+    ExamRiskRuleImportPreviewService,
+    ExamRiskRuleImportApplyService,
     EsocialProcedureRepository,
     EsocialProcedureService,
     EsocialProcedureSpreadsheetExportService,
