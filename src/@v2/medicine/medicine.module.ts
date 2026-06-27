@@ -5,6 +5,12 @@ import { ESocial27TableRepository } from '@/modules/esocial/repositories/impleme
 import { FindAllTable27Service } from '@/modules/esocial/services/tables/find-all-27.service';
 import { PrismaModule } from '@/prisma/prisma.module';
 
+import { AcgihBeiIndicatorImportApplyService } from './acgih-bei-indicator/acgih-bei-indicator-import-apply.service';
+import { AcgihBeiIndicatorImportPreviewService } from './acgih-bei-indicator/acgih-bei-indicator-import-preview.service';
+import { AcgihBeiIndicatorSpreadsheetExportService } from './acgih-bei-indicator/acgih-bei-indicator-spreadsheet-export.service';
+import { AcgihBeiIndicatorController } from './acgih-bei-indicator/acgih-bei-indicator.controller';
+import { AcgihBeiIndicatorRepository } from './acgih-bei-indicator/acgih-bei-indicator.repository';
+import { AcgihBeiIndicatorService } from './acgih-bei-indicator/acgih-bei-indicator.service';
 import { BiologicalIndicatorApplicationController } from './biological-indicator/application/application/biological-indicator-application.controller';
 import { BiologicalIndicatorCurationController } from './biological-indicator/application/curation/biological-indicator-curation.controller';
 import { BiologicalIndicatorMaintenanceController } from './biological-indicator/application/maintenance/biological-indicator-maintenance.controller';
@@ -36,6 +42,7 @@ import { ExamRiskRuleService } from './exam-risk-rule/exam-risk-rule.service';
     BiologicalIndicatorCurationController,
     ExamRiskRuleController,
     EsocialProcedureController,
+    AcgihBeiIndicatorController,
   ],
   providers: [
     BiologicalIndicatorDAO,
@@ -55,6 +62,11 @@ import { ExamRiskRuleService } from './exam-risk-rule/exam-risk-rule.service';
     EsocialProcedureSpreadsheetExportService,
     EsocialProcedureImportPreviewService,
     EsocialProcedureImportApplyService,
+    AcgihBeiIndicatorRepository,
+    AcgihBeiIndicatorService,
+    AcgihBeiIndicatorSpreadsheetExportService,
+    AcgihBeiIndicatorImportPreviewService,
+    AcgihBeiIndicatorImportApplyService,
     // Leitura apenas do catálogo oficial da Tabela 27 (não altera eSocial).
     FindAllTable27Service,
     ESocial27TableRepository,

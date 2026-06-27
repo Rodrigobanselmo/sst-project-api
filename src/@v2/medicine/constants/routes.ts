@@ -52,4 +52,15 @@ export const MedicineRoutes = {
       STATUS: ':id/status',
     },
   },
+  ACGIH_BEI_INDICATORS: {
+    BASE: 'v2/master/acgih-bei-indicators',
+    EXPORT: 'export',
+    TEMPLATE: 'template',
+    IMPORT_PREVIEW: 'import/preview',
+    IMPORT_APPLY: 'import/apply',
+    BY_ID: {
+      PATH: ':id',
+      STATUS: ':id/status',
+    },
+  },
 } as const;

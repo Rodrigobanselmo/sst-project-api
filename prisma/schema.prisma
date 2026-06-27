@@ -4107,3 +4107,70 @@ model PcmsoEsocialProcedure {
   @@index([source])
   @@map("PcmsoEsocialProcedure")
 }
+
+enum PcmsoAcgihBeiIndicatorStatusEnum {
+  DRAFT
+  ACTIVE
+  DEPRECATED
+}
+
+enum PcmsoAcgihBeiIndicatorSourceEnum {
+  ACGIH_BEI
+  SIMPLE_SST
+  TECHNICAL
+  OTHER
+}
+
+enum PcmsoAcgihBeiIndicatorConfidenceEnum {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+// Base de referência técnica internacional ACGIH/BEI, mantida como curadoria
+// técnica interna a partir de fonte fornecida pelo usuário. É aditiva e
+// totalmente isolada: NÃO toca NR-7, Tabela 27/eSocial, XML/S-2220/S-2240,
+// ExamToRisk, empresas nem a biblioteca Regras Exame × Risco. A integração
+// futura (gerar candidatos para Exame × Risco) será controlada e manual.
+model PcmsoAcgihBeiIndicator {
+  id String @id @default(cuid())
+
+  substanceName           String
+  substanceNameNormalized String
+  cas                     String?
+  referenceYear           Int?
+  determinant             String?
+  biologicalMatrix        String? // texto livre (urina, sangue, soro/plasma, ar exalado...)
+  samplingTime            String? // texto livre (Final da jornada, Não crítico...)
+  beiValue                String? // string: pode conter símbolos, faixas, percentuais
+  unit                    String?
+  notation                String? // notações ACGIH, podem vir combinadas (texto)
+
+  status     PcmsoAcgihBeiIndicatorStatusEnum     @default(DRAFT)
+  source     PcmsoAcgihBeiIndicatorSourceEnum     @default(ACGIH_BEI)
+  sourceYear Int?
+  isCurated  Boolean                              @default(false)
+  confidence PcmsoAcgihBeiIndicatorConfidenceEnum? // null = não informado
+
+  internalNotes String?
+  sourcePage    String?
+
+  // Chave natural normalizada para upsert idempotente quando não há id:
+  // substanceName | cas | determinant | biologicalMatrix | samplingTime.
+  dedupeKey String
+
+  createdById Int?
+  updatedById Int?
+
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+
+  @@unique([dedupeKey])
+  @@index([status])
+  @@index([confidence])
+  @@index([source])
+  @@index([substanceNameNormalized])
+  @@index([cas])
+  @@map("PcmsoAcgihBeiIndicator")
+}
