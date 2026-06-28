@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as ExcelJS from 'exceljs';
 
 import {
+  ACGIH_BEI_COMPARISON_COLUMN_HEADERS,
   ACGIH_BEI_COMPARISON_COLUMN_ORDER,
   ACGIH_BEI_COMPARISON_COLUMN_WIDTHS,
   ACGIH_BEI_COMPARISON_SHEET_NAMES as SHEETS,
@@ -29,6 +30,14 @@ export const excelTechnicalDiff = (value?: string | null): string | null => {
   return trimmed;
 };
 
+/** Booleano opcional legível: true → "Sim", false → "Não", null/undefined → null. */
+export const excelOptionalBoolean = (
+  value?: boolean | null,
+): string | null => {
+  if (value == null) return null;
+  return value ? 'Sim' : 'Não';
+};
+
 @Injectable()
 export class AcgihBeiComparisonSpreadsheetExportService {
   /** Exporta o resultado da comparação (read-only). Não grava nada no banco. */
@@ -39,7 +48,7 @@ export class AcgihBeiComparisonSpreadsheetExportService {
 
     const sheet = workbook.addWorksheet(SHEETS.DATA);
     sheet.columns = ACGIH_BEI_COMPARISON_COLUMN_ORDER.map((key) => ({
-      header: key,
+      header: ACGIH_BEI_COMPARISON_COLUMN_HEADERS[key] ?? key,
       key,
       width: ACGIH_BEI_COMPARISON_COLUMN_WIDTHS[key],
     }));
@@ -78,6 +87,21 @@ export class AcgihBeiComparisonSpreadsheetExportService {
       suggestedAction: row.suggestedAction,
       technicalDiff: excelTechnicalDiff(row.technicalDiff),
       reviewNotes: excelOptionalText(row.reviewNotes),
+      // 4L.1a — contexto/readiness (read-only).
+      acgihBeiStatus: excelOptionalText(row.acgihBeiStatus),
+      acgihBeiIsCurated: excelOptionalBoolean(row.acgihBeiIsCurated),
+      acgihBeiSourceYear:
+        row.acgihBeiSourceYear != null ? String(row.acgihBeiSourceYear) : null,
+      acgihBeiSourcePage: excelOptionalText(row.acgihBeiSourcePage),
+      nr7Status: excelOptionalText(row.nr7Status),
+      nr7PendencyCount:
+        row.nr7PendencyCount != null ? String(row.nr7PendencyCount) : null,
+      nr7PendencyCodes: excelOptionalText(
+        row.nr7PendencyCodes?.length ? row.nr7PendencyCodes.join(', ') : null,
+      ),
+      examRiskRuleStatus: excelOptionalText(row.examRiskRuleStatus),
+      examRiskRuleIsCurated: excelOptionalBoolean(row.examRiskRuleIsCurated),
+      hasComplementaryReference: row.hasComplementaryReference ? 'Sim' : null,
     };
   }
 
@@ -98,6 +122,8 @@ export class AcgihBeiComparisonSpreadsheetExportService {
       ['Enriquecimento de fonte', 'Quando ACGIH confirma uma regra NR-7 existente, a sugestão é ADD_REFERENCE_ONLY: futuramente a regra poderá exibir "NR-7 + ACGIH/BEI". A gravação dessa referência NÃO ocorre nesta fase.'],
       ['Critérios de match NR-7', 'Âncora por CAS (casPrimary/casNumbers) ou nome normalizado; equivalência de determinante, matriz biológica e momento de coleta; comparação tolerante de valor/unidade.'],
       ['Critérios de match Regra', 'Por proveniência (regra NR_07 cujo sourceIndicatorId aponta ao indicador NR-7 correspondente) ou por agente (agentCas/agentName).'],
+      ['Contexto/readiness (4L)', 'Colunas de apoio à revisão (read-only): Status/Curado/Ano/Página ACGIH/BEI; Status e Pendências NR-7; Status/Curada da regra da Biblioteca; e se a fonte complementar já está registrada. Não alteram a classificação nem a elegibilidade.'],
+      ['Pendências NR-7', 'Reaproveitam a mesma lógica de pendências de ativação da curadoria NR-7 (ex.: RISK_NOT_CONFIRMED, EXAM_NOT_CONFIRMED, NORMATIVE_REVIEW_REQUIRED). Quantidade e códigos são informativos.'],
     ];
     rows.forEach((row) => sheet.addRow({ topic: row[0], description: row[1] }));
     sheet.getColumn('description').alignment = { wrapText: true, vertical: 'top' };

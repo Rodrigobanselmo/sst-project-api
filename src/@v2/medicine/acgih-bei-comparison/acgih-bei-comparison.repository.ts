@@ -18,7 +18,9 @@ export class AcgihBeiComparisonRepository {
     });
   }
 
-  /** Indicadores biológicos NR-7 ativos. */
+  /** Indicadores biológicos NR-7 ativos.
+   * 4L.1a: inclui status e os vínculos confirmados para reaproveitar a lógica
+   * de pendências de ativação (getActivationPendencies) sem N+1. */
   findNr07Indicators() {
     return this.prisma.occupationalBiologicalIndicator.findMany({
       where: { deleted_at: null, normativeSource: 'NR_07' },
@@ -34,6 +36,16 @@ export class AcgihBeiComparisonRepository {
         collectionMoment: true,
         referenceValue: true,
         unit: true,
+        status: true,
+        deleted_at: true,
+        requiresNormativeReview: true,
+        reviewedAt: true,
+        riskLinks: {
+          select: { deleted_at: true, isConfirmed: true, isPrimary: true },
+        },
+        examLinks: {
+          select: { deleted_at: true, isConfirmed: true, isDefault: true },
+        },
       },
       orderBy: [{ substanceName: 'asc' }],
     });
@@ -68,6 +80,7 @@ export class AcgihBeiComparisonRepository {
         id: true,
         source: true,
         status: true,
+        isCurated: true,
         agentCas: true,
         agentName: true,
         agentNameNormalized: true,

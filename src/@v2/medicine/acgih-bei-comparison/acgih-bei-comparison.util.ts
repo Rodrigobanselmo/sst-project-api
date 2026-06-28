@@ -36,6 +36,11 @@ export type AcgihItemInput = {
   unit: string | null;
   notation: string | null;
   confidence: PcmsoAcgihBeiIndicatorConfidenceEnum | null;
+  // 4L.1a — contexto de curadoria (read-only, não afeta classificação).
+  status?: string | null;
+  isCurated?: boolean | null;
+  sourceYear?: number | null;
+  sourcePage?: string | null;
 };
 
 /** Indicador NR-7 (OccupationalBiologicalIndicator) normalizado p/ comparação. */
@@ -51,6 +56,10 @@ export type Nr7IndicatorInput = {
   collectionMoment: string; // enum BiologicalCollectionMomentEnum (string)
   referenceValue: string | null;
   unit: string | null;
+  // 4L.1a — contexto de curadoria/readiness (read-only).
+  status?: string | null;
+  pendencyCount?: number | null;
+  pendencyCodes?: string[] | null;
 };
 
 /** Regra Exame × Risco (campos p/ match por proveniência ou agente). */
@@ -63,6 +72,8 @@ export type RuleInput = {
   agentNameNormalized: string | null;
   sourceIndicatorId: string | null;
   examNames: string[];
+  // 4L.1a — contexto de curadoria (read-only).
+  isCurated?: boolean | null;
 };
 
 export type ComparisonResult = {
@@ -91,6 +102,18 @@ export type ComparisonResult = {
   suggestedAction: AcgihBeiSuggestedAction;
   technicalDiff: string;
   reviewNotes: string;
+  // 4L.1a — contexto de curadoria/readiness (read-only). Derivado de dados já
+  // carregados no fluxo da comparação. NÃO altera classificação, suggestedAction
+  // nem elegibilidade de fonte complementar.
+  acgihBeiStatus?: string | null;
+  acgihBeiIsCurated?: boolean | null;
+  acgihBeiSourceYear?: number | null;
+  acgihBeiSourcePage?: string | null;
+  nr7Status?: string | null;
+  nr7PendencyCount?: number | null;
+  nr7PendencyCodes?: string[] | null;
+  examRiskRuleStatus?: string | null;
+  examRiskRuleIsCurated?: boolean | null;
   // Estado persistente da fonte complementar (Fase 4I) — preenchido após o
   // cálculo puro, a partir de PcmsoExamRiskRuleReference. Não afeta o veredito
   // nem a elegibilidade; serve apenas para refletir o vínculo já registrado.
@@ -386,6 +409,16 @@ export const compareItem = (
     examRiskRuleSource: rule.rule?.source ?? null,
     examNameSnapshot: rule.rule?.examNames.join('; ') || null,
     ruleMatchMethod: rule.method,
+    // 4L.1a — contexto de curadoria/readiness (read-only).
+    acgihBeiStatus: acgih.status ?? null,
+    acgihBeiIsCurated: acgih.isCurated ?? null,
+    acgihBeiSourceYear: acgih.sourceYear ?? null,
+    acgihBeiSourcePage: acgih.sourcePage ?? null,
+    nr7Status: nr7.indicator?.status ?? null,
+    nr7PendencyCount: nr7.indicator?.pendencyCount ?? null,
+    nr7PendencyCodes: nr7.indicator?.pendencyCodes ?? null,
+    examRiskRuleStatus: rule.rule?.status ?? null,
+    examRiskRuleIsCurated: rule.rule?.isCurated ?? null,
   };
 
   // 4. Baixa confiança tem precedência.

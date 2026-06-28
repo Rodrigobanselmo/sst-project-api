@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
+import { getActivationPendencies } from '../biological-indicator/services/biological-indicator-activation.validator';
 import { AcgihBeiComparisonRepository } from './acgih-bei-comparison.repository';
 import {
   AcgihBeiComparisonStatus,
@@ -64,24 +65,41 @@ export class AcgihBeiComparisonService {
       );
     }
 
-    const nr7List: Nr7IndicatorInput[] = nr7Rows.map((n) => ({
-      id: n.id,
-      substanceName: n.substanceName,
-      substanceNameNormalized: n.substanceNameNormalized,
-      casPrimary: n.casPrimary,
-      casNumbers: n.casNumbers ?? [],
-      determinantNormalized: n.biologicalIndicatorNormalized,
-      determinantOriginal: n.biologicalIndicatorOriginal,
-      biologicalMatrix: n.biologicalMatrix,
-      collectionMoment: String(n.collectionMoment),
-      referenceValue: n.referenceValue,
-      unit: n.unit,
-    }));
+    const nr7List: Nr7IndicatorInput[] = nr7Rows.map((n) => {
+      // 4L.1a — reaproveita a lógica de pendências de ativação NR-7 já existente
+      // (read-only). Sem N+1: os vínculos vêm no mesmo findMany.
+      const pendencies = getActivationPendencies({
+        indicator: {
+          deleted_at: n.deleted_at,
+          requiresNormativeReview: n.requiresNormativeReview,
+          reviewedAt: n.reviewedAt,
+        },
+        riskLinks: n.riskLinks ?? [],
+        examLinks: n.examLinks ?? [],
+      });
+      return {
+        id: n.id,
+        substanceName: n.substanceName,
+        substanceNameNormalized: n.substanceNameNormalized,
+        casPrimary: n.casPrimary,
+        casNumbers: n.casNumbers ?? [],
+        determinantNormalized: n.biologicalIndicatorNormalized,
+        determinantOriginal: n.biologicalIndicatorOriginal,
+        biologicalMatrix: n.biologicalMatrix,
+        collectionMoment: String(n.collectionMoment),
+        referenceValue: n.referenceValue,
+        unit: n.unit,
+        status: String(n.status),
+        pendencyCount: pendencies.length,
+        pendencyCodes: pendencies.map((p) => p.code),
+      };
+    });
 
     const rules: RuleInput[] = ruleRows.map((r) => ({
       id: r.id,
       source: String(r.source),
       status: String(r.status),
+      isCurated: r.isCurated,
       agentCas: r.agentCas,
       agentName: r.agentName,
       agentNameNormalized: r.agentNameNormalized,
@@ -115,6 +133,11 @@ export class AcgihBeiComparisonService {
       unit: a.unit,
       notation: a.notation,
       confidence: a.confidence,
+      // 4L.1a — contexto de curadoria (read-only).
+      status: String(a.status),
+      isCurated: a.isCurated,
+      sourceYear: a.sourceYear,
+      sourcePage: a.sourcePage,
     }));
 
     return acgihItems.map((item) => {
