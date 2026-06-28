@@ -27,9 +27,11 @@ export enum AcgihBeiComparisonStatus {
 }
 
 /**
- * 4O.3 — status operacional/efetivo. Superconjunto do comparisonStatus bruto +
- * o estado resolvido por decisão técnica humana. Derivado em runtime; NUNCA
- * substitui o comparisonStatus calculado (preservado p/ auditoria/export).
+ * 4O.3/4O.4 — status operacional/efetivo. Superconjunto do comparisonStatus
+ * bruto + o estado resultante da decisão técnica humana. Derivado em runtime;
+ * NUNCA substitui o comparisonStatus calculado (preservado p/ auditoria/export).
+ * Os valores espelhados da decisão (4O.4) permitem que linhas revisadas saiam da
+ * fila "Requer revisão" e apareçam no bucket operacional correspondente.
  */
 export enum AcgihBeiOperationalStatus {
   ALREADY_COVERED = 'ALREADY_COVERED',
@@ -38,6 +40,12 @@ export enum AcgihBeiOperationalStatus {
   NEW_CANDIDATE = 'NEW_CANDIDATE',
   LOW_CONFIDENCE_REVIEW = 'LOW_CONFIDENCE_REVIEW',
   RESOLVED_EQUIVALENCE = 'RESOLVED_EQUIVALENCE',
+  // 4O.4 — estados operacionais derivados da decisão técnica em linhas revisadas.
+  REAL_DIVERGENCE = 'REAL_DIVERGENCE',
+  SOURCE_ACGIH_ERROR = 'SOURCE_ACGIH_ERROR',
+  SOURCE_NR7_ERROR = 'SOURCE_NR7_ERROR',
+  NEEDS_FURTHER_REVIEW = 'NEEDS_FURTHER_REVIEW',
+  IGNORE_MONITOR = 'IGNORE_MONITOR',
 }
 
 /** Sugestão de ação (apenas informativa nesta fase — nada é aplicado). */
@@ -248,16 +256,49 @@ export const parseValue = (
 };
 
 /**
- * 4O.3 — deriva o status operacional/efetivo a partir do status bruto e da
- * decisão técnica. Regra mínima: uma linha DIVERGENT marcada como
- * FALSE_DIVERGENCE_EQUIVALENT é tratada operacionalmente como resolvida por
- * equivalência. Demais casos mantêm o status bruto. Só colapsa quando o status
- * atual ainda é DIVERGENT (evita resolver indevidamente decisões desatualizadas).
+ * 4O.4 — mapeia a decisão técnica para o status operacional correspondente.
+ * Usado quando uma linha "Requer revisão" recebe uma decisão fresca (não-stale):
+ * ela sai da fila de pendentes e passa a refletir a decisão registrada.
+ */
+const DECISION_TO_OPERATIONAL_STATUS: Record<
+  PcmsoAcgihBeiComparisonDecisionEnum,
+  AcgihBeiOperationalStatus
+> = {
+  [PcmsoAcgihBeiComparisonDecisionEnum.FALSE_DIVERGENCE_EQUIVALENT]:
+    AcgihBeiOperationalStatus.RESOLVED_EQUIVALENCE,
+  [PcmsoAcgihBeiComparisonDecisionEnum.REAL_DIVERGENCE]:
+    AcgihBeiOperationalStatus.REAL_DIVERGENCE,
+  [PcmsoAcgihBeiComparisonDecisionEnum.SOURCE_ACGIH_ERROR]:
+    AcgihBeiOperationalStatus.SOURCE_ACGIH_ERROR,
+  [PcmsoAcgihBeiComparisonDecisionEnum.SOURCE_NR7_ERROR]:
+    AcgihBeiOperationalStatus.SOURCE_NR7_ERROR,
+  [PcmsoAcgihBeiComparisonDecisionEnum.NEEDS_FURTHER_REVIEW]:
+    AcgihBeiOperationalStatus.NEEDS_FURTHER_REVIEW,
+  [PcmsoAcgihBeiComparisonDecisionEnum.IGNORE_MONITOR]:
+    AcgihBeiOperationalStatus.IGNORE_MONITOR,
+};
+
+/**
+ * 4O.3/4O.4 — deriva o status operacional/efetivo a partir do status bruto e da
+ * decisão técnica. NUNCA altera o comparisonStatus bruto (preservado p/
+ * auditoria/export).
+ *
+ * Regras:
+ *  1. (4O.3) DIVERGENT + FALSE_DIVERGENCE_EQUIVALENT → RESOLVED_EQUIVALENCE.
+ *  2. (4O.4) NEEDS_REVIEW + decisão técnica fresca (isStale !== true) → reflete a
+ *     decisão (ex.: REAL_DIVERGENCE, SOURCE_*_ERROR, NEEDS_FURTHER_REVIEW,
+ *     IGNORE_MONITOR, RESOLVED_EQUIVALENCE). Assim o item sai da fila operacional
+ *     "Requer revisão" assim que recebe uma decisão humana.
+ *
+ * Decisões desatualizadas (isStale) NÃO colapsam: a linha permanece em
+ * NEEDS_REVIEW para nova análise.
  */
 export const deriveOperationalStatus = (
   comparisonStatus: AcgihBeiComparisonStatus,
   reviewDecision?: PcmsoAcgihBeiComparisonDecisionEnum | null,
+  reviewIsStale?: boolean | null,
 ): AcgihBeiOperationalStatus => {
+  // 1. Regra 4O.3 (mantida): divergência marcada como falso divergente/equivalência.
   if (
     comparisonStatus === AcgihBeiComparisonStatus.DIVERGENT &&
     reviewDecision ===
@@ -265,6 +306,17 @@ export const deriveOperationalStatus = (
   ) {
     return AcgihBeiOperationalStatus.RESOLVED_EQUIVALENCE;
   }
+
+  // 2. Regra 4O.4: linha "Requer revisão" com decisão técnica fresca reflete a
+  // decisão e deixa de ser uma pendência operacional.
+  if (
+    comparisonStatus === AcgihBeiComparisonStatus.NEEDS_REVIEW &&
+    reviewDecision &&
+    reviewIsStale !== true
+  ) {
+    return DECISION_TO_OPERATIONAL_STATUS[reviewDecision];
+  }
+
   return comparisonStatus as unknown as AcgihBeiOperationalStatus;
 };
 

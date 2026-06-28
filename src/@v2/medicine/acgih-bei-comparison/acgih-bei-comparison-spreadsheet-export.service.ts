@@ -40,7 +40,7 @@ export const excelOptionalBoolean = (
   return value ? 'Sim' : 'Não';
 };
 
-/** 4O.3 — rótulos legíveis do status operacional/efetivo para o Excel. */
+/** 4O.3/4O.4 — rótulos legíveis do status operacional/efetivo para o Excel. */
 export const COMPARISON_OPERATIONAL_STATUS_LABELS: Record<
   AcgihBeiOperationalStatus,
   string
@@ -51,6 +51,12 @@ export const COMPARISON_OPERATIONAL_STATUS_LABELS: Record<
   NEW_CANDIDATE: 'Candidato novo',
   LOW_CONFIDENCE_REVIEW: 'Baixa confiança',
   RESOLVED_EQUIVALENCE: 'Resolvido por equivalência técnica',
+  // 4O.4 — estados operacionais derivados da decisão técnica em linhas revisadas.
+  REAL_DIVERGENCE: 'Divergência técnica real',
+  SOURCE_ACGIH_ERROR: 'Erro na base ACGIH/BEI',
+  SOURCE_NR7_ERROR: 'Erro na base NR-7',
+  NEEDS_FURTHER_REVIEW: 'Pendente de revisão (decisão)',
+  IGNORE_MONITOR: 'Monitorar / ignorar',
 };
 
 /** 4O.1 — rótulos legíveis das decisões técnicas para o Excel. */
@@ -162,7 +168,7 @@ export class AcgihBeiComparisonSpreadsheetExportService {
       ['Objetivo', 'Comparação técnica entre a base ACGIH/BEI e a base NR-7 e a biblioteca Regras Exame × Risco. Esta planilha é APENAS LEITURA (diagnóstica). Nada é aplicado, criado ou alterado.'],
       ['Não é importável', 'Esta exportação não tem fluxo de importação/aplicação. É um relatório de comparação.'],
       ['comparisonStatus', 'ALREADY_COVERED (ACGIH confirma NR-7/regra existente); DIVERGENT (mesmo determinante, diferença técnica relevante); NEEDS_REVIEW (correspondência parcial/ambígua); NEW_CANDIDATE (sem equivalente claro); LOW_CONFIDENCE_REVIEW (transcrição duvidosa). Status BRUTO calculado — nunca alterado pela curadoria.'],
-      ['Status operacional (4O.3)', 'Classificação efetiva derivada do comparisonStatus + decisão técnica. Uma linha DIVERGENT marcada como "Equivalência técnica / falso divergente" passa a "Resolvido por equivalência técnica" e sai da fila de divergentes. O comparisonStatus bruto permanece preservado nesta planilha para auditoria.'],
+      ['Status operacional (4O.3/4O.4)', 'Classificação efetiva derivada do comparisonStatus + decisão técnica. Uma linha DIVERGENT marcada como "Equivalência técnica / falso divergente" passa a "Resolvido por equivalência técnica" e sai da fila de divergentes. Uma linha "Requer revisão" que recebe qualquer decisão técnica fresca passa a refletir essa decisão (ex.: Divergência técnica real, Erro ACGIH/BEI, Erro NR-7, Pendente de revisão, Monitorar/ignorar) e sai da fila de pendentes. Decisões desatualizadas (recalculadas) permanecem em "Requer revisão". O comparisonStatus bruto permanece preservado nesta planilha para auditoria.'],
       ['suggestedAction', 'ADD_REFERENCE_ONLY (sugerir fonte complementar à regra existente; NÃO criar regra); REVIEW_DIVERGENCE; CREATE_NEW_RULE_CANDIDATE (possível regra nova, não criada nesta fase); IGNORE_OR_MONITOR; LOW_CONFIDENCE_REVIEW.'],
       ['nr7MatchStatus / examRiskRuleMatchStatus', 'FULL, PARTIAL ou Sem match (quando não há correspondência).'],
       ['Enriquecimento de fonte', 'Quando ACGIH confirma uma regra NR-7 existente, a sugestão é ADD_REFERENCE_ONLY: futuramente a regra poderá exibir "NR-7 + ACGIH/BEI". A gravação dessa referência NÃO ocorre nesta fase.'],

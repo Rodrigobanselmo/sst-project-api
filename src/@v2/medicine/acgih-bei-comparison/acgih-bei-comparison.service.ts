@@ -208,10 +208,13 @@ export class AcgihBeiComparisonService {
         complementaryReferenceStatus: reference?.status ?? null,
         review,
         hasReview: Boolean(review),
-        // 4O.3 — status operacional derivado (após o join da decisão técnica).
+        // 4O.3/4O.4 — status operacional derivado (após o join da decisão
+        // técnica). Linhas revisadas (decisão fresca) saem da fila operacional
+        // "Requer revisão"; decisões desatualizadas (isStale) não colapsam.
         operationalStatus: deriveOperationalStatus(
           row.comparisonStatus,
           review?.decision ?? null,
+          review?.isStale ?? null,
         ),
       };
     });
@@ -270,7 +273,9 @@ export class AcgihBeiComparisonService {
       total: rows.length,
       alreadyCovered: count(AcgihBeiComparisonStatus.ALREADY_COVERED),
       divergent: countOperational(AcgihBeiOperationalStatus.DIVERGENT),
-      needsReview: count(AcgihBeiComparisonStatus.NEEDS_REVIEW),
+      // 4O.4 — "Requer revisão" conta apenas pendentes reais (status
+      // operacional). Linhas já revisadas migram para o bucket da decisão.
+      needsReview: countOperational(AcgihBeiOperationalStatus.NEEDS_REVIEW),
       newCandidate: count(AcgihBeiComparisonStatus.NEW_CANDIDATE),
       lowConfidenceReview: count(AcgihBeiComparisonStatus.LOW_CONFIDENCE_REVIEW),
       resolvedEquivalence: countOperational(

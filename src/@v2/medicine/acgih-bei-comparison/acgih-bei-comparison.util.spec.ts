@@ -1,13 +1,18 @@
 import { describe, expect, it } from '@jest/globals';
-import { PcmsoAcgihBeiIndicatorConfidenceEnum } from '@prisma/client';
+import {
+  PcmsoAcgihBeiComparisonDecisionEnum,
+  PcmsoAcgihBeiIndicatorConfidenceEnum,
+} from '@prisma/client';
 
 import {
   AcgihBeiComparisonStatus,
+  AcgihBeiOperationalStatus,
   AcgihBeiSuggestedAction,
   AcgihItemInput,
   canonMatrix,
   canonMoment,
   compareItem,
+  deriveOperationalStatus,
   MatchStatus,
   matchNr7,
   normalizeCas,
@@ -176,5 +181,98 @@ describe('compareItem', () => {
     expect(res.examRiskRuleMatchStatus).toBe(MatchStatus.FULL);
     expect(res.ruleMatchMethod).toBe('VIA_NR7');
     expect(res.examNameSnapshot).toBe('Ácido hipúrico');
+  });
+});
+
+describe('deriveOperationalStatus', () => {
+  // 4O.3 — regra mantida.
+  it('DIVERGENT + FALSE_DIVERGENCE_EQUIVALENT → RESOLVED_EQUIVALENCE', () => {
+    expect(
+      deriveOperationalStatus(
+        AcgihBeiComparisonStatus.DIVERGENT,
+        PcmsoAcgihBeiComparisonDecisionEnum.FALSE_DIVERGENCE_EQUIVALENT,
+        false,
+      ),
+    ).toBe(AcgihBeiOperationalStatus.RESOLVED_EQUIVALENCE);
+  });
+
+  // Caso A (4O.4) — NEEDS_REVIEW revisado como divergência real sai da fila.
+  it('Caso A: NEEDS_REVIEW + REAL_DIVERGENCE (fresca) → REAL_DIVERGENCE', () => {
+    expect(
+      deriveOperationalStatus(
+        AcgihBeiComparisonStatus.NEEDS_REVIEW,
+        PcmsoAcgihBeiComparisonDecisionEnum.REAL_DIVERGENCE,
+        false,
+      ),
+    ).toBe(AcgihBeiOperationalStatus.REAL_DIVERGENCE);
+  });
+
+  // Caso B (4O.4) — NEEDS_REVIEW revisado como equivalência → resolvido.
+  it('Caso B: NEEDS_REVIEW + FALSE_DIVERGENCE_EQUIVALENT (fresca) → RESOLVED_EQUIVALENCE', () => {
+    expect(
+      deriveOperationalStatus(
+        AcgihBeiComparisonStatus.NEEDS_REVIEW,
+        PcmsoAcgihBeiComparisonDecisionEnum.FALSE_DIVERGENCE_EQUIVALENT,
+        false,
+      ),
+    ).toBe(AcgihBeiOperationalStatus.RESOLVED_EQUIVALENCE);
+  });
+
+  // Caso C (4O.4) — NEEDS_REVIEW sem decisão permanece pendente.
+  it('Caso C: NEEDS_REVIEW sem decisão → NEEDS_REVIEW', () => {
+    expect(
+      deriveOperationalStatus(AcgihBeiComparisonStatus.NEEDS_REVIEW, null, null),
+    ).toBe(AcgihBeiOperationalStatus.NEEDS_REVIEW);
+  });
+
+  it('NEEDS_REVIEW + decisão DESATUALIZADA (isStale) permanece NEEDS_REVIEW', () => {
+    expect(
+      deriveOperationalStatus(
+        AcgihBeiComparisonStatus.NEEDS_REVIEW,
+        PcmsoAcgihBeiComparisonDecisionEnum.REAL_DIVERGENCE,
+        true,
+      ),
+    ).toBe(AcgihBeiOperationalStatus.NEEDS_REVIEW);
+  });
+
+  it('demais decisões em NEEDS_REVIEW refletem o bucket operacional', () => {
+    expect(
+      deriveOperationalStatus(
+        AcgihBeiComparisonStatus.NEEDS_REVIEW,
+        PcmsoAcgihBeiComparisonDecisionEnum.SOURCE_ACGIH_ERROR,
+        false,
+      ),
+    ).toBe(AcgihBeiOperationalStatus.SOURCE_ACGIH_ERROR);
+    expect(
+      deriveOperationalStatus(
+        AcgihBeiComparisonStatus.NEEDS_REVIEW,
+        PcmsoAcgihBeiComparisonDecisionEnum.SOURCE_NR7_ERROR,
+        false,
+      ),
+    ).toBe(AcgihBeiOperationalStatus.SOURCE_NR7_ERROR);
+    expect(
+      deriveOperationalStatus(
+        AcgihBeiComparisonStatus.NEEDS_REVIEW,
+        PcmsoAcgihBeiComparisonDecisionEnum.NEEDS_FURTHER_REVIEW,
+        false,
+      ),
+    ).toBe(AcgihBeiOperationalStatus.NEEDS_FURTHER_REVIEW);
+    expect(
+      deriveOperationalStatus(
+        AcgihBeiComparisonStatus.NEEDS_REVIEW,
+        PcmsoAcgihBeiComparisonDecisionEnum.IGNORE_MONITOR,
+        false,
+      ),
+    ).toBe(AcgihBeiOperationalStatus.IGNORE_MONITOR);
+  });
+
+  it('status sem decisão preserva o bruto (ALREADY_COVERED)', () => {
+    expect(
+      deriveOperationalStatus(
+        AcgihBeiComparisonStatus.ALREADY_COVERED,
+        null,
+        null,
+      ),
+    ).toBe(AcgihBeiOperationalStatus.ALREADY_COVERED);
   });
 });
