@@ -24,6 +24,7 @@ import {
   CurationNotesBody,
   SearchExamCandidatesQuery,
   UpdateIndicatorStatusBody,
+  UpdateReviewNotesBody,
 } from './biological-indicator-curation.dto';
 import { BiologicalIndicatorCurationService } from '../../services/biological-indicator-curation.service';
 
@@ -81,6 +82,17 @@ export class BiologicalIndicatorCurationController {
       indicatorId: path.id,
       status: body.status,
       userId: user.userId,
+      reviewNotes: body.reviewNotes,
+    });
+  }
+
+  @Patch(MedicineRoutes.BIOLOGICAL_INDICATORS.BY_ID.REVIEW_NOTES)
+  updateReviewNotes(
+    @Param() path: BiologicalIndicatorIdPath,
+    @Body() body: UpdateReviewNotesBody,
+  ) {
+    return this.curationService.updateReviewNotes({
+      indicatorId: path.id,
       reviewNotes: body.reviewNotes,
     });
   }

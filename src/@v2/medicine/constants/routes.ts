@@ -21,6 +21,7 @@ export const MedicineRoutes = {
     BY_ID: {
       PATH: ':id',
       STATUS: ':id/status',
+      REVIEW_NOTES: ':id/review-notes',
       RISK_LINKS: ':id/risk-links',
       EXAM_LINKS: ':id/exam-links',
       PENDENCIES: ':id/pendencies',

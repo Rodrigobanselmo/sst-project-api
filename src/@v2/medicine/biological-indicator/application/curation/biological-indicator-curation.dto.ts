@@ -115,6 +115,11 @@ export class UpdateIndicatorStatusBody {
   reviewNotes?: string;
 }
 
+export class UpdateReviewNotesBody {
+  @IsString()
+  reviewNotes!: string;
+}
+
 export class CreateExamLinkBody {
   @Type(() => Number)
   @IsInt()

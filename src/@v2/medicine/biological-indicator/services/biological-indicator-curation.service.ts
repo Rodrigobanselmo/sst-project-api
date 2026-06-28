@@ -392,6 +392,24 @@ export class BiologicalIndicatorCurationService {
     });
   }
 
+  /**
+   * 4M.0 — Atualiza APENAS a nota de revisão normativa/médica do indicador.
+   * Não altera status, vínculos, exame padrão, requiresNormativeReview nem
+   * reviewedAt/reviewedById. Não roda sync NR-7. Não reabre pendências.
+   * Permitido em qualquer status (inclusive ACTIVE).
+   */
+  async updateReviewNotes(params: { indicatorId: string; reviewNotes: string }) {
+    await this.ensureIndicatorExists(params.indicatorId);
+
+    await this.prisma.occupationalBiologicalIndicator.update({
+      where: { id: params.indicatorId },
+      data: { reviewNotes: params.reviewNotes },
+      select: { id: true },
+    });
+
+    return this.getById(params.indicatorId);
+  }
+
   private async ensureIndicatorExists(indicatorId: string) {
     const indicator = await this.prisma.occupationalBiologicalIndicator.findFirst({
       where: { id: indicatorId, deleted_at: null },
