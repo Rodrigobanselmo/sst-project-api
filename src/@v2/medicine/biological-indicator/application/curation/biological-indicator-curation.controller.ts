@@ -22,6 +22,7 @@ import {
   BrowseBiologicalIndicatorsQuery,
   CreateExamLinkBody,
   CurationNotesBody,
+  RematchBody,
   SearchExamCandidatesQuery,
   UpdateIndicatorStatusBody,
   UpdateReviewNotesBody,
@@ -94,6 +95,18 @@ export class BiologicalIndicatorCurationController {
     return this.curationService.updateReviewNotes({
       indicatorId: path.id,
       reviewNotes: body.reviewNotes,
+    });
+  }
+
+  @Post(MedicineRoutes.BIOLOGICAL_INDICATORS.BY_ID.REMATCH)
+  rematch(
+    @Param() path: BiologicalIndicatorIdPath,
+    @Body() body: RematchBody,
+  ) {
+    return this.curationService.rematchIndicator({
+      indicatorId: path.id,
+      target: body.target,
+      dryRun: body.dryRun,
     });
   }
 

@@ -13,15 +13,57 @@ import { PrismaService } from '@/prisma/prisma.service';
 import { simpleCompanyId } from '@/shared/constants/ids';
 
 import { buildExamCatalogWhere } from '../biological-indicator-exam-provision.util';
+import { BiologicalIndicatorMatchService } from '../biological-indicator-match.service';
+import {
+  BiologicalIndicatorExamMatchCandidate,
+  BiologicalIndicatorRiskMatchCandidate,
+} from '../biological-indicator-match.types';
 
+import { RematchTarget } from '../application/curation/biological-indicator-curation.dto';
 import { BiologicalIndicatorDAO } from '../database/dao/biological-indicator.dao';
 import { getActivationPendencies } from './biological-indicator-activation.validator';
+
+/** 4M.1 — Candidato exibível na prévia/resumo de reanálise. */
+type RematchRiskCandidate = {
+  riskFactorId: string;
+  riskName: string | null;
+  riskCas: string | null;
+  matchMethod: string;
+  matchConfidence: string;
+  requiresReview: boolean;
+};
+
+type RematchExamCandidate = {
+  examId: number;
+  examName: string | null;
+  examMaterial: string | null;
+  matchMethod: string;
+  matchConfidence: string;
+  requiresReview: boolean;
+};
+
+type RematchBucket<TCandidate> = {
+  created: TCandidate[];
+  restored: TCandidate[];
+  ignoredConfirmed: TCandidate[];
+  ignoredExisting: TCandidate[];
+  candidates: TCandidate[];
+};
+
+const emptyBucket = <TCandidate>(): RematchBucket<TCandidate> => ({
+  created: [],
+  restored: [],
+  ignoredConfirmed: [],
+  ignoredExisting: [],
+  candidates: [],
+});
 
 @Injectable()
 export class BiologicalIndicatorCurationService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly biologicalIndicatorDAO: BiologicalIndicatorDAO,
+    private readonly matchService: BiologicalIndicatorMatchService,
   ) {}
 
   browse(params: Parameters<BiologicalIndicatorDAO['browse']>[0]) {
@@ -408,6 +450,216 @@ export class BiologicalIndicatorCurationService {
     });
 
     return this.getById(params.indicatorId);
+  }
+
+  /**
+   * 4M.1 — Reanálise SEGURA de vínculos de UM indicador NR-7.
+   * - Não confirma, não ativa, não altera status/nota, não roda sync.
+   * - Nunca altera/deprecia vínculos já confirmados.
+   * - Cria/restaura apenas candidatos PENDENTES.
+   * - dryRun: apenas calcula a prévia, sem escrever no banco.
+   */
+  async rematchIndicator(params: {
+    indicatorId: string;
+    target: RematchTarget;
+    dryRun: boolean;
+  }) {
+    const computed = await this.matchService.computeCandidatesForIndicator(
+      params.indicatorId,
+    );
+
+    if (!computed) {
+      throw new NotFoundException('Indicador biológico não encontrado.');
+    }
+
+    const risk =
+      params.target === 'RISK' || params.target === 'BOTH'
+        ? await this.applySafeRiskRematch(
+            params.indicatorId,
+            computed.riskMatches,
+            params.dryRun,
+          )
+        : emptyBucket<RematchRiskCandidate>();
+
+    const exam =
+      params.target === 'EXAM' || params.target === 'BOTH'
+        ? await this.applySafeExamRematch(
+            params.indicatorId,
+            computed.examMatches,
+            params.dryRun,
+          )
+        : emptyBucket<RematchExamCandidate>();
+
+    const indicator = await this.getById(params.indicatorId);
+
+    return {
+      target: params.target,
+      dryRun: params.dryRun,
+      risk,
+      exam,
+      indicator,
+    };
+  }
+
+  private async applySafeRiskRematch(
+    indicatorId: string,
+    matches: BiologicalIndicatorRiskMatchCandidate[],
+    dryRun: boolean,
+  ): Promise<RematchBucket<RematchRiskCandidate>> {
+    const bucket = emptyBucket<RematchRiskCandidate>();
+
+    // Carrega TODOS os vínculos (inclui soft-deleted) para classificar com segurança.
+    const existing = await this.prisma.biologicalIndicatorToRisk.findMany({
+      where: { indicatorId },
+    });
+    const byRiskId = new Map(existing.map((link) => [link.riskFactorId, link]));
+
+    for (const match of matches) {
+      const candidate: RematchRiskCandidate = {
+        riskFactorId: match.riskFactorId,
+        riskName: match.riskName,
+        riskCas: match.riskCas,
+        matchMethod: match.matchMethod,
+        matchConfidence: match.matchConfidence,
+        requiresReview: match.requiresReview,
+      };
+      bucket.candidates.push(candidate);
+
+      const link = byRiskId.get(match.riskFactorId);
+
+      if (link && !link.deleted_at && link.isConfirmed) {
+        bucket.ignoredConfirmed.push(candidate);
+        continue;
+      }
+
+      if (link && !link.deleted_at && !link.isConfirmed) {
+        bucket.ignoredExisting.push(candidate);
+        continue;
+      }
+
+      if (link && link.deleted_at) {
+        if (!dryRun) {
+          await this.prisma.biologicalIndicatorToRisk.update({
+            where: { id: link.id },
+            data: {
+              deleted_at: null,
+              isConfirmed: false,
+              isPrimary: false,
+              confirmedById: null,
+              confirmedAt: null,
+              matchConfidence: match.matchConfidence,
+              matchMethod: match.matchMethod,
+              requiresReview: match.requiresReview,
+              riskNameSnapshot: match.riskName,
+              riskCasSnapshot: match.riskCas,
+              notes: 'Restaurado por reanálise de vínculos (pendente).',
+            },
+          });
+        }
+        bucket.restored.push(candidate);
+        continue;
+      }
+
+      if (!dryRun) {
+        await this.prisma.biologicalIndicatorToRisk.create({
+          data: {
+            indicatorId,
+            riskFactorId: match.riskFactorId,
+            matchConfidence: match.matchConfidence,
+            matchMethod: match.matchMethod,
+            requiresReview: match.requiresReview,
+            isConfirmed: false,
+            isPrimary: false,
+            riskNameSnapshot: match.riskName,
+            riskCasSnapshot: match.riskCas,
+            notes: 'Criado por reanálise de vínculos (pendente).',
+          },
+        });
+      }
+      bucket.created.push(candidate);
+    }
+
+    return bucket;
+  }
+
+  private async applySafeExamRematch(
+    indicatorId: string,
+    matches: BiologicalIndicatorExamMatchCandidate[],
+    dryRun: boolean,
+  ): Promise<RematchBucket<RematchExamCandidate>> {
+    const bucket = emptyBucket<RematchExamCandidate>();
+
+    const existing = await this.prisma.biologicalIndicatorToExam.findMany({
+      where: { indicatorId },
+    });
+    const byExamId = new Map(existing.map((link) => [link.examId, link]));
+
+    for (const match of matches) {
+      const candidate: RematchExamCandidate = {
+        examId: match.examId,
+        examName: match.examName,
+        examMaterial: match.examMaterial,
+        matchMethod: match.matchMethod,
+        matchConfidence: match.matchConfidence,
+        requiresReview: match.requiresReview,
+      };
+      bucket.candidates.push(candidate);
+
+      const link = byExamId.get(match.examId);
+
+      if (link && !link.deleted_at && link.isConfirmed) {
+        bucket.ignoredConfirmed.push(candidate);
+        continue;
+      }
+
+      if (link && !link.deleted_at && !link.isConfirmed) {
+        bucket.ignoredExisting.push(candidate);
+        continue;
+      }
+
+      if (link && link.deleted_at) {
+        if (!dryRun) {
+          await this.prisma.biologicalIndicatorToExam.update({
+            where: { id: link.id },
+            data: {
+              deleted_at: null,
+              isConfirmed: false,
+              isDefault: false,
+              confirmedById: null,
+              confirmedAt: null,
+              matchConfidence: match.matchConfidence,
+              matchMethod: match.matchMethod,
+              requiresReview: match.requiresReview,
+              examNameSnapshot: match.examName,
+              examMaterialSnapshot: match.examMaterial,
+              notes: 'Restaurado por reanálise de vínculos (pendente).',
+            },
+          });
+        }
+        bucket.restored.push(candidate);
+        continue;
+      }
+
+      if (!dryRun) {
+        await this.prisma.biologicalIndicatorToExam.create({
+          data: {
+            indicatorId,
+            examId: match.examId,
+            matchConfidence: match.matchConfidence,
+            matchMethod: match.matchMethod,
+            requiresReview: match.requiresReview,
+            isConfirmed: false,
+            isDefault: false,
+            examNameSnapshot: match.examName,
+            examMaterialSnapshot: match.examMaterial,
+            notes: 'Criado por reanálise de vínculos (pendente).',
+          },
+        });
+      }
+      bucket.created.push(candidate);
+    }
+
+    return bucket;
   }
 
   private async ensureIndicatorExists(indicatorId: string) {

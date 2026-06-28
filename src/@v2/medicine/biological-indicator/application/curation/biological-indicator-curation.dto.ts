@@ -2,6 +2,7 @@ import { Type } from 'class-transformer';
 import {
   IsBoolean,
   IsEnum,
+  IsIn,
   IsInt,
   IsOptional,
   IsString,
@@ -118,6 +119,16 @@ export class UpdateIndicatorStatusBody {
 export class UpdateReviewNotesBody {
   @IsString()
   reviewNotes!: string;
+}
+
+export type RematchTarget = 'RISK' | 'EXAM' | 'BOTH';
+
+export class RematchBody {
+  @IsIn(['RISK', 'EXAM', 'BOTH'])
+  target!: RematchTarget;
+
+  @IsBoolean()
+  dryRun!: boolean;
 }
 
 export class CreateExamLinkBody {

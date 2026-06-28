@@ -394,6 +394,62 @@ export class BiologicalIndicatorMatchService {
     return { riskByConfidence, riskByMethod, examByConfidence, examByMethod };
   }
 
+  /**
+   * 4M.1 — Calcula candidatos de risco/exame para UM indicador, SEM persistir.
+   * Reaproveita exatamente a mesma lógica determinística do match em lote.
+   * Retorna null quando o indicador não existe (ou está removido).
+   */
+  async computeCandidatesForIndicator(indicatorId: string) {
+    const indicator = await this.prisma.occupationalBiologicalIndicator.findFirst({
+      where: { id: indicatorId, deleted_at: null },
+    });
+
+    if (!indicator) return null;
+
+    const [risks, exams, catalogRows] = await Promise.all([
+      this.prisma.riskFactors.findMany({
+        where: { system: true, type: 'QUI', deleted_at: null },
+        select: { id: true, name: true, cas: true, synonymous: true },
+      }),
+      this.prisma.exam.findMany({
+        where: buildExamCatalogWhere(simpleCompanyId),
+        select: {
+          id: true,
+          name: true,
+          material: true,
+          instruction: true,
+          analyses: true,
+        },
+      }),
+      this.prisma.riskCatalogEquivalence.findMany({
+        where: { revokedAt: null },
+        select: { canonicalLabel: true, aliasLabel: true },
+      }),
+    ]);
+
+    const catalogNameAliases = buildCatalogNameAliasMap(catalogRows);
+
+    const matchInput = {
+      id: indicator.id,
+      substanceName: indicator.substanceName,
+      substanceNameNormalized: indicator.substanceNameNormalized,
+      casNumbers: indicator.casNumbers,
+      biologicalIndicatorNormalized: indicator.biologicalIndicatorNormalized,
+      biologicalMatrix: indicator.biologicalMatrix,
+      collectionMoment: indicator.collectionMoment,
+      tableNumber: indicator.tableNumber,
+      indicatorType: indicator.indicatorType,
+      isSubstanceGroup: indicator.isSubstanceGroup,
+      requiresNormativeReview: indicator.requiresNormativeReview,
+    };
+
+    return {
+      indicator,
+      riskMatches: matchIndicatorToRisks(matchInput, risks, catalogNameAliases),
+      examMatches: matchIndicatorToExams(matchInput, exams),
+    };
+  }
+
   async findReusableImportBatch(params: {
     normativeSource: BiologicalNormativeSourceEnum;
     normativeVersion: string;

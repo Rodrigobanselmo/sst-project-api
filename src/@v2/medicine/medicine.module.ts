@@ -4,6 +4,7 @@ import { SharedModule } from '@/@v2/shared/shared.module';
 import { ESocial27TableRepository } from '@/modules/esocial/repositories/implementations/ESocial27TableRepository';
 import { FindAllTable27Service } from '@/modules/esocial/services/tables/find-all-27.service';
 import { PrismaModule } from '@/prisma/prisma.module';
+import { PrismaService } from '@/prisma/prisma.service';
 
 import { AcgihBeiComparisonController } from './acgih-bei-comparison/acgih-bei-comparison.controller';
 import { AcgihBeiComparisonRepository } from './acgih-bei-comparison/acgih-bei-comparison.repository';
@@ -18,6 +19,7 @@ import { AcgihBeiIndicatorService } from './acgih-bei-indicator/acgih-bei-indica
 import { BiologicalIndicatorApplicationController } from './biological-indicator/application/application/biological-indicator-application.controller';
 import { BiologicalIndicatorCurationController } from './biological-indicator/application/curation/biological-indicator-curation.controller';
 import { BiologicalIndicatorMaintenanceController } from './biological-indicator/application/maintenance/biological-indicator-maintenance.controller';
+import { BiologicalIndicatorMatchService } from './biological-indicator/biological-indicator-match.service';
 import { BiologicalIndicatorDAO } from './biological-indicator/database/dao/biological-indicator.dao';
 import { BiologicalIndicatorApplicationService } from './biological-indicator/services/biological-indicator-application.service';
 import { BiologicalIndicatorCurationService } from './biological-indicator/services/biological-indicator-curation.service';
@@ -55,6 +57,13 @@ import { ExamRiskRuleReferenceService } from './exam-risk-rule-reference/exam-ri
   ],
   providers: [
     BiologicalIndicatorDAO,
+    // 4M.1 — match determinístico reutilizável (recebe PrismaClient; PrismaService o estende).
+    {
+      provide: BiologicalIndicatorMatchService,
+      useFactory: (prisma: PrismaService) =>
+        new BiologicalIndicatorMatchService(prisma),
+      inject: [PrismaService],
+    },
     BiologicalIndicatorCurationService,
     BiologicalIndicatorApplicationService,
     BiologicalIndicatorSpreadsheetExportService,
