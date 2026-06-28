@@ -10,6 +10,7 @@ import { AcgihBeiComparisonController } from './acgih-bei-comparison/acgih-bei-c
 import { AcgihBeiComparisonRepository } from './acgih-bei-comparison/acgih-bei-comparison.repository';
 import { AcgihBeiComparisonSpreadsheetExportService } from './acgih-bei-comparison/acgih-bei-comparison-spreadsheet-export.service';
 import { AcgihBeiComparisonService } from './acgih-bei-comparison/acgih-bei-comparison.service';
+import { ComparisonAiSuggestionService } from './acgih-bei-comparison/comparison-ai-suggestion.service';
 import { ComparisonReviewRepository } from './acgih-bei-comparison/comparison-review.repository';
 import { ComparisonReviewService } from './acgih-bei-comparison/comparison-review.service';
 import { AcgihBeiIndicatorImportApplyService } from './acgih-bei-indicator/acgih-bei-indicator-import-apply.service';
@@ -94,6 +95,7 @@ import { ExamRiskRuleReferenceService } from './exam-risk-rule-reference/exam-ri
     AcgihBeiComparisonSpreadsheetExportService,
     ComparisonReviewRepository,
     ComparisonReviewService,
+    ComparisonAiSuggestionService,
     // Leitura apenas do catálogo oficial da Tabela 27 (não altera eSocial).
     FindAllTable27Service,
     ESocial27TableRepository,

@@ -73,5 +73,6 @@ export const MedicineRoutes = {
     REFERENCES: 'references',
     REVIEWS: 'reviews',
     REVIEW_BY_ID: 'reviews/:acgihBeiIndicatorId',
+    REVIEW_AI_SUGGESTION: 'reviews/:acgihBeiIndicatorId/ai-suggestion',
   },
 } as const;

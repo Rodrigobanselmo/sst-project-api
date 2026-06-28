@@ -28,6 +28,7 @@ import {
 } from './acgih-bei-comparison.dto';
 import { AcgihBeiComparisonSpreadsheetExportService } from './acgih-bei-comparison-spreadsheet-export.service';
 import { AcgihBeiComparisonService } from './acgih-bei-comparison.service';
+import { ComparisonAiSuggestionService } from './comparison-ai-suggestion.service';
 import { ComparisonReviewService } from './comparison-review.service';
 
 const XLSX_CONTENT_TYPE =
@@ -48,6 +49,7 @@ export class AcgihBeiComparisonController {
     private readonly exportService: AcgihBeiComparisonSpreadsheetExportService,
     private readonly referenceService: ExamRiskRuleReferenceService,
     private readonly reviewService: ComparisonReviewService,
+    private readonly aiSuggestionService: ComparisonAiSuggestionService,
   ) {}
 
   @Post(MedicineRoutes.ACGIH_BEI_COMPARISON.REFERENCES)
@@ -74,6 +76,14 @@ export class AcgihBeiComparisonController {
       technicalNote: body.technicalNote,
       userId: user.userId,
     });
+  }
+
+  // 4O.2 — sugestão de decisão técnica assistida por IA (apenas sugere; não
+  // grava decisão nem sugestão; não altera nenhuma base). Requer confirmação
+  // humana pelo fluxo de decisão (4O.1).
+  @Post(MedicineRoutes.ACGIH_BEI_COMPARISON.REVIEW_AI_SUGGESTION)
+  aiSuggestion(@Param('acgihBeiIndicatorId') acgihBeiIndicatorId: string) {
+    return this.aiSuggestionService.suggest({ acgihBeiIndicatorId });
   }
 
   // 4O.1 — limpa/reabre a decisão técnica (soft-delete).
