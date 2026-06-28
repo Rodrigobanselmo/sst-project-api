@@ -5,11 +5,13 @@ import { getActivationPendencies } from '../biological-indicator/services/biolog
 import { AcgihBeiComparisonRepository } from './acgih-bei-comparison.repository';
 import {
   AcgihBeiComparisonStatus,
+  AcgihBeiOperationalStatus,
   AcgihBeiSuggestedAction,
   AcgihItemInput,
   compareItem,
   ComparisonResult,
   ComparisonReviewInfo,
+  deriveOperationalStatus,
   normalizeCas,
   normalizeText,
   Nr7IndicatorInput,
@@ -19,6 +21,9 @@ import {
 export type ComparisonFilters = {
   search?: string;
   comparisonStatus?: AcgihBeiComparisonStatus;
+  // 4O.3 — filtro pelo status operacional/efetivo (Divergentes operacionais,
+  // Resolvidos por equivalência, etc.).
+  operationalStatus?: AcgihBeiOperationalStatus;
   suggestedAction?: AcgihBeiSuggestedAction;
   confidence?: string;
   // 4O.1 — filtros pela decisão técnica de curadoria.
@@ -33,6 +38,8 @@ export type ComparisonTotals = {
   needsReview: number;
   newCandidate: number;
   lowConfidenceReview: number;
+  // 4O.3 — divergências resolvidas por equivalência técnica.
+  resolvedEquivalence: number;
 };
 
 export type ComparisonResponse = {
@@ -201,6 +208,11 @@ export class AcgihBeiComparisonService {
         complementaryReferenceStatus: reference?.status ?? null,
         review,
         hasReview: Boolean(review),
+        // 4O.3 — status operacional derivado (após o join da decisão técnica).
+        operationalStatus: deriveOperationalStatus(
+          row.comparisonStatus,
+          review?.decision ?? null,
+        ),
       };
     });
   }
@@ -211,6 +223,12 @@ export class AcgihBeiComparisonService {
   ): ComparisonResult[] {
     return rows.filter((row) => {
       if (filters.comparisonStatus && row.comparisonStatus !== filters.comparisonStatus)
+        return false;
+      // 4O.3 — filtro pelo status operacional/efetivo.
+      if (
+        filters.operationalStatus &&
+        row.operationalStatus !== filters.operationalStatus
+      )
         return false;
       if (filters.suggestedAction && row.suggestedAction !== filters.suggestedAction)
         return false;
@@ -240,13 +258,24 @@ export class AcgihBeiComparisonService {
   buildTotals(rows: ComparisonResult[]): ComparisonTotals {
     const count = (status: AcgihBeiComparisonStatus) =>
       rows.filter((r) => r.comparisonStatus === status).length;
+    // 4O.3 — divergente e resolvido por equivalência usam o status operacional.
+    const countOperational = (status: AcgihBeiOperationalStatus) =>
+      rows.filter(
+        (r) =>
+          (r.operationalStatus ??
+            (r.comparisonStatus as unknown as AcgihBeiOperationalStatus)) ===
+          status,
+      ).length;
     return {
       total: rows.length,
       alreadyCovered: count(AcgihBeiComparisonStatus.ALREADY_COVERED),
-      divergent: count(AcgihBeiComparisonStatus.DIVERGENT),
+      divergent: countOperational(AcgihBeiOperationalStatus.DIVERGENT),
       needsReview: count(AcgihBeiComparisonStatus.NEEDS_REVIEW),
       newCandidate: count(AcgihBeiComparisonStatus.NEW_CANDIDATE),
       lowConfidenceReview: count(AcgihBeiComparisonStatus.LOW_CONFIDENCE_REVIEW),
+      resolvedEquivalence: countOperational(
+        AcgihBeiOperationalStatus.RESOLVED_EQUIVALENCE,
+      ),
     };
   }
 

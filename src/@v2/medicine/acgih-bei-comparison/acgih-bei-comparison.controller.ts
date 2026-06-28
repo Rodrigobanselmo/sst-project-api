@@ -106,6 +106,7 @@ export class AcgihBeiComparisonController {
     const rows = await this.service.computeForExport({
       search: query.search,
       comparisonStatus: query.comparisonStatus,
+      operationalStatus: query.operationalStatus,
       suggestedAction: query.suggestedAction,
       confidence: query.confidence,
       reviewDecision: query.reviewDecision,
@@ -129,6 +130,7 @@ export class AcgihBeiComparisonController {
       filters: {
         search: query.search,
         comparisonStatus: query.comparisonStatus,
+        operationalStatus: query.operationalStatus,
         suggestedAction: query.suggestedAction,
         confidence: query.confidence,
         reviewDecision: query.reviewDecision,

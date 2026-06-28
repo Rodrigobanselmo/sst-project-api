@@ -26,6 +26,20 @@ export enum AcgihBeiComparisonStatus {
   LOW_CONFIDENCE_REVIEW = 'LOW_CONFIDENCE_REVIEW',
 }
 
+/**
+ * 4O.3 — status operacional/efetivo. Superconjunto do comparisonStatus bruto +
+ * o estado resolvido por decisão técnica humana. Derivado em runtime; NUNCA
+ * substitui o comparisonStatus calculado (preservado p/ auditoria/export).
+ */
+export enum AcgihBeiOperationalStatus {
+  ALREADY_COVERED = 'ALREADY_COVERED',
+  DIVERGENT = 'DIVERGENT',
+  NEEDS_REVIEW = 'NEEDS_REVIEW',
+  NEW_CANDIDATE = 'NEW_CANDIDATE',
+  LOW_CONFIDENCE_REVIEW = 'LOW_CONFIDENCE_REVIEW',
+  RESOLVED_EQUIVALENCE = 'RESOLVED_EQUIVALENCE',
+}
+
 /** Sugestão de ação (apenas informativa nesta fase — nada é aplicado). */
 export enum AcgihBeiSuggestedAction {
   ADD_REFERENCE_ONLY = 'ADD_REFERENCE_ONLY',
@@ -119,6 +133,11 @@ export type ComparisonResult = {
   suggestedAction: AcgihBeiSuggestedAction;
   technicalDiff: string;
   reviewNotes: string;
+  // 4O.3 — status operacional/efetivo derivado (comparisonStatus + decisão
+  // técnica). Preenchido após o cálculo puro e o join da review. NÃO altera o
+  // comparisonStatus bruto. Quando não há decisão que altere o estado, é igual
+  // ao comparisonStatus.
+  operationalStatus?: AcgihBeiOperationalStatus;
   // 4L.1a — contexto de curadoria/readiness (read-only). Derivado de dados já
   // carregados no fluxo da comparação. NÃO altera classificação, suggestedAction
   // nem elegibilidade de fonte complementar.
@@ -227,6 +246,131 @@ export const parseValue = (
   const unit = normalizeText(normalized.replace(/-?\d+(\.\d+)?/, ''));
   return { num: Number.isFinite(num as number) ? num : null, unit };
 };
+
+/**
+ * 4O.3 — deriva o status operacional/efetivo a partir do status bruto e da
+ * decisão técnica. Regra mínima: uma linha DIVERGENT marcada como
+ * FALSE_DIVERGENCE_EQUIVALENT é tratada operacionalmente como resolvida por
+ * equivalência. Demais casos mantêm o status bruto. Só colapsa quando o status
+ * atual ainda é DIVERGENT (evita resolver indevidamente decisões desatualizadas).
+ */
+export const deriveOperationalStatus = (
+  comparisonStatus: AcgihBeiComparisonStatus,
+  reviewDecision?: PcmsoAcgihBeiComparisonDecisionEnum | null,
+): AcgihBeiOperationalStatus => {
+  if (
+    comparisonStatus === AcgihBeiComparisonStatus.DIVERGENT &&
+    reviewDecision ===
+      PcmsoAcgihBeiComparisonDecisionEnum.FALSE_DIVERGENCE_EQUIVALENT
+  ) {
+    return AcgihBeiOperationalStatus.RESOLVED_EQUIVALENCE;
+  }
+  return comparisonStatus as unknown as AcgihBeiOperationalStatus;
+};
+
+/**
+ * 4O.3 — decisões técnicas que impedem fonte complementar no caminho de
+ * equivalência (e em geral).
+ */
+export const REFERENCE_BLOCKING_DECISIONS: PcmsoAcgihBeiComparisonDecisionEnum[] =
+  [
+    PcmsoAcgihBeiComparisonDecisionEnum.REAL_DIVERGENCE,
+    PcmsoAcgihBeiComparisonDecisionEnum.SOURCE_ACGIH_ERROR,
+    PcmsoAcgihBeiComparisonDecisionEnum.SOURCE_NR7_ERROR,
+    PcmsoAcgihBeiComparisonDecisionEnum.NEEDS_FURTHER_REVIEW,
+    PcmsoAcgihBeiComparisonDecisionEnum.IGNORE_MONITOR,
+  ];
+
+const isActiveStatus = (value?: string | null): boolean =>
+  String(value ?? '').toUpperCase() === 'ACTIVE';
+
+const isEquivalenceResolved = (row: ComparisonResult): boolean =>
+  row.operationalStatus === AcgihBeiOperationalStatus.RESOLVED_EQUIVALENCE ||
+  row.review?.decision ===
+    PcmsoAcgihBeiComparisonDecisionEnum.FALSE_DIVERGENCE_EQUIVALENT;
+
+/**
+ * 4O.3 — lista objetiva do que impede fonte complementar (para tooltip/API).
+ * Retorna array vazio quando elegível.
+ */
+export const getReferenceEligibilityBlockers = (
+  row: ComparisonResult,
+): string[] => {
+  if (!row.examRiskRuleId) {
+    return [
+      'Sem regra da Biblioteca Risco × Exame vinculada (examRiskRuleId).',
+    ];
+  }
+
+  // Caminho atual (4I): item já coberto — sem exigências extras de readiness.
+  const currentPath =
+    row.comparisonStatus === AcgihBeiComparisonStatus.ALREADY_COVERED &&
+    row.suggestedAction === AcgihBeiSuggestedAction.ADD_REFERENCE_ONLY;
+  if (currentPath) return [];
+
+  const blockers: string[] = [];
+
+  if (!row.review) {
+    return [
+      'Sem decisão técnica registrada. Registre equivalência técnica / falso divergente para habilitar.',
+    ];
+  }
+
+  if (REFERENCE_BLOCKING_DECISIONS.includes(row.review.decision)) {
+    return [
+      'A decisão técnica registrada não permite adicionar fonte complementar.',
+    ];
+  }
+
+  if (!isEquivalenceResolved(row)) {
+    return [
+      'Item não está coberto nem resolvido por equivalência técnica (operationalStatus / decisão).',
+    ];
+  }
+
+  if (row.review.isStale) {
+    blockers.push(
+      'Decisão técnica desatualizada (classificação recalculada); revise antes de aplicar.',
+    );
+  }
+
+  if (!isActiveStatus(row.acgihBeiStatus)) {
+    blockers.push(
+      row.acgihBeiStatus === 'DRAFT'
+        ? 'ACGIH/BEI em rascunho.'
+        : 'ACGIH/BEI não está ativo.',
+    );
+  }
+  if (row.acgihBeiIsCurated !== true) {
+    blockers.push('ACGIH/BEI não está marcado como curado.');
+  }
+  if (!row.nr7IndicatorId) {
+    blockers.push('Sem indicador NR-7 vinculado.');
+  } else if (!isActiveStatus(row.nr7Status)) {
+    blockers.push(
+      row.nr7Status === 'DRAFT'
+        ? 'Indicador NR-7 em rascunho.'
+        : 'Indicador NR-7 não está ativo.',
+    );
+  }
+  if (!isActiveStatus(row.examRiskRuleStatus)) {
+    blockers.push('Regra da Biblioteca não está ativa.');
+  }
+  if (row.examRiskRuleIsCurated !== true) {
+    blockers.push('Regra da Biblioteca não está marcada como curada.');
+  }
+
+  return blockers;
+};
+
+/**
+ * 4O.3 — elegibilidade para registrar a ACGIH/BEI como fonte complementar.
+ * Caminho atual (item já coberto) OU caminho de equivalência técnica com
+ * readiness estrito. Helper puro reutilizado pela API (autoritativa) e espelhado
+ * no Client. Não persiste nada e não confia em dados do Client.
+ */
+export const isReferenceEligible = (row: ComparisonResult): boolean =>
+  getReferenceEligibilityBlockers(row).length === 0;
 
 const casMatches = (acgihCas: string, nr7: Nr7IndicatorInput): boolean => {
   if (!acgihCas) return false;

@@ -10,10 +10,7 @@ import {
 } from '@prisma/client';
 
 import { AcgihBeiComparisonService } from '../acgih-bei-comparison/acgih-bei-comparison.service';
-import {
-  AcgihBeiComparisonStatus,
-  AcgihBeiSuggestedAction,
-} from '../acgih-bei-comparison/acgih-bei-comparison.util';
+import { isReferenceEligible, getReferenceEligibilityBlockers } from '../acgih-bei-comparison/acgih-bei-comparison.util';
 import { ExamRiskRuleReferenceRepository } from './exam-risk-rule-reference.repository';
 
 export type ApplyReferenceOutcome = 'CREATED' | 'RESTORED' | 'UNCHANGED';
@@ -61,20 +58,21 @@ export class ExamRiskRuleReferenceService {
       );
     }
 
-    // 2. Bloqueios de elegibilidade (impede aplicação indevida).
-    if (row.comparisonStatus !== AcgihBeiComparisonStatus.ALREADY_COVERED) {
-      throw new BadRequestException(
-        'Apenas itens classificados como ALREADY_COVERED podem virar fonte complementar.',
-      );
-    }
-    if (row.suggestedAction !== AcgihBeiSuggestedAction.ADD_REFERENCE_ONLY) {
-      throw new BadRequestException(
-        'Ação não permitida: a sugestão técnica deste item não é ADD_REFERENCE_ONLY.',
-      );
-    }
+    // 2. Bloqueio de elegibilidade (impede aplicação indevida). Aceita o caminho
+    // atual (item já coberto) OU o caminho de equivalência técnica (4O.3):
+    // decisão FALSE_DIVERGENCE_EQUIVALENT com readiness seguro das três bases.
+    // O servidor é autoritativo: recalcula a comparação e revalida o estado.
     if (!row.examRiskRuleId) {
       throw new BadRequestException(
         'Não há regra existente resolvida para este item. Nenhuma regra será criada nesta fase.',
+      );
+    }
+    if (!isReferenceEligible(row)) {
+      const blockers = getReferenceEligibilityBlockers(row);
+      throw new BadRequestException(
+        blockers.length
+          ? `Item não elegível para fonte complementar: ${blockers.join(' ')}`
+          : 'Item não elegível para fonte complementar.',
       );
     }
 

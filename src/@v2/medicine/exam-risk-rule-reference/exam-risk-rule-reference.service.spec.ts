@@ -1,11 +1,15 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 
+import { PcmsoAcgihBeiComparisonDecisionEnum } from '@prisma/client';
+
 import { AcgihBeiComparisonService } from '../acgih-bei-comparison/acgih-bei-comparison.service';
 import {
   AcgihBeiComparisonStatus,
+  AcgihBeiOperationalStatus,
   AcgihBeiSuggestedAction,
   ComparisonResult,
+  ComparisonReviewInfo,
   MatchStatus,
 } from '../acgih-bei-comparison/acgih-bei-comparison.util';
 import { ExamRiskRuleReferenceRepository } from './exam-risk-rule-reference.repository';
@@ -187,6 +191,120 @@ describe('ExamRiskRuleReferenceService.applyAcgihReference', () => {
     await expect(
       ctx.service.applyAcgihReference({ acgihBeiIndicatorId: ACGIH_ID }),
     ).rejects.toBeInstanceOf(BadRequestException);
+  });
+
+  // 4O.3 — caminho de equivalência técnica.
+  const equivalenceReview: ComparisonReviewInfo = {
+    id: 'rev-1',
+    decision: PcmsoAcgihBeiComparisonDecisionEnum.FALSE_DIVERGENCE_EQUIVALENT,
+    technicalNote: 'Equivalência nomenclatural FJFS.',
+    comparisonStatusSnapshot: AcgihBeiComparisonStatus.DIVERGENT,
+    suggestedActionSnapshot: AcgihBeiSuggestedAction.REVIEW_DIVERGENCE,
+    isStale: false,
+    reviewedById: 1,
+    reviewedByName: 'Curador',
+    reviewedAt: new Date().toISOString(),
+  };
+
+  const equivalenceRow = (over: Partial<ComparisonResult> = {}) =>
+    buildRow({
+      comparisonStatus: AcgihBeiComparisonStatus.DIVERGENT,
+      suggestedAction: AcgihBeiSuggestedAction.REVIEW_DIVERGENCE,
+      operationalStatus: AcgihBeiOperationalStatus.RESOLVED_EQUIVALENCE,
+      review: equivalenceReview,
+      acgihBeiStatus: 'ACTIVE',
+      acgihBeiIsCurated: true,
+      nr7Status: 'ACTIVE',
+      examRiskRuleStatus: 'ACTIVE',
+      examRiskRuleIsCurated: true,
+      ...over,
+    });
+
+  it('permite equivalência técnica com readiness seguro (CREATED)', async () => {
+    ctx.comparisonService.computeAll.mockResolvedValue([
+      equivalenceRow(),
+    ] as never);
+    (ctx.repository.findRawByRuleAndAcgih as jest.Mock).mockResolvedValue(
+      null as never,
+    );
+
+    const res = await ctx.service.applyAcgihReference({
+      acgihBeiIndicatorId: ACGIH_ID,
+    });
+
+    expect(res.outcome).toBe('CREATED');
+    expect(ctx.repository.create).toHaveBeenCalledTimes(1);
+  });
+
+  it('permite equivalência via operationalStatus RESOLVED_EQUIVALENCE sem review.decision no helper', async () => {
+    ctx.comparisonService.computeAll.mockResolvedValue([
+      equivalenceRow({
+        review: {
+          ...equivalenceReview,
+          decision:
+            PcmsoAcgihBeiComparisonDecisionEnum.FALSE_DIVERGENCE_EQUIVALENT,
+        },
+        operationalStatus: AcgihBeiOperationalStatus.RESOLVED_EQUIVALENCE,
+      }),
+    ] as never);
+    (ctx.repository.findRawByRuleAndAcgih as jest.Mock).mockResolvedValue(
+      null as never,
+    );
+
+    const res = await ctx.service.applyAcgihReference({
+      acgihBeiIndicatorId: ACGIH_ID,
+    });
+
+    expect(res.outcome).toBe('CREATED');
+  });
+
+  it('bloqueia equivalência com decisão desatualizada (isStale)', async () => {
+    ctx.comparisonService.computeAll.mockResolvedValue([
+      equivalenceRow({
+        review: { ...equivalenceReview, isStale: true },
+      }),
+    ] as never);
+    await expect(
+      ctx.service.applyAcgihReference({ acgihBeiIndicatorId: ACGIH_ID }),
+    ).rejects.toBeInstanceOf(BadRequestException);
+    expect(ctx.repository.create).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['ACGIH inativo', { acgihBeiStatus: 'DRAFT' }],
+    ['ACGIH não curado', { acgihBeiIsCurated: false }],
+    ['NR-7 inativo', { nr7Status: 'DRAFT' }],
+    ['regra inativa', { examRiskRuleStatus: 'DRAFT' }],
+    ['regra não curada', { examRiskRuleIsCurated: false }],
+  ])(
+    'bloqueia equivalência com readiness incompleto: %s',
+    async (_label, patch) => {
+      ctx.comparisonService.computeAll.mockResolvedValue([
+        equivalenceRow(patch as Partial<ComparisonResult>),
+      ] as never);
+      await expect(
+        ctx.service.applyAcgihReference({ acgihBeiIndicatorId: ACGIH_ID }),
+      ).rejects.toBeInstanceOf(BadRequestException);
+      expect(ctx.repository.create).not.toHaveBeenCalled();
+    },
+  );
+
+  it.each([
+    PcmsoAcgihBeiComparisonDecisionEnum.REAL_DIVERGENCE,
+    PcmsoAcgihBeiComparisonDecisionEnum.SOURCE_ACGIH_ERROR,
+    PcmsoAcgihBeiComparisonDecisionEnum.SOURCE_NR7_ERROR,
+    PcmsoAcgihBeiComparisonDecisionEnum.NEEDS_FURTHER_REVIEW,
+    PcmsoAcgihBeiComparisonDecisionEnum.IGNORE_MONITOR,
+  ])('bloqueia equivalência para decisão %s', async (decision) => {
+    ctx.comparisonService.computeAll.mockResolvedValue([
+      equivalenceRow({
+        review: { ...equivalenceReview, decision },
+      }),
+    ] as never);
+    await expect(
+      ctx.service.applyAcgihReference({ acgihBeiIndicatorId: ACGIH_ID }),
+    ).rejects.toBeInstanceOf(BadRequestException);
+    expect(ctx.repository.create).not.toHaveBeenCalled();
   });
 });
 

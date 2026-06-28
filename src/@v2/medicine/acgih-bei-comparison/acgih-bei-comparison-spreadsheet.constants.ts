@@ -24,6 +24,8 @@ export const ACGIH_BEI_COMPARISON_COLUMN_ORDER = [
   'examRiskRuleId',
   'examNameSnapshot',
   'comparisonStatus',
+  // 4O.3 — status operacional/efetivo (mantém comparisonStatus bruto ao lado).
+  'operationalStatus',
   'suggestedAction',
   'technicalDiff',
   'reviewNotes',
@@ -69,6 +71,7 @@ export const ACGIH_BEI_COMPARISON_COLUMN_WIDTHS: Partial<
   examRiskRuleId: 26,
   examNameSnapshot: 30,
   comparisonStatus: 20,
+  operationalStatus: 24,
   suggestedAction: 24,
   technicalDiff: 60,
   reviewNotes: 60,
@@ -94,6 +97,7 @@ export const ACGIH_BEI_COMPARISON_COLUMN_WIDTHS: Partial<
 export const ACGIH_BEI_COMPARISON_COLUMN_HEADERS: Partial<
   Record<AcgihBeiComparisonColumnKey, string>
 > = {
+  operationalStatus: 'Status operacional',
   acgihBeiStatus: 'Status ACGIH/BEI',
   acgihBeiIsCurated: 'Curado ACGIH/BEI',
   acgihBeiSourceYear: 'Ano/fonte ACGIH/BEI',

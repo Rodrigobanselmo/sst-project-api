@@ -18,6 +18,7 @@ import {
 
 import {
   AcgihBeiComparisonStatus,
+  AcgihBeiOperationalStatus,
   AcgihBeiSuggestedAction,
 } from './acgih-bei-comparison.util';
 
@@ -42,6 +43,11 @@ export class BrowseAcgihBeiComparisonQuery {
   @IsOptional()
   @IsEnum(AcgihBeiComparisonStatus)
   comparisonStatus?: AcgihBeiComparisonStatus;
+
+  // 4O.3 — filtro pelo status operacional/efetivo.
+  @IsOptional()
+  @IsEnum(AcgihBeiOperationalStatus)
+  operationalStatus?: AcgihBeiOperationalStatus;
 
   @IsOptional()
   @IsEnum(AcgihBeiSuggestedAction)
@@ -70,6 +76,11 @@ export class ExportAcgihBeiComparisonQuery {
   @IsOptional()
   @IsEnum(AcgihBeiComparisonStatus)
   comparisonStatus?: AcgihBeiComparisonStatus;
+
+  // 4O.3 — filtro pelo status operacional/efetivo.
+  @IsOptional()
+  @IsEnum(AcgihBeiOperationalStatus)
+  operationalStatus?: AcgihBeiOperationalStatus;
 
   @IsOptional()
   @IsEnum(AcgihBeiSuggestedAction)
