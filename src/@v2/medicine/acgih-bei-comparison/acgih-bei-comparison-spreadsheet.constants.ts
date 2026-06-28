@@ -38,6 +38,12 @@ export const ACGIH_BEI_COMPARISON_COLUMN_ORDER = [
   'examRiskRuleStatus',
   'examRiskRuleIsCurated',
   'hasComplementaryReference',
+  // 4O.1 — decisão técnica de curadoria.
+  'reviewDecision',
+  'reviewTechnicalNote',
+  'reviewReviewedBy',
+  'reviewReviewedAt',
+  'reviewIsStale',
 ] as const;
 
 export type AcgihBeiComparisonColumnKey =
@@ -76,6 +82,11 @@ export const ACGIH_BEI_COMPARISON_COLUMN_WIDTHS: Partial<
   examRiskRuleStatus: 18,
   examRiskRuleIsCurated: 18,
   hasComplementaryReference: 26,
+  reviewDecision: 28,
+  reviewTechnicalNote: 60,
+  reviewReviewedBy: 24,
+  reviewReviewedAt: 22,
+  reviewIsStale: 26,
 };
 
 /** Rótulos legíveis SOMENTE para as colunas novas (4L.1a). As colunas
@@ -93,4 +104,9 @@ export const ACGIH_BEI_COMPARISON_COLUMN_HEADERS: Partial<
   examRiskRuleStatus: 'Status Biblioteca',
   examRiskRuleIsCurated: 'Curada Biblioteca',
   hasComplementaryReference: 'Fonte complementar já registrada',
+  reviewDecision: 'Decisão técnica',
+  reviewTechnicalNote: 'Nota técnica da decisão',
+  reviewReviewedBy: 'Revisado por',
+  reviewReviewedAt: 'Revisado em',
+  reviewIsStale: 'Decisão desatualizada (recalculada)',
 };

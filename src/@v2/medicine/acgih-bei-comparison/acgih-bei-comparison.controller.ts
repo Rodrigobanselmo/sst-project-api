@@ -1,8 +1,10 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpStatus,
+  Param,
   Post,
   Query,
   Res,
@@ -22,9 +24,11 @@ import { ExamRiskRuleReferenceService } from '../exam-risk-rule-reference/exam-r
 import {
   BrowseAcgihBeiComparisonQuery,
   ExportAcgihBeiComparisonQuery,
+  UpsertComparisonReviewBody,
 } from './acgih-bei-comparison.dto';
 import { AcgihBeiComparisonSpreadsheetExportService } from './acgih-bei-comparison-spreadsheet-export.service';
 import { AcgihBeiComparisonService } from './acgih-bei-comparison.service';
+import { ComparisonReviewService } from './comparison-review.service';
 
 const XLSX_CONTENT_TYPE =
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
@@ -43,6 +47,7 @@ export class AcgihBeiComparisonController {
     private readonly service: AcgihBeiComparisonService,
     private readonly exportService: AcgihBeiComparisonSpreadsheetExportService,
     private readonly referenceService: ExamRiskRuleReferenceService,
+    private readonly reviewService: ComparisonReviewService,
   ) {}
 
   @Post(MedicineRoutes.ACGIH_BEI_COMPARISON.REFERENCES)
@@ -52,6 +57,33 @@ export class AcgihBeiComparisonController {
   ) {
     return this.referenceService.applyAcgihReference({
       acgihBeiIndicatorId: body.acgihBeiIndicatorId,
+      userId: user.userId,
+    });
+  }
+
+  // 4O.1 — registra/atualiza a decisão técnica de uma linha da comparação.
+  // Camada de curadoria: NÃO altera o cálculo nem as bases de origem.
+  @Post(MedicineRoutes.ACGIH_BEI_COMPARISON.REVIEWS)
+  upsertReview(
+    @Body() body: UpsertComparisonReviewBody,
+    @User() user: UserPayloadDto,
+  ) {
+    return this.reviewService.upsert({
+      acgihBeiIndicatorId: body.acgihBeiIndicatorId,
+      decision: body.decision,
+      technicalNote: body.technicalNote,
+      userId: user.userId,
+    });
+  }
+
+  // 4O.1 — limpa/reabre a decisão técnica (soft-delete).
+  @Delete(MedicineRoutes.ACGIH_BEI_COMPARISON.REVIEW_BY_ID)
+  removeReview(
+    @Param('acgihBeiIndicatorId') acgihBeiIndicatorId: string,
+    @User() user: UserPayloadDto,
+  ) {
+    return this.reviewService.remove({
+      acgihBeiIndicatorId,
       userId: user.userId,
     });
   }
@@ -66,6 +98,8 @@ export class AcgihBeiComparisonController {
       comparisonStatus: query.comparisonStatus,
       suggestedAction: query.suggestedAction,
       confidence: query.confidence,
+      reviewDecision: query.reviewDecision,
+      hasReview: query.hasReview,
     });
     const buffer = await this.exportService.export(rows);
     res.setHeader('Content-Type', XLSX_CONTENT_TYPE);
@@ -87,6 +121,8 @@ export class AcgihBeiComparisonController {
         comparisonStatus: query.comparisonStatus,
         suggestedAction: query.suggestedAction,
         confidence: query.confidence,
+        reviewDecision: query.reviewDecision,
+        hasReview: query.hasReview,
       },
     });
   }

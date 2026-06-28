@@ -3849,6 +3849,9 @@ model OccupationalBiologicalIndicator {
   // Fontes complementares (4I) que referenciam este indicador NR-7.
   examRiskRuleReferences PcmsoExamRiskRuleReference[]
 
+  // Decisões de curadoria da comparação (4O.1) que referenciam este NR-7 (snapshot).
+  comparisonReviews PcmsoAcgihBeiComparisonReview[] @relation("ComparisonReviewNr7")
+
   created_at DateTime  @default(now())
   updated_at DateTime  @updatedAt
   deleted_at DateTime?
@@ -4001,6 +4004,9 @@ model PcmsoExamRiskRule {
   exams      PcmsoExamRiskRuleExam[]
   references PcmsoExamRiskRuleReference[]
 
+  // Decisões de curadoria da comparação (4O.1) que referenciam esta regra (snapshot).
+  comparisonReviews PcmsoAcgihBeiComparisonReview[] @relation("ComparisonReviewRule")
+
   created_at DateTime  @default(now())
   updated_at DateTime  @updatedAt
   deleted_at DateTime?
@@ -4112,6 +4118,53 @@ model PcmsoExamRiskRuleReference {
   @@index([nr7IndicatorId])
   @@index([status])
   @@map("PcmsoExamRiskRuleReference")
+}
+
+// Decisão técnica de curadoria (4O.1) sobre uma linha da comparação ACGIH/BEI ×
+// NR-7 × Biblioteca. É uma camada ADITIVA e isolada: NÃO altera o cálculo da
+// comparação, NR-7, ACGIH/BEI, Biblioteca, fonte complementar, regras nem sync.
+// A linha da comparação tem identidade estável por acgihBeiIndicatorId (uma
+// linha por indicador ACGIH/BEI), que é a chave natural única da decisão. Os
+// IDs NR-7/regra são apenas SNAPSHOTS de contexto no momento da decisão.
+enum PcmsoAcgihBeiComparisonDecisionEnum {
+  FALSE_DIVERGENCE_EQUIVALENT
+  REAL_DIVERGENCE
+  SOURCE_ACGIH_ERROR
+  SOURCE_NR7_ERROR
+  NEEDS_FURTHER_REVIEW
+  IGNORE_MONITOR
+}
+
+model PcmsoAcgihBeiComparisonReview {
+  id String @id @default(cuid())
+
+  // Identidade estável da linha de comparação.
+  acgihBeiIndicatorId String
+  acgihBeiIndicator   PcmsoAcgihBeiIndicator @relation(fields: [acgihBeiIndicatorId], references: [id], onDelete: Cascade)
+
+  // Snapshots de contexto no momento da decisão (não são chave).
+  nr7IndicatorId           String?
+  nr7Indicator             OccupationalBiologicalIndicator? @relation("ComparisonReviewNr7", fields: [nr7IndicatorId], references: [id], onDelete: SetNull)
+  examRiskRuleId           String?
+  examRiskRule             PcmsoExamRiskRule? @relation("ComparisonReviewRule", fields: [examRiskRuleId], references: [id], onDelete: SetNull)
+  comparisonStatusSnapshot String
+  suggestedActionSnapshot  String?
+
+  decision      PcmsoAcgihBeiComparisonDecisionEnum
+  technicalNote String
+
+  reviewedById Int?
+  updatedById  Int?
+  deletedById  Int?
+
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+
+  @@unique([acgihBeiIndicatorId])
+  @@index([decision])
+  @@index([acgihBeiIndicatorId])
+  @@map("PcmsoAcgihBeiComparisonReview")
 }
 
 enum PcmsoEsocialProcedureStatusEnum {
@@ -4226,6 +4279,9 @@ model PcmsoAcgihBeiIndicator {
 
   // Regras Exame × Risco que registram este indicador como fonte complementar (4I).
   examRiskRuleReferences PcmsoExamRiskRuleReference[]
+
+  // Decisões de curadoria da comparação (4O.1) sobre a linha deste indicador.
+  comparisonReviews PcmsoAcgihBeiComparisonReview[]
 
   created_at DateTime  @default(now())
   updated_at DateTime  @updatedAt

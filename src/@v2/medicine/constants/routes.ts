@@ -71,5 +71,7 @@ export const MedicineRoutes = {
     BASE: 'v2/master/acgih-bei-comparison',
     EXPORT: 'export',
     REFERENCES: 'references',
+    REVIEWS: 'reviews',
+    REVIEW_BY_ID: 'reviews/:acgihBeiIndicatorId',
   },
 } as const;

@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { PcmsoAcgihBeiComparisonDecisionEnum } from '@prisma/client';
 import * as ExcelJS from 'exceljs';
 
 import {
@@ -36,6 +37,19 @@ export const excelOptionalBoolean = (
 ): string | null => {
   if (value == null) return null;
   return value ? 'Sim' : 'Não';
+};
+
+/** 4O.1 — rótulos legíveis das decisões técnicas para o Excel. */
+export const COMPARISON_DECISION_LABELS: Record<
+  PcmsoAcgihBeiComparisonDecisionEnum,
+  string
+> = {
+  FALSE_DIVERGENCE_EQUIVALENT: 'Equivalência técnica / falso divergente',
+  REAL_DIVERGENCE: 'Divergência técnica real',
+  SOURCE_ACGIH_ERROR: 'Erro na base ACGIH/BEI',
+  SOURCE_NR7_ERROR: 'Erro na base NR-7',
+  NEEDS_FURTHER_REVIEW: 'Pendente de revisão',
+  IGNORE_MONITOR: 'Monitorar / ignorar',
 };
 
 @Injectable()
@@ -102,6 +116,16 @@ export class AcgihBeiComparisonSpreadsheetExportService {
       examRiskRuleStatus: excelOptionalText(row.examRiskRuleStatus),
       examRiskRuleIsCurated: excelOptionalBoolean(row.examRiskRuleIsCurated),
       hasComplementaryReference: row.hasComplementaryReference ? 'Sim' : null,
+      // 4O.1 — decisão técnica de curadoria.
+      reviewDecision: row.review
+        ? COMPARISON_DECISION_LABELS[row.review.decision] ?? row.review.decision
+        : null,
+      reviewTechnicalNote: excelOptionalText(row.review?.technicalNote),
+      reviewReviewedBy: excelOptionalText(row.review?.reviewedByName),
+      reviewReviewedAt: row.review?.reviewedAt
+        ? new Date(row.review.reviewedAt).toLocaleString('pt-BR')
+        : null,
+      reviewIsStale: row.review ? excelOptionalBoolean(row.review.isStale) : null,
     };
   }
 
@@ -124,6 +148,8 @@ export class AcgihBeiComparisonSpreadsheetExportService {
       ['Critérios de match Regra', 'Por proveniência (regra NR_07 cujo sourceIndicatorId aponta ao indicador NR-7 correspondente) ou por agente (agentCas/agentName).'],
       ['Contexto/readiness (4L)', 'Colunas de apoio à revisão (read-only): Status/Curado/Ano/Página ACGIH/BEI; Status e Pendências NR-7; Status/Curada da regra da Biblioteca; e se a fonte complementar já está registrada. Não alteram a classificação nem a elegibilidade.'],
       ['Pendências NR-7', 'Reaproveitam a mesma lógica de pendências de ativação da curadoria NR-7 (ex.: RISK_NOT_CONFIRMED, EXAM_NOT_CONFIRMED, NORMATIVE_REVIEW_REQUIRED). Quantidade e códigos são informativos.'],
+      ['Decisão técnica (4O.1)', 'Camada de curadoria humana sobre a comparação. Valores: Equivalência técnica / falso divergente; Divergência técnica real; Erro na base ACGIH/BEI; Erro na base NR-7; Pendente de revisão; Monitorar / ignorar. Registrar decisão NÃO altera o comparisonStatus calculado nem as bases NR-7/ACGIH/BEI/Biblioteca.'],
+      ['Decisão desatualizada', 'Marcada quando o comparisonStatus recalculado difere do status registrado no momento da decisão (a decisão antiga é apenas sinalizada, nunca apagada).'],
     ];
     rows.forEach((row) => sheet.addRow({ topic: row[0], description: row[1] }));
     sheet.getColumn('description').alignment = { wrapText: true, vertical: 'top' };

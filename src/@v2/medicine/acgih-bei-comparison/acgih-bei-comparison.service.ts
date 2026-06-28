@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { PcmsoAcgihBeiComparisonDecisionEnum } from '@prisma/client';
 
 import { getActivationPendencies } from '../biological-indicator/services/biological-indicator-activation.validator';
 import { AcgihBeiComparisonRepository } from './acgih-bei-comparison.repository';
@@ -8,6 +9,7 @@ import {
   AcgihItemInput,
   compareItem,
   ComparisonResult,
+  ComparisonReviewInfo,
   normalizeCas,
   normalizeText,
   Nr7IndicatorInput,
@@ -19,6 +21,9 @@ export type ComparisonFilters = {
   comparisonStatus?: AcgihBeiComparisonStatus;
   suggestedAction?: AcgihBeiSuggestedAction;
   confidence?: string;
+  // 4O.1 — filtros pela decisão técnica de curadoria.
+  reviewDecision?: PcmsoAcgihBeiComparisonDecisionEnum;
+  hasReview?: 'true' | 'false';
 };
 
 export type ComparisonTotals = {
@@ -44,12 +49,30 @@ export class AcgihBeiComparisonService {
 
   /** Calcula a comparação completa (sem paginação) — base p/ tela e export. */
   async computeAll(): Promise<ComparisonResult[]> {
-    const [acgihRows, nr7Rows, ruleRows, activeReferences] = await Promise.all([
-      this.repository.findAcgihBeiIndicators(),
-      this.repository.findNr07Indicators(),
-      this.repository.findExamRiskRules(),
-      this.repository.findActiveAcgihReferences(),
-    ]);
+    const [acgihRows, nr7Rows, ruleRows, activeReferences, activeReviews] =
+      await Promise.all([
+        this.repository.findAcgihBeiIndicators(),
+        this.repository.findNr07Indicators(),
+        this.repository.findExamRiskRules(),
+        this.repository.findActiveAcgihReferences(),
+        this.repository.findActiveComparisonReviews(),
+      ]);
+
+    // 4O.1 — indexa decisões de curadoria por acgihBeiIndicatorId (chave estável
+    // da linha) e resolve os nomes dos revisores (sem PII de empresas/pessoas).
+    const reviewerNames = await this.repository.findReviewerNames(
+      Array.from(
+        new Set(
+          activeReviews
+            .map((r) => r.reviewedById)
+            .filter((id): id is number => id != null),
+        ),
+      ),
+    );
+    const reviewByAcgihId = new Map<string, (typeof activeReviews)[number]>();
+    for (const review of activeReviews) {
+      reviewByAcgihId.set(review.acgihBeiIndicatorId, review);
+    }
 
     // Indexa referências ACGIH ativas por regra+indicador, para refletir o
     // vínculo persistente em cada linha (sem afetar o veredito/elegibilidade).
@@ -153,11 +176,31 @@ export class AcgihBeiComparisonService {
             `${row.examRiskRuleId}::${row.acgihBeiId}`,
           )
         : undefined;
+      const rawReview = reviewByAcgihId.get(row.acgihBeiId);
+      const review: ComparisonReviewInfo | null = rawReview
+        ? {
+            id: rawReview.id,
+            decision: rawReview.decision,
+            technicalNote: rawReview.technicalNote,
+            comparisonStatusSnapshot: rawReview.comparisonStatusSnapshot,
+            suggestedActionSnapshot: rawReview.suggestedActionSnapshot,
+            isStale:
+              rawReview.comparisonStatusSnapshot !== row.comparisonStatus,
+            reviewedById: rawReview.reviewedById,
+            reviewedByName:
+              rawReview.reviewedById != null
+                ? reviewerNames.get(rawReview.reviewedById) ?? null
+                : null,
+            reviewedAt: rawReview.updated_at.toISOString(),
+          }
+        : null;
       return {
         ...row,
         hasComplementaryReference: Boolean(reference),
         complementaryReferenceId: reference?.id ?? null,
         complementaryReferenceStatus: reference?.status ?? null,
+        review,
+        hasReview: Boolean(review),
       };
     });
   }
@@ -175,6 +218,14 @@ export class AcgihBeiComparisonService {
         const wanted = filters.confidence.toUpperCase();
         if ((row.confidence ?? 'NONE') !== wanted) return false;
       }
+      // 4O.1 — filtros de decisão técnica.
+      if (filters.hasReview === 'true' && !row.hasReview) return false;
+      if (filters.hasReview === 'false' && row.hasReview) return false;
+      if (
+        filters.reviewDecision &&
+        row.review?.decision !== filters.reviewDecision
+      )
+        return false;
       if (filters.search?.trim()) {
         const search = normalizeText(filters.search);
         const haystack = normalizeText(

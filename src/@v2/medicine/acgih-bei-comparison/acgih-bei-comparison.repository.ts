@@ -72,6 +72,37 @@ export class AcgihBeiComparisonRepository {
     });
   }
 
+  /**
+   * Decisões técnicas de curadoria ativas (4O.1), para anexar à comparação.
+   * Read-only; não altera nenhuma base. Inclui o nome do revisor (sem PII de
+   * empresas/trabalhadores) para exibição.
+   */
+  findActiveComparisonReviews() {
+    return this.prisma.pcmsoAcgihBeiComparisonReview.findMany({
+      where: { deleted_at: null },
+      select: {
+        id: true,
+        acgihBeiIndicatorId: true,
+        decision: true,
+        technicalNote: true,
+        comparisonStatusSnapshot: true,
+        suggestedActionSnapshot: true,
+        reviewedById: true,
+        updated_at: true,
+      },
+    });
+  }
+
+  /** Nomes dos revisores (sem dados sensíveis), para exibir "quem registrou". */
+  async findReviewerNames(ids: number[]) {
+    if (!ids.length) return new Map<number, string>();
+    const users = await this.prisma.user.findMany({
+      where: { id: { in: ids } },
+      select: { id: true, name: true },
+    });
+    return new Map(users.map((u) => [u.id, u.name]));
+  }
+
   /** Regras Exame × Risco ativas com seus exames (read-only). */
   findExamRiskRules() {
     return this.prisma.pcmsoExamRiskRule.findMany({

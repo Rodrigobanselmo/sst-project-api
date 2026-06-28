@@ -1,4 +1,21 @@
-import { PcmsoAcgihBeiIndicatorConfidenceEnum } from '@prisma/client';
+import {
+  PcmsoAcgihBeiComparisonDecisionEnum,
+  PcmsoAcgihBeiIndicatorConfidenceEnum,
+} from '@prisma/client';
+
+/** 4O.1 — decisão técnica de curadoria anexada a uma linha da comparação. */
+export type ComparisonReviewInfo = {
+  id: string;
+  decision: PcmsoAcgihBeiComparisonDecisionEnum;
+  technicalNote: string;
+  comparisonStatusSnapshot: string;
+  suggestedActionSnapshot: string | null;
+  // true quando o status atual recalculado difere do snapshot da decisão.
+  isStale: boolean;
+  reviewedById: number | null;
+  reviewedByName: string | null;
+  reviewedAt: string;
+};
 
 /** Veredito técnico da comparação ACGIH/BEI × NR-7 × Regras Exame × Risco. */
 export enum AcgihBeiComparisonStatus {
@@ -120,6 +137,11 @@ export type ComparisonResult = {
   hasComplementaryReference?: boolean;
   complementaryReferenceId?: string | null;
   complementaryReferenceStatus?: string | null;
+  // 4O.1 — camada de curadoria (decisão técnica) sobre a linha. Preenchida após
+  // o cálculo puro, a partir de PcmsoAcgihBeiComparisonReview. NÃO altera o
+  // comparisonStatus calculado, a suggestedAction nem a elegibilidade.
+  review?: ComparisonReviewInfo | null;
+  hasReview?: boolean;
 };
 
 // ── Normalização ────────────────────────────────────────────────────────────
