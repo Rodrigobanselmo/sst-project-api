@@ -19,6 +19,8 @@ import { AcgihBeiIndicatorSpreadsheetExportService } from './acgih-bei-indicator
 import { AcgihBeiIndicatorController } from './acgih-bei-indicator/acgih-bei-indicator.controller';
 import { AcgihBeiIndicatorRepository } from './acgih-bei-indicator/acgih-bei-indicator.repository';
 import { AcgihBeiIndicatorService } from './acgih-bei-indicator/acgih-bei-indicator.service';
+import { AcgihOfficialIndicatorApplyController } from './biological-indicator/acgih-promotion/acgih-official-indicator-apply.controller';
+import { AcgihOfficialIndicatorApplyService } from './biological-indicator/acgih-promotion/acgih-official-indicator-apply.service';
 import { AcgihOfficialIndicatorPreviewController } from './biological-indicator/acgih-promotion/acgih-official-indicator-preview.controller';
 import { AcgihOfficialIndicatorPreviewRepository } from './biological-indicator/acgih-promotion/acgih-official-indicator-preview.repository';
 import { AcgihOfficialIndicatorPreviewService } from './biological-indicator/acgih-promotion/acgih-official-indicator-preview.service';
@@ -61,6 +63,7 @@ import { ExamRiskRuleReferenceService } from './exam-risk-rule-reference/exam-ri
     AcgihBeiIndicatorController,
     AcgihBeiComparisonController,
     AcgihOfficialIndicatorPreviewController,
+    AcgihOfficialIndicatorApplyController,
   ],
   providers: [
     BiologicalIndicatorDAO,
@@ -103,6 +106,8 @@ import { ExamRiskRuleReferenceService } from './exam-risk-rule-reference/exam-ri
     // 4P.1B — preview/dry-run de promoção ACGIH/BEI (somente leitura).
     AcgihOfficialIndicatorPreviewRepository,
     AcgihOfficialIndicatorPreviewService,
+    // 4P.2A — apply/promote real de candidatos ACGIH/BEI (escrita controlada).
+    AcgihOfficialIndicatorApplyService,
     // Leitura apenas do catálogo oficial da Tabela 27 (não altera eSocial).
     FindAllTable27Service,
     ESocial27TableRepository,

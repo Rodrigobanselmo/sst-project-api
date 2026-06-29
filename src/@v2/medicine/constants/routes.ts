@@ -11,6 +11,9 @@ export const MedicineRoutes = {
     // 4P.1B — preview/dry-run (somente leitura) de candidatos ACGIH/BEI a
     // indicador oficial. Não cria dados.
     ACGIH_PROMOTION_PREVIEW: 'acgih-promotion/preview',
+    // 4P.2A — promoção real (escrita) de candidatos ACGIH/BEI elegíveis para
+    // OccupationalBiologicalIndicator DRAFT. MASTER-only.
+    ACGIH_PROMOTION_APPLY: 'acgih-promotion/apply',
     RISK_LINKS: {
       CONFIRM: 'risk-links/:id/confirm',
       REJECT: 'risk-links/:id/reject',

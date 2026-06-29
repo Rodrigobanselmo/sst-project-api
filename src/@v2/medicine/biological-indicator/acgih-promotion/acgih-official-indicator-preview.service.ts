@@ -102,11 +102,15 @@ export class AcgihOfficialIndicatorPreviewService {
     return haystack.includes(needle);
   }
 
-  async preview(
-    params: AcgihPromotionPreviewParams,
-  ): Promise<AcgihPromotionPreviewResponse> {
-    const page = params.page ?? 1;
-    const limit = params.limit ?? 20;
+  /**
+   * Avalia TODOS os candidatos (sem paginação). Base compartilhada entre o
+   * preview (4P.1B) e o apply (4P.2A) — garante a mesma regra de elegibilidade
+   * autoritativa no servidor. Somente leitura.
+   */
+  async computeEvaluatedItems(params: {
+    includeDivergenceDerived?: boolean;
+    search?: string;
+  }): Promise<AcgihPromotionPreviewItem[]> {
     const includeDivergenceDerived = params.includeDivergenceDerived ?? false;
 
     const rows = await this.comparisonService.computeAll();
@@ -146,7 +150,7 @@ export class AcgihOfficialIndicatorPreviewService {
     const dedupe = this.buildDedupeContext(officials);
 
     // 3) Avaliação pura de cada candidato.
-    const items: AcgihPromotionPreviewItem[] = candidates.map(({ row, tier }) => {
+    return candidates.map(({ row, tier }) => {
       const enrichment = enrichmentById.get(row.acgihBeiId) ?? null;
       const mappedMoment = mapCollectionMoment(row.samplingTime);
       const proposedOfficialPayload = buildProposedOfficialPayload({
@@ -163,8 +167,20 @@ export class AcgihOfficialIndicatorPreviewService {
         mappedMoment,
       });
     });
+  }
 
-    // 4) Totais sobre o conjunto completo (antes da paginação).
+  async preview(
+    params: AcgihPromotionPreviewParams,
+  ): Promise<AcgihPromotionPreviewResponse> {
+    const page = params.page ?? 1;
+    const limit = params.limit ?? 20;
+
+    const items = await this.computeEvaluatedItems({
+      includeDivergenceDerived: params.includeDivergenceDerived,
+      search: params.search,
+    });
+
+    // Totais sobre o conjunto completo (antes da paginação).
     const totals = this.buildTotals(items);
 
     const skip = (page - 1) * limit;
