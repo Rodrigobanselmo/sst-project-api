@@ -143,6 +143,34 @@ const MOMENT_BUCKET_TO_ENUM: Record<string, BiologicalCollectionMomentEnum> = {
   'antes/fim jornada': BiologicalCollectionMomentEnum.AJ_FJ,
 };
 
+// 4P.2.1/4P.2.2 — frases livres ACGIH/BEI 2025 que canonMoment() (compartilhada
+// com a comparação 4O) ainda NÃO reconhece, mas que têm equivalente claro no
+// enum NR-7. Aplicado APENAS na promoção (não altera canonMoment nem o 4O).
+// Chave já normalizada por normalizeText (minúsculas, sem acento). NÃO força
+// mapeamentos ambíguos: só frases com correspondência inequívoca ao enum.
+//  - "Antes da última jornada da semana" (ACGIH "Prior to last shift of
+//    workweek") ⇒ AJFS (antes da jornada / fim de semana).
+//  - "Final da exposição" (ACGIH "End of exposure") ⇒ FINAL_EXPOSURE (4P.2.2);
+//    momento próprio, não confundir com "Final da jornada" (FJ).
+const ACGIH_FREE_TEXT_MOMENT_TO_ENUM: Record<
+  string,
+  BiologicalCollectionMomentEnum
+> = {
+  'antes da ultima jornada da semana': BiologicalCollectionMomentEnum.AJFS,
+  'antes da ultima jornada semanal': BiologicalCollectionMomentEnum.AJFS,
+  'antes do ultimo turno da semana': BiologicalCollectionMomentEnum.AJFS,
+  'prior to last shift of workweek': BiologicalCollectionMomentEnum.AJFS,
+  'final da exposicao': BiologicalCollectionMomentEnum.FINAL_EXPOSURE,
+  'fim da exposicao': BiologicalCollectionMomentEnum.FINAL_EXPOSURE,
+  'final de exposicao': BiologicalCollectionMomentEnum.FINAL_EXPOSURE,
+  'end of exposure': BiologicalCollectionMomentEnum.FINAL_EXPOSURE,
+  // Fraseados "fim de jornada ao fim da semana" que canonMoment() não captura
+  // (exige "fim/final de semana"); mantidos explicitamente como FJFS.
+  'final da jornada e da semana': BiologicalCollectionMomentEnum.FJFS,
+  'fim da jornada e da semana': BiologicalCollectionMomentEnum.FJFS,
+  'final da jornada e fim da semana': BiologicalCollectionMomentEnum.FJFS,
+};
+
 /**
  * 4P.1B — mapeia o momento de coleta (texto livre ACGIH ou código NR-7) para o
  * enum BiologicalCollectionMomentEnum. Não inventa valores nem cria enum novo.
@@ -167,6 +195,17 @@ export const mapCollectionMoment = (
     return {
       original,
       mappedValue: MOMENT_CODE_TO_ENUM[code],
+      confidence: AcgihPromotionMomentConfidence.SAFE,
+    };
+  }
+
+  // 4P.2.1 — frase livre ACGIH com equivalente inequívoco no enum NR-7, antes
+  // de delegar para canonMoment (que é compartilhada com a comparação 4O).
+  const freeText = ACGIH_FREE_TEXT_MOMENT_TO_ENUM[normalizeText(trimmed)];
+  if (freeText) {
+    return {
+      original,
+      mappedValue: freeText,
       confidence: AcgihPromotionMomentConfidence.SAFE,
     };
   }

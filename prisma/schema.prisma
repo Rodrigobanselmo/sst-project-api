@@ -3698,6 +3698,9 @@ enum BiologicalCollectionMomentEnum {
   NC
   FS
   AJ_FJ
+  // 4P.2.2 — momento ACGIH/BEI "Final da exposição" (sem equivalente seguro nos
+  // demais valores; não deve ser forçado para FJ).
+  FINAL_EXPOSURE
 }
 
 enum BiologicalIndicatorStatusEnum {

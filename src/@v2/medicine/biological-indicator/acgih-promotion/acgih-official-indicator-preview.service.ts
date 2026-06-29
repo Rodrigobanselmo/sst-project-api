@@ -3,7 +3,6 @@ import { Injectable } from '@nestjs/common';
 import { PcmsoAcgihBeiComparisonDecisionEnum } from '@prisma/client';
 
 import {
-  AcgihBeiComparisonStatus,
   AcgihBeiOperationalStatus,
   ComparisonResult,
   normalizeText,
@@ -79,13 +78,17 @@ export class AcgihOfficialIndicatorPreviewService {
       return AcgihPromotionEligibilityTier.PRIMARY;
     }
 
-    // DIVERGENCE_DERIVED: somente com flag explícita.
+    // DIVERGENCE_DERIVED: somente com flag explícita. 4P.2.3 — a decisão técnica
+    // humana REAL_DIVERGENCE fresca é suficiente para a promoção; NÃO exigimos
+    // comparisonStatus bruto = DIVERGENT nem operationalStatus = REAL_DIVERGENCE.
+    // Isso fecha o gap em que um item com bruto DIVERGENT + REAL_DIVERGENCE
+    // permanecia operacional DIVERGENT (deriveOperationalStatus do 4O não é
+    // alterado aqui). Os demais desfechos (erros de origem, pendência, ignorar,
+    // equivalência, cobertura) seguem fora; NO_MATCH_CONFIRMED segue PRIMARY.
     if (
       includeDivergenceDerived &&
       isFresh &&
-      decision === PcmsoAcgihBeiComparisonDecisionEnum.REAL_DIVERGENCE &&
-      row.comparisonStatus === AcgihBeiComparisonStatus.DIVERGENT &&
-      operational === AcgihBeiOperationalStatus.REAL_DIVERGENCE
+      decision === PcmsoAcgihBeiComparisonDecisionEnum.REAL_DIVERGENCE
     ) {
       return AcgihPromotionEligibilityTier.DIVERGENCE_DERIVED;
     }

@@ -134,6 +134,80 @@ describe('AcgihOfficialIndicatorPreviewService', () => {
     );
   });
 
+  it('4P.2.1 — REAL_DIVERGENCE entra como DIVERGENCE_DERIVED mesmo sem comparisonStatus bruto = DIVERGENT (decisão humana prevalece)', async () => {
+    const row = makeRow({
+      acgihBeiId: 'd2',
+      // Bruto NEEDS_REVIEW; humano marcou REAL_DIVERGENCE → operacional reflete.
+      comparisonStatus: AcgihBeiComparisonStatus.NEEDS_REVIEW,
+      nr7MatchStatus: MatchStatus.PARTIAL,
+      operationalStatus: AcgihBeiOperationalStatus.REAL_DIVERGENCE,
+      review: {
+        id: 'r6',
+        decision: PcmsoAcgihBeiComparisonDecisionEnum.REAL_DIVERGENCE,
+        technicalNote: 'Parâmetro tecnicamente diferente.',
+        isStale: false,
+      } as any,
+    });
+
+    const off = await buildService([row]).service.preview({});
+    expect(off.count).toBe(0);
+
+    const on = await buildService([row]).service.preview({
+      includeDivergenceDerived: true,
+    });
+    expect(on.count).toBe(1);
+    expect(on.data[0].eligibilityTier).toBe(
+      AcgihPromotionEligibilityTier.DIVERGENCE_DERIVED,
+    );
+  });
+
+  it('4P.2.3 — REAL_DIVERGENCE fresca entra como DIVERGENCE_DERIVED mesmo com operationalStatus = DIVERGENT (fecha o gap do 4O)', async () => {
+    const row = makeRow({
+      acgihBeiId: 'd4',
+      // Gap: bruto DIVERGENT + REAL_DIVERGENCE pode permanecer operacional
+      // DIVERGENT (deriveOperationalStatus do 4O não converte). A promoção agora
+      // depende só da decisão humana fresca.
+      comparisonStatus: AcgihBeiComparisonStatus.DIVERGENT,
+      operationalStatus: AcgihBeiOperationalStatus.DIVERGENT,
+      review: {
+        id: 'r8',
+        decision: PcmsoAcgihBeiComparisonDecisionEnum.REAL_DIVERGENCE,
+        technicalNote: 'Divergência real, operacional ainda DIVERGENT.',
+        isStale: false,
+      } as any,
+    });
+
+    const off = await buildService([row]).service.preview({});
+    expect(off.count).toBe(0);
+
+    const on = await buildService([row]).service.preview({
+      includeDivergenceDerived: true,
+    });
+    expect(on.count).toBe(1);
+    expect(on.data[0].eligibilityTier).toBe(
+      AcgihPromotionEligibilityTier.DIVERGENCE_DERIVED,
+    );
+  });
+
+  it('4P.2.1 — REAL_DIVERGENCE stale não entra mesmo com o toggle ligado', async () => {
+    const row = makeRow({
+      acgihBeiId: 'd3',
+      comparisonStatus: AcgihBeiComparisonStatus.NEEDS_REVIEW,
+      operationalStatus: AcgihBeiOperationalStatus.NEEDS_REVIEW,
+      review: {
+        id: 'r7',
+        decision: PcmsoAcgihBeiComparisonDecisionEnum.REAL_DIVERGENCE,
+        technicalNote: 'Divergência antiga.',
+        isStale: true,
+      } as any,
+    });
+
+    const res = await buildService([row]).service.preview({
+      includeDivergenceDerived: true,
+    });
+    expect(res.count).toBe(0);
+  });
+
   it('exclui MATCH_CONFIRMED e RESOLVED_EQUIVALENCE', async () => {
     const matchConfirmed = makeRow({
       acgihBeiId: 'm1',
@@ -230,6 +304,41 @@ describe('AcgihOfficialIndicatorPreviewService', () => {
     );
     expect(res.data[0].eligibilityStatus).toBe(
       AcgihPromotionEligibilityStatus.BLOCKED,
+    );
+  });
+
+  it('4P.2.2 — n-Heptano ("Final da exposição") deixa de bloquear e fica ELIGIBLE', async () => {
+    const nHeptano = makeRow({
+      acgihBeiId: 'nh1',
+      substanceName: 'n-Heptano',
+      samplingTime: 'Final da exposição',
+    });
+    const res = await buildService([nHeptano]).service.preview({});
+    expect(res.data[0].mappedFields.collectionMoment.confidence).toBe('SAFE');
+    expect(res.data[0].mappedFields.collectionMoment.mappedValue).toBe(
+      'FINAL_EXPOSURE',
+    );
+    expect(res.data[0].blockers).not.toContain(
+      AcgihPromotionBlocker.UNMAPPED_COLLECTION_MOMENT,
+    );
+    expect(res.data[0].eligibilityStatus).toBe(
+      AcgihPromotionEligibilityStatus.ELIGIBLE,
+    );
+    expect(res.data[0].proposedOfficialPayload.collectionMoment).toBe(
+      'FINAL_EXPOSURE',
+    );
+  });
+
+  it('4P.2.2 — Pentaclorofenol ("Antes da última jornada da semana") segue AJFS/ELIGIBLE', async () => {
+    const penta = makeRow({
+      acgihBeiId: 'pc1',
+      substanceName: 'Pentaclorofenol',
+      samplingTime: 'Antes da última jornada da semana',
+    });
+    const res = await buildService([penta]).service.preview({});
+    expect(res.data[0].mappedFields.collectionMoment.mappedValue).toBe('AJFS');
+    expect(res.data[0].eligibilityStatus).toBe(
+      AcgihPromotionEligibilityStatus.ELIGIBLE,
     );
   });
 
