@@ -24,6 +24,9 @@ import { AcgihOfficialIndicatorApplyService } from './biological-indicator/acgih
 import { AcgihOfficialIndicatorPreviewController } from './biological-indicator/acgih-promotion/acgih-official-indicator-preview.controller';
 import { AcgihOfficialIndicatorPreviewRepository } from './biological-indicator/acgih-promotion/acgih-official-indicator-preview.repository';
 import { AcgihOfficialIndicatorPreviewService } from './biological-indicator/acgih-promotion/acgih-official-indicator-preview.service';
+import { AcgihRiskCorrelationController } from './biological-indicator/acgih-risk-correlation/acgih-risk-correlation.controller';
+import { AcgihRiskCorrelationRepository } from './biological-indicator/acgih-risk-correlation/acgih-risk-correlation.repository';
+import { AcgihRiskCorrelationService } from './biological-indicator/acgih-risk-correlation/acgih-risk-correlation.service';
 import { BiologicalIndicatorApplicationController } from './biological-indicator/application/application/biological-indicator-application.controller';
 import { BiologicalIndicatorCurationController } from './biological-indicator/application/curation/biological-indicator-curation.controller';
 import { BiologicalIndicatorMaintenanceController } from './biological-indicator/application/maintenance/biological-indicator-maintenance.controller';
@@ -64,6 +67,7 @@ import { ExamRiskRuleReferenceService } from './exam-risk-rule-reference/exam-ri
     AcgihBeiComparisonController,
     AcgihOfficialIndicatorPreviewController,
     AcgihOfficialIndicatorApplyController,
+    AcgihRiskCorrelationController,
   ],
   providers: [
     BiologicalIndicatorDAO,
@@ -108,6 +112,9 @@ import { ExamRiskRuleReferenceService } from './exam-risk-rule-reference/exam-ri
     AcgihOfficialIndicatorPreviewService,
     // 4P.2A — apply/promote real de candidatos ACGIH/BEI (escrita controlada).
     AcgihOfficialIndicatorApplyService,
+    // Frente A.1 — preview de correlação ACGIH/BEI × Fatores de Risco (read-only).
+    AcgihRiskCorrelationRepository,
+    AcgihRiskCorrelationService,
     // Leitura apenas do catálogo oficial da Tabela 27 (não altera eSocial).
     FindAllTable27Service,
     ESocial27TableRepository,

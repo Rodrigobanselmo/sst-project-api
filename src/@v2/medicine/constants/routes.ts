@@ -14,6 +14,9 @@ export const MedicineRoutes = {
     // 4P.2A — promoção real (escrita) de candidatos ACGIH/BEI elegíveis para
     // OccupationalBiologicalIndicator DRAFT. MASTER-only.
     ACGIH_PROMOTION_APPLY: 'acgih-promotion/apply',
+    // Frente A.1 — preview/dry-run (somente leitura) da correlação ACGIH/BEI ×
+    // Fatores de Risco, com overrides manuais versionados. Não cria dados.
+    ACGIH_RISK_CORRELATION_PREVIEW: 'acgih-risk-correlation/preview',
     RISK_LINKS: {
       CONFIRM: 'risk-links/:id/confirm',
       REJECT: 'risk-links/:id/reject',
