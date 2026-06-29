@@ -158,6 +158,19 @@ export class FindExamDto extends PaginationQueryDto {
   @ToBoolean()
   @IsOptional()
   includeIncompatible?: boolean;
+
+  // Agent recommendation context (Fase 2). Optional and backward-compatible:
+  // when an agent (CAS and/or name) is provided and includeIncompatible is not
+  // set, the exam list is restricted to exams recommended for that agent
+  // (Library ACTIVE/AGENT rules + biological-indicator links). Not Exam columns,
+  // so they are skipped by prismaFilter.
+  @IsString()
+  @IsOptional()
+  agentCas?: string;
+
+  @IsString()
+  @IsOptional()
+  agentName?: string;
 }
 
 export class FindExamHierarchyDto {

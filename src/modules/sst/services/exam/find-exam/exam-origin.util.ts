@@ -1,6 +1,12 @@
-import { Prisma, RiskFactorsEnum } from '@prisma/client';
+import {
+  PcmsoExamRiskRuleScopeEnum,
+  PcmsoExamRiskRuleStatusEnum,
+  Prisma,
+  RiskFactorsEnum,
+} from '@prisma/client';
 
 import { simpleCompanyId } from '../../../../../shared/constants/ids';
+import { normalizeCas } from '../../../../../shared/utils/agent-normalize.util';
 
 /** Source/origin classification for a registered exam (Exames Cadastrados). */
 export enum ExamOriginEnum {
@@ -98,6 +104,108 @@ export const buildRiskApplicabilityConstraint = (
 
   return { id: { notIn: ids } };
 };
+
+// ── Fase 2: filtro de exames recomendados por agente ────────────────────────
+
+/**
+ * Decides whether the agent-recommendation filter must be applied. It only runs
+ * when origin metadata is requested, the user did NOT ask for the broad catalog
+ * ("Mostrar todos os exames" → includeIncompatible), and at least one normalized
+ * agent key (CAS or name) is available.
+ */
+export const shouldApplyAgentFilter = (
+  withOrigin: boolean | undefined,
+  includeIncompatible: boolean | undefined,
+  agentCasNormalized: string | null,
+  agentNameNormalized: string | null,
+): boolean =>
+  Boolean(withOrigin) &&
+  includeIncompatible !== true &&
+  Boolean(agentCasNormalized || agentNameNormalized);
+
+/**
+ * Static superset filter for Library rules eligible to recommend exams for an
+ * agent: not deleted, ACTIVE and scope AGENT. CAS/name matching is applied in
+ * memory (see {@link agentRuleMatches}) because stored CAS keeps its hyphens and
+ * matching is an OR over CAS and normalized name.
+ */
+export const buildAgentLibraryWhere = (): Prisma.PcmsoExamRiskRuleWhereInput => ({
+  deleted_at: null,
+  status: PcmsoExamRiskRuleStatusEnum.ACTIVE,
+  scope: PcmsoExamRiskRuleScopeEnum.AGENT,
+});
+
+/**
+ * Static superset filter for biological-indicator → exam links eligible to
+ * recommend exams for an agent: neither the link nor its indicator deleted.
+ * NR-07 and ACGIH/BEI indicators are both allowed (no normativeSource filter).
+ */
+export const buildAgentIndicatorWhere =
+  (): Prisma.BiologicalIndicatorToExamWhereInput => ({
+    deleted_at: null,
+    indicator: { deleted_at: null },
+  });
+
+/**
+ * Matches a Library rule against the requested agent. CAS comparison is done on
+ * digit-normalized values (stored CAS keeps hyphens); name comparison uses the
+ * canonical normalized name. Match semantics are OR (CAS or name).
+ */
+export const agentRuleMatches = (
+  rule: { agentCas: string | null; agentNameNormalized: string | null },
+  agentCasNormalized: string | null,
+  agentNameNormalized: string | null,
+): boolean => {
+  if (agentCasNormalized && normalizeCas(rule.agentCas) === agentCasNormalized) {
+    return true;
+  }
+  if (
+    agentNameNormalized &&
+    rule.agentNameNormalized === agentNameNormalized
+  ) {
+    return true;
+  }
+  return false;
+};
+
+/**
+ * Matches a biological indicator against the requested agent. CAS comparison is
+ * digit-normalized across casPrimary and casNumbers; name comparison uses the
+ * indicator's stored normalized substance name. Match semantics are OR.
+ */
+export const agentIndicatorMatches = (
+  indicator: {
+    casPrimary: string | null;
+    casNumbers: string[];
+    substanceNameNormalized: string | null;
+  },
+  agentCasNormalized: string | null,
+  agentNameNormalized: string | null,
+): boolean => {
+  if (agentCasNormalized) {
+    if (normalizeCas(indicator.casPrimary) === agentCasNormalized) return true;
+    if (
+      (indicator.casNumbers ?? []).some(
+        (cas) => normalizeCas(cas) === agentCasNormalized,
+      )
+    ) {
+      return true;
+    }
+  }
+  if (
+    agentNameNormalized &&
+    indicator.substanceNameNormalized === agentNameNormalized
+  ) {
+    return true;
+  }
+  return false;
+};
+
+/** Unions exam ids from both recommendation sources, de-duplicating. */
+export const mergeRecommendedExamIds = (
+  libraryExamIds: number[],
+  indicatorExamIds: number[],
+): Set<number> => new Set<number>([...libraryExamIds, ...indicatorExamIds]);
 
 const SORTABLE_FIELDS = new Set([
   'name',

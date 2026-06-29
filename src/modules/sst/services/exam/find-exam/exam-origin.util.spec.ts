@@ -1,11 +1,21 @@
 import { describe, expect, it } from '@jest/globals';
+import {
+  PcmsoExamRiskRuleScopeEnum,
+  PcmsoExamRiskRuleStatusEnum,
+} from '@prisma/client';
 
 import { simpleCompanyId } from '../../../../../shared/constants/ids';
 import {
+  agentIndicatorMatches,
+  agentRuleMatches,
+  buildAgentIndicatorWhere,
+  buildAgentLibraryWhere,
   buildExamOrderBy,
   buildExamOriginConstraint,
   ExamOriginEnum,
+  mergeRecommendedExamIds,
   resolveExamOrigin,
+  shouldApplyAgentFilter,
 } from './exam-origin.util';
 
 const CLIENT_COMPANY = 'company-tenant-1';
@@ -103,6 +113,114 @@ describe('buildExamOriginConstraint', () => {
         { id: { notIn: [5] } },
       ],
     });
+  });
+});
+
+describe('shouldApplyAgentFilter', () => {
+  it('aplica quando withOrigin, sem includeIncompatible e com CAS', () => {
+    expect(shouldApplyAgentFilter(true, false, '108883', null)).toBe(true);
+  });
+
+  it('aplica quando withOrigin, sem includeIncompatible e com nome', () => {
+    expect(shouldApplyAgentFilter(true, undefined, null, 'tolueno')).toBe(true);
+  });
+
+  it('não aplica sem withOrigin (não calcula recomendação)', () => {
+    expect(shouldApplyAgentFilter(false, false, '108883', 'tolueno')).toBe(
+      false,
+    );
+    expect(shouldApplyAgentFilter(undefined, false, '108883', null)).toBe(false);
+  });
+
+  it('não aplica quando includeIncompatible=true (catálogo amplo)', () => {
+    expect(shouldApplyAgentFilter(true, true, '108883', 'tolueno')).toBe(false);
+  });
+
+  it('não aplica sem agente (CAS e nome ausentes)', () => {
+    expect(shouldApplyAgentFilter(true, false, null, null)).toBe(false);
+  });
+});
+
+describe('buildAgentLibraryWhere', () => {
+  it('filtra apenas regras ACTIVE, scope AGENT e não deletadas', () => {
+    expect(buildAgentLibraryWhere()).toEqual({
+      deleted_at: null,
+      status: PcmsoExamRiskRuleStatusEnum.ACTIVE,
+      scope: PcmsoExamRiskRuleScopeEnum.AGENT,
+    });
+  });
+});
+
+describe('buildAgentIndicatorWhere', () => {
+  it('exige link e indicador não deletados, sem filtrar normativeSource', () => {
+    const where = buildAgentIndicatorWhere();
+    expect(where).toEqual({
+      deleted_at: null,
+      indicator: { deleted_at: null },
+    });
+    expect(where.indicator).not.toHaveProperty('normativeSource');
+  });
+});
+
+describe('agentRuleMatches', () => {
+  const rule = { agentCas: '108-88-3', agentNameNormalized: 'tolueno' };
+
+  it('casa por CAS normalizado (ignora hífens)', () => {
+    expect(agentRuleMatches(rule, '108883', null)).toBe(true);
+  });
+
+  it('faz fallback por nome normalizado quando CAS não casa', () => {
+    expect(agentRuleMatches(rule, '999999', 'tolueno')).toBe(true);
+  });
+
+  it('não casa quando nem CAS nem nome batem', () => {
+    expect(agentRuleMatches(rule, '999999', 'benzeno')).toBe(false);
+  });
+
+  it('não casa por CAS quando regra não tem agentCas', () => {
+    expect(
+      agentRuleMatches(
+        { agentCas: null, agentNameNormalized: 'tolueno' },
+        '108883',
+        null,
+      ),
+    ).toBe(false);
+  });
+});
+
+describe('agentIndicatorMatches', () => {
+  const indicator = {
+    casPrimary: '108-88-3',
+    casNumbers: ['108-88-3', '50-00-0'],
+    substanceNameNormalized: 'tolueno',
+  };
+
+  it('casa por casPrimary normalizado', () => {
+    expect(agentIndicatorMatches(indicator, '108883', null)).toBe(true);
+  });
+
+  it('casa por algum CAS em casNumbers', () => {
+    expect(agentIndicatorMatches(indicator, '50000', null)).toBe(true);
+  });
+
+  it('faz fallback por substanceNameNormalized', () => {
+    expect(agentIndicatorMatches(indicator, '999999', 'tolueno')).toBe(true);
+  });
+
+  it('não casa quando nada bate', () => {
+    expect(agentIndicatorMatches(indicator, '999999', 'benzeno')).toBe(false);
+  });
+});
+
+describe('mergeRecommendedExamIds', () => {
+  it('une as duas fontes deduplicando', () => {
+    const merged = mergeRecommendedExamIds([1, 2, 3], [3, 4]);
+    expect(Array.from(merged).sort((a, b) => a - b)).toEqual([1, 2, 3, 4]);
+    expect(merged.size).toBe(4);
+  });
+
+  it('retorna conjunto vazio quando ambas as fontes são vazias', () => {
+    expect(mergeRecommendedExamIds([], []).size).toBe(0);
   });
 });
 

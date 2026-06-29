@@ -7,11 +7,21 @@ import { PrismaService } from '../../../../prisma/prisma.service';
 import { CreateExamDto, FindExamDto, UpdateExamDto, UpsertExamDto } from '../../dto/exam.dto';
 import { BiologicalNormativeSourceEnum, Prisma } from '@prisma/client';
 import {
+  agentIndicatorMatches,
+  agentRuleMatches,
+  buildAgentIndicatorWhere,
+  buildAgentLibraryWhere,
   buildExamOrderBy,
   buildExamOriginConstraint,
   buildRiskApplicabilityConstraint,
+  mergeRecommendedExamIds,
   resolveExamOrigin,
+  shouldApplyAgentFilter,
 } from '../../services/exam/find-exam/exam-origin.util';
+import {
+  normalizeAgentName,
+  normalizeCas,
+} from '../../../../shared/utils/agent-normalize.util';
 
 let i = 0;
 
@@ -79,6 +89,8 @@ export class ExamRepository {
         'origin',
         'riskType',
         'includeIncompatible',
+        'agentCas',
+        'agentName',
       ],
     });
 
@@ -121,7 +133,85 @@ export class ExamRepository {
           nr07ExamIds,
         )
       : null;
-    const extraConstraints = [originConstraint, applicabilityConstraint].filter(
+    // Agent recommendation filter (Fase 2): restricts the list to exams
+    // recommended for a specific agent (Library ACTIVE/AGENT rules + biological
+    // indicator links). Opt-in via agentCas/agentName, only when withOrigin and
+    // not includeIncompatible. CAS is matched on digits; name on canonical form.
+    const agentCasNormalized = extra.withOrigin
+      ? normalizeCas(query.agentCas)
+      : null;
+    const agentNameNormalized = extra.withOrigin
+      ? normalizeAgentName(query.agentName)
+      : null;
+    const applyAgentFilter = shouldApplyAgentFilter(
+      extra.withOrigin,
+      query.includeIncompatible,
+      agentCasNormalized,
+      agentNameNormalized,
+    );
+
+    let agentRecommendationConstraint: Prisma.ExamWhereInput | null = null;
+    let agentFilter: { applied: true; recommendedCount: number } | undefined;
+
+    if (applyAgentFilter) {
+      const [rules, links] = await this.prisma.$transaction([
+        this.prisma.pcmsoExamRiskRule.findMany({
+          where: buildAgentLibraryWhere(),
+          select: {
+            agentCas: true,
+            agentNameNormalized: true,
+            exams: { where: { deleted_at: null }, select: { examId: true } },
+          },
+        }),
+        this.prisma.biologicalIndicatorToExam.findMany({
+          where: buildAgentIndicatorWhere(),
+          select: {
+            examId: true,
+            indicator: {
+              select: {
+                casPrimary: true,
+                casNumbers: true,
+                substanceNameNormalized: true,
+              },
+            },
+          },
+        }),
+      ]);
+
+      const libraryExamIds = rules
+        .filter((rule) =>
+          agentRuleMatches(rule, agentCasNormalized, agentNameNormalized),
+        )
+        .flatMap((rule) => rule.exams.map((exam) => exam.examId))
+        .filter((examId): examId is number => examId != null);
+
+      const indicatorExamIds = links
+        .filter((link) =>
+          agentIndicatorMatches(
+            link.indicator,
+            agentCasNormalized,
+            agentNameNormalized,
+          ),
+        )
+        .map((link) => link.examId);
+
+      const recommendedExamIds = mergeRecommendedExamIds(
+        libraryExamIds,
+        indicatorExamIds,
+      );
+      // Empty recommendation set still applies: never fall back to the broad
+      // catalog. `{ id: { in: [] } }` yields an empty page with count 0.
+      agentRecommendationConstraint = {
+        id: { in: Array.from(recommendedExamIds) },
+      };
+      agentFilter = { applied: true, recommendedCount: recommendedExamIds.size };
+    }
+
+    const extraConstraints = [
+      originConstraint,
+      applicabilityConstraint,
+      agentRecommendationConstraint,
+    ].filter(
       (constraint): constraint is Prisma.ExamWhereInput => Boolean(constraint),
     );
     const orderBy = buildExamOrderBy(query.orderBy, query.orderByDirection);
@@ -169,6 +259,7 @@ export class ExamRepository {
           }),
       ),
       count: response[0],
+      ...(agentFilter ? { agentFilter } : {}),
     };
   }
 

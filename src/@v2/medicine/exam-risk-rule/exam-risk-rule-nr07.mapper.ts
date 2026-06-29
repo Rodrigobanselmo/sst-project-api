@@ -72,15 +72,11 @@ export type Nr07RuleData = {
   pendingReasons: string[];
 };
 
-export const normalizeAgentName = (value?: string | null): string | null => {
-  if (!value) return null;
-  const normalized = value
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .trim()
-    .toLowerCase();
-  return normalized || null;
-};
+// Canonical agent-name normalization lives in the shared util so that NR-7,
+// ACGIH/BEI and the Library produce identical `agentNameNormalized` values.
+// Re-exported here to preserve the existing import surface.
+export { normalizeAgentName } from '@/shared/utils/agent-normalize.util';
+import { normalizeAgentName } from '@/shared/utils/agent-normalize.util';
 
 const resolveApplicability = (indicator: Nr07IndicatorWithLinks) => {
   const base = indicator.occupationalApplicability as Record<string, unknown> | null;

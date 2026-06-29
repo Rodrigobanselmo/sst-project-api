@@ -22,6 +22,9 @@ export class FindExamService {
         ...exam,
         origin: exam.origin,
       })),
+      ...('agentFilter' in result && result.agentFilter
+        ? { agentFilter: result.agentFilter }
+        : {}),
     };
   }
 }
