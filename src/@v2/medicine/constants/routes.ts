@@ -8,6 +8,9 @@ export const MedicineRoutes = {
     TEMPLATE: 'template',
     IMPORT_PREVIEW: 'import/preview',
     IMPORT_APPLY: 'import/apply',
+    // 4P.1B — preview/dry-run (somente leitura) de candidatos ACGIH/BEI a
+    // indicador oficial. Não cria dados.
+    ACGIH_PROMOTION_PREVIEW: 'acgih-promotion/preview',
     RISK_LINKS: {
       CONFIRM: 'risk-links/:id/confirm',
       REJECT: 'risk-links/:id/reject',

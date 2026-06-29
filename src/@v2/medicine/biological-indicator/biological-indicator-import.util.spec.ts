@@ -12,8 +12,10 @@ import {
 
 import { QUADRO_1_APPLICABILITY_DEFAULT } from './biological-indicator-applicability.schema';
 import {
+  assertNr07NormativeFields,
   hasNormativeContentChanges,
   IndicatorNormativePayload,
+  Nr07NormativeFieldsError,
   toIndicatorNormativePayload,
 } from './biological-indicator-import.util';
 
@@ -101,5 +103,73 @@ describe('biological-indicator-import.util', () => {
     });
 
     expect(first).toEqual(second);
+  });
+
+  // 4P.1A — guard de obrigatoriedade lógica da NR-7 (campos agora nullable no schema).
+  describe('assertNr07NormativeFields', () => {
+    it('aceita registro NR-7 completo e retorna a mesma referência', () => {
+      const payload = basePayload();
+      expect(assertNr07NormativeFields(payload)).toBe(payload);
+    });
+
+    it.each([
+      ['annex', { annex: null }],
+      ['tableNumber', { tableNumber: null }],
+      ['indicatorType', { indicatorType: null }],
+      ['normativeVersion', { normativeVersion: null }],
+      ['normativeVersion vazio', { normativeVersion: '   ' }],
+    ])('rejeita NR-7 sem %s', (_label, patch) => {
+      const source = { ...basePayload(), ...patch } as IndicatorNormativePayload;
+      expect(() => assertNr07NormativeFields(source)).toThrow(
+        Nr07NormativeFieldsError,
+      );
+    });
+
+    it('acumula todos os campos ausentes no erro', () => {
+      const source = {
+        ...basePayload(),
+        annex: null,
+        tableNumber: null,
+        indicatorType: null,
+        normativeVersion: null,
+      } as IndicatorNormativePayload;
+
+      try {
+        assertNr07NormativeFields(source);
+        throw new Error('deveria ter lançado');
+      } catch (error) {
+        expect(error).toBeInstanceOf(Nr07NormativeFieldsError);
+        expect((error as Nr07NormativeFieldsError).missingFields).toEqual([
+          'annex',
+          'tableNumber',
+          'indicatorType',
+          'normativeVersion',
+        ]);
+      }
+    });
+
+    it('não exige campos NR-7 para origem ACGIH/BEI (fundação 4P.1A)', () => {
+      const source = {
+        ...basePayload(),
+        normativeSource: BiologicalNormativeSourceEnum.ACGIH_BEI,
+        annex: null,
+        tableNumber: null,
+        indicatorType: null,
+        normativeVersion: null,
+      } as unknown as Parameters<typeof assertNr07NormativeFields>[0];
+
+      expect(() => assertNr07NormativeFields(source)).not.toThrow();
+    });
+  });
+
+  it('toIndicatorNormativePayload bloqueia NR-7 incompleto', () => {
+    const source = {
+      ...basePayload(),
+      tableNumber: null,
+    } as IndicatorNormativePayload;
+
+    expect(() => toIndicatorNormativePayload(source)).toThrow(
+      Nr07NormativeFieldsError,
+    );
   });
 });

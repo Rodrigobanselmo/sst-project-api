@@ -19,6 +19,9 @@ import { AcgihBeiIndicatorSpreadsheetExportService } from './acgih-bei-indicator
 import { AcgihBeiIndicatorController } from './acgih-bei-indicator/acgih-bei-indicator.controller';
 import { AcgihBeiIndicatorRepository } from './acgih-bei-indicator/acgih-bei-indicator.repository';
 import { AcgihBeiIndicatorService } from './acgih-bei-indicator/acgih-bei-indicator.service';
+import { AcgihOfficialIndicatorPreviewController } from './biological-indicator/acgih-promotion/acgih-official-indicator-preview.controller';
+import { AcgihOfficialIndicatorPreviewRepository } from './biological-indicator/acgih-promotion/acgih-official-indicator-preview.repository';
+import { AcgihOfficialIndicatorPreviewService } from './biological-indicator/acgih-promotion/acgih-official-indicator-preview.service';
 import { BiologicalIndicatorApplicationController } from './biological-indicator/application/application/biological-indicator-application.controller';
 import { BiologicalIndicatorCurationController } from './biological-indicator/application/curation/biological-indicator-curation.controller';
 import { BiologicalIndicatorMaintenanceController } from './biological-indicator/application/maintenance/biological-indicator-maintenance.controller';
@@ -57,6 +60,7 @@ import { ExamRiskRuleReferenceService } from './exam-risk-rule-reference/exam-ri
     EsocialProcedureController,
     AcgihBeiIndicatorController,
     AcgihBeiComparisonController,
+    AcgihOfficialIndicatorPreviewController,
   ],
   providers: [
     BiologicalIndicatorDAO,
@@ -96,6 +100,9 @@ import { ExamRiskRuleReferenceService } from './exam-risk-rule-reference/exam-ri
     ComparisonReviewRepository,
     ComparisonReviewService,
     ComparisonAiSuggestionService,
+    // 4P.1B — preview/dry-run de promoção ACGIH/BEI (somente leitura).
+    AcgihOfficialIndicatorPreviewRepository,
+    AcgihOfficialIndicatorPreviewService,
     // Leitura apenas do catálogo oficial da Tabela 27 (não altera eSocial).
     FindAllTable27Service,
     ESocial27TableRepository,

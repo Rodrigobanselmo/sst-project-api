@@ -50,47 +50,109 @@ const sortTechnicalObservations = (
   values: BiologicalIndicatorTechnicalObservationEnum[],
 ) => [...values].sort();
 
+/**
+ * 4P.1A — erro controlado para registros NR-07 sem os campos normativos
+ * obrigatórios. Após tornar annex/tableNumber/indicatorType/normativeVersion
+ * nullable no schema (para permitir ACGIH/BEI), a obrigatoriedade lógica da NR-07
+ * é garantida em código.
+ */
+export class Nr07NormativeFieldsError extends Error {
+  constructor(public readonly missingFields: string[]) {
+    super(
+      `Indicador NR-07 com campos normativos obrigatórios ausentes: ${missingFields.join(
+        ', ',
+      )}.`,
+    );
+    this.name = 'Nr07NormativeFieldsError';
+  }
+}
+
+type Nr07NormativeRequiredFields = {
+  annex: BiologicalIndicatorAnnexEnum;
+  tableNumber: BiologicalIndicatorTableEnum;
+  indicatorType: BiologicalIndicatorTypeEnum;
+  normativeVersion: string;
+};
+
+/**
+ * 4P.1A — guard que mantém a NR-07 logicamente obrigatória. Para
+ * normativeSource = NR_07, exige annex, tableNumber, indicatorType e
+ * normativeVersion; caso contrário lança {@link Nr07NormativeFieldsError}.
+ * Registros não-NR-7 (ex.: futura origem ACGIH/BEI) passam sem exigência.
+ */
+export const assertNr07NormativeFields = <
+  T extends {
+    normativeSource: BiologicalNormativeSourceEnum;
+    annex: BiologicalIndicatorAnnexEnum | null;
+    tableNumber: BiologicalIndicatorTableEnum | null;
+    indicatorType: BiologicalIndicatorTypeEnum | null;
+    normativeVersion: string | null;
+  },
+>(
+  source: T,
+): T & Nr07NormativeRequiredFields => {
+  if (source.normativeSource === BiologicalNormativeSourceEnum.NR_07) {
+    const missing: string[] = [];
+    if (source.annex == null) missing.push('annex');
+    if (source.tableNumber == null) missing.push('tableNumber');
+    if (source.indicatorType == null) missing.push('indicatorType');
+    if (
+      source.normativeVersion == null ||
+      String(source.normativeVersion).trim() === ''
+    ) {
+      missing.push('normativeVersion');
+    }
+    if (missing.length) throw new Nr07NormativeFieldsError(missing);
+  }
+  return source as T & Nr07NormativeRequiredFields;
+};
+
 export const toIndicatorNormativePayload = (
-  source:
+  rawSource:
     | IndicatorNormativePayload
     | Pick<
         OccupationalBiologicalIndicator,
         keyof IndicatorNormativePayload
       >,
-): IndicatorNormativePayload => ({
-  normativeSource: source.normativeSource,
-  annex: source.annex,
-  tableNumber: source.tableNumber,
-  indicatorType: source.indicatorType,
-  normativeVersion: source.normativeVersion,
-  substanceName: source.substanceName,
-  substanceNameNormalized: source.substanceNameNormalized,
-  casPrimary: source.casPrimary,
-  casNumbers: sortCasNumbers(source.casNumbers ?? []),
-  substanceGroupId: source.substanceGroupId,
-  isSubstanceGroup: source.isSubstanceGroup,
-  biologicalIndicatorOriginal: source.biologicalIndicatorOriginal,
-  biologicalIndicatorNormalized: source.biologicalIndicatorNormalized,
-  biologicalMatrix: source.biologicalMatrix,
-  collectionMoment: source.collectionMoment,
-  referenceValue: source.referenceValue,
-  referenceValueRaw: source.referenceValueRaw,
-  unit: source.unit,
-  technicalObservations: sortTechnicalObservations(
-    source.technicalObservations ?? [],
-  ),
-  technicalObservationsRaw: source.technicalObservationsRaw,
-  defaultValidityMonths: source.defaultValidityMonths,
-  collectionToleranceDays: source.collectionToleranceDays,
-  occupationalApplicability: parseOccupationalApplicability(
-    source.occupationalApplicability,
-  ),
-  requiresNormativeReview: source.requiresNormativeReview,
-  generalApplicabilityNotes: source.generalApplicabilityNotes,
-  status: source.status,
-  dataOrigin: source.dataOrigin,
-  idempotencyKey: source.idempotencyKey,
-});
+): IndicatorNormativePayload => {
+  // 4P.1A — payload normativo é NR-07 por contrato; garante os campos exigidos
+  // mesmo agora que são nullable no schema.
+  const source = assertNr07NormativeFields(rawSource);
+  return {
+    normativeSource: source.normativeSource,
+    annex: source.annex,
+    tableNumber: source.tableNumber,
+    indicatorType: source.indicatorType,
+    normativeVersion: source.normativeVersion,
+    substanceName: source.substanceName,
+    substanceNameNormalized: source.substanceNameNormalized,
+    casPrimary: source.casPrimary,
+    casNumbers: sortCasNumbers(source.casNumbers ?? []),
+    substanceGroupId: source.substanceGroupId,
+    isSubstanceGroup: source.isSubstanceGroup,
+    biologicalIndicatorOriginal: source.biologicalIndicatorOriginal,
+    biologicalIndicatorNormalized: source.biologicalIndicatorNormalized,
+    biologicalMatrix: source.biologicalMatrix,
+    collectionMoment: source.collectionMoment,
+    referenceValue: source.referenceValue,
+    referenceValueRaw: source.referenceValueRaw,
+    unit: source.unit,
+    technicalObservations: sortTechnicalObservations(
+      source.technicalObservations ?? [],
+    ),
+    technicalObservationsRaw: source.technicalObservationsRaw,
+    defaultValidityMonths: source.defaultValidityMonths,
+    collectionToleranceDays: source.collectionToleranceDays,
+    occupationalApplicability: parseOccupationalApplicability(
+      source.occupationalApplicability,
+    ),
+    requiresNormativeReview: source.requiresNormativeReview,
+    generalApplicabilityNotes: source.generalApplicabilityNotes,
+    status: source.status,
+    dataOrigin: source.dataOrigin,
+    idempotencyKey: source.idempotencyKey,
+  };
+};
 
 export const serializeIndicatorNormativePayload = (
   payload: IndicatorNormativePayload,

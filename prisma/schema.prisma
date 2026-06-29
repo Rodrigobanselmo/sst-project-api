@@ -3670,6 +3670,9 @@ model RiskCatalogEquivalence {
 
 enum BiologicalNormativeSourceEnum {
   NR_07
+  // 4P.1A — habilita indicador oficial de origem ACGIH/BEI (fundação; nenhum
+  // registro é criado nesta fase).
+  ACGIH_BEI
 }
 
 enum BiologicalIndicatorAnnexEnum {
@@ -3709,6 +3712,9 @@ enum BiologicalIndicatorDataOriginEnum {
   MANUAL
   AI_REVIEW
   NORMATIVE_UPDATE
+  // 4P.1A — proveniência: indicador oficial promovido a partir da comparação
+  // ACGIH/BEI (fundação; promoção real ocorre em fase posterior).
+  ACGIH_BEI_COMPARISON
 }
 
 enum BiologicalIndicatorMatchConfidenceEnum {
@@ -3800,10 +3806,13 @@ model OccupationalBiologicalIndicator {
   id String @id @default(cuid())
 
   normativeSource   BiologicalNormativeSourceEnum
-  annex             BiologicalIndicatorAnnexEnum
-  tableNumber       BiologicalIndicatorTableEnum
-  indicatorType     BiologicalIndicatorTypeEnum
-  normativeVersion  String
+  // 4P.1A — campos específicos da NR-7 (Anexo I). Tornados nullable para permitir
+  // indicador oficial ACGIH/BEI futuramente. A obrigatoriedade lógica para
+  // registros NR-7 é garantida em código (assertNr7NormativeFields), não no schema.
+  annex             BiologicalIndicatorAnnexEnum?
+  tableNumber       BiologicalIndicatorTableEnum?
+  indicatorType     BiologicalIndicatorTypeEnum?
+  normativeVersion  String?
 
   substanceName             String
   substanceNameNormalized   String
@@ -3835,6 +3844,15 @@ model OccupationalBiologicalIndicator {
   importBatchId  String?
   importBatch    BiologicalIndicatorImportBatch? @relation(fields: [importBatchId], references: [id], onDelete: SetNull)
   idempotencyKey String
+
+  // 4P.1A — proveniência opcional do indicador oficial promovido a partir de um
+  // item da base ACGIH/BEI. Null para registros NR-7. Unique => promoção 1:1
+  // idempotente (a promoção real acontece em fase posterior).
+  acgihBeiIndicatorId String?
+  acgihBeiIndicator   PcmsoAcgihBeiIndicator? @relation("OfficialIndicatorAcgihProvenance", fields: [acgihBeiIndicatorId], references: [id], onDelete: SetNull)
+  // 4P.1A — página da fonte ACGIH/BEI (a base de origem já possui sourcePage;
+  // aqui preserva a referência ao promover). Null para registros NR-7.
+  sourcePage String?
   supersededById String?
   supersededBy   OccupationalBiologicalIndicator?  @relation("IndicatorSupersession", fields: [supersededById], references: [id], onDelete: SetNull)
   supersedes     OccupationalBiologicalIndicator[] @relation("IndicatorSupersession")
@@ -3857,6 +3875,9 @@ model OccupationalBiologicalIndicator {
   deleted_at DateTime?
 
   @@unique([idempotencyKey])
+  // 4P.1A — promoção 1:1 idempotente ACGIH/BEI → indicador oficial. O unique já
+  // serve de índice; não criar @@index separado em acgihBeiIndicatorId.
+  @@unique([acgihBeiIndicatorId])
   @@index([normativeSource, annex, tableNumber, indicatorType])
   @@index([substanceNameNormalized])
   @@index([casPrimary])
@@ -4285,6 +4306,11 @@ model PcmsoAcgihBeiIndicator {
 
   // Decisões de curadoria da comparação (4O.1) sobre a linha deste indicador.
   comparisonReviews PcmsoAcgihBeiComparisonReview[]
+
+  // 4P.1A — indicador(es) oficiais promovidos a partir deste item ACGIH/BEI
+  // (relação inversa; promoção real ocorre em fase posterior). Unique no lado
+  // oficial garante no máximo um.
+  officialIndicators OccupationalBiologicalIndicator[] @relation("OfficialIndicatorAcgihProvenance")
 
   created_at DateTime  @default(now())
   updated_at DateTime  @updatedAt
