@@ -275,4 +275,52 @@ describe('deriveOperationalStatus', () => {
       ),
     ).toBe(AcgihBeiOperationalStatus.ALREADY_COVERED);
   });
+
+  // 4O.5 — desfechos de auditoria independem do status bruto.
+  it('ALREADY_COVERED + MATCH_CONFIRMED (fresca) → COVERAGE_CONFIRMED', () => {
+    expect(
+      deriveOperationalStatus(
+        AcgihBeiComparisonStatus.ALREADY_COVERED,
+        PcmsoAcgihBeiComparisonDecisionEnum.MATCH_CONFIRMED,
+        false,
+      ),
+    ).toBe(AcgihBeiOperationalStatus.COVERAGE_CONFIRMED);
+  });
+
+  it('NEW_CANDIDATE + NO_MATCH_CONFIRMED (fresca) → ACGIH_CANDIDATE_CONFIRMED', () => {
+    expect(
+      deriveOperationalStatus(
+        AcgihBeiComparisonStatus.NEW_CANDIDATE,
+        PcmsoAcgihBeiComparisonDecisionEnum.NO_MATCH_CONFIRMED,
+        false,
+      ),
+    ).toBe(AcgihBeiOperationalStatus.ACGIH_CANDIDATE_CONFIRMED);
+  });
+
+  it('NEEDS_REVIEW + MATCH_CONFIRMED (fresca) → COVERAGE_CONFIRMED', () => {
+    expect(
+      deriveOperationalStatus(
+        AcgihBeiComparisonStatus.NEEDS_REVIEW,
+        PcmsoAcgihBeiComparisonDecisionEnum.MATCH_CONFIRMED,
+        false,
+      ),
+    ).toBe(AcgihBeiOperationalStatus.COVERAGE_CONFIRMED);
+  });
+
+  it('desfecho de auditoria DESATUALIZADO (isStale) não colapsa', () => {
+    expect(
+      deriveOperationalStatus(
+        AcgihBeiComparisonStatus.ALREADY_COVERED,
+        PcmsoAcgihBeiComparisonDecisionEnum.MATCH_CONFIRMED,
+        true,
+      ),
+    ).toBe(AcgihBeiOperationalStatus.ALREADY_COVERED);
+    expect(
+      deriveOperationalStatus(
+        AcgihBeiComparisonStatus.NEW_CANDIDATE,
+        PcmsoAcgihBeiComparisonDecisionEnum.NO_MATCH_CONFIRMED,
+        true,
+      ),
+    ).toBe(AcgihBeiOperationalStatus.NEW_CANDIDATE);
+  });
 });

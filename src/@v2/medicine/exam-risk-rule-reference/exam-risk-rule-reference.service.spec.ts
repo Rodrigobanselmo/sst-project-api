@@ -295,6 +295,8 @@ describe('ExamRiskRuleReferenceService.applyAcgihReference', () => {
     PcmsoAcgihBeiComparisonDecisionEnum.SOURCE_NR7_ERROR,
     PcmsoAcgihBeiComparisonDecisionEnum.NEEDS_FURTHER_REVIEW,
     PcmsoAcgihBeiComparisonDecisionEnum.IGNORE_MONITOR,
+    // 4O.5 — "candidato ACGIH confirmado" (sem match) não recebe fonte complementar.
+    PcmsoAcgihBeiComparisonDecisionEnum.NO_MATCH_CONFIRMED,
   ])('bloqueia equivalência para decisão %s', async (decision) => {
     ctx.comparisonService.computeAll.mockResolvedValue([
       equivalenceRow({

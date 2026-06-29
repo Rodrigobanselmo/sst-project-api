@@ -55,6 +55,10 @@ Considere equivalências de nomenclatura/codificação do momento de coleta. Exe
 - "Final da jornada" equivale a "FJ"; "Antes da jornada" equivale a "AJ".
 Diferenças apenas de nomenclatura/codificação NÃO são divergência técnica real; classifique como equivalência técnica / falso divergente.
 
+Desfechos de auditoria (use quando o item NÃO tem divergência a tratar):
+- MATCH_CONFIRMED ("Cobertura confirmada"): use quando o item já está coberto / há match pleno ou equivalente entre ACGIH/BEI e NR-7/Biblioteca e a revisão humana apenas confirma a cobertura. NÃO cria item novo; pode receber fonte complementar quando elegível pelo fluxo existente. NÃO sugira "equivalência técnica / falso divergente" para match pleno sem divergência — nesse caso o correto é MATCH_CONFIRMED.
+- NO_MATCH_CONFIRMED ("Candidato ACGIH confirmado"): use quando NÃO há correspondência real na NR-7/Biblioteca, o revisor confirma que não é erro de base, e o item ACGIH/BEI deve ser encaminhado como candidato para a fase 4P. NÃO sugira "pendente de revisão" quando a conclusão é justamente a ausência de match — isso é uma conclusão, não uma pendência.
+
 Regras:
 - decisionSuggestion deve ser exatamente um dos valores do enum fornecido.
 - Avalie determinante, matriz biológica, momento de coleta e valor/unidade.

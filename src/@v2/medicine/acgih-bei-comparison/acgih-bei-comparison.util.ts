@@ -46,6 +46,9 @@ export enum AcgihBeiOperationalStatus {
   SOURCE_NR7_ERROR = 'SOURCE_NR7_ERROR',
   NEEDS_FURTHER_REVIEW = 'NEEDS_FURTHER_REVIEW',
   IGNORE_MONITOR = 'IGNORE_MONITOR',
+  // 4O.5 — desfechos de auditoria para itens sem divergência.
+  COVERAGE_CONFIRMED = 'COVERAGE_CONFIRMED',
+  ACGIH_CANDIDATE_CONFIRMED = 'ACGIH_CANDIDATE_CONFIRMED',
 }
 
 /** Sugestão de ação (apenas informativa nesta fase — nada é aplicado). */
@@ -276,29 +279,54 @@ const DECISION_TO_OPERATIONAL_STATUS: Record<
     AcgihBeiOperationalStatus.NEEDS_FURTHER_REVIEW,
   [PcmsoAcgihBeiComparisonDecisionEnum.IGNORE_MONITOR]:
     AcgihBeiOperationalStatus.IGNORE_MONITOR,
+  // 4O.5 — desfechos de auditoria.
+  [PcmsoAcgihBeiComparisonDecisionEnum.MATCH_CONFIRMED]:
+    AcgihBeiOperationalStatus.COVERAGE_CONFIRMED,
+  [PcmsoAcgihBeiComparisonDecisionEnum.NO_MATCH_CONFIRMED]:
+    AcgihBeiOperationalStatus.ACGIH_CANDIDATE_CONFIRMED,
 };
 
 /**
- * 4O.3/4O.4 — deriva o status operacional/efetivo a partir do status bruto e da
- * decisão técnica. NUNCA altera o comparisonStatus bruto (preservado p/
+ * 4O.3/4O.4/4O.5 — deriva o status operacional/efetivo a partir do status bruto
+ * e da decisão técnica. NUNCA altera o comparisonStatus bruto (preservado p/
  * auditoria/export).
  *
  * Regras:
- *  1. (4O.3) DIVERGENT + FALSE_DIVERGENCE_EQUIVALENT → RESOLVED_EQUIVALENCE.
- *  2. (4O.4) NEEDS_REVIEW + decisão técnica fresca (isStale !== true) → reflete a
+ *  1. (4O.5) Desfechos de auditoria valem para QUALQUER status bruto quando a
+ *     decisão é fresca: MATCH_CONFIRMED → COVERAGE_CONFIRMED;
+ *     NO_MATCH_CONFIRMED → ACGIH_CANDIDATE_CONFIRMED. Assim itens "já cobertos"
+ *     e "candidatos novos" recebem desfecho operacional e saem de "sem decisão".
+ *  2. (4O.3) DIVERGENT + FALSE_DIVERGENCE_EQUIVALENT → RESOLVED_EQUIVALENCE.
+ *  3. (4O.4) NEEDS_REVIEW + decisão técnica fresca (isStale !== true) → reflete a
  *     decisão (ex.: REAL_DIVERGENCE, SOURCE_*_ERROR, NEEDS_FURTHER_REVIEW,
  *     IGNORE_MONITOR, RESOLVED_EQUIVALENCE). Assim o item sai da fila operacional
  *     "Requer revisão" assim que recebe uma decisão humana.
  *
- * Decisões desatualizadas (isStale) NÃO colapsam: a linha permanece em
- * NEEDS_REVIEW para nova análise.
+ * Decisões desatualizadas (isStale) NÃO colapsam: a linha permanece no status
+ * bruto para nova análise.
  */
 export const deriveOperationalStatus = (
   comparisonStatus: AcgihBeiComparisonStatus,
   reviewDecision?: PcmsoAcgihBeiComparisonDecisionEnum | null,
   reviewIsStale?: boolean | null,
 ): AcgihBeiOperationalStatus => {
-  // 1. Regra 4O.3 (mantida): divergência marcada como falso divergente/equivalência.
+  const hasFreshDecision = Boolean(reviewDecision) && reviewIsStale !== true;
+
+  // 1. Regra 4O.5: desfechos de auditoria independem do status bruto.
+  if (hasFreshDecision) {
+    if (
+      reviewDecision === PcmsoAcgihBeiComparisonDecisionEnum.MATCH_CONFIRMED
+    ) {
+      return AcgihBeiOperationalStatus.COVERAGE_CONFIRMED;
+    }
+    if (
+      reviewDecision === PcmsoAcgihBeiComparisonDecisionEnum.NO_MATCH_CONFIRMED
+    ) {
+      return AcgihBeiOperationalStatus.ACGIH_CANDIDATE_CONFIRMED;
+    }
+  }
+
+  // 2. Regra 4O.3 (mantida): divergência marcada como falso divergente/equivalência.
   if (
     comparisonStatus === AcgihBeiComparisonStatus.DIVERGENT &&
     reviewDecision ===
@@ -307,12 +335,12 @@ export const deriveOperationalStatus = (
     return AcgihBeiOperationalStatus.RESOLVED_EQUIVALENCE;
   }
 
-  // 2. Regra 4O.4: linha "Requer revisão" com decisão técnica fresca reflete a
+  // 3. Regra 4O.4: linha "Requer revisão" com decisão técnica fresca reflete a
   // decisão e deixa de ser uma pendência operacional.
   if (
     comparisonStatus === AcgihBeiComparisonStatus.NEEDS_REVIEW &&
-    reviewDecision &&
-    reviewIsStale !== true
+    hasFreshDecision &&
+    reviewDecision
   ) {
     return DECISION_TO_OPERATIONAL_STATUS[reviewDecision];
   }
@@ -331,6 +359,9 @@ export const REFERENCE_BLOCKING_DECISIONS: PcmsoAcgihBeiComparisonDecisionEnum[]
     PcmsoAcgihBeiComparisonDecisionEnum.SOURCE_NR7_ERROR,
     PcmsoAcgihBeiComparisonDecisionEnum.NEEDS_FURTHER_REVIEW,
     PcmsoAcgihBeiComparisonDecisionEnum.IGNORE_MONITOR,
+    // 4O.5 — "candidato ACGIH confirmado" (sem match) não recebe fonte
+    // complementar: não há regra/indicador a enriquecer; segue para a fase 4P.
+    PcmsoAcgihBeiComparisonDecisionEnum.NO_MATCH_CONFIRMED,
   ];
 
 const isActiveStatus = (value?: string | null): boolean =>

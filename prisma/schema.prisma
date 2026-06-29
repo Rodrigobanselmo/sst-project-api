@@ -4133,6 +4133,9 @@ enum PcmsoAcgihBeiComparisonDecisionEnum {
   SOURCE_NR7_ERROR
   NEEDS_FURTHER_REVIEW
   IGNORE_MONITOR
+  // 4O.5 — desfechos para fechar a auditoria de itens sem divergência.
+  MATCH_CONFIRMED
+  NO_MATCH_CONFIRMED
 }
 
 model PcmsoAcgihBeiComparisonReview {

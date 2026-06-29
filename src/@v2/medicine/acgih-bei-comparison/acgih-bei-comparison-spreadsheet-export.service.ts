@@ -57,6 +57,9 @@ export const COMPARISON_OPERATIONAL_STATUS_LABELS: Record<
   SOURCE_NR7_ERROR: 'Erro na base NR-7',
   NEEDS_FURTHER_REVIEW: 'Pendente de revisão (decisão)',
   IGNORE_MONITOR: 'Monitorar / ignorar',
+  // 4O.5 — desfechos de auditoria para itens sem divergência.
+  COVERAGE_CONFIRMED: 'Cobertura confirmada',
+  ACGIH_CANDIDATE_CONFIRMED: 'Candidato ACGIH confirmado',
 };
 
 /** 4O.1 — rótulos legíveis das decisões técnicas para o Excel. */
@@ -70,6 +73,9 @@ export const COMPARISON_DECISION_LABELS: Record<
   SOURCE_NR7_ERROR: 'Erro na base NR-7',
   NEEDS_FURTHER_REVIEW: 'Pendente de revisão',
   IGNORE_MONITOR: 'Monitorar / ignorar',
+  // 4O.5 — desfechos de auditoria para itens sem divergência.
+  MATCH_CONFIRMED: 'Cobertura confirmada',
+  NO_MATCH_CONFIRMED: 'Candidato ACGIH confirmado',
 };
 
 @Injectable()
@@ -168,7 +174,7 @@ export class AcgihBeiComparisonSpreadsheetExportService {
       ['Objetivo', 'Comparação técnica entre a base ACGIH/BEI e a base NR-7 e a biblioteca Regras Exame × Risco. Esta planilha é APENAS LEITURA (diagnóstica). Nada é aplicado, criado ou alterado.'],
       ['Não é importável', 'Esta exportação não tem fluxo de importação/aplicação. É um relatório de comparação.'],
       ['comparisonStatus', 'ALREADY_COVERED (ACGIH confirma NR-7/regra existente); DIVERGENT (mesmo determinante, diferença técnica relevante); NEEDS_REVIEW (correspondência parcial/ambígua); NEW_CANDIDATE (sem equivalente claro); LOW_CONFIDENCE_REVIEW (transcrição duvidosa). Status BRUTO calculado — nunca alterado pela curadoria.'],
-      ['Status operacional (4O.3/4O.4)', 'Classificação efetiva derivada do comparisonStatus + decisão técnica. Uma linha DIVERGENT marcada como "Equivalência técnica / falso divergente" passa a "Resolvido por equivalência técnica" e sai da fila de divergentes. Uma linha "Requer revisão" que recebe qualquer decisão técnica fresca passa a refletir essa decisão (ex.: Divergência técnica real, Erro ACGIH/BEI, Erro NR-7, Pendente de revisão, Monitorar/ignorar) e sai da fila de pendentes. Decisões desatualizadas (recalculadas) permanecem em "Requer revisão". O comparisonStatus bruto permanece preservado nesta planilha para auditoria.'],
+      ['Status operacional (4O.3/4O.4/4O.5)', 'Classificação efetiva derivada do comparisonStatus + decisão técnica. Uma linha DIVERGENT marcada como "Equivalência técnica / falso divergente" passa a "Resolvido por equivalência técnica" e sai da fila de divergentes. Uma linha "Requer revisão" que recebe qualquer decisão técnica fresca passa a refletir essa decisão (ex.: Divergência técnica real, Erro ACGIH/BEI, Erro NR-7, Pendente de revisão, Monitorar/ignorar) e sai da fila de pendentes. Decisões de auditoria "Cobertura confirmada" e "Candidato ACGIH confirmado" passam a "Cobertura confirmada"/"Candidato ACGIH confirmado" em qualquer status e tiram o item da condição "sem decisão". Decisões desatualizadas (recalculadas) não colapsam o status. O comparisonStatus bruto permanece preservado nesta planilha para auditoria.'],
       ['suggestedAction', 'ADD_REFERENCE_ONLY (sugerir fonte complementar à regra existente; NÃO criar regra); REVIEW_DIVERGENCE; CREATE_NEW_RULE_CANDIDATE (possível regra nova, não criada nesta fase); IGNORE_OR_MONITOR; LOW_CONFIDENCE_REVIEW.'],
       ['nr7MatchStatus / examRiskRuleMatchStatus', 'FULL, PARTIAL ou Sem match (quando não há correspondência).'],
       ['Enriquecimento de fonte', 'Quando ACGIH confirma uma regra NR-7 existente, a sugestão é ADD_REFERENCE_ONLY: futuramente a regra poderá exibir "NR-7 + ACGIH/BEI". A gravação dessa referência NÃO ocorre nesta fase.'],
@@ -176,7 +182,7 @@ export class AcgihBeiComparisonSpreadsheetExportService {
       ['Critérios de match Regra', 'Por proveniência (regra NR_07 cujo sourceIndicatorId aponta ao indicador NR-7 correspondente) ou por agente (agentCas/agentName).'],
       ['Contexto/readiness (4L)', 'Colunas de apoio à revisão (read-only): Status/Curado/Ano/Página ACGIH/BEI; Status e Pendências NR-7; Status/Curada da regra da Biblioteca; e se a fonte complementar já está registrada. Não alteram a classificação nem a elegibilidade.'],
       ['Pendências NR-7', 'Reaproveitam a mesma lógica de pendências de ativação da curadoria NR-7 (ex.: RISK_NOT_CONFIRMED, EXAM_NOT_CONFIRMED, NORMATIVE_REVIEW_REQUIRED). Quantidade e códigos são informativos.'],
-      ['Decisão técnica (4O.1)', 'Camada de curadoria humana sobre a comparação. Valores: Equivalência técnica / falso divergente; Divergência técnica real; Erro na base ACGIH/BEI; Erro na base NR-7; Pendente de revisão; Monitorar / ignorar. Registrar decisão NÃO altera o comparisonStatus calculado nem as bases NR-7/ACGIH/BEI/Biblioteca.'],
+      ['Decisão técnica (4O.1/4O.5)', 'Camada de curadoria humana sobre a comparação. Valores: Equivalência técnica / falso divergente; Divergência técnica real; Erro na base ACGIH/BEI; Erro na base NR-7; Pendente de revisão; Monitorar / ignorar; Cobertura confirmada (match pleno / já coberto, sem criar item novo); Candidato ACGIH confirmado (sem match real, encaminhar para fase 4P). Registrar decisão NÃO altera o comparisonStatus calculado nem as bases NR-7/ACGIH/BEI/Biblioteca.'],
       ['Decisão desatualizada', 'Marcada quando o comparisonStatus recalculado difere do status registrado no momento da decisão (a decisão antiga é apenas sinalizada, nunca apagada).'],
     ];
     rows.forEach((row) => sheet.addRow({ topic: row[0], description: row[1] }));
