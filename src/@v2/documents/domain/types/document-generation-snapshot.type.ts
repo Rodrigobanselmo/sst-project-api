@@ -59,7 +59,7 @@ export const buildDocumentGenerationSnapshot = (params: {
   Object.keys(params.json).length
     ? { json: params.json }
     : {}),
-  ...(params.professionalSignatures?.length
+  ...(params.professionalSignatures !== undefined
     ? { professionalSignatures: params.professionalSignatures }
     : {}),
   ...(params.riskFilter ? { riskFilter: params.riskFilter } : {}),

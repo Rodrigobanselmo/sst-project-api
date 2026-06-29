@@ -4,6 +4,7 @@ import { Prisma } from '@prisma/client'
 import { IDocumentVersionRepository } from './document-version.types'
 import { DocumentBaseDAO } from '../document-base/document-base.dao'
 import { DocumentVersionMapper } from '../../mappers/document-version.mapper'
+import { parseDocumentGenerationSnapshot } from '@/@v2/documents/domain/types/document-generation-snapshot.type'
 import {
   applyGenerationSnapshotToDocumentData,
   resolveSnapshotModelId,
@@ -46,9 +47,18 @@ export class DocumentVersionDAO {
       }
     }
 
+    const snapshot = parseDocumentGenerationSnapshot(
+      documentversion.generationSnapshot,
+    )
+    const supplementalProfessionalSignatures = await this.resolveSupplementalProfessionalSignatures(
+      snapshot,
+      documentversion.documentData.professionalsSignatures,
+    )
+
     applyGenerationSnapshotToDocumentData(
       documentversion.documentData,
       documentversion.generationSnapshot,
+      { supplementalProfessionalSignatures },
     )
 
     return DocumentVersionMapper.toModel(documentversion)
@@ -59,5 +69,53 @@ export class DocumentVersionDAO {
       where: { id },
       data: { documentDate },
     });
+  }
+
+  private async resolveSupplementalProfessionalSignatures(
+    snapshot: ReturnType<typeof parseDocumentGenerationSnapshot>,
+    existingSignatures?: Array<{ professionalId: number }>,
+  ) {
+    const supplementalProfessionalSignatures = new Map<
+      number,
+      {
+        professionalId: number;
+        isSigner: boolean;
+        isElaborator: boolean;
+        professional: unknown;
+      }
+    >()
+
+    if (!snapshot?.professionalSignatures?.length) {
+      return supplementalProfessionalSignatures
+    }
+
+    const existingIds = new Set(
+      (existingSignatures || []).map((signature) => signature.professionalId),
+    )
+    const missingCouncilIds = snapshot.professionalSignatures
+      .map((signature) => signature.professionalId)
+      .filter((professionalId) => !existingIds.has(professionalId))
+
+    if (!missingCouncilIds.length) {
+      return supplementalProfessionalSignatures
+    }
+
+    const councils = await this.prisma.professionalCouncil.findMany({
+      where: { id: { in: missingCouncilIds } },
+      include: {
+        professional: true,
+      },
+    })
+
+    councils.forEach((council) => {
+      supplementalProfessionalSignatures.set(council.id, {
+        professionalId: council.id,
+        isSigner: false,
+        isElaborator: false,
+        professional: council,
+      })
+    })
+
+    return supplementalProfessionalSignatures
   }
 }

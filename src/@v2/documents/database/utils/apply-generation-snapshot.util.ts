@@ -9,18 +9,25 @@ import {
   parseDocumentGenerationRiskFilter,
 } from '@/@v2/documents/domain/types/document-generation-risk-filter.type';
 
+type ProfessionalSignatureRelation = {
+  professionalId: number;
+  isSigner: boolean;
+  isElaborator: boolean;
+  professional?: unknown;
+};
+
 type DocumentDataWithRelations = DocumentData & {
-  professionalsSignatures?: Array<{
-    professionalId: number;
-    isSigner: boolean;
-    isElaborator: boolean;
-    professional?: unknown;
-  }>;
+  professionalsSignatures?: ProfessionalSignatureRelation[];
+};
+
+type ApplyGenerationSnapshotOptions = {
+  supplementalProfessionalSignatures?: Map<number, ProfessionalSignatureRelation>;
 };
 
 export const applyGenerationSnapshotToDocumentData = (
   documentData: DocumentDataWithRelations,
   snapshotValue: unknown,
+  options?: ApplyGenerationSnapshotOptions,
 ): void => {
   const snapshot = parseDocumentGenerationSnapshot(snapshotValue);
   if (!snapshot) return;
@@ -49,23 +56,53 @@ export const applyGenerationSnapshotToDocumentData = (
       : {}),
   } as Prisma.JsonValue;
 
-  if (snapshot.professionalSignatures?.length && documentData.professionalsSignatures) {
-    const signatureMap = new Map(
-      snapshot.professionalSignatures.map((item) => [item.professionalId, item]),
-    );
-
-    documentData.professionalsSignatures = documentData.professionalsSignatures
-      .filter((signature) => signatureMap.has(signature.professionalId))
-      .map((signature) => {
-        const snapshotSignature = signatureMap.get(signature.professionalId);
-
-        return {
-          ...signature,
-          isSigner: snapshotSignature?.isSigner ?? signature.isSigner,
-          isElaborator: snapshotSignature?.isElaborator ?? signature.isElaborator,
-        };
-      });
+  if (snapshot.professionalSignatures === undefined) {
+    return;
   }
+
+  if (!snapshot.professionalSignatures.length) {
+    documentData.professionalsSignatures = [];
+    return;
+  }
+
+  const existingMap = new Map(
+    (documentData.professionalsSignatures || []).map((signature) => [
+      signature.professionalId,
+      signature,
+    ]),
+  );
+
+  documentData.professionalsSignatures = snapshot.professionalSignatures.map(
+    (snapshotSignature) => {
+      const existing = existingMap.get(snapshotSignature.professionalId);
+      const supplemental = options?.supplementalProfessionalSignatures?.get(
+        snapshotSignature.professionalId,
+      );
+
+      if (existing) {
+        return {
+          ...existing,
+          isSigner: snapshotSignature.isSigner ?? existing.isSigner,
+          isElaborator: snapshotSignature.isElaborator ?? existing.isElaborator,
+        };
+      }
+
+      if (supplemental) {
+        return {
+          ...supplemental,
+          isSigner: snapshotSignature.isSigner ?? supplemental.isSigner,
+          isElaborator:
+            snapshotSignature.isElaborator ?? supplemental.isElaborator,
+        };
+      }
+
+      return {
+        professionalId: snapshotSignature.professionalId,
+        isSigner: snapshotSignature.isSigner ?? false,
+        isElaborator: snapshotSignature.isElaborator ?? false,
+      };
+    },
+  );
 };
 
 export const resolveSnapshotModelId = (

@@ -38,6 +38,16 @@ describe('document generation snapshot', () => {
     });
   });
 
+  it('persists an explicit empty professionalSignatures list', () => {
+    const snapshot = buildDocumentGenerationSnapshot({
+      professionalSignatures: [],
+    });
+
+    expect(snapshot).toEqual({
+      professionalSignatures: [],
+    });
+  });
+
   it('parses nullable snapshot safely', () => {
     expect(parseDocumentGenerationSnapshot(null)).toBeNull();
     expect(parseDocumentGenerationSnapshot({ ghoIds: ['a'] })?.ghoIds).toEqual([
