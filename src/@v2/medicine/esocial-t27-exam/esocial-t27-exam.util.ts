@@ -21,23 +21,40 @@ export const searchEsocialT27Catalog = (
   search: string,
   limit = ESOCIAL_T27_SEARCH_DEFAULT_LIMIT,
 ): ESocialTable27Item[] => {
-  const normalizedSearch = normalizeText(search);
+  const trimmedSearch = search.trim();
+  const normalizedSearch = normalizeText(trimmedSearch);
   if (normalizedSearch.length < ESOCIAL_T27_SEARCH_MIN_LENGTH) return [];
 
+  const searchDigits = trimmedSearch.replace(/\D/g, '');
   const matches: Array<{ item: ESocialTable27Item; score: number }> = [];
 
   for (const item of catalog) {
     const normalizedName = normalizeText(item.name);
-    if (!normalizedName) continue;
+    const code = item.code.trim();
+    const codeDigits = code.replace(/\D/g, '');
+    const normalizedCodeDigits = codeDigits.replace(/^0+/, '') || codeDigits;
 
-    if (normalizedName.includes(normalizedSearch)) {
+    let score = 0;
+
+    if (code === trimmedSearch) {
+      score = 100;
+    } else if (
+      searchDigits &&
+      (codeDigits === searchDigits ||
+        normalizedCodeDigits === searchDigits.replace(/^0+/, ''))
+    ) {
+      score = 90;
+    } else if (code.includes(trimmedSearch)) {
+      score = 80;
+    } else if (normalizedName.includes(normalizedSearch)) {
       const startsWith = normalizedName.startsWith(normalizedSearch) ? 2 : 0;
       const position = normalizedName.indexOf(normalizedSearch);
       const positionScore = position === 0 ? 3 : position < 10 ? 1 : 0;
-      matches.push({
-        item,
-        score: normalizedSearch.length + startsWith + positionScore,
-      });
+      score = normalizedSearch.length + startsWith + positionScore;
+    }
+
+    if (score > 0) {
+      matches.push({ item, score });
     }
   }
 

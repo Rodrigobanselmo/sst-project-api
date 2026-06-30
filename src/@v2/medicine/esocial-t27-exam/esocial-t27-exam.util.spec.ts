@@ -23,6 +23,16 @@ describe('esocial-t27-exam.util', () => {
     expect(result.map((item) => item.code)).toEqual(['0100']);
   });
 
+  it('searchEsocialT27Catalog finds by T27 code', () => {
+    const result = searchEsocialT27Catalog(catalog, '0100');
+    expect(result.map((item) => item.code)).toEqual(['0100']);
+  });
+
+  it('searchEsocialT27Catalog finds by T27 code without leading zeros', () => {
+    const result = searchEsocialT27Catalog(catalog, '100');
+    expect(result.map((item) => item.code)).toEqual(['0100']);
+  });
+
   it('buildEsocialT27SourceIndicatorId is stable', () => {
     expect(buildEsocialT27SourceIndicatorId('risk-1', 10)).toBe(
       'esocial-t27::risk-1::10',
