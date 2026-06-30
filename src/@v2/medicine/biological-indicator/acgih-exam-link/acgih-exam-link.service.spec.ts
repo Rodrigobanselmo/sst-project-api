@@ -5,29 +5,43 @@ import { plainToInstance } from 'class-transformer';
 
 import { AcgihExamLinkService } from './acgih-exam-link.service';
 import {
+  ACGIH_EXAM_LINK_RESOLVE_CONFIRM_TEXT,
   ACGIH_EXAM_LINK_SYNC_CONFIRM_TEXT,
+  AcgihExamLinkResolveBody,
   AcgihExamLinkSyncBody,
 } from './acgih-exam-link.dto';
-import { matchAcgihIndicatorExam } from './acgih-exam-link.util';
+import {
+  buildAcgihExamName,
+  classifyAcgihExamPreview,
+  matchAcgihIndicatorExam,
+} from './acgih-exam-link.util';
 
 type IndicatorRow = {
   id: string;
+  acgihBeiIndicatorId: string | null;
   substanceName: string;
   biologicalIndicatorOriginal: string;
   biologicalIndicatorNormalized: string;
   biologicalMatrix: string;
   casPrimary: string | null;
-  examLinks: Array<{ examId: number; deleted_at: Date | null }>;
+  examLinks: Array<{
+    examId: number;
+    deleted_at: Date | null;
+    examName: string | null;
+  }>;
+  riskLinks: Array<{ riskFactorId: string; riskName: string | null }>;
 };
 
 const indicator = (over: Partial<IndicatorRow> = {}): IndicatorRow => ({
   id: 'ind-1',
+  acgihBeiIndicatorId: 'acgih-1',
   substanceName: 'n-Heptano',
   biologicalIndicatorOriginal: '2,5-hexanodiona na urina',
   biologicalIndicatorNormalized: '2,5 hexanodiona urina',
   biologicalMatrix: 'urina',
   casPrimary: '142-82-5',
   examLinks: [],
+  riskLinks: [],
   ...over,
 });
 
@@ -42,9 +56,18 @@ const buildRepo = (over: {
     examMaterial: string | null;
   }>;
   createExamLink?: jest.Mock;
+  createSystemExam?: jest.Mock;
 } = {}) => {
   const createExamLink =
     over.createExamLink ?? jest.fn().mockResolvedValue({ id: 'link-1' } as never);
+  const createSystemExam =
+    over.createSystemExam ??
+    jest.fn().mockResolvedValue({
+      id: 99,
+      name: 'Novo exame',
+      material: 'urina',
+      esocial27Code: null,
+    } as never);
   return {
     findAcgihOfficialIndicators: jest
       .fn()
@@ -52,6 +75,7 @@ const buildRepo = (over: {
     findSystemicCatalog: jest.fn().mockResolvedValue((over.catalog ?? []) as never),
     findNr7ConfirmedExamLinks: jest.fn().mockResolvedValue((over.nr7 ?? []) as never),
     createExamLink,
+    createSystemExam,
   };
 };
 
@@ -215,7 +239,7 @@ describe('AcgihExamLinkService.sync', () => {
   it('idempotência: indicador com vínculo ativo retorna alreadyLinked sem escrever', async () => {
     repo = buildRepo({
       indicators: [
-        indicator({ examLinks: [{ examId: 7, deleted_at: null }] }),
+        indicator({ examLinks: [{ examId: 7, deleted_at: null, examName: '2,5-hexanodiona na urina' }] }),
       ],
       catalog: [
         { id: 7, name: '2,5-hexanodiona na urina', material: 'urina', esocial27Code: null },
@@ -293,5 +317,178 @@ describe('AcgihExamLinkService.sync', () => {
 
     expect(res.items[0].action).toBe('blocked');
     expect(res.items[0].reason).toBe('MISSING_DETERMINANT');
+  });
+});
+
+describe('buildAcgihExamName', () => {
+  it('monta nome com matriz urina', () => {
+    expect(buildAcgihExamName('2,5-heptanodiona', 'urina')).toBe(
+      '2,5-heptanodiona na urina',
+    );
+  });
+
+  it('não duplica matriz se já estiver no determinante', () => {
+    expect(buildAcgihExamName('2,5-hexanodiona na urina', 'urina')).toBe(
+      '2,5-hexanodiona na urina',
+    );
+  });
+});
+
+describe('classifyAcgihExamPreview', () => {
+  const snap = {
+    id: 'i',
+    substanceName: 'X',
+    determinant: 'det',
+    determinantNormalized: 'det',
+    matrix: 'urina',
+  };
+
+  it('retorna LINKED quando já vinculado', () => {
+    const r = classifyAcgihExamPreview({
+      alreadyLinked: { examId: 1, examName: 'Exame A' },
+      indicator: snap,
+      outcome: { kind: 'none' },
+    });
+    expect(r.status).toBe('LINKED');
+  });
+
+  it('retorna READY_TO_CREATE quando sem match mas com dados', () => {
+    const r = classifyAcgihExamPreview({
+      alreadyLinked: null,
+      indicator: snap,
+      outcome: { kind: 'none' },
+    });
+    expect(r.status).toBe('READY_TO_CREATE');
+    expect(r.suggestedExamName).toContain('det');
+  });
+});
+
+describe('AcgihExamLinkResolveBody (confirmText)', () => {
+  it('aceita confirmText RESOLVER EXAMES ACGIH', async () => {
+    const dto = plainToInstance(AcgihExamLinkResolveBody, {
+      confirmText: ACGIH_EXAM_LINK_RESOLVE_CONFIRM_TEXT,
+      dryRun: true,
+    });
+    const errors = await validate(dto);
+    expect(errors).toHaveLength(0);
+  });
+});
+
+describe('AcgihExamLinkService.preview', () => {
+  it('retorna estado consolidado sem escrita', async () => {
+    const repo = buildRepo({
+      indicators: [
+        indicator(),
+        indicator({
+          id: 'ind-2',
+          acgihBeiIndicatorId: 'acgih-2',
+          substanceName: 'Fluoretos',
+          biologicalIndicatorOriginal: 'Fluoreto urinário',
+          biologicalIndicatorNormalized: 'fluoreto urinario',
+          examLinks: [
+            { examId: 5, deleted_at: null, examName: 'Fluoreto na urina' },
+          ],
+        }),
+      ],
+      catalog: [
+        { id: 7, name: '2,5-hexanodiona na urina', material: 'urina', esocial27Code: null },
+      ],
+    });
+    const service = new AcgihExamLinkService(repo as never);
+    const res = await service.preview();
+    expect(res.totals.indicators).toBe(2);
+    expect(res.totals.linked).toBe(1);
+    expect(res.items[0].examLink.status).toBe('NOT_LINKED');
+    expect(res.items[1].examLink.status).toBe('LINKED');
+  });
+});
+
+describe('AcgihExamLinkService.resolve', () => {
+  it('dryRun não escreve e reporta linkedExistingExam + createdExamAndLinked', async () => {
+    const repo = buildRepo({
+      indicators: [
+        indicator(),
+        indicator({
+          id: 'ind-2',
+          acgihBeiIndicatorId: 'acgih-2',
+          substanceName: 'Fluoretos',
+          biologicalIndicatorOriginal: 'Fluoreto urinário',
+          biologicalIndicatorNormalized: 'fluoreto urinario',
+        }),
+      ],
+      catalog: [
+        { id: 7, name: '2,5-hexanodiona na urina', material: 'urina', esocial27Code: null },
+      ],
+    });
+    const service = new AcgihExamLinkService(repo as never);
+    const res = await service.resolve({ userId: 1, dryRun: true });
+    expect(repo.createExamLink).not.toHaveBeenCalled();
+    expect(repo.createSystemExam).not.toHaveBeenCalled();
+    expect(res.totals.linksCreated).toBe(1);
+    expect(res.totals.examsCreated).toBe(1);
+  });
+
+  it('apply real vincula existente e cria exame novo', async () => {
+    const repo = buildRepo({
+      indicators: [
+        indicator(),
+        indicator({
+          id: 'ind-2',
+          acgihBeiIndicatorId: 'acgih-2',
+          substanceName: 'Fluoretos',
+          biologicalIndicatorOriginal: 'Fluoreto urinário',
+          biologicalIndicatorNormalized: 'fluoreto urinario',
+        }),
+      ],
+      catalog: [
+        { id: 7, name: '2,5-hexanodiona na urina', material: 'urina', esocial27Code: null },
+      ],
+    });
+    const service = new AcgihExamLinkService(repo as never);
+    const res = await service.resolve({ userId: 1, dryRun: false });
+    expect(repo.createExamLink).toHaveBeenCalledTimes(2);
+    expect(repo.createSystemExam).toHaveBeenCalledTimes(1);
+    expect(res.totals.linksCreated).toBe(1);
+    expect(res.totals.examsCreated).toBe(1);
+  });
+
+  it('ambíguo não processa em lote', async () => {
+    const repo = buildRepo({
+      indicators: [
+        indicator({ biologicalIndicatorOriginal: 'Fenol na urina' }),
+      ],
+      catalog: [
+        { id: 1, name: 'Fenol na urina', material: 'urina', esocial27Code: null },
+        { id: 2, name: 'Fenol na urina', material: 'urina', esocial27Code: null },
+      ],
+    });
+    const service = new AcgihExamLinkService(repo as never);
+    const res = await service.resolve({ userId: 1, dryRun: false });
+    expect(repo.createExamLink).not.toHaveBeenCalled();
+    expect(res.items[0].action).toBe('ambiguous');
+    expect(res.totals.ambiguous).toBe(1);
+  });
+
+  it('não cria exame duplicado se já existir no pool por nome+matriz', async () => {
+    const repo = buildRepo({
+      indicators: [
+        indicator({
+          biologicalIndicatorOriginal: 'Fluoreto urinário',
+          biologicalIndicatorNormalized: 'fluoreto urinario',
+        }),
+      ],
+      catalog: [
+        {
+          id: 50,
+          name: 'Fluoreto urinário na urina',
+          material: 'urina',
+          esocial27Code: null,
+        },
+      ],
+    });
+    const service = new AcgihExamLinkService(repo as never);
+    const res = await service.resolve({ userId: 1, dryRun: false });
+    expect(repo.createSystemExam).not.toHaveBeenCalled();
+    expect(res.items[0].action).toBe('linkedExistingExam');
   });
 });

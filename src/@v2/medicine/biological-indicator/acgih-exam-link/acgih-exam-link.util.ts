@@ -173,3 +173,94 @@ export const matchAcgihIndicatorExam = (params: {
 /** Normaliza determinante para casamento (reusa a normalização canônica). */
 export const normalizeDeterminant = (value: string | null | undefined): string =>
   normalizeText(value ?? '');
+
+/**
+ * Nome sugerido para um exame sistêmico criado a partir do indicador ACGIH/BEI.
+ * Simples e rastreável (determinante + matriz). Não inventa sufixos de catálogo
+ * como (H)/(SH). Se o determinante já cita a matriz, usa-o tal como está.
+ */
+export const buildAcgihExamName = (
+  determinant: string | null | undefined,
+  matrix: string | null | undefined,
+): string => {
+  const det = (determinant ?? '').trim();
+  const mat = (matrix ?? '').trim();
+  if (!det) return '';
+  if (!mat) return det;
+
+  const detNorm = normalizeText(det);
+  const matNorm = normalizeText(mat);
+  if (matNorm && detNorm.includes(matNorm)) return det;
+
+  if (matNorm.includes('urina')) return `${det} na urina`;
+  if (matNorm.includes('sangue')) return `${det} no sangue`;
+  if (matNorm.includes('exalado')) return `${det} no ar exalado`;
+  return `${det} (${mat})`;
+};
+
+export type AcgihExamPreviewStatus =
+  | 'LINKED'
+  | 'NOT_LINKED'
+  | 'AMBIGUOUS'
+  | 'NO_MATCH'
+  | 'READY_TO_CREATE';
+
+export type AcgihExamPreviewResult = {
+  status: AcgihExamPreviewStatus;
+  examId?: number;
+  examName?: string;
+  candidates?: AcgihExamCandidate[];
+  suggestedExamName?: string;
+  reason?: string;
+};
+
+/**
+ * Classifica o estado de exame de um indicador ACGIH/BEI para a tela de
+ * curadoria (read-only). `LINKED` quando já há vínculo; senão, deriva do
+ * matcher: único→`NOT_LINKED` (vincular existente), vários→`AMBIGUOUS`,
+ * nenhum→`READY_TO_CREATE` (há determinante+matriz) ou `NO_MATCH` (faltam dados).
+ */
+export const classifyAcgihExamPreview = (params: {
+  alreadyLinked: { examId: number; examName: string | null } | null;
+  indicator: AcgihIndicatorSnapshot;
+  outcome: AcgihExamMatchOutcome;
+}): AcgihExamPreviewResult => {
+  const { alreadyLinked, indicator, outcome } = params;
+
+  if (alreadyLinked) {
+    return {
+      status: 'LINKED',
+      examId: alreadyLinked.examId,
+      examName: alreadyLinked.examName ?? undefined,
+    };
+  }
+
+  if (outcome.kind === 'matched') {
+    return {
+      status: 'NOT_LINKED',
+      examId: outcome.match.examId,
+      examName: outcome.match.examName,
+    };
+  }
+
+  if (outcome.kind === 'ambiguous') {
+    return { status: 'AMBIGUOUS', candidates: outcome.candidates };
+  }
+
+  const hasDeterminant = !!indicator.determinant?.trim();
+  const hasMatrix = !!indicator.matrix?.trim();
+  if (hasDeterminant && hasMatrix) {
+    return {
+      status: 'READY_TO_CREATE',
+      suggestedExamName: buildAcgihExamName(
+        indicator.determinant,
+        indicator.matrix,
+      ),
+    };
+  }
+
+  return {
+    status: 'NO_MATCH',
+    reason: !hasDeterminant ? 'MISSING_DETERMINANT' : 'MISSING_MATRIX',
+  };
+};

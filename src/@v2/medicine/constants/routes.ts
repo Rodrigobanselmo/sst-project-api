@@ -29,6 +29,10 @@ export const MedicineRoutes = {
     // indicadores oficiais ACGIH/BEI (pré-requisito do sync da Biblioteca).
     // MASTER-only. Não cria exame, regra da Biblioteca nem ExamToRisk.
     ACGIH_EXAM_LINK_SYNC: 'acgih-exam-links/sync',
+    // Estado consolidado (read-only) de exame por indicador ACGIH/BEI.
+    ACGIH_EXAM_LINK_PREVIEW: 'acgih-exam-links/preview',
+    // Resolução em lote: vincula candidatos seguros e cria exame quando faltar.
+    ACGIH_EXAM_LINK_RESOLVE: 'acgih-exam-links/resolve',
     RISK_LINKS: {
       CONFIRM: 'risk-links/:id/confirm',
       REJECT: 'risk-links/:id/reject',

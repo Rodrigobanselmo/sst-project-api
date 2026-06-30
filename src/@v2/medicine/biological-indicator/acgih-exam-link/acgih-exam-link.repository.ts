@@ -3,6 +3,8 @@ import {
   BiologicalIndicatorMatchConfidenceEnum,
   BiologicalIndicatorMatchMethodEnum,
   BiologicalNormativeSourceEnum,
+  ExamTypeEnum,
+  StatusEnum,
 } from '@prisma/client';
 
 import { PrismaService } from '@/prisma/prisma.service';
@@ -15,12 +17,21 @@ import {
 
 export type AcgihOfficialIndicatorRow = {
   id: string;
+  acgihBeiIndicatorId: string | null;
   substanceName: string;
   biologicalIndicatorOriginal: string;
   biologicalIndicatorNormalized: string;
   biologicalMatrix: string;
   casPrimary: string | null;
-  examLinks: Array<{ examId: number; deleted_at: Date | null }>;
+  examLinks: Array<{
+    examId: number;
+    deleted_at: Date | null;
+    examName: string | null;
+  }>;
+  riskLinks: Array<{
+    riskFactorId: string;
+    riskName: string | null;
+  }>;
 };
 
 /**
@@ -32,7 +43,7 @@ export type AcgihOfficialIndicatorRow = {
 export class AcgihExamLinkRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  /** Indicadores oficiais ACGIH/BEI com seus vínculos de exame ativos. */
+  /** Indicadores oficiais ACGIH/BEI com seus vínculos de exame e de risco. */
   async findAcgihOfficialIndicators(): Promise<AcgihOfficialIndicatorRow[]> {
     const rows = await this.prisma.occupationalBiologicalIndicator.findMany({
       where: {
@@ -41,6 +52,7 @@ export class AcgihExamLinkRepository {
       },
       select: {
         id: true,
+        acgihBeiIndicatorId: true,
         substanceName: true,
         biologicalIndicatorOriginal: true,
         biologicalIndicatorNormalized: true,
@@ -48,12 +60,43 @@ export class AcgihExamLinkRepository {
         casPrimary: true,
         examLinks: {
           where: { deleted_at: null },
-          select: { examId: true, deleted_at: true },
+          select: {
+            examId: true,
+            deleted_at: true,
+            examNameSnapshot: true,
+            exam: { select: { name: true } },
+          },
+        },
+        riskLinks: {
+          where: { deleted_at: null },
+          select: {
+            riskFactorId: true,
+            riskNameSnapshot: true,
+            riskFactor: { select: { name: true } },
+          },
         },
       },
       orderBy: [{ substanceName: 'asc' }, { id: 'asc' }],
     });
-    return rows;
+
+    return rows.map((row) => ({
+      id: row.id,
+      acgihBeiIndicatorId: row.acgihBeiIndicatorId,
+      substanceName: row.substanceName,
+      biologicalIndicatorOriginal: row.biologicalIndicatorOriginal,
+      biologicalIndicatorNormalized: row.biologicalIndicatorNormalized,
+      biologicalMatrix: row.biologicalMatrix,
+      casPrimary: row.casPrimary,
+      examLinks: row.examLinks.map((link) => ({
+        examId: link.examId,
+        deleted_at: link.deleted_at,
+        examName: link.exam?.name ?? link.examNameSnapshot ?? null,
+      })),
+      riskLinks: row.riskLinks.map((link) => ({
+        riskFactorId: link.riskFactorId,
+        riskName: link.riskFactor?.name ?? link.riskNameSnapshot ?? null,
+      })),
+    }));
   }
 
   /** Catálogo sistêmico SimpleSST (exames system + companyId SimpleSST). */
@@ -101,6 +144,34 @@ export class AcgihExamLinkRepository {
       examName: r.exam?.name ?? r.examNameSnapshot ?? '',
       examMaterial: r.exam?.material ?? null,
     }));
+  }
+
+  /**
+   * Cria um exame sistêmico SimpleSST a partir do indicador ACGIH/BEI. Sem
+   * origem dedicada no schema → usa system=true/companyId=SimpleSST e registra a
+   * proveniência ACGIH/BEI em `obsProc` (rastreável, sem migration).
+   */
+  async createSystemExam(params: {
+    name: string;
+    material: string | null;
+    obsProc: string;
+  }): Promise<AcgihExamCatalogEntry> {
+    const created = await this.prisma.exam.create({
+      data: {
+        name: params.name,
+        companyId: simpleCompanyId,
+        material: params.material,
+        analyses: params.name,
+        type: ExamTypeEnum.LAB,
+        system: true,
+        isAttendance: false,
+        isAvaliation: false,
+        status: StatusEnum.ACTIVE,
+        obsProc: params.obsProc,
+      },
+      select: { id: true, name: true, material: true, esocial27Code: true },
+    });
+    return created;
   }
 
   /** Vínculo indicador→exame ativo já existente (idempotência). */
