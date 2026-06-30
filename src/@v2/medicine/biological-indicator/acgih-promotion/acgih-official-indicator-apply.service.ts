@@ -161,7 +161,10 @@ export class AcgihOfficialIndicatorApplyService {
       }
 
       results.push(
-        await this.promoteOne(item.proposedOfficialPayload, params.userId),
+        await this.createOfficialDraftFromPayload(
+          item.proposedOfficialPayload,
+          params.userId,
+        ),
       );
     }
 
@@ -182,11 +185,25 @@ export class AcgihOfficialIndicatorApplyService {
    * item é proposital: no Postgres, uma violação de unicidade (P2002) aborta a
    * transação corrente; isolando, uma corrida em um item não invalida os demais
    * e o P2002 é convertido em `skipped` (idempotência).
+   *
+   * Público para reuso pela consolidação completa dos 65 ACGIH/BEI (mesma regra
+   * de criação 4P.2). Inclui a defesa de campos obrigatórios: payload incompleto
+   * vira `blocked` em vez de estourar no INSERT.
    */
-  private async promoteOne(
+  async createOfficialDraftFromPayload(
     payload: ProposedOfficialIndicatorPayload,
     userId: number,
   ): Promise<AcgihPromotionApplyItemResult> {
+    const missing = this.findMissingRequiredFields(payload);
+    if (missing.length) {
+      return {
+        acgihBeiIndicatorId: payload.acgihBeiIndicatorId,
+        status: 'blocked',
+        reason: `Campos obrigatórios ausentes: ${missing.join(', ')}.`,
+        blockers: missing.map((f) => `MISSING_${f}`),
+      };
+    }
+
     const reviewNotes = this.buildAuditNote(userId);
     try {
       const created = await this.prisma.$transaction(async (tx) => {

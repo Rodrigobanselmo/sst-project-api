@@ -29,6 +29,8 @@ import { AcgihRiskCorrelationRepository } from './biological-indicator/acgih-ris
 import { AcgihRiskCorrelationService } from './biological-indicator/acgih-risk-correlation/acgih-risk-correlation.service';
 import { AcgihRiskCorrelationApplyController } from './biological-indicator/acgih-risk-correlation/acgih-risk-correlation-apply.controller';
 import { AcgihRiskCorrelationApplyService } from './biological-indicator/acgih-risk-correlation/acgih-risk-correlation-apply.service';
+import { AcgihRiskCorrelationConsolidateController } from './biological-indicator/acgih-risk-correlation/acgih-risk-correlation-consolidate.controller';
+import { AcgihRiskCorrelationConsolidateService } from './biological-indicator/acgih-risk-correlation/acgih-risk-correlation-consolidate.service';
 import { BiologicalIndicatorApplicationController } from './biological-indicator/application/application/biological-indicator-application.controller';
 import { BiologicalIndicatorCurationController } from './biological-indicator/application/curation/biological-indicator-curation.controller';
 import { BiologicalIndicatorMaintenanceController } from './biological-indicator/application/maintenance/biological-indicator-maintenance.controller';
@@ -71,6 +73,7 @@ import { ExamRiskRuleReferenceService } from './exam-risk-rule-reference/exam-ri
     AcgihOfficialIndicatorApplyController,
     AcgihRiskCorrelationController,
     AcgihRiskCorrelationApplyController,
+    AcgihRiskCorrelationConsolidateController,
   ],
   providers: [
     BiologicalIndicatorDAO,
@@ -119,6 +122,7 @@ import { ExamRiskRuleReferenceService } from './exam-risk-rule-reference/exam-ri
     AcgihRiskCorrelationRepository,
     AcgihRiskCorrelationService,
     AcgihRiskCorrelationApplyService,
+    AcgihRiskCorrelationConsolidateService,
     // Leitura apenas do catálogo oficial da Tabela 27 (não altera eSocial).
     FindAllTable27Service,
     ESocial27TableRepository,

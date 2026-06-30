@@ -8,7 +8,10 @@ import {
   normalizeText,
 } from '../../acgih-bei-comparison/acgih-bei-comparison.util';
 import { AcgihBeiComparisonService } from '../../acgih-bei-comparison/acgih-bei-comparison.service';
-import { buildProposedOfficialPayload } from './acgih-official-indicator-preview.mapper';
+import {
+  buildProposedOfficialPayload,
+  ProposedOfficialIndicatorPayload,
+} from './acgih-official-indicator-preview.mapper';
 import { AcgihOfficialIndicatorPreviewRepository } from './acgih-official-indicator-preview.repository';
 import {
   AcgihPromotionEligibilityStatus,
@@ -170,6 +173,48 @@ export class AcgihOfficialIndicatorPreviewService {
         mappedMoment,
       });
     });
+  }
+
+  /**
+   * Consolidação completa — calcula o payload proposto de indicador oficial para
+   * TODOS os itens ACGIH/BEI (os "65"), SEM o recorte por tier do preview de
+   * promoção (4P.1B/4P.2A só inclui NO_MATCH_CONFIRMED / REAL_DIVERGENCE).
+   *
+   * Reaproveita exatamente o mesmo mapper (buildProposedOfficialPayload) e o
+   * mesmo mapeamento de momento (mapCollectionMoment) da promoção 4P.2, para não
+   * divergir a regra de criação. Somente leitura; nenhuma escrita aqui.
+   */
+  async computeProposedPayloadsByAcgihId(): Promise<
+    Map<string, ProposedOfficialIndicatorPayload>
+  > {
+    const rows = await this.comparisonService.computeAll();
+
+    const acgihRecords = await this.repository.findAcgihIndicatorsByIds(
+      rows.map((r) => r.acgihBeiId),
+    );
+    const enrichmentById = new Map<string, AcgihSourceEnrichment>(
+      acgihRecords.map((r) => [
+        r.id,
+        {
+          notation: r.notation ?? null,
+          referenceYear: r.referenceYear ?? null,
+          sourceYear: r.sourceYear ?? null,
+          sourcePage: r.sourcePage ?? null,
+          substanceNameNormalized: r.substanceNameNormalized ?? null,
+        },
+      ]),
+    );
+
+    const map = new Map<string, ProposedOfficialIndicatorPayload>();
+    for (const row of rows) {
+      const enrichment = enrichmentById.get(row.acgihBeiId) ?? null;
+      const mappedMoment = mapCollectionMoment(row.samplingTime);
+      map.set(
+        row.acgihBeiId,
+        buildProposedOfficialPayload({ row, enrichment, mappedMoment }),
+      );
+    }
+    return map;
   }
 
   async preview(

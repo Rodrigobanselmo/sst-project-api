@@ -20,6 +20,11 @@ export const MedicineRoutes = {
     // Frente A.3 — apply seguro (escrita controlada) da correlação ACGIH/BEI ×
     // Fatores de Risco. Cria APENAS BiologicalIndicatorToRisk. MASTER-only.
     ACGIH_RISK_CORRELATION_APPLY: 'acgih-risk-correlation/apply',
+    // Fix — consolidação completa: promove TODOS os ACGIH/BEI da correlação (os
+    // 65) a OccupationalBiologicalIndicator, sem o recorte por tier da 4P.2.
+    // Cria APENAS OccupationalBiologicalIndicator. MASTER-only.
+    ACGIH_RISK_CORRELATION_CONSOLIDATE:
+      'acgih-risk-correlation/consolidate-official-indicators',
     RISK_LINKS: {
       CONFIRM: 'risk-links/:id/confirm',
       REJECT: 'risk-links/:id/reject',
