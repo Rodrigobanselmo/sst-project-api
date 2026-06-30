@@ -25,6 +25,10 @@ export const MedicineRoutes = {
     // Cria APENAS OccupationalBiologicalIndicator. MASTER-only.
     ACGIH_RISK_CORRELATION_CONSOLIDATE:
       'acgih-risk-correlation/consolidate-official-indicators',
+    // Vínculo ACGIH/BEI → Exame: cria APENAS BiologicalIndicatorToExam para os
+    // indicadores oficiais ACGIH/BEI (pré-requisito do sync da Biblioteca).
+    // MASTER-only. Não cria exame, regra da Biblioteca nem ExamToRisk.
+    ACGIH_EXAM_LINK_SYNC: 'acgih-exam-links/sync',
     RISK_LINKS: {
       CONFIRM: 'risk-links/:id/confirm',
       REJECT: 'risk-links/:id/reject',
