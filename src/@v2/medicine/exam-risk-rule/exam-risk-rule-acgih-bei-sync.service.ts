@@ -117,11 +117,16 @@ export class ExamRiskRuleAcgihBeiSyncService {
       const defaultExam = this.resolveDefaultExamLink(indicator);
 
       if (!defaultExam) {
+        const hasUnconfirmedExam = indicator.examLinks.some(
+          (l) => !l.deleted_at && !l.isConfirmed,
+        );
         items.push({
           indicatorId: indicator.id,
           substanceName: indicator.substanceName,
           action: 'blocked',
-          reason: 'Sem exame vinculado ao indicador ACGIH/BEI',
+          reason: hasUnconfirmedExam
+            ? 'Exame vinculado pendente de confirmação (isConfirmed=false)'
+            : 'Sem exame vinculado ao indicador ACGIH/BEI',
         });
         continue;
       }

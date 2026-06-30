@@ -200,6 +200,7 @@ export const buildAcgihExamName = (
 
 export type AcgihExamPreviewStatus =
   | 'LINKED'
+  | 'LINKED_PENDING_CONFIRMATION'
   | 'NOT_LINKED'
   | 'AMBIGUOUS'
   | 'NO_MATCH'
@@ -216,18 +217,33 @@ export type AcgihExamPreviewResult = {
 
 /**
  * Classifica o estado de exame de um indicador ACGIH/BEI para a tela de
- * curadoria (read-only). `LINKED` quando já há vínculo; senão, deriva do
- * matcher: único→`NOT_LINKED` (vincular existente), vários→`AMBIGUOUS`,
- * nenhum→`READY_TO_CREATE` (há determinante+matriz) ou `NO_MATCH` (faltam dados).
+ * curadoria (read-only). `LINKED` apenas quando o vínculo está confirmado
+ * (mesmo critério do sync da Biblioteca). Vínculo ativo não confirmado vira
+ * `LINKED_PENDING_CONFIRMATION`. Sem vínculo, deriva do matcher.
  */
 export const classifyAcgihExamPreview = (params: {
-  alreadyLinked: { examId: number; examName: string | null } | null;
+  alreadyLinked: {
+    examId: number;
+    examName: string | null;
+    isConfirmed: boolean;
+    requiresReview?: boolean;
+  } | null;
   indicator: AcgihIndicatorSnapshot;
   outcome: AcgihExamMatchOutcome;
 }): AcgihExamPreviewResult => {
   const { alreadyLinked, indicator, outcome } = params;
 
   if (alreadyLinked) {
+    if (!alreadyLinked.isConfirmed) {
+      return {
+        status: 'LINKED_PENDING_CONFIRMATION',
+        examId: alreadyLinked.examId,
+        examName: alreadyLinked.examName ?? undefined,
+        reason:
+          'Vínculo de exame aguarda confirmação manual antes do sync da Biblioteca.',
+      };
+    }
+
     return {
       status: 'LINKED',
       examId: alreadyLinked.examId,

@@ -28,6 +28,8 @@ type IndicatorRow = {
     examId: number;
     deleted_at: Date | null;
     examName: string | null;
+    isConfirmed?: boolean;
+    requiresReview?: boolean;
   }>;
   riskLinks: Array<{ riskFactorId: string; riskName: string | null }>;
 };
@@ -343,13 +345,27 @@ describe('classifyAcgihExamPreview', () => {
     matrix: 'urina',
   };
 
-  it('retorna LINKED quando já vinculado', () => {
+  it('retorna LINKED quando já vinculado e confirmado', () => {
     const r = classifyAcgihExamPreview({
-      alreadyLinked: { examId: 1, examName: 'Exame A' },
+      alreadyLinked: { examId: 1, examName: 'Exame A', isConfirmed: true },
       indicator: snap,
       outcome: { kind: 'none' },
     });
     expect(r.status).toBe('LINKED');
+  });
+
+  it('retorna LINKED_PENDING_CONFIRMATION quando vínculo não confirmado', () => {
+    const r = classifyAcgihExamPreview({
+      alreadyLinked: {
+        examId: 1,
+        examName: 'Exame A',
+        isConfirmed: false,
+        requiresReview: true,
+      },
+      indicator: snap,
+      outcome: { kind: 'none' },
+    });
+    expect(r.status).toBe('LINKED_PENDING_CONFIRMATION');
   });
 
   it('retorna READY_TO_CREATE quando sem match mas com dados', () => {
@@ -386,7 +402,13 @@ describe('AcgihExamLinkService.preview', () => {
           biologicalIndicatorOriginal: 'Fluoreto urinário',
           biologicalIndicatorNormalized: 'fluoreto urinario',
           examLinks: [
-            { examId: 5, deleted_at: null, examName: 'Fluoreto na urina' },
+            {
+              examId: 5,
+              deleted_at: null,
+              examName: 'Fluoreto na urina',
+              isConfirmed: true,
+              requiresReview: false,
+            },
           ],
         }),
       ],
@@ -400,6 +422,29 @@ describe('AcgihExamLinkService.preview', () => {
     expect(res.totals.linked).toBe(1);
     expect(res.items[0].examLink.status).toBe('NOT_LINKED');
     expect(res.items[1].examLink.status).toBe('LINKED');
+  });
+
+  it('conta vínculo não confirmado como pendente de confirmação', async () => {
+    const repo = buildRepo({
+      indicators: [
+        indicator({
+          examLinks: [
+            {
+              examId: 5,
+              deleted_at: null,
+              examName: 'Exame parcial',
+              isConfirmed: false,
+              requiresReview: true,
+            },
+          ],
+        }),
+      ],
+    });
+    const service = new AcgihExamLinkService(repo as never);
+    const res = await service.preview();
+    expect(res.totals.linked).toBe(0);
+    expect(res.totals.linkedPendingConfirmation).toBe(1);
+    expect(res.items[0].examLink.status).toBe('LINKED_PENDING_CONFIRMATION');
   });
 });
 

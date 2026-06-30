@@ -78,6 +78,7 @@ export type AcgihExamPreviewItem = {
 export type AcgihExamPreviewTotals = {
   indicators: number;
   linked: number;
+  linkedPendingConfirmation: number;
   notLinked: number;
   ambiguous: number;
   readyToCreate: number;
@@ -295,7 +296,12 @@ export class AcgihExamLinkService {
 
       const examLink = classifyAcgihExamPreview({
         alreadyLinked: activeLink
-          ? { examId: activeLink.examId, examName: activeLink.examName }
+          ? {
+              examId: activeLink.examId,
+              examName: activeLink.examName,
+              isConfirmed: activeLink.isConfirmed,
+              requiresReview: activeLink.requiresReview,
+            }
           : null,
         indicator: snapshot,
         outcome,
@@ -320,6 +326,9 @@ export class AcgihExamLinkService {
       totals: {
         indicators: items.length,
         linked: items.filter((i) => i.examLink.status === 'LINKED').length,
+        linkedPendingConfirmation: items.filter(
+          (i) => i.examLink.status === 'LINKED_PENDING_CONFIRMATION',
+        ).length,
         notLinked: items.filter((i) => i.examLink.status === 'NOT_LINKED')
           .length,
         ambiguous: items.filter((i) => i.examLink.status === 'AMBIGUOUS').length,

@@ -175,6 +175,38 @@ describe('ExamRiskRuleAcgihBeiSyncService', () => {
     });
   });
 
+  it('bloqueia com motivo específico quando há exame não confirmado', async () => {
+    const { service, ruleRepo } = buildCtx([
+      acgihFixture({
+        examLinks: [
+          {
+            id: 'el-1',
+            examId: 99,
+            deleted_at: null,
+            isConfirmed: false,
+            isDefault: true,
+            examNameSnapshot: '2,5-heptanodiona',
+            exam: {
+              id: 99,
+              name: '2,5-heptanodiona urinária',
+              system: true,
+              deleted_at: null,
+            },
+          },
+        ],
+      }),
+    ]);
+
+    const res = await service.sync({ userId: 1 });
+
+    expect(ruleRepo.create).not.toHaveBeenCalled();
+    expect(res.totals.blocked).toBe(1);
+    expect(res.items[0]).toMatchObject({
+      action: 'blocked',
+      reason: 'Exame vinculado pendente de confirmação (isConfirmed=false)',
+    });
+  });
+
   it('bloqueia quando não há vínculo de risco confirmado', async () => {
     const { service, ruleRepo } = buildCtx([
       acgihFixture({ riskLinks: [] }),

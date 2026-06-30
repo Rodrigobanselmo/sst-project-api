@@ -27,6 +27,8 @@ export type AcgihOfficialIndicatorRow = {
     examId: number;
     deleted_at: Date | null;
     examName: string | null;
+    isConfirmed: boolean;
+    requiresReview: boolean;
   }>;
   riskLinks: Array<{
     riskFactorId: string;
@@ -63,6 +65,8 @@ export class AcgihExamLinkRepository {
           select: {
             examId: true,
             deleted_at: true,
+            isConfirmed: true,
+            requiresReview: true,
             examNameSnapshot: true,
             exam: { select: { name: true } },
           },
@@ -91,6 +95,8 @@ export class AcgihExamLinkRepository {
         examId: link.examId,
         deleted_at: link.deleted_at,
         examName: link.exam?.name ?? link.examNameSnapshot ?? null,
+        isConfirmed: link.isConfirmed,
+        requiresReview: link.requiresReview,
       })),
       riskLinks: row.riskLinks.map((link) => ({
         riskFactorId: link.riskFactorId,
