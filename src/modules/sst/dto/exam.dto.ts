@@ -171,6 +171,17 @@ export class FindExamDto extends PaginationQueryDto {
   @IsString()
   @IsOptional()
   agentName?: string;
+
+  // Consolidated ACGIH/BEI recommendation path (riskFactor → indicator → exam).
+  // Optional and backward-compatible: when a riskFactorId is provided alongside
+  // includeIncompatible=false, the recommended set also includes exams reached
+  // through confirmed BiologicalIndicatorToRisk → BiologicalIndicatorToExam
+  // links. This resolves group/isomer agents (e.g. "Heptano, todos os isômeros"
+  // vs the "n-Heptano" indicator) where CAS/name matching alone fails. Not an
+  // Exam column, so it is skipped by prismaFilter.
+  @IsString()
+  @IsOptional()
+  riskFactorId?: string;
 }
 
 export class FindExamHierarchyDto {

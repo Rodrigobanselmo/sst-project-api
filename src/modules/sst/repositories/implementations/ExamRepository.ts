@@ -14,6 +14,8 @@ import {
   buildExamOrderBy,
   buildExamOriginConstraint,
   buildRiskApplicabilityConstraint,
+  buildRiskIndicatorExamWhere,
+  buildRiskIndicatorLinkWhere,
   mergeRecommendedExamIds,
   resolveExamOrigin,
   shouldApplyAgentFilter,
@@ -91,6 +93,7 @@ export class ExamRepository {
         'includeIncompatible',
         'agentCas',
         'agentName',
+        'riskFactorId',
       ],
     });
 
@@ -143,11 +146,16 @@ export class ExamRepository {
     const agentNameNormalized = extra.withOrigin
       ? normalizeAgentName(query.agentName)
       : null;
+    // Consolidated ACGIH/BEI path is keyed by the selected company risk factor.
+    // It is only honored when origin metadata is requested (company exam picker).
+    const riskFactorId =
+      extra.withOrigin && query.riskFactorId ? query.riskFactorId : null;
     const applyAgentFilter = shouldApplyAgentFilter(
       extra.withOrigin,
       query.includeIncompatible,
       agentCasNormalized,
       agentNameNormalized,
+      riskFactorId,
     );
 
     let agentRecommendationConstraint: Prisma.ExamWhereInput | null = null;
@@ -195,9 +203,17 @@ export class ExamRepository {
         )
         .map((link) => link.examId);
 
+      // Consolidated ACGIH/BEI path: riskFactorId → confirmed indicator→risk
+      // links → confirmed indicator→exam links. Independent of CAS/name, so it
+      // resolves group/isomer agents. Confirmed-only on both hops (user rule).
+      const riskFactorExamIds = riskFactorId
+        ? await this.findRiskFactorRecommendedExamIds(riskFactorId)
+        : [];
+
       const recommendedExamIds = mergeRecommendedExamIds(
         libraryExamIds,
         indicatorExamIds,
+        riskFactorExamIds,
       );
       // Empty recommendation set still applies: never fall back to the broad
       // catalog. `{ id: { in: [] } }` yields an empty page with count 0.
@@ -261,6 +277,35 @@ export class ExamRepository {
       count: response[0],
       ...(agentFilter ? { agentFilter } : {}),
     };
+  }
+
+  /**
+   * Resolves exam ids recommended for a company risk factor through the
+   * consolidated ACGIH/BEI bridge: `BiologicalIndicatorToRisk.riskFactorId` →
+   * indicator → `BiologicalIndicatorToExam.examId`. Read-only. Both hops require
+   * active (not deleted) and confirmed links. Returns [] when the risk factor
+   * has no confirmed indicator links, so the recommendation set stays empty
+   * rather than falling back to the broad catalog.
+   */
+  private async findRiskFactorRecommendedExamIds(
+    riskFactorId: string,
+  ): Promise<number[]> {
+    const riskLinks = await this.prisma.biologicalIndicatorToRisk.findMany({
+      where: buildRiskIndicatorLinkWhere(riskFactorId),
+      select: { indicatorId: true },
+    });
+
+    const indicatorIds = Array.from(
+      new Set(riskLinks.map((link) => link.indicatorId)),
+    );
+    if (indicatorIds.length === 0) return [];
+
+    const examLinks = await this.prisma.biologicalIndicatorToExam.findMany({
+      where: buildRiskIndicatorExamWhere(indicatorIds),
+      select: { examId: true },
+    });
+
+    return examLinks.map((link) => link.examId);
   }
 
   private async getNr07ExamIds(): Promise<Set<number>> {

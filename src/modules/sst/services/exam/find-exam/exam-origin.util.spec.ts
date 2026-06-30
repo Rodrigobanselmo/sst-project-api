@@ -12,6 +12,8 @@ import {
   buildAgentLibraryWhere,
   buildExamOrderBy,
   buildExamOriginConstraint,
+  buildRiskIndicatorExamWhere,
+  buildRiskIndicatorLinkWhere,
   ExamOriginEnum,
   mergeRecommendedExamIds,
   resolveExamOrigin,
@@ -139,6 +141,40 @@ describe('shouldApplyAgentFilter', () => {
   it('não aplica sem agente (CAS e nome ausentes)', () => {
     expect(shouldApplyAgentFilter(true, false, null, null)).toBe(false);
   });
+
+  it('aplica quando só há riskFactorId (sem CAS/nome) — caminho consolidado', () => {
+    expect(shouldApplyAgentFilter(true, false, null, null, 'rf-1')).toBe(true);
+  });
+
+  it('não aplica riskFactorId quando includeIncompatible=true (catálogo amplo)', () => {
+    expect(shouldApplyAgentFilter(true, true, null, null, 'rf-1')).toBe(false);
+  });
+
+  it('não aplica riskFactorId sem withOrigin', () => {
+    expect(shouldApplyAgentFilter(false, false, null, null, 'rf-1')).toBe(false);
+  });
+});
+
+describe('buildRiskIndicatorLinkWhere', () => {
+  it('exige riskFactorId, link ativo, confirmado e indicador não deletado', () => {
+    expect(buildRiskIndicatorLinkWhere('rf-1')).toEqual({
+      riskFactorId: 'rf-1',
+      deleted_at: null,
+      isConfirmed: true,
+      indicator: { deleted_at: null },
+    });
+  });
+});
+
+describe('buildRiskIndicatorExamWhere', () => {
+  it('exige indicadores informados, link ativo, confirmado e indicador não deletado', () => {
+    expect(buildRiskIndicatorExamWhere(['ind-1', 'ind-2'])).toEqual({
+      indicatorId: { in: ['ind-1', 'ind-2'] },
+      deleted_at: null,
+      isConfirmed: true,
+      indicator: { deleted_at: null },
+    });
+  });
 });
 
 describe('buildAgentLibraryWhere', () => {
@@ -221,6 +257,17 @@ describe('mergeRecommendedExamIds', () => {
 
   it('retorna conjunto vazio quando ambas as fontes são vazias', () => {
     expect(mergeRecommendedExamIds([], []).size).toBe(0);
+  });
+
+  it('une as três fontes (Biblioteca + CAS/nome + riskFactorId) deduplicando', () => {
+    const merged = mergeRecommendedExamIds([1, 2], [2, 3], [3, 4]);
+    expect(Array.from(merged).sort((a, b) => a - b)).toEqual([1, 2, 3, 4]);
+    expect(merged.size).toBe(4);
+  });
+
+  it('inclui exame vindo apenas do riskFactorId (grupo/isômero, sem CAS/nome)', () => {
+    const merged = mergeRecommendedExamIds([], [], [99]);
+    expect(Array.from(merged)).toEqual([99]);
   });
 });
 

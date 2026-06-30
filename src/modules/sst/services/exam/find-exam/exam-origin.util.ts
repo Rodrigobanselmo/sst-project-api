@@ -118,10 +118,11 @@ export const shouldApplyAgentFilter = (
   includeIncompatible: boolean | undefined,
   agentCasNormalized: string | null,
   agentNameNormalized: string | null,
+  riskFactorId?: string | null,
 ): boolean =>
   Boolean(withOrigin) &&
   includeIncompatible !== true &&
-  Boolean(agentCasNormalized || agentNameNormalized);
+  Boolean(agentCasNormalized || agentNameNormalized || riskFactorId);
 
 /**
  * Static superset filter for Library rules eligible to recommend exams for an
@@ -145,6 +146,38 @@ export const buildAgentIndicatorWhere =
     deleted_at: null,
     indicator: { deleted_at: null },
   });
+
+/**
+ * Filter for the consolidated ACGIH/BEI path: indicator → risk links that bind
+ * a biological indicator to the selected company risk factor. Requires the link
+ * to be active (not deleted), confirmed and backed by a non-deleted indicator.
+ * isConfirmed is enforced because this recommendation is surfaced automatically
+ * to the company without a human review step at selection time.
+ */
+export const buildRiskIndicatorLinkWhere = (
+  riskFactorId: string,
+): Prisma.BiologicalIndicatorToRiskWhereInput => ({
+  riskFactorId,
+  deleted_at: null,
+  isConfirmed: true,
+  indicator: { deleted_at: null },
+});
+
+/**
+ * Filter for the indicator → exam side of the consolidated ACGIH/BEI path,
+ * restricted to a set of indicator ids. Mirrors {@link buildRiskIndicatorLinkWhere}:
+ * active (not deleted), confirmed links over a non-deleted indicator. Exam
+ * status/visibility is enforced downstream by the main exam query, so it is not
+ * re-checked here.
+ */
+export const buildRiskIndicatorExamWhere = (
+  indicatorIds: string[],
+): Prisma.BiologicalIndicatorToExamWhereInput => ({
+  indicatorId: { in: indicatorIds },
+  deleted_at: null,
+  isConfirmed: true,
+  indicator: { deleted_at: null },
+});
 
 /**
  * Matches a Library rule against the requested agent. CAS comparison is done on
@@ -201,11 +234,14 @@ export const agentIndicatorMatches = (
   return false;
 };
 
-/** Unions exam ids from both recommendation sources, de-duplicating. */
+/**
+ * Unions exam ids from every recommendation source, de-duplicating. Sources are
+ * variadic so the consolidated riskFactorId path can be merged alongside the
+ * Library (ACTIVE/AGENT) and CAS/name indicator sources.
+ */
 export const mergeRecommendedExamIds = (
-  libraryExamIds: number[],
-  indicatorExamIds: number[],
-): Set<number> => new Set<number>([...libraryExamIds, ...indicatorExamIds]);
+  ...sources: number[][]
+): Set<number> => new Set<number>(sources.flat());
 
 const SORTABLE_FIELDS = new Set([
   'name',
