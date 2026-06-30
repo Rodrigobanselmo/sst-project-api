@@ -21,6 +21,26 @@ export enum ExamOriginEnum {
 }
 
 /**
+ * Accumulative technical/normative source for a registered exam. Unlike
+ * {@link ExamOriginEnum} (a single legacy bucket kept for retrocompatibility),
+ * an exam can carry several of these at once — e.g. an exam linked to both an
+ * NR-07 and an ACGIH/BEI indicator surfaces ["NR_07", "ACGIH_BEI"]. SYSTEM /
+ * CLIENT / OTHER only appear when there is no specific normative source.
+ */
+export enum ExamOriginSourceEnum {
+  /** Linked to an NR-07 biological indicator. */
+  NR_07 = 'NR_07',
+  /** Linked to an ACGIH/BEI biological indicator. */
+  ACGIH_BEI = 'ACGIH_BEI',
+  /** SimpleSST system catalog exam without a specific normative source. */
+  SYSTEM = 'SYSTEM',
+  /** Exam owned by a client/tenant company. */
+  CLIENT = 'CLIENT',
+  /** Anything else (e.g. system exam from a non-simple company). */
+  OTHER = 'OTHER',
+}
+
+/**
  * Resolves the origin of an exam. Precedence: NR-07 link > System catalog >
  * Client > Other. NR-07 takes priority because provisioned NR-07 exams are also
  * system+simpleCompanyId, but should be surfaced as normative.
@@ -33,6 +53,34 @@ export const resolveExamOrigin = (
   if (exam.system && exam.companyId === simpleCompanyId) return ExamOriginEnum.SYSTEM;
   if (!exam.system) return ExamOriginEnum.CLIENT;
   return ExamOriginEnum.OTHER;
+};
+
+/**
+ * Resolves the accumulative technical/normative sources of an exam. Normative
+ * sources (NR-07, ACGIH/BEI) stack and take precedence in a fixed order
+ * (NR_07 first, then ACGIH_BEI). Only when no normative link exists does the
+ * exam fall back to a single systemic/ownership bucket (SYSTEM / CLIENT /
+ * OTHER), mirroring {@link resolveExamOrigin}. This guarantees:
+ *  - a pure NR-07 exam → ["NR_07"];
+ *  - a pure ACGIH/BEI exam → ["ACGIH_BEI"] (never masked as "SYSTEM");
+ *  - an exam linked to both → ["NR_07", "ACGIH_BEI"] (NR-07 never replaced);
+ *  - a generic catalog exam → ["SYSTEM"].
+ */
+export const resolveExamOriginSources = (
+  exam: { id: number; companyId: string; system: boolean },
+  nr07ExamIds: Set<number>,
+  acgihBeiExamIds: Set<number>,
+): ExamOriginSourceEnum[] => {
+  const sources: ExamOriginSourceEnum[] = [];
+  if (nr07ExamIds.has(exam.id)) sources.push(ExamOriginSourceEnum.NR_07);
+  if (acgihBeiExamIds.has(exam.id)) sources.push(ExamOriginSourceEnum.ACGIH_BEI);
+  if (sources.length > 0) return sources;
+
+  if (exam.system && exam.companyId === simpleCompanyId) {
+    return [ExamOriginSourceEnum.SYSTEM];
+  }
+  if (!exam.system) return [ExamOriginSourceEnum.CLIENT];
+  return [ExamOriginSourceEnum.OTHER];
 };
 
 /**

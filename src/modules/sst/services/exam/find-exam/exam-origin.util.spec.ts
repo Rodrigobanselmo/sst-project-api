@@ -15,8 +15,10 @@ import {
   buildRiskIndicatorExamWhere,
   buildRiskIndicatorLinkWhere,
   ExamOriginEnum,
+  ExamOriginSourceEnum,
   mergeRecommendedExamIds,
   resolveExamOrigin,
+  resolveExamOriginSources,
   shouldApplyAgentFilter,
 } from './exam-origin.util';
 
@@ -63,6 +65,57 @@ describe('resolveExamOrigin', () => {
       new Set<number>(),
     );
     expect(origin).toBe(ExamOriginEnum.OTHER);
+  });
+});
+
+describe('resolveExamOriginSources', () => {
+  const SYSTEM_EXAM = { id: 1, companyId: simpleCompanyId, system: true };
+  const CLIENT_EXAM = { id: 2, companyId: CLIENT_COMPANY, system: false };
+
+  it('exame só com indicador NR-7 → ["NR_07"]', () => {
+    expect(
+      resolveExamOriginSources(SYSTEM_EXAM, new Set([1]), new Set()),
+    ).toEqual([ExamOriginSourceEnum.NR_07]);
+  });
+
+  it('exame só com indicador ACGIH/BEI → ["ACGIH_BEI"] (não vira "SYSTEM")', () => {
+    expect(
+      resolveExamOriginSources(SYSTEM_EXAM, new Set(), new Set([1])),
+    ).toEqual([ExamOriginSourceEnum.ACGIH_BEI]);
+  });
+
+  it('exame com NR-7 + ACGIH/BEI → ["NR_07", "ACGIH_BEI"] (ordem fixa, NR-7 nunca substituído)', () => {
+    expect(
+      resolveExamOriginSources(SYSTEM_EXAM, new Set([1]), new Set([1])),
+    ).toEqual([ExamOriginSourceEnum.NR_07, ExamOriginSourceEnum.ACGIH_BEI]);
+  });
+
+  it('exame sistêmico sem fonte normativa → ["SYSTEM"]', () => {
+    expect(
+      resolveExamOriginSources(SYSTEM_EXAM, new Set(), new Set()),
+    ).toEqual([ExamOriginSourceEnum.SYSTEM]);
+  });
+
+  it('exame da empresa/manual sem fonte normativa → ["CLIENT"]', () => {
+    expect(
+      resolveExamOriginSources(CLIENT_EXAM, new Set(), new Set()),
+    ).toEqual([ExamOriginSourceEnum.CLIENT]);
+  });
+
+  it('exame system de outra empresa sem fonte normativa → ["OTHER"]', () => {
+    expect(
+      resolveExamOriginSources(
+        { id: 3, companyId: CLIENT_COMPANY, system: true },
+        new Set(),
+        new Set(),
+      ),
+    ).toEqual([ExamOriginSourceEnum.OTHER]);
+  });
+
+  it('fonte normativa tem precedência sobre o bucket sistêmico (CLIENT + ACGIH → só ACGIH)', () => {
+    expect(
+      resolveExamOriginSources(CLIENT_EXAM, new Set(), new Set([2])),
+    ).toEqual([ExamOriginSourceEnum.ACGIH_BEI]);
   });
 });
 

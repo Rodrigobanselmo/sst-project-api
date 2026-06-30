@@ -21,6 +21,7 @@ export class FindExamService {
       data: result.data.map((exam) => ({
         ...exam,
         origin: exam.origin,
+        originSources: exam.originSources,
       })),
       ...('agentFilter' in result && result.agentFilter
         ? { agentFilter: result.agentFilter }

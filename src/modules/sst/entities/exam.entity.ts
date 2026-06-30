@@ -58,6 +58,8 @@ export class ExamEntity implements Exam {
   examToRiskData?: ExamRiskDataEntity[];
   examToRisk?: ExamRiskEntity[];
   origin?: string;
+  /** Accumulative technical/normative sources (ExamOriginSourceEnum[]). */
+  originSources?: string[];
   // origins?: IExamOriginData[];
 
   constructor(partial: Partial<ExamEntity>) {

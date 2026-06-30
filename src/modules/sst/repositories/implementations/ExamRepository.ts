@@ -18,6 +18,7 @@ import {
   buildRiskIndicatorLinkWhere,
   mergeRecommendedExamIds,
   resolveExamOrigin,
+  resolveExamOriginSources,
   shouldApplyAgentFilter,
 } from '../../services/exam/find-exam/exam-origin.util';
 import {
@@ -264,19 +265,60 @@ export class ExamRepository {
       ]);
     }
 
+    // Accumulative technical/normative sources (NR-07 / ACGIH-BEI / ...). The
+    // NR-07 set is reused as-is (preserves the legacy chip); ACGIH/BEI links are
+    // fetched in a single batched query scoped to the current page's exam ids
+    // (no N+1), restricted to active + confirmed links over a non-deleted
+    // indicator. Only computed when origin metadata is requested.
+    const acgihBeiExamIds = extra.withOrigin
+      ? await this.getAcgihBeiExamIds(response[1].map((exam) => exam.id))
+      : new Set<number>();
+
     return {
       data: response[1].map(
         (exam) =>
           new ExamEntity({
             ...(exam as any),
             ...(extra.withOrigin
-              ? { origin: resolveExamOrigin(exam, nr07ExamIds) }
+              ? {
+                  origin: resolveExamOrigin(exam, nr07ExamIds),
+                  originSources: resolveExamOriginSources(
+                    exam,
+                    nr07ExamIds,
+                    acgihBeiExamIds,
+                  ),
+                }
               : {}),
           }),
       ),
       count: response[0],
       ...(agentFilter ? { agentFilter } : {}),
     };
+  }
+
+  /**
+   * Batched lookup of which exams (within the given page) are linked to an
+   * ACGIH/BEI biological indicator. Read-only. Requires active (not deleted)
+   * and confirmed links over a non-deleted indicator, matching the consolidated
+   * recommendation rule. Single query with `examId in (...)` — avoids N+1.
+   */
+  private async getAcgihBeiExamIds(examIds: number[]): Promise<Set<number>> {
+    if (examIds.length === 0) return new Set<number>();
+
+    const links = await this.prisma.biologicalIndicatorToExam.findMany({
+      where: {
+        examId: { in: examIds },
+        deleted_at: null,
+        isConfirmed: true,
+        indicator: {
+          deleted_at: null,
+          normativeSource: BiologicalNormativeSourceEnum.ACGIH_BEI,
+        },
+      },
+      select: { examId: true },
+    });
+
+    return new Set(links.map((link) => link.examId));
   }
 
   /**

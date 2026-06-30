@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 
+import { simpleCompanyId } from '../../../../shared/constants/ids';
 import { ExamRepository } from './ExamRepository';
 
 /**
@@ -38,6 +39,10 @@ interface MockData {
   }[];
   /** examId[] linked to NR-07 indicators (origin classification). */
   nr07ExamIds: number[];
+  /** examId[] linked to confirmed ACGIH/BEI indicators (origin enrichment). */
+  acgihBeiExamIds: number[];
+  /** Exam rows returned by the final exam.findMany (origin chips). */
+  examRows: { id: number; companyId: string; system: boolean }[];
 }
 
 const emptyData = (): MockData => ({
@@ -46,17 +51,26 @@ const emptyData = (): MockData => ({
   libraryRules: [],
   casNameIndicatorLinks: [],
   nr07ExamIds: [],
+  acgihBeiExamIds: [],
+  examRows: [],
 });
 
 const buildPrisma = (data: MockData) => {
-  const examFindMany = jest.fn(async (_args?: { where: Where }) => [] as any[]);
-  const examCount = jest.fn(async (_args?: { where: Where }) => 0);
+  const examFindMany = jest.fn(async (_args?: { where: Where }) => data.examRows);
+  const examCount = jest.fn(async (_args?: { where: Where }) => data.examRows.length);
 
   const biologicalIndicatorToExamFindMany = jest.fn(
     async ({ where }: { where: Where }) => {
-      // getNr07ExamIds(): indicator.normativeSource === NR_07
-      if (where?.indicator?.normativeSource) {
+      // getNr07ExamIds(): indicator.normativeSource === NR_07 (whole table).
+      if (where?.indicator?.normativeSource === 'NR_07') {
         return data.nr07ExamIds.map((examId) => ({ examId }));
+      }
+      // getAcgihBeiExamIds(): ACGIH_BEI links batched by page examId in (...).
+      if (where?.indicator?.normativeSource === 'ACGIH_BEI') {
+        const pageIds: number[] = where?.examId?.in ?? [];
+        return data.acgihBeiExamIds
+          .filter((examId) => pageIds.includes(examId))
+          .map((examId) => ({ examId }));
       }
       // riskFactor path: indicator→exam restricted to a set of indicator ids.
       if (where?.indicatorId?.in) {
@@ -86,7 +100,12 @@ const buildPrisma = (data: MockData) => {
     $transaction: (ops: Promise<any>[]) => Promise.all(ops),
   };
 
-  return { prisma, examFindMany, examCount };
+  return {
+    prisma,
+    examFindMany,
+    examCount,
+    biologicalIndicatorToExamFindMany,
+  };
 };
 
 /** Extracts the `{ id: { in } }` recommendation constraint from the exam query. */
@@ -278,5 +297,212 @@ describe('ExamRepository.find — consolidated ACGIH/BEI riskFactorId path', () 
 
     expect((result as any).agentFilter).toBeUndefined();
     expect(prisma.biologicalIndicatorToRisk.findMany).not.toHaveBeenCalled();
+  });
+});
+
+describe('ExamRepository.find — accumulative originSources enrichment', () => {
+  let data: MockData;
+
+  // System catalog exams live under simpleCompanyId — these fall back to SYSTEM
+  // when there is no normative source. A non-simple system company falls back
+  // to OTHER, and a non-system exam to CLIENT.
+  const SYSTEM_COMPANY = simpleCompanyId;
+  const OTHER_COMPANY = '5e9e0335-b7cf-4805-9c7c-1bc637e2bb07';
+
+  beforeEach(() => {
+    data = emptyData();
+  });
+
+  const originSourcesById = (result: any): Record<number, string[]> =>
+    Object.fromEntries(result.data.map((e: any) => [e.id, e.originSources]));
+
+  it('(1) exame só NR-7 → ["NR_07"]', async () => {
+    data.examRows = [{ id: 10, companyId: SYSTEM_COMPANY, system: true }];
+    data.nr07ExamIds = [10];
+    const { prisma } = buildPrisma(data);
+    const repo = new ExamRepository(prisma as any);
+
+    const result = await repo.find(
+      { companyId: COMPANY },
+      { skip: 0, take: 20 },
+      {},
+      { withOrigin: true },
+    );
+
+    expect(originSourcesById(result)[10]).toEqual(['NR_07']);
+  });
+
+  it('(2) exame só ACGIH/BEI → ["ACGIH_BEI"] (não "SYSTEM")', async () => {
+    data.examRows = [{ id: 20, companyId: SYSTEM_COMPANY, system: true }];
+    data.acgihBeiExamIds = [20];
+    const { prisma } = buildPrisma(data);
+    const repo = new ExamRepository(prisma as any);
+
+    const result = await repo.find(
+      { companyId: COMPANY },
+      { skip: 0, take: 20 },
+      {},
+      { withOrigin: true },
+    );
+
+    expect(originSourcesById(result)[20]).toEqual(['ACGIH_BEI']);
+  });
+
+  it('(3) exame com NR-7 + ACGIH/BEI → ["NR_07", "ACGIH_BEI"]', async () => {
+    data.examRows = [{ id: 30, companyId: SYSTEM_COMPANY, system: true }];
+    data.nr07ExamIds = [30];
+    data.acgihBeiExamIds = [30];
+    const { prisma } = buildPrisma(data);
+    const repo = new ExamRepository(prisma as any);
+
+    const result = await repo.find(
+      { companyId: COMPANY },
+      { skip: 0, take: 20 },
+      {},
+      { withOrigin: true },
+    );
+
+    expect(originSourcesById(result)[30]).toEqual(['NR_07', 'ACGIH_BEI']);
+  });
+
+  it('(4) exame system do catálogo sem fonte normativa → ["SYSTEM"]', async () => {
+    data.examRows = [{ id: 40, companyId: SYSTEM_COMPANY, system: true }];
+    const { prisma } = buildPrisma(data);
+    const repo = new ExamRepository(prisma as any);
+
+    const result = await repo.find(
+      { companyId: COMPANY },
+      { skip: 0, take: 20 },
+      {},
+      { withOrigin: true },
+    );
+
+    expect(originSourcesById(result)[40]).toEqual(['SYSTEM']);
+  });
+
+  it('(4b) exame system de empresa não-simple sem fonte normativa → ["OTHER"]', async () => {
+    data.examRows = [{ id: 41, companyId: OTHER_COMPANY, system: true }];
+    const { prisma } = buildPrisma(data);
+    const repo = new ExamRepository(prisma as any);
+
+    const result = await repo.find(
+      { companyId: COMPANY },
+      { skip: 0, take: 20 },
+      {},
+      { withOrigin: true },
+    );
+
+    expect(originSourcesById(result)[41]).toEqual(['OTHER']);
+  });
+
+  it('(5) exame manual/empresa (system=false) preserva origem → ["CLIENT"]', async () => {
+    data.examRows = [{ id: 50, companyId: COMPANY, system: false }];
+    const { prisma } = buildPrisma(data);
+    const repo = new ExamRepository(prisma as any);
+
+    const result = await repo.find(
+      { companyId: COMPANY },
+      { skip: 0, take: 20 },
+      {},
+      { withOrigin: true },
+    );
+
+    expect(originSourcesById(result)[50]).toEqual(['CLIENT']);
+  });
+
+  it('(6/7) vínculo ACGIH/BEI deletado ou não confirmado não conta (where exige isConfirmed + deleted_at null)', async () => {
+    // O mock só devolve ids "confirmados ativos"; aqui simulamos que o exame não
+    // está nesse conjunto → cai no bucket sistêmico, sem chip ACGIH.
+    data.examRows = [{ id: 60, companyId: SYSTEM_COMPANY, system: true }];
+    data.acgihBeiExamIds = []; // nenhum link confirmado/ativo
+    const { prisma, biologicalIndicatorToExamFindMany } = buildPrisma(data);
+    const repo = new ExamRepository(prisma as any);
+
+    const result = await repo.find(
+      { companyId: COMPANY },
+      { skip: 0, take: 20 },
+      {},
+      { withOrigin: true },
+    );
+
+    expect(originSourcesById(result)[60]).toEqual(['SYSTEM']);
+
+    // Confirma o contrato do where do enriquecimento ACGIH/BEI.
+    const acgihCall = biologicalIndicatorToExamFindMany.mock.calls
+      .map((c: any[]) => c[0])
+      .find((args: any) => args?.where?.indicator?.normativeSource === 'ACGIH_BEI');
+    expect(acgihCall.where).toMatchObject({
+      examId: { in: [60] },
+      deleted_at: null,
+      isConfirmed: true,
+      indicator: { deleted_at: null, normativeSource: 'ACGIH_BEI' },
+    });
+  });
+
+  it('(8) sem N+1: a fonte ACGIH/BEI é buscada em uma única query por lote para a página inteira', async () => {
+    data.examRows = [
+      { id: 71, companyId: SYSTEM_COMPANY, system: true },
+      { id: 72, companyId: SYSTEM_COMPANY, system: true },
+      { id: 73, companyId: SYSTEM_COMPANY, system: true },
+    ];
+    data.acgihBeiExamIds = [72];
+    const { prisma, biologicalIndicatorToExamFindMany } = buildPrisma(data);
+    const repo = new ExamRepository(prisma as any);
+
+    const result = await repo.find(
+      { companyId: COMPANY },
+      { skip: 0, take: 20 },
+      {},
+      { withOrigin: true },
+    );
+
+    const acgihCalls = biologicalIndicatorToExamFindMany.mock.calls
+      .map((c: any[]) => c[0])
+      .filter((args: any) => args?.where?.indicator?.normativeSource === 'ACGIH_BEI');
+    expect(acgihCalls).toHaveLength(1);
+    expect(acgihCalls[0].where.examId.in).toEqual([71, 72, 73]);
+
+    const byId = originSourcesById(result);
+    expect(byId[71]).toEqual(['SYSTEM']);
+    expect(byId[72]).toEqual(['ACGIH_BEI']);
+    expect(byId[73]).toEqual(['SYSTEM']);
+  });
+
+  it('(9) não quebra o campo antigo origin (continua presente ao lado de originSources)', async () => {
+    data.examRows = [{ id: 80, companyId: SYSTEM_COMPANY, system: true }];
+    data.nr07ExamIds = [80];
+    const { prisma } = buildPrisma(data);
+    const repo = new ExamRepository(prisma as any);
+
+    const result = await repo.find(
+      { companyId: COMPANY },
+      { skip: 0, take: 20 },
+      {},
+      { withOrigin: true },
+    );
+
+    expect((result.data[0] as any).origin).toBe('NR07');
+    expect((result.data[0] as any).originSources).toEqual(['NR_07']);
+  });
+
+  it('sem withOrigin: não enriquece origin nem originSources (picker de clínica)', async () => {
+    data.examRows = [{ id: 90, companyId: SYSTEM_COMPANY, system: true }];
+    data.acgihBeiExamIds = [90];
+    const { prisma, biologicalIndicatorToExamFindMany } = buildPrisma(data);
+    const repo = new ExamRepository(prisma as any);
+
+    const result = await repo.find(
+      { companyId: COMPANY },
+      { skip: 0, take: 20 },
+      {},
+      {},
+    );
+
+    expect((result.data[0] as any).origin).toBeUndefined();
+    expect((result.data[0] as any).originSources).toBeUndefined();
+    const acgihCalls = biologicalIndicatorToExamFindMany.mock.calls
+      .map((c: any[]) => c[0])
+      .filter((args: any) => args?.where?.indicator?.normativeSource === 'ACGIH_BEI');
+    expect(acgihCalls).toHaveLength(0);
   });
 });
