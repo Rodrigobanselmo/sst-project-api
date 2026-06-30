@@ -254,6 +254,24 @@ export class ExamRiskRuleRepository {
    * Regra NR-07 existente para o mesmo agente (fator de risco) e exame — base
    * para anexar ACGIH/BEI como fonte complementar sem duplicar regra.
    */
+  findAgentRuleByExam(params: {
+    agentNameNormalized: string | null;
+    examId: number;
+  }) {
+    if (!params.agentNameNormalized) return Promise.resolve(null);
+    return this.prisma.pcmsoExamRiskRule.findFirst({
+      where: {
+        deleted_at: null,
+        scope: PcmsoExamRiskRuleScopeEnum.AGENT,
+        agentNameNormalized: params.agentNameNormalized,
+        exams: {
+          some: { deleted_at: null, examId: params.examId },
+        },
+      },
+      include: ruleInclude,
+    });
+  }
+
   findNr07RuleByAgentAndExam(params: {
     agentNameNormalized: string | null;
     examId: number;

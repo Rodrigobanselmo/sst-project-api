@@ -95,6 +95,13 @@ export const MedicineRoutes = {
       STATUS: ':id/status',
     },
   },
+  EXAMS: {
+    ESOCIAL_T27: {
+      BASE: 'v2/exams/esocial-t27',
+      SEARCH: 'search',
+      MATERIALIZE: 'materialize',
+    },
+  },
   ACGIH_BEI_COMPARISON: {
     BASE: 'v2/master/acgih-bei-comparison',
     EXPORT: 'export',

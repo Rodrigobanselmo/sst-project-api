@@ -98,6 +98,11 @@ export class CreateExamsRiskDto {
   @IsDate({ message: 'Data de início inválida' })
   @Type(() => Date)
   startDate: Date;
+
+  @IsOptional()
+  @IsBoolean()
+  @ToBoolean()
+  publishAsSystemRule?: boolean;
 }
 
 export class UpdateExamRiskDto extends PartialType(CreateExamsRiskDto) {

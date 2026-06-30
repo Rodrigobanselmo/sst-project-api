@@ -2,6 +2,7 @@ import { UpsertDocumentDataService } from './services/documentData/upsert-docume
 import { Module, forwardRef } from '@nestjs/common';
 import { DayJSProvider } from '../../shared/providers/DateProvider/implementations/DayJSProvider';
 
+import { MedicineModule } from '@/@v2/medicine/medicine.module';
 import { CompanyModule } from '../company/company.module';
 import { ChecklistController } from './controller/checklist/checklist.controller';
 import { DocumentPgrController } from './controller/doc-version/doc-version.controller';
@@ -251,6 +252,7 @@ import { RiskCatalogEquivalenceModule } from '@/shared/risk-catalog-equivalence/
     forwardRef(() => CompanyModule),
     CacheModule.register(),
     RiskCatalogEquivalenceModule,
+    MedicineModule,
   ],
 })
 export class SSTModule {}

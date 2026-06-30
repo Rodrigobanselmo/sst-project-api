@@ -61,6 +61,9 @@ import { ExamRiskRuleService } from './exam-risk-rule/exam-risk-rule.service';
 import { ExamRiskRuleReferenceController } from './exam-risk-rule-reference/exam-risk-rule-reference.controller';
 import { ExamRiskRuleReferenceRepository } from './exam-risk-rule-reference/exam-risk-rule-reference.repository';
 import { ExamRiskRuleReferenceService } from './exam-risk-rule-reference/exam-risk-rule-reference.service';
+import { EsocialT27ExamController } from './esocial-t27-exam/esocial-t27-exam.controller';
+import { EsocialT27ExamService } from './esocial-t27-exam/esocial-t27-exam.service';
+import { ExamRiskRulePublishFromSelectionService } from './esocial-t27-exam/exam-risk-rule-publish-from-selection.service';
 
 @Module({
   imports: [SharedModule, PrismaModule],
@@ -79,6 +82,7 @@ import { ExamRiskRuleReferenceService } from './exam-risk-rule-reference/exam-ri
     AcgihRiskCorrelationApplyController,
     AcgihRiskCorrelationConsolidateController,
     AcgihExamLinkController,
+    EsocialT27ExamController,
   ],
   providers: [
     BiologicalIndicatorDAO,
@@ -132,9 +136,12 @@ import { ExamRiskRuleReferenceService } from './exam-risk-rule-reference/exam-ri
     // Vínculo ACGIH/BEI → Exame (pré-requisito do sync da Biblioteca).
     AcgihExamLinkRepository,
     AcgihExamLinkService,
+    EsocialT27ExamService,
+    ExamRiskRulePublishFromSelectionService,
     // Leitura apenas do catálogo oficial da Tabela 27 (não altera eSocial).
     FindAllTable27Service,
     ESocial27TableRepository,
   ],
+  exports: [ExamRiskRulePublishFromSelectionService],
 })
 export class MedicineModule {}
