@@ -18,6 +18,11 @@ import {
   matchAcgihIndicatorExam,
 } from './acgih-exam-link.util';
 import {
+  AcgihMatrixSafeReason,
+  countAcgihExamStrongCandidates,
+  isAcgihDeterminantMatrixSafeMatch,
+} from './acgih-exam-matrix-safe.util';
+import {
   materialsAreCompatible,
   scoreNameCompatibility,
 } from '../biological-indicator-exam-provision.util';
@@ -125,6 +130,37 @@ export type AcgihExamResolveResponse = {
   dryRun: boolean;
   totals: AcgihExamResolveTotals;
   items: AcgihExamResolveItemResult[];
+};
+
+export type AcgihExamConfirmSafeAction =
+  | 'confirmed'
+  | 'alreadyConfirmed'
+  | 'skipped'
+  | 'failed';
+
+export type AcgihExamConfirmSafeItemResult = {
+  indicatorId: string;
+  substanceName: string;
+  determinant: string;
+  matrix: string;
+  examId?: number;
+  examName?: string;
+  action: AcgihExamConfirmSafeAction;
+  reason?: AcgihMatrixSafeReason | string;
+};
+
+export type AcgihExamConfirmSafeTotals = {
+  pending: number;
+  confirmed: number;
+  alreadyConfirmed: number;
+  skipped: number;
+  failed: number;
+};
+
+export type AcgihExamConfirmSafeResponse = {
+  dryRun: boolean;
+  totals: AcgihExamConfirmSafeTotals;
+  items: AcgihExamConfirmSafeItemResult[];
 };
 
 const isUniqueViolation = (error: unknown): boolean =>
@@ -454,6 +490,222 @@ export class AcgihExamLinkService {
     }
 
     return { dryRun, totals: this.buildResolveTotals(indicators.length, items), items };
+  }
+
+  /**
+   * Confirma vínculos pendentes que passam na regra segura determinante + matriz
+   * embutida no nome/material do exame. Idempotente; não cria exame, regra da
+   * Biblioteca nem altera risco. Única escrita: BiologicalIndicatorToExam.
+   */
+  async confirmSafePending(params: {
+    userId: number;
+    dryRun?: boolean;
+  }): Promise<AcgihExamConfirmSafeResponse> {
+    const dryRun = params.dryRun === true;
+
+    const [indicators, catalog, nr7ExamLinks] = await Promise.all([
+      this.repository.findAcgihOfficialIndicators(),
+      this.repository.findSystemicCatalog(),
+      this.repository.findNr7ConfirmedExamLinks(),
+    ]);
+
+    const items: AcgihExamConfirmSafeItemResult[] = [];
+
+    for (const indicator of indicators) {
+      const base = {
+        indicatorId: indicator.id,
+        substanceName: indicator.substanceName,
+        determinant: indicator.biologicalIndicatorOriginal,
+        matrix: indicator.biologicalMatrix,
+      };
+
+      const pendingLinks = indicator.examLinks.filter(
+        (l) =>
+          !l.deleted_at &&
+          !l.isConfirmed &&
+          l.requiresReview,
+      );
+
+      if (!pendingLinks.length) continue;
+
+      if (pendingLinks.length > 1) {
+        items.push({
+          ...base,
+          action: 'skipped',
+          reason: 'MULTIPLE_PENDING_LINKS',
+        });
+        continue;
+      }
+
+      const link = pendingLinks[0];
+      const examName = link.examName ?? '';
+      const examMaterial = link.examMaterial;
+
+      if (link.isConfirmed) {
+        items.push({
+          ...base,
+          examId: link.examId,
+          examName: examName || undefined,
+          action: 'alreadyConfirmed',
+          reason: 'ALREADY_CONFIRMED',
+        });
+        continue;
+      }
+
+      if (link.examDeleted || !link.examActive) {
+        items.push({
+          ...base,
+          examId: link.examId,
+          examName: examName || undefined,
+          action: 'skipped',
+          reason: 'EXAM_INACTIVE',
+        });
+        continue;
+      }
+
+      const snapshot = this.toIndicatorSnapshot(indicator);
+      const outcome = matchAcgihIndicatorExam({
+        indicator: snapshot,
+        catalog,
+        nr7ExamLinks,
+      });
+
+      if (outcome.kind === 'ambiguous') {
+        items.push({
+          ...base,
+          examId: link.examId,
+          examName: examName || undefined,
+          action: 'skipped',
+          reason: 'AMBIGUOUS_EXAM_MATCH',
+        });
+        continue;
+      }
+
+      if (
+        outcome.kind === 'matched' &&
+        outcome.match.examId !== link.examId
+      ) {
+        items.push({
+          ...base,
+          examId: link.examId,
+          examName: examName || undefined,
+          action: 'skipped',
+          reason: 'LINKED_EXAM_MISMATCH',
+        });
+        continue;
+      }
+
+      const candidateCount = countAcgihExamStrongCandidates(
+        indicator.biologicalIndicatorOriginal,
+        indicator.biologicalMatrix,
+        catalog,
+      );
+      if (candidateCount > 1) {
+        items.push({
+          ...base,
+          examId: link.examId,
+          examName: examName || undefined,
+          action: 'skipped',
+          reason: 'AMBIGUOUS_CANDIDATES',
+        });
+        continue;
+      }
+
+      const safeEval = isAcgihDeterminantMatrixSafeMatch({
+        determinant: indicator.biologicalIndicatorOriginal,
+        matrix: indicator.biologicalMatrix,
+        examName,
+        examMaterial,
+      });
+
+      if (!safeEval.safe) {
+        items.push({
+          ...base,
+          examId: link.examId,
+          examName: examName || undefined,
+          action: 'skipped',
+          reason: safeEval.reason,
+        });
+        continue;
+      }
+
+      if (dryRun) {
+        items.push({
+          ...base,
+          examId: link.examId,
+          examName: examName || undefined,
+          action: 'confirmed',
+          reason: safeEval.reason,
+        });
+        continue;
+      }
+
+      try {
+        const notes = this.buildSafeConfirmationNotes({
+          existingNotes: link.notes,
+          userId: params.userId,
+          determinant: indicator.biologicalIndicatorOriginal,
+          matrix: indicator.biologicalMatrix,
+          examName,
+        });
+        await this.repository.confirmPendingExamLink({
+          indicatorId: indicator.id,
+          examId: link.examId,
+          userId: params.userId,
+          notes,
+        });
+        items.push({
+          ...base,
+          examId: link.examId,
+          examName: examName || undefined,
+          action: 'confirmed',
+          reason: safeEval.reason,
+        });
+      } catch {
+        items.push({
+          ...base,
+          examId: link.examId,
+          examName: examName || undefined,
+          action: 'failed',
+        });
+      }
+    }
+
+    return {
+      dryRun,
+      totals: this.buildConfirmSafeTotals(items),
+      items,
+    };
+  }
+
+  private buildSafeConfirmationNotes(params: {
+    existingNotes: string | null;
+    userId: number;
+    determinant: string;
+    matrix: string;
+    examName: string;
+  }): string {
+    const stamp = new Date().toISOString();
+    const trace =
+      `Confirmado por regra segura determinante+matriz (frente ACGIH/BEI) em ${stamp} ` +
+      `por usuário ${params.userId}. Determinante: ${params.determinant}. ` +
+      `Matriz: ${params.matrix}. Exame: ${params.examName}.`;
+    return params.existingNotes?.trim()
+      ? `${params.existingNotes.trim()} ${trace}`
+      : trace;
+  }
+
+  private buildConfirmSafeTotals(
+    items: AcgihExamConfirmSafeItemResult[],
+  ): AcgihExamConfirmSafeTotals {
+    return {
+      pending: items.length,
+      confirmed: items.filter((i) => i.action === 'confirmed').length,
+      alreadyConfirmed: items.filter((i) => i.action === 'alreadyConfirmed')
+        .length,
+      skipped: items.filter((i) => i.action === 'skipped').length,
+      failed: items.filter((i) => i.action === 'failed').length,
+    };
   }
 
   /** Vincula a um exame existente (ou simula em dryRun). */

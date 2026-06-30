@@ -5,8 +5,10 @@ import { plainToInstance } from 'class-transformer';
 
 import { AcgihExamLinkService } from './acgih-exam-link.service';
 import {
+  ACGIH_EXAM_LINK_CONFIRM_SAFE_PENDING_TEXT,
   ACGIH_EXAM_LINK_RESOLVE_CONFIRM_TEXT,
   ACGIH_EXAM_LINK_SYNC_CONFIRM_TEXT,
+  AcgihExamLinkConfirmSafePendingBody,
   AcgihExamLinkResolveBody,
   AcgihExamLinkSyncBody,
 } from './acgih-exam-link.dto';
@@ -25,11 +27,16 @@ type IndicatorRow = {
   biologicalMatrix: string;
   casPrimary: string | null;
   examLinks: Array<{
+    id?: string;
     examId: number;
     deleted_at: Date | null;
     examName: string | null;
+    examMaterial?: string | null;
+    examDeleted?: boolean;
+    examActive?: boolean;
     isConfirmed?: boolean;
     requiresReview?: boolean;
+    notes?: string | null;
   }>;
   riskLinks: Array<{ riskFactorId: string; riskName: string | null }>;
 };
@@ -47,6 +54,23 @@ const indicator = (over: Partial<IndicatorRow> = {}): IndicatorRow => ({
   ...over,
 });
 
+const pendingLink = (over: {
+  examId?: number;
+  examName?: string;
+  examMaterial?: string | null;
+} = {}) => ({
+  id: 'link-pending-1',
+  examId: over.examId ?? 42,
+  deleted_at: null,
+  examName: over.examName ?? '1,6 hexametilenodiamina na urina',
+  examMaterial: over.examMaterial ?? 'urina',
+  examDeleted: false,
+  examActive: true,
+  isConfirmed: false,
+  requiresReview: true,
+  notes: 'Vínculo parcial',
+});
+
 const buildRepo = (over: {
   indicators?: IndicatorRow[];
   catalog?: Array<{ id: number; name: string; material: string | null; esocial27Code: string | null }>;
@@ -59,6 +83,7 @@ const buildRepo = (over: {
   }>;
   createExamLink?: jest.Mock;
   createSystemExam?: jest.Mock;
+  confirmPendingExamLink?: jest.Mock;
 } = {}) => {
   const createExamLink =
     over.createExamLink ?? jest.fn().mockResolvedValue({ id: 'link-1' } as never);
@@ -70,6 +95,9 @@ const buildRepo = (over: {
       material: 'urina',
       esocial27Code: null,
     } as never);
+  const confirmPendingExamLink =
+    over.confirmPendingExamLink ??
+    jest.fn().mockResolvedValue({ id: 'link-confirmed' } as never);
   return {
     findAcgihOfficialIndicators: jest
       .fn()
@@ -78,6 +106,7 @@ const buildRepo = (over: {
     findNr7ConfirmedExamLinks: jest.fn().mockResolvedValue((over.nr7 ?? []) as never),
     createExamLink,
     createSystemExam,
+    confirmPendingExamLink,
   };
 };
 
@@ -184,6 +213,33 @@ describe('matchAcgihIndicatorExam', () => {
     expect(outcome.kind).toBe('ambiguous');
     if (outcome.kind === 'ambiguous') {
       expect(outcome.candidates).toHaveLength(2);
+    }
+  });
+
+  it('marca seguro quando determinante + matriz embutida no nome do exame', () => {
+    const outcome = matchAcgihIndicatorExam({
+      indicator: {
+        id: 'i',
+        substanceName: 'HDI',
+        determinant: '1,6-hexametilenodiamina',
+        determinantNormalized: '1,6 hexametilenodiamina',
+        matrix: 'urina',
+      },
+      catalog: [
+        {
+          id: 10,
+          name: '1,6 hexametilenodiamina na urina',
+          material: 'urina',
+          esocial27Code: null,
+        },
+        { id: 11, name: 'Ácido hipúrico', material: 'urina', esocial27Code: null },
+      ],
+      nr7ExamLinks: [],
+    });
+    expect(outcome.kind).toBe('matched');
+    if (outcome.kind === 'matched') {
+      expect(outcome.match.examId).toBe(10);
+      expect(outcome.match.safe).toBe(true);
     }
   });
 });
@@ -535,5 +591,144 @@ describe('AcgihExamLinkService.resolve', () => {
     const res = await service.resolve({ userId: 1, dryRun: false });
     expect(repo.createSystemExam).not.toHaveBeenCalled();
     expect(res.items[0].action).toBe('linkedExistingExam');
+  });
+});
+
+describe('AcgihExamLinkConfirmSafePendingBody (confirmText)', () => {
+  it('aceita confirmText CONFIRMAR EXAMES ACGIH', async () => {
+    const dto = plainToInstance(AcgihExamLinkConfirmSafePendingBody, {
+      confirmText: ACGIH_EXAM_LINK_CONFIRM_SAFE_PENDING_TEXT,
+      dryRun: true,
+    });
+    const errors = await validate(dto);
+    expect(errors).toHaveLength(0);
+  });
+});
+
+describe('AcgihExamLinkService.confirmSafePending', () => {
+  it('dryRun confirma pendente seguro sem escrever', async () => {
+    const repo = buildRepo({
+      indicators: [
+        indicator({
+          substanceName: 'HDI',
+          biologicalIndicatorOriginal: '1,6-hexametilenodiamina',
+          biologicalIndicatorNormalized: '1,6 hexametilenodiamina',
+          examLinks: [pendingLink()],
+        }),
+      ],
+      catalog: [
+        {
+          id: 42,
+          name: '1,6 hexametilenodiamina na urina',
+          material: 'urina',
+          esocial27Code: null,
+        },
+      ],
+    });
+    const service = new AcgihExamLinkService(repo as never);
+    const res = await service.confirmSafePending({ userId: 1, dryRun: true });
+    expect(repo.confirmPendingExamLink).not.toHaveBeenCalled();
+    expect(res.totals.confirmed).toBe(1);
+    expect(res.items[0].action).toBe('confirmed');
+  });
+
+  it('apply real confirma vínculo pendente seguro', async () => {
+    const repo = buildRepo({
+      indicators: [
+        indicator({
+          biologicalIndicatorOriginal: 'Chumbo',
+          biologicalIndicatorNormalized: 'chumbo',
+          biologicalMatrix: 'sangue',
+          examLinks: [
+            pendingLink({
+              examId: 50,
+              examName: 'Chumbo no sangue',
+              examMaterial: 'sangue',
+            }),
+          ],
+        }),
+      ],
+      catalog: [
+        { id: 50, name: 'Chumbo no sangue', material: 'sangue', esocial27Code: null },
+      ],
+    });
+    const service = new AcgihExamLinkService(repo as never);
+    const res = await service.confirmSafePending({ userId: 7, dryRun: false });
+    expect(repo.confirmPendingExamLink).toHaveBeenCalledTimes(1);
+    expect(res.totals.confirmed).toBe(1);
+    const callArg = (repo.confirmPendingExamLink as jest.Mock).mock
+      .calls[0][0] as { notes: string };
+    expect(callArg.notes).toContain('regra segura determinante+matriz');
+    expect(callArg.notes).toContain('usuário 7');
+  });
+
+  it('não confirma exame inativo', async () => {
+    const repo = buildRepo({
+      indicators: [
+        indicator({
+          examLinks: [
+            {
+              ...pendingLink(),
+              examActive: false,
+            },
+          ],
+        }),
+      ],
+      catalog: [
+        {
+          id: 42,
+          name: '1,6 hexametilenodiamina na urina',
+          material: 'urina',
+          esocial27Code: null,
+        },
+      ],
+    });
+    const service = new AcgihExamLinkService(repo as never);
+    const res = await service.confirmSafePending({ userId: 1, dryRun: false });
+    expect(repo.confirmPendingExamLink).not.toHaveBeenCalled();
+    expect(res.items[0].action).toBe('skipped');
+    expect(res.items[0].reason).toBe('EXAM_INACTIVE');
+  });
+
+  it('idempotência: já confirmado não reescreve', async () => {
+    const repo = buildRepo({
+      indicators: [
+        indicator({
+          examLinks: [
+            {
+              ...pendingLink(),
+              isConfirmed: true,
+              requiresReview: false,
+            },
+          ],
+        }),
+      ],
+    });
+    const service = new AcgihExamLinkService(repo as never);
+    const res = await service.confirmSafePending({ userId: 1, dryRun: false });
+    expect(repo.confirmPendingExamLink).not.toHaveBeenCalled();
+    expect(res.totals.confirmed).toBe(0);
+    expect(res.totals.pending).toBe(0);
+  });
+
+  it('não confirma quando matcher é ambíguo', async () => {
+    const repo = buildRepo({
+      indicators: [
+        indicator({
+          biologicalIndicatorOriginal: 'Fenol na urina',
+          examLinks: [
+            pendingLink({ examId: 1, examName: 'Fenol na urina' }),
+          ],
+        }),
+      ],
+      catalog: [
+        { id: 1, name: 'Fenol na urina', material: 'urina', esocial27Code: null },
+        { id: 2, name: 'Fenol na urina', material: 'urina', esocial27Code: null },
+      ],
+    });
+    const service = new AcgihExamLinkService(repo as never);
+    const res = await service.confirmSafePending({ userId: 1, dryRun: false });
+    expect(repo.confirmPendingExamLink).not.toHaveBeenCalled();
+    expect(res.items[0].reason).toBe('AMBIGUOUS_EXAM_MATCH');
   });
 });

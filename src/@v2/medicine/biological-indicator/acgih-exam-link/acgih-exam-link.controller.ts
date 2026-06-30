@@ -10,6 +10,7 @@ import { UserPayloadDto } from '@/shared/dto/user-payload.dto';
 import {
   AcgihExamLinkResolveBody,
   AcgihExamLinkSyncBody,
+  AcgihExamLinkConfirmSafePendingBody,
 } from './acgih-exam-link.dto';
 import { AcgihExamLinkService } from './acgih-exam-link.service';
 
@@ -45,6 +46,17 @@ export class AcgihExamLinkController {
       dryRun: body.dryRun,
       createMissingExams: body.createMissingExams,
       linkSafeMatches: body.linkSafeMatches,
+    });
+  }
+
+  @Post(MedicineRoutes.BIOLOGICAL_INDICATORS.ACGIH_EXAM_LINK_CONFIRM_SAFE_PENDING)
+  confirmSafePending(
+    @Body() body: AcgihExamLinkConfirmSafePendingBody,
+    @User() user: UserPayloadDto,
+  ) {
+    return this.service.confirmSafePending({
+      userId: user.userId,
+      dryRun: body.dryRun,
     });
   }
 }

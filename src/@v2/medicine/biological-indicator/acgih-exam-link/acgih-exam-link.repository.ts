@@ -24,11 +24,16 @@ export type AcgihOfficialIndicatorRow = {
   biologicalMatrix: string;
   casPrimary: string | null;
   examLinks: Array<{
+    id: string;
     examId: number;
     deleted_at: Date | null;
     examName: string | null;
+    examMaterial: string | null;
+    examDeleted: boolean;
+    examActive: boolean;
     isConfirmed: boolean;
     requiresReview: boolean;
+    notes: string | null;
   }>;
   riskLinks: Array<{
     riskFactorId: string;
@@ -63,12 +68,22 @@ export class AcgihExamLinkRepository {
         examLinks: {
           where: { deleted_at: null },
           select: {
+            id: true,
             examId: true,
             deleted_at: true,
             isConfirmed: true,
             requiresReview: true,
+            notes: true,
             examNameSnapshot: true,
-            exam: { select: { name: true } },
+            examMaterialSnapshot: true,
+            exam: {
+              select: {
+                name: true,
+                material: true,
+                deleted_at: true,
+                status: true,
+              },
+            },
           },
         },
         riskLinks: {
@@ -92,11 +107,17 @@ export class AcgihExamLinkRepository {
       biologicalMatrix: row.biologicalMatrix,
       casPrimary: row.casPrimary,
       examLinks: row.examLinks.map((link) => ({
+        id: link.id,
         examId: link.examId,
         deleted_at: link.deleted_at,
         examName: link.exam?.name ?? link.examNameSnapshot ?? null,
+        examMaterial:
+          link.exam?.material ?? link.examMaterialSnapshot ?? null,
+        examDeleted: !!link.exam?.deleted_at,
+        examActive: link.exam?.status === StatusEnum.ACTIVE,
         isConfirmed: link.isConfirmed,
         requiresReview: link.requiresReview,
+        notes: link.notes,
       })),
       riskLinks: row.riskLinks.map((link) => ({
         riskFactorId: link.riskFactorId,
@@ -259,6 +280,31 @@ export class AcgihExamLinkRepository {
         },
         select: { id: true },
       });
+    });
+  }
+
+  /** Confirma vínculo pendente (somente BiologicalIndicatorToExam). */
+  confirmPendingExamLink(params: {
+    indicatorId: string;
+    examId: number;
+    userId: number;
+    notes: string;
+  }) {
+    return this.prisma.biologicalIndicatorToExam.update({
+      where: {
+        indicatorId_examId: {
+          indicatorId: params.indicatorId,
+          examId: params.examId,
+        },
+      },
+      data: {
+        isConfirmed: true,
+        requiresReview: false,
+        confirmedAt: new Date(),
+        confirmedById: params.userId,
+        notes: params.notes,
+      },
+      select: { id: true },
     });
   }
 }

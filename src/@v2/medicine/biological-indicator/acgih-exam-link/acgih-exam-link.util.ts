@@ -8,6 +8,7 @@ import {
   scoreNameCompatibility,
 } from '../biological-indicator-exam-provision.util';
 import { normalizeText } from '../biological-indicator-normalize.util';
+import { isAcgihDeterminantMatrixSafeMatch } from './acgih-exam-matrix-safe.util';
 
 /** Exame sistêmico candidato (catálogo SimpleSST). */
 export type AcgihExamCatalogEntry = {
@@ -151,20 +152,26 @@ export const matchAcgihIndicatorExam = (params: {
 
   const best = scored[0];
   const isExact = best.score >= EXACT_SCORE;
+  const matrixSafe = isAcgihDeterminantMatrixSafeMatch({
+    determinant: indicator.determinant,
+    matrix: indicator.matrix,
+    examName: best.exam.name,
+    examMaterial: best.exam.material,
+  });
+  const safe = isExact || matrixSafe.safe;
   return {
     kind: 'matched',
     match: {
       examId: best.exam.id,
       examName: best.exam.name,
       examMaterial: best.exam.material,
-      matchMethod: isExact
+      matchMethod: safe
         ? BiologicalIndicatorMatchMethodEnum.NAME_EXACT
         : BiologicalIndicatorMatchMethodEnum.NAME_FUZZY,
-      matchConfidence: isExact
+      matchConfidence: safe
         ? BiologicalIndicatorMatchConfidenceEnum.HIGH
         : BiologicalIndicatorMatchConfidenceEnum.PROBABLE,
-      // Seguro apenas no nome exato; parcial entra como vínculo a revisar.
-      safe: isExact,
+      safe,
       reusedFromNr7: false,
     },
   };
