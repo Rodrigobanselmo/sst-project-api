@@ -8,7 +8,10 @@ import {
   scoreNameCompatibility,
 } from '../biological-indicator-exam-provision.util';
 import { normalizeText } from '../biological-indicator-normalize.util';
-import { isAcgihDeterminantMatrixSafeMatch } from './acgih-exam-matrix-safe.util';
+import {
+  isAcgihDeterminantMatrixSafeMatch,
+  listAcgihExamStrongCandidates,
+} from './acgih-exam-matrix-safe.util';
 
 /** Exame sistêmico candidato (catálogo SimpleSST). */
 export type AcgihExamCatalogEntry = {
@@ -218,6 +221,15 @@ export type AcgihExamPreviewResult = {
   examId?: number;
   examName?: string;
   candidates?: AcgihExamCandidate[];
+  /** Candidatos fortes quando há ambiguidade (ex.: múltiplos exames compatíveis). */
+  ambiguousCandidates?: Array<{
+    examId: number;
+    examName: string;
+    material: string | null;
+    score?: number;
+    reason?: string;
+  }>;
+  pendingReason?: string;
   suggestedExamName?: string;
   reason?: string;
 };
@@ -286,4 +298,95 @@ export const classifyAcgihExamPreview = (params: {
     status: 'NO_MATCH',
     reason: !hasDeterminant ? 'MISSING_DETERMINANT' : 'MISSING_MATRIX',
   };
+};
+
+/** Candidatos permitidos para resolução manual de ambiguidade ACGIH/BEI × Exame. */
+export const buildAmbiguousCandidateAllowlist = (params: {
+  indicator: AcgihIndicatorSnapshot;
+  catalog: AcgihExamCatalogEntry[];
+  nr7ExamLinks: Nr7ExamLinkSnapshot[];
+  linkedExamIds: number[];
+}): NonNullable<AcgihExamPreviewResult['ambiguousCandidates']> => {
+  const { indicator, catalog, nr7ExamLinks, linkedExamIds } = params;
+  const outcome = matchAcgihIndicatorExam({
+    indicator,
+    catalog,
+    nr7ExamLinks,
+  });
+  const strong = listAcgihExamStrongCandidates(
+    indicator.determinant,
+    indicator.matrix,
+    catalog,
+  );
+
+  const byId = new Map<
+    number,
+    NonNullable<AcgihExamPreviewResult['ambiguousCandidates']>[number]
+  >();
+
+  for (const candidate of strong) {
+    byId.set(candidate.examId, {
+      examId: candidate.examId,
+      examName: candidate.examName,
+      material: candidate.material,
+      score: candidate.score,
+      reason: candidate.reason,
+    });
+  }
+
+  if (outcome.kind === 'ambiguous') {
+    for (const candidate of outcome.candidates) {
+      if (byId.has(candidate.examId)) continue;
+      const exam = catalog.find((entry) => entry.id === candidate.examId);
+      byId.set(candidate.examId, {
+        examId: candidate.examId,
+        examName: candidate.examName,
+        material: exam?.material ?? null,
+        reason: candidate.reason,
+      });
+    }
+  }
+
+  for (const examId of linkedExamIds) {
+    if (byId.has(examId)) continue;
+    const exam = catalog.find((entry) => entry.id === examId);
+    if (!exam) continue;
+    byId.set(examId, {
+      examId,
+      examName: exam.name,
+      material: exam.material,
+      reason: 'Já vinculado ao indicador',
+    });
+  }
+
+  return Array.from(byId.values()).sort(
+    (a, b) => (b.score ?? 0) - (a.score ?? 0),
+  );
+};
+
+/** Enriquece preview com candidatos ambíguos e motivo de pendência. */
+export const enrichAcgihExamPreviewWithAmbiguity = (params: {
+  examLink: AcgihExamPreviewResult;
+  indicator: AcgihIndicatorSnapshot;
+  catalog: AcgihExamCatalogEntry[];
+  nr7ExamLinks: Nr7ExamLinkSnapshot[];
+  linkedExamIds: number[];
+}): AcgihExamPreviewResult => {
+  const allowlist = buildAmbiguousCandidateAllowlist(params);
+  if (allowlist.length <= 1) return params.examLink;
+
+  const enriched: AcgihExamPreviewResult = {
+    ...params.examLink,
+    ambiguousCandidates: allowlist,
+  };
+
+  if (params.examLink.status === 'LINKED_PENDING_CONFIRMATION') {
+    enriched.pendingReason = 'AMBIGUOUS_CANDIDATES';
+    enriched.reason =
+      'Múltiplos exames candidatos — resolução manual necessária antes do sync da Biblioteca.';
+  } else if (params.examLink.status === 'AMBIGUOUS') {
+    enriched.pendingReason = 'AMBIGUOUS_EXAM_MATCH';
+  }
+
+  return enriched;
 };

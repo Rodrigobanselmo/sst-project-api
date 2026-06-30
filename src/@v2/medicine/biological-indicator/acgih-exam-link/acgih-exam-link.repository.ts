@@ -283,6 +283,93 @@ export class AcgihExamLinkRepository {
     });
   }
 
+  /** Indicador oficial ACGIH/BEI por id (com vínculos). */
+  async findAcgihIndicatorById(
+    id: string,
+  ): Promise<AcgihOfficialIndicatorRow | null> {
+    const rows = await this.findAcgihOfficialIndicators();
+    return rows.find((row) => row.id === id) ?? null;
+  }
+
+  /** Exames sistêmicos por ids (validação de candidatos ambíguos). */
+  async findSystemExamsByIds(ids: number[]) {
+    if (!ids.length) return [];
+    return this.prisma.exam.findMany({
+      where: {
+        id: { in: ids },
+        deleted_at: null,
+        system: true,
+        companyId: simpleCompanyId,
+      },
+      select: {
+        id: true,
+        name: true,
+        material: true,
+        status: true,
+        deleted_at: true,
+      },
+    });
+  }
+
+  /**
+   * Confirma manualmente um ou mais vínculos ambíguos. Primeiro exame selecionado
+   * fica como default; demais confirmados sem default. Não remove vínculos não
+   * selecionados.
+   */
+  confirmAmbiguousExamLinks(params: {
+    indicatorId: string;
+    exams: Array<{
+      examId: number;
+      examName: string;
+      examMaterial: string | null;
+      isDefault: boolean;
+      notes: string;
+    }>;
+    userId: number;
+  }) {
+    const confirmedAt = new Date();
+    return this.prisma.$transaction(
+      params.exams.map((exam) =>
+        this.prisma.biologicalIndicatorToExam.upsert({
+          where: {
+            indicatorId_examId: {
+              indicatorId: params.indicatorId,
+              examId: exam.examId,
+            },
+          },
+          create: {
+            indicatorId: params.indicatorId,
+            examId: exam.examId,
+            matchMethod: BiologicalIndicatorMatchMethodEnum.MANUAL,
+            matchConfidence: BiologicalIndicatorMatchConfidenceEnum.MANUAL,
+            requiresReview: false,
+            isConfirmed: true,
+            isDefault: exam.isDefault,
+            confirmedAt,
+            confirmedById: params.userId,
+            examNameSnapshot: exam.examName,
+            examMaterialSnapshot: exam.examMaterial,
+            notes: exam.notes,
+          },
+          update: {
+            deleted_at: null,
+            matchMethod: BiologicalIndicatorMatchMethodEnum.MANUAL,
+            matchConfidence: BiologicalIndicatorMatchConfidenceEnum.MANUAL,
+            requiresReview: false,
+            isConfirmed: true,
+            isDefault: exam.isDefault,
+            confirmedAt,
+            confirmedById: params.userId,
+            examNameSnapshot: exam.examName,
+            examMaterialSnapshot: exam.examMaterial,
+            notes: exam.notes,
+          },
+          select: { id: true, examId: true },
+        }),
+      ),
+    );
+  }
+
   /** Confirma vínculo pendente (somente BiologicalIndicatorToExam). */
   confirmPendingExamLink(params: {
     indicatorId: string;

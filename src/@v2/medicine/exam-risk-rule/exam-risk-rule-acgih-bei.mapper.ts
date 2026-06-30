@@ -71,10 +71,18 @@ export const buildAcgihSourceIndicatorKey = (
   indicatorId: string,
   riskFactorId: string,
   confirmedRiskCount: number,
-): string =>
-  confirmedRiskCount > 1
-    ? `${indicatorId}::${riskFactorId}`
-    : indicatorId;
+  options?: { examId?: number | null; confirmedExamCount?: number },
+): string => {
+  let key =
+    confirmedRiskCount > 1
+      ? `${indicatorId}::${riskFactorId}`
+      : indicatorId;
+  const examCount = options?.confirmedExamCount ?? 1;
+  if (examCount > 1 && options?.examId != null) {
+    key = `${key}::exam${options.examId}`;
+  }
+  return key;
+};
 
 const buildRationale = (params: {
   riskName: string | null;
@@ -111,8 +119,10 @@ export const buildAcgihRuleData = (params: {
   riskLink: AcgihIndicatorWithLinks['riskLinks'][number];
   examLink: AcgihIndicatorWithLinks['examLinks'][number];
   confirmedRiskCount: number;
+  confirmedExamCount: number;
 }): AcgihRuleData => {
-  const { indicator, riskLink, examLink, confirmedRiskCount } = params;
+  const { indicator, riskLink, examLink, confirmedRiskCount, confirmedExamCount } =
+    params;
   const risk = riskLink.riskFactor;
   const exam = examLink.exam;
 
@@ -162,6 +172,10 @@ export const buildAcgihRuleData = (params: {
       indicator.id,
       riskLink.riskFactorId,
       confirmedRiskCount,
+      {
+        examId: examLink.examId,
+        confirmedExamCount,
+      },
     ),
     agentCas,
     agentName,

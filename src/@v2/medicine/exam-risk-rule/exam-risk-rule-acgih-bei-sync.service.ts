@@ -114,9 +114,11 @@ export class ExamRiskRuleAcgihBeiSyncService {
       const confirmedRisks = indicator.riskLinks.filter(
         (l) => !l.deleted_at && l.isConfirmed,
       );
-      const defaultExam = this.resolveDefaultExamLink(indicator);
+      const confirmedExams = indicator.examLinks.filter(
+        (l) => !l.deleted_at && l.isConfirmed,
+      );
 
-      if (!defaultExam) {
+      if (!confirmedExams.length) {
         const hasUnconfirmedExam = indicator.examLinks.some(
           (l) => !l.deleted_at && !l.isConfirmed,
         );
@@ -135,10 +137,10 @@ export class ExamRiskRuleAcgihBeiSyncService {
         items.push({
           indicatorId: indicator.id,
           substanceName: indicator.substanceName,
-          examId: defaultExam.examId ?? undefined,
+          examId: confirmedExams[0].examId ?? undefined,
           examName:
-            defaultExam.exam?.name ??
-            defaultExam.examNameSnapshot ??
+            confirmedExams[0].exam?.name ??
+            confirmedExams[0].examNameSnapshot ??
             undefined,
           action: 'blocked',
           reason: 'Sem vínculo confirmado com Fator de Risco',
@@ -147,15 +149,18 @@ export class ExamRiskRuleAcgihBeiSyncService {
       }
 
       for (const riskLink of confirmedRisks) {
-        const result = await this.syncOneTuple({
-          indicator,
-          riskLink,
-          examLink: defaultExam,
-          confirmedRiskCount: confirmedRisks.length,
-          userId: params.userId,
-          dryRun,
-        });
-        items.push(result);
+        for (const examLink of confirmedExams) {
+          const result = await this.syncOneTuple({
+            indicator,
+            riskLink,
+            examLink,
+            confirmedRiskCount: confirmedRisks.length,
+            confirmedExamCount: confirmedExams.length,
+            userId: params.userId,
+            dryRun,
+          });
+          items.push(result);
+        }
       }
     }
 
@@ -166,25 +171,24 @@ export class ExamRiskRuleAcgihBeiSyncService {
     };
   }
 
-  private resolveDefaultExamLink(indicator: AcgihIndicatorWithLinks) {
-    const confirmed = indicator.examLinks.filter(
-      (l) => !l.deleted_at && l.isConfirmed,
-    );
-    if (!confirmed.length) return null;
-    if (confirmed.length === 1) return confirmed[0];
-    return confirmed.find((l) => l.isDefault) ?? confirmed[0];
-  }
-
   private async syncOneTuple(params: {
     indicator: AcgihIndicatorWithLinks;
     riskLink: AcgihIndicatorWithLinks['riskLinks'][number];
     examLink: AcgihIndicatorWithLinks['examLinks'][number];
     confirmedRiskCount: number;
+    confirmedExamCount: number;
     userId: number;
     dryRun: boolean;
   }): Promise<AcgihSyncItemResult> {
-    const { indicator, riskLink, examLink, confirmedRiskCount, userId, dryRun } =
-      params;
+    const {
+      indicator,
+      riskLink,
+      examLink,
+      confirmedRiskCount,
+      confirmedExamCount,
+      userId,
+      dryRun,
+    } = params;
 
     const base = {
       indicatorId: indicator.id,
@@ -209,6 +213,7 @@ export class ExamRiskRuleAcgihBeiSyncService {
       riskLink,
       examLink,
       confirmedRiskCount,
+      confirmedExamCount,
     });
 
     try {

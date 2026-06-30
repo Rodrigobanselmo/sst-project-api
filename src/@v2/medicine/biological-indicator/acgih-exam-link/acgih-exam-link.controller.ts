@@ -11,6 +11,7 @@ import {
   AcgihExamLinkResolveBody,
   AcgihExamLinkSyncBody,
   AcgihExamLinkConfirmSafePendingBody,
+  AcgihExamLinkResolveAmbiguousBody,
 } from './acgih-exam-link.dto';
 import { AcgihExamLinkService } from './acgih-exam-link.service';
 
@@ -55,6 +56,19 @@ export class AcgihExamLinkController {
     @User() user: UserPayloadDto,
   ) {
     return this.service.confirmSafePending({
+      userId: user.userId,
+      dryRun: body.dryRun,
+    });
+  }
+
+  @Post(MedicineRoutes.BIOLOGICAL_INDICATORS.ACGIH_EXAM_LINK_RESOLVE_AMBIGUOUS)
+  resolveAmbiguous(
+    @Body() body: AcgihExamLinkResolveAmbiguousBody,
+    @User() user: UserPayloadDto,
+  ) {
+    return this.service.resolveAmbiguous({
+      indicatorId: body.indicatorId,
+      examIds: body.examIds,
       userId: user.userId,
       dryRun: body.dryRun,
     });

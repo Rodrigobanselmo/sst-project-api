@@ -6,9 +6,11 @@ import { plainToInstance } from 'class-transformer';
 import { AcgihExamLinkService } from './acgih-exam-link.service';
 import {
   ACGIH_EXAM_LINK_CONFIRM_SAFE_PENDING_TEXT,
+  ACGIH_EXAM_LINK_RESOLVE_AMBIGUOUS_CONFIRM_TEXT,
   ACGIH_EXAM_LINK_RESOLVE_CONFIRM_TEXT,
   ACGIH_EXAM_LINK_SYNC_CONFIRM_TEXT,
   AcgihExamLinkConfirmSafePendingBody,
+  AcgihExamLinkResolveAmbiguousBody,
   AcgihExamLinkResolveBody,
   AcgihExamLinkSyncBody,
 } from './acgih-exam-link.dto';
@@ -84,6 +86,9 @@ const buildRepo = (over: {
   createExamLink?: jest.Mock;
   createSystemExam?: jest.Mock;
   confirmPendingExamLink?: jest.Mock;
+  confirmAmbiguousExamLinks?: jest.Mock;
+  findAcgihIndicatorById?: jest.Mock;
+  findSystemExamsByIds?: jest.Mock;
 } = {}) => {
   const createExamLink =
     over.createExamLink ?? jest.fn().mockResolvedValue({ id: 'link-1' } as never);
@@ -98,15 +103,37 @@ const buildRepo = (over: {
   const confirmPendingExamLink =
     over.confirmPendingExamLink ??
     jest.fn().mockResolvedValue({ id: 'link-confirmed' } as never);
+  const confirmAmbiguousExamLinks =
+    over.confirmAmbiguousExamLinks ??
+    jest.fn().mockResolvedValue([{ id: 'link-confirmed' }] as never);
+  const findAcgihIndicatorById =
+    over.findAcgihIndicatorById ??
+    jest.fn().mockImplementation(async (id: string) => {
+      const rows = over.indicators ?? [indicator()];
+      return rows.find((row) => row.id === id) ?? null;
+    });
+  const findSystemExamsByIds =
+    over.findSystemExamsByIds ??
+    jest.fn().mockImplementation(async (ids: number[]) => {
+      const catalog = (over.catalog ?? []).map((exam) => ({
+        ...exam,
+        status: 'ACTIVE',
+        deleted_at: null,
+      }));
+      return catalog.filter((exam) => ids.includes(exam.id));
+    });
   return {
     findAcgihOfficialIndicators: jest
       .fn()
       .mockResolvedValue((over.indicators ?? [indicator()]) as never),
+    findAcgihIndicatorById,
+    findSystemExamsByIds,
     findSystemicCatalog: jest.fn().mockResolvedValue((over.catalog ?? []) as never),
     findNr7ConfirmedExamLinks: jest.fn().mockResolvedValue((over.nr7 ?? []) as never),
     createExamLink,
     createSystemExam,
     confirmPendingExamLink,
+    confirmAmbiguousExamLinks,
   };
 };
 
@@ -730,5 +757,123 @@ describe('AcgihExamLinkService.confirmSafePending', () => {
     const res = await service.confirmSafePending({ userId: 1, dryRun: false });
     expect(repo.confirmPendingExamLink).not.toHaveBeenCalled();
     expect(res.items[0].reason).toBe('AMBIGUOUS_EXAM_MATCH');
+  });
+});
+
+describe('AcgihExamLinkResolveAmbiguousBody (confirmText)', () => {
+  it('aceita confirmText CONFIRMAR AMBIGUIDADE ACGIH', async () => {
+    const dto = plainToInstance(AcgihExamLinkResolveAmbiguousBody, {
+      indicatorId: 'ind-1',
+      examIds: [1, 2],
+      confirmText: ACGIH_EXAM_LINK_RESOLVE_AMBIGUOUS_CONFIRM_TEXT,
+      dryRun: true,
+    });
+    const errors = await validate(dto);
+    expect(errors).toHaveLength(0);
+  });
+});
+
+describe('AcgihExamLinkService.resolveAmbiguous', () => {
+  it('dryRun confirma candidatos ambíguos sem escrever', async () => {
+    const repo = buildRepo({
+      indicators: [
+        indicator({
+          id: 'ind-eto',
+          substanceName: 'Óxido de etileno',
+          biologicalIndicatorOriginal: 'HEV/adutos de hemoglobina',
+          biologicalIndicatorNormalized: 'hev adutos hemoglobina',
+          biologicalMatrix: 'sangue',
+          examLinks: [
+            pendingLink({
+              examId: 10,
+              examName: 'HEV no sangue',
+              examMaterial: 'sangue',
+            }),
+          ],
+        }),
+      ],
+      catalog: [
+        { id: 10, name: 'HEV no sangue', material: 'sangue', esocial27Code: null },
+        { id: 11, name: 'Adutos de HEV no sangue', material: 'sangue', esocial27Code: null },
+      ],
+    });
+    const service = new AcgihExamLinkService(repo as never);
+    const res = await service.resolveAmbiguous({
+      indicatorId: 'ind-eto',
+      examIds: [10],
+      userId: 1,
+      dryRun: true,
+    });
+    expect(repo.confirmAmbiguousExamLinks).not.toHaveBeenCalled();
+    expect(res.confirmedLinks).toBe(1);
+  });
+
+  it('apply real confirma múltiplos exames selecionados', async () => {
+    const repo = buildRepo({
+      indicators: [
+        indicator({
+          id: 'ind-tdi',
+          substanceName: 'TDI',
+          biologicalIndicatorOriginal:
+            'Isômeros 2,4 e 2,6 toluenodiamino na urina',
+          biologicalIndicatorNormalized: 'toluenodiamino urina',
+          biologicalMatrix: 'urina',
+          examLinks: [
+            pendingLink({
+              examId: 20,
+              examName: 'Toluenodiamina (TDA) na urina',
+              examMaterial: 'urina',
+            }),
+          ],
+        }),
+      ],
+      catalog: [
+        {
+          id: 20,
+          name: 'Toluenodiamina (TDA) na urina',
+          material: 'urina',
+          esocial27Code: null,
+        },
+        {
+          id: 21,
+          name: 'Isômeros 2,4 e 2,6 toluenodiamino na urina',
+          material: 'urina',
+          esocial27Code: null,
+        },
+      ],
+    });
+    const service = new AcgihExamLinkService(repo as never);
+    const res = await service.resolveAmbiguous({
+      indicatorId: 'ind-tdi',
+      examIds: [20, 21],
+      userId: 3,
+      dryRun: false,
+    });
+    expect(repo.confirmAmbiguousExamLinks).toHaveBeenCalledTimes(1);
+    expect(res.confirmedLinks).toBe(2);
+    const batch = (repo.confirmAmbiguousExamLinks as jest.Mock).mock
+      .calls[0][0] as { exams: Array<{ isDefault: boolean }> };
+    expect(batch.exams).toHaveLength(2);
+    expect(batch.exams[0].isDefault).toBe(true);
+    expect(batch.exams[1].isDefault).toBe(false);
+  });
+
+  it('rejeita exame fora da allowlist de candidatos', async () => {
+    const repo = buildRepo({
+      indicators: [indicator({ id: 'ind-x' })],
+      catalog: [
+        { id: 7, name: '2,5-hexanodiona na urina', material: 'urina', esocial27Code: null },
+      ],
+    });
+    const service = new AcgihExamLinkService(repo as never);
+    const res = await service.resolveAmbiguous({
+      indicatorId: 'ind-x',
+      examIds: [999],
+      userId: 1,
+      dryRun: false,
+    });
+    expect(repo.confirmAmbiguousExamLinks).not.toHaveBeenCalled();
+    expect(res.skipped).toBe(1);
+    expect(res.items[0].reason).toBe('EXAM_INACTIVE');
   });
 });

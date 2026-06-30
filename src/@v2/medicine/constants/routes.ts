@@ -34,6 +34,7 @@ export const MedicineRoutes = {
     // Resolução em lote: vincula candidatos seguros e cria exame quando faltar.
     ACGIH_EXAM_LINK_RESOLVE: 'acgih-exam-links/resolve',
     ACGIH_EXAM_LINK_CONFIRM_SAFE_PENDING: 'acgih-exam-links/confirm-safe-pending',
+    ACGIH_EXAM_LINK_RESOLVE_AMBIGUOUS: 'acgih-exam-links/resolve-ambiguous',
     RISK_LINKS: {
       CONFIRM: 'risk-links/:id/confirm',
       REJECT: 'risk-links/:id/reject',

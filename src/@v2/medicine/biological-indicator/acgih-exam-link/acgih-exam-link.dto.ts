@@ -1,4 +1,4 @@
-import { IsBoolean, IsOptional, Matches } from 'class-validator';
+import { IsBoolean, IsInt, IsOptional, IsString, Matches, ArrayMinSize, IsArray } from 'class-validator';
 
 export const ACGIH_EXAM_LINK_SYNC_CONFIRM_TEXT = 'VINCULAR EXAMES ACGIH';
 export const ACGIH_EXAM_LINK_RESOLVE_CONFIRM_TEXT = 'RESOLVER EXAMES ACGIH';
@@ -53,6 +53,32 @@ export class AcgihExamLinkResolveBody {
 export class AcgihExamLinkConfirmSafePendingBody {
   @Matches(new RegExp(`^${ACGIH_EXAM_LINK_CONFIRM_SAFE_PENDING_TEXT}$`), {
     message: `confirmText deve ser exatamente "${ACGIH_EXAM_LINK_CONFIRM_SAFE_PENDING_TEXT}".`,
+  })
+  confirmText!: string;
+
+  @IsOptional()
+  @IsBoolean()
+  dryRun?: boolean;
+}
+
+export const ACGIH_EXAM_LINK_RESOLVE_AMBIGUOUS_CONFIRM_TEXT =
+  'CONFIRMAR AMBIGUIDADE ACGIH';
+
+/**
+ * Confirma manualmente vínculos ACGIH/BEI → Exame ambíguos. O servidor valida
+ * que cada examId é candidato recalculado ou já vinculado ao indicador.
+ */
+export class AcgihExamLinkResolveAmbiguousBody {
+  @IsString()
+  indicatorId!: string;
+
+  @IsArray()
+  @ArrayMinSize(1)
+  @IsInt({ each: true })
+  examIds!: number[];
+
+  @Matches(new RegExp(`^${ACGIH_EXAM_LINK_RESOLVE_AMBIGUOUS_CONFIRM_TEXT}$`), {
+    message: `confirmText deve ser exatamente "${ACGIH_EXAM_LINK_RESOLVE_AMBIGUOUS_CONFIRM_TEXT}".`,
   })
   confirmText!: string;
 

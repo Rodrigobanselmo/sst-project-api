@@ -3,6 +3,7 @@ import {
   BiologicalIndicatorMatchConfidenceEnum,
   BiologicalIndicatorMatchMethodEnum,
   Prisma,
+  StatusEnum,
 } from '@prisma/client';
 
 import {
@@ -14,7 +15,9 @@ import {
   AcgihExamCatalogEntry,
   AcgihExamPreviewResult,
   buildAcgihExamName,
+  buildAmbiguousCandidateAllowlist,
   classifyAcgihExamPreview,
+  enrichAcgihExamPreviewWithAmbiguity,
   matchAcgihIndicatorExam,
 } from './acgih-exam-link.util';
 import {
@@ -161,6 +164,32 @@ export type AcgihExamConfirmSafeResponse = {
   dryRun: boolean;
   totals: AcgihExamConfirmSafeTotals;
   items: AcgihExamConfirmSafeItemResult[];
+};
+
+export type AcgihExamResolveAmbiguousAction =
+  | 'confirmed'
+  | 'alreadyConfirmed'
+  | 'skipped'
+  | 'failed';
+
+export type AcgihExamResolveAmbiguousItemResult = {
+  examId: number;
+  examName: string;
+  action: AcgihExamResolveAmbiguousAction;
+  reason?: string;
+};
+
+export type AcgihExamResolveAmbiguousResponse = {
+  dryRun: boolean;
+  indicatorId: string;
+  substanceName: string;
+  determinant: string;
+  matrix: string;
+  confirmedLinks: number;
+  alreadyConfirmed: number;
+  skipped: number;
+  remainingPending: number;
+  items: AcgihExamResolveAmbiguousItemResult[];
 };
 
 const isUniqueViolation = (error: unknown): boolean =>
@@ -330,17 +359,25 @@ export class AcgihExamLinkService {
         nr7ExamLinks,
       });
 
-      const examLink = classifyAcgihExamPreview({
-        alreadyLinked: activeLink
-          ? {
-              examId: activeLink.examId,
-              examName: activeLink.examName,
-              isConfirmed: activeLink.isConfirmed,
-              requiresReview: activeLink.requiresReview,
-            }
-          : null,
+      const examLink = enrichAcgihExamPreviewWithAmbiguity({
+        examLink: classifyAcgihExamPreview({
+          alreadyLinked: activeLink
+            ? {
+                examId: activeLink.examId,
+                examName: activeLink.examName,
+                isConfirmed: activeLink.isConfirmed,
+                requiresReview: activeLink.requiresReview,
+              }
+            : null,
+          indicator: snapshot,
+          outcome,
+        }),
         indicator: snapshot,
-        outcome,
+        catalog,
+        nr7ExamLinks,
+        linkedExamIds: indicator.examLinks
+          .filter((l) => !l.deleted_at)
+          .map((l) => l.examId),
       });
 
       return {
@@ -676,6 +713,165 @@ export class AcgihExamLinkService {
       totals: this.buildConfirmSafeTotals(items),
       items,
     };
+  }
+
+  /**
+   * Resolve manualmente ambiguidade ACGIH/BEI × Exame confirmando um ou mais
+   * candidatos selecionados. Idempotente; não cria exame, regra da Biblioteca
+   * nem altera risco. Não remove vínculos não selecionados.
+   */
+  async resolveAmbiguous(params: {
+    indicatorId: string;
+    examIds: number[];
+    userId: number;
+    dryRun?: boolean;
+  }): Promise<AcgihExamResolveAmbiguousResponse> {
+    const dryRun = params.dryRun === true;
+    const uniqueExamIds = Array.from(new Set(params.examIds));
+
+    const indicator = await this.repository.findAcgihIndicatorById(
+      params.indicatorId,
+    );
+    if (!indicator) {
+      throw new Error('Indicador ACGIH/BEI não encontrado');
+    }
+
+    const [catalog, nr7ExamLinks] = await Promise.all([
+      this.repository.findSystemicCatalog(),
+      this.repository.findNr7ConfirmedExamLinks(),
+    ]);
+
+    const snapshot = this.toIndicatorSnapshot(indicator);
+    const linkedExamIds = indicator.examLinks
+      .filter((l) => !l.deleted_at)
+      .map((l) => l.examId);
+    const allowlist = buildAmbiguousCandidateAllowlist({
+      indicator: snapshot,
+      catalog,
+      nr7ExamLinks,
+      linkedExamIds,
+    });
+    const allowedIds = new Set(allowlist.map((c) => c.examId));
+
+    const exams = await this.repository.findSystemExamsByIds(uniqueExamIds);
+    const examById = new Map(exams.map((exam) => [exam.id, exam]));
+
+    const items: AcgihExamResolveAmbiguousItemResult[] = [];
+    const toConfirm: Array<{
+      examId: number;
+      examName: string;
+      examMaterial: string | null;
+      notes: string;
+    }> = [];
+    let confirmedLinks = 0;
+    let alreadyConfirmed = 0;
+    let skipped = 0;
+
+    for (const examId of uniqueExamIds) {
+      const exam = examById.get(examId);
+      if (!exam || exam.deleted_at || exam.status !== StatusEnum.ACTIVE) {
+        skipped += 1;
+        items.push({
+          examId,
+          examName: exam?.name ?? `#${examId}`,
+          action: 'skipped',
+          reason: 'EXAM_INACTIVE',
+        });
+        continue;
+      }
+
+      if (!allowedIds.has(examId)) {
+        skipped += 1;
+        items.push({
+          examId,
+          examName: exam.name,
+          action: 'skipped',
+          reason: 'NOT_IN_CANDIDATE_ALLOWLIST',
+        });
+        continue;
+      }
+
+      const existing = indicator.examLinks.find(
+        (l) => !l.deleted_at && l.examId === examId,
+      );
+      if (existing?.isConfirmed) {
+        alreadyConfirmed += 1;
+        items.push({
+          examId,
+          examName: exam.name,
+          action: 'alreadyConfirmed',
+        });
+        continue;
+      }
+
+      confirmedLinks += 1;
+      items.push({
+        examId,
+        examName: exam.name,
+        action: 'confirmed',
+      });
+      toConfirm.push({
+        examId,
+        examName: exam.name,
+        examMaterial: exam.material,
+        notes: this.buildAmbiguousConfirmationNotes({
+          existingNotes: existing?.notes ?? null,
+          userId: params.userId,
+          determinant: indicator.biologicalIndicatorOriginal,
+          matrix: indicator.biologicalMatrix,
+          examName: exam.name,
+        }),
+      });
+    }
+
+    if (!dryRun && toConfirm.length) {
+      await this.repository.confirmAmbiguousExamLinks({
+        indicatorId: indicator.id,
+        userId: params.userId,
+        exams: toConfirm.map((entry, index) => ({
+          ...entry,
+          isDefault: index === 0,
+        })),
+      });
+    }
+
+    const refreshed = dryRun
+      ? indicator
+      : await this.repository.findAcgihIndicatorById(indicator.id);
+    const remainingPending =
+      refreshed?.examLinks.filter(
+        (l) => !l.deleted_at && !l.isConfirmed && l.requiresReview,
+      ).length ?? 0;
+
+    return {
+      dryRun,
+      indicatorId: indicator.id,
+      substanceName: indicator.substanceName,
+      determinant: indicator.biologicalIndicatorOriginal,
+      matrix: indicator.biologicalMatrix,
+      confirmedLinks,
+      alreadyConfirmed,
+      skipped,
+      remainingPending,
+      items,
+    };
+  }
+
+  private buildAmbiguousConfirmationNotes(params: {
+    existingNotes: string | null;
+    userId: number;
+    determinant: string;
+    matrix: string;
+    examName: string;
+  }): string {
+    const stamp = new Date().toISOString();
+    const trace =
+      `Confirmado manualmente por ambiguidade ACGIH/BEI em ${stamp} ` +
+      `por usuário ${params.userId}. Determinante: ${params.determinant}. ` +
+      `Matriz: ${params.matrix}. Exame: ${params.examName}.`;
+    return params.existingNotes?.trim()
+      ? `${params.existingNotes.trim()} ${trace}`
+      : trace;
   }
 
   private buildSafeConfirmationNotes(params: {

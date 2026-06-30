@@ -109,22 +109,49 @@ export const isAcgihDeterminantMatrixSafeMatch = (params: {
   return { safe: true, reason: 'DETERMINANT_MATRIX_SAFE' };
 };
 
+export type AcgihExamStrongCandidate = {
+  examId: number;
+  examName: string;
+  material: string | null;
+  score: number;
+  reason: string;
+};
+
+/** Lista candidatos sistêmicos com score forte para o determinante + matriz. */
+export const listAcgihExamStrongCandidates = (
+  determinant: string,
+  matrix: string,
+  catalog: AcgihExamCatalogEntry[],
+): AcgihExamStrongCandidate[] => {
+  const seen = new Set<number>();
+  const results: AcgihExamStrongCandidate[] = [];
+
+  for (const exam of catalog) {
+    const score = scoreNameCompatibility(determinant, exam.name);
+    if (score < ACGIH_EXAM_PARTIAL_SCORE_THRESHOLD) continue;
+
+    const matrixOk =
+      matrixEvidenceInExam(matrix, exam.name, exam.material) ||
+      materialsAreCompatible(exam.material, matrix);
+    if (!matrixOk) continue;
+    if (seen.has(exam.id)) continue;
+
+    seen.add(exam.id);
+    results.push({
+      examId: exam.id,
+      examName: exam.name,
+      material: exam.material,
+      score,
+      reason: `Score de nome ${score} (matriz compatível)`,
+    });
+  }
+
+  return results.sort((a, b) => b.score - a.score);
+};
+
 /** Conta candidatos sistêmicos com score forte para o determinante + matriz. */
 export const countAcgihExamStrongCandidates = (
   determinant: string,
   matrix: string,
   catalog: AcgihExamCatalogEntry[],
-): number => {
-  const ids = catalog
-    .filter((exam) => {
-      const score = scoreNameCompatibility(determinant, exam.name);
-      if (score < ACGIH_EXAM_PARTIAL_SCORE_THRESHOLD) return false;
-      return (
-        matrixEvidenceInExam(matrix, exam.name, exam.material) ||
-        materialsAreCompatible(exam.material, matrix)
-      );
-    })
-    .map((exam) => exam.id);
-
-  return new Set(ids).size;
-};
+): number => listAcgihExamStrongCandidates(determinant, matrix, catalog).length;

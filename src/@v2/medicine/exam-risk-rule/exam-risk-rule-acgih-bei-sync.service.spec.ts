@@ -307,4 +307,40 @@ describe('ExamRiskRuleAcgihBeiSyncService', () => {
     expect(ruleRepo.create).not.toHaveBeenCalled();
     expect(refRepo.create).not.toHaveBeenCalled();
   });
+
+  it('múltiplos exames confirmados geram uma regra por exame', async () => {
+    const multiExam = acgihFixture({
+      examLinks: [
+        {
+          id: 'el-1',
+          examId: 99,
+          deleted_at: null,
+          isConfirmed: true,
+          isDefault: true,
+          examNameSnapshot: 'Exame A',
+          exam: { id: 99, name: 'Exame A', system: true, deleted_at: null },
+        },
+        {
+          id: 'el-2',
+          examId: 100,
+          deleted_at: null,
+          isConfirmed: true,
+          isDefault: false,
+          examNameSnapshot: 'Exame B',
+          exam: { id: 100, name: 'Exame B', system: true, deleted_at: null },
+        },
+      ],
+    });
+    const { service, ruleRepo } = buildCtx([multiExam]);
+
+    const res = await service.sync({ userId: 1 });
+
+    expect(ruleRepo.create).toHaveBeenCalledTimes(2);
+    expect(res.totals.rulesCreated).toBe(2);
+    const keys = ruleRepo.create.mock.calls.map(
+      (call) => (call[0] as { sourceIndicatorId: string }).sourceIndicatorId,
+    );
+    expect(keys).toContain('acgih-official-1::exam99');
+    expect(keys).toContain('acgih-official-1::exam100');
+  });
 });
