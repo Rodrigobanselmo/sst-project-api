@@ -50,6 +50,9 @@ export const MedicineRoutes = {
     RISK_CANDIDATES: 'risk-candidates',
     EXAM_CANDIDATES: 'exam-candidates',
     SYNC_NR07: 'sync-nr07',
+    // Sincronização ACGIH/BEI consolidados → Biblioteca Risco × Exame (regras
+    // TECHNICAL e referências complementares em NR-07). MASTER-only.
+    SYNC_ACGIH_BEI: 'sync-acgih-bei',
     EXPORT: 'export',
     TEMPLATE: 'template',
     IMPORT_PREVIEW: 'import/preview',

@@ -50,6 +50,7 @@ import { EsocialProcedureService } from './esocial-procedure/esocial-procedure.s
 import { ExamRiskRuleImportApplyService } from './exam-risk-rule/exam-risk-rule-import-apply.service';
 import { ExamRiskRuleImportPreviewService } from './exam-risk-rule/exam-risk-rule-import-preview.service';
 import { ExamRiskRuleNr07SyncService } from './exam-risk-rule/exam-risk-rule-nr07-sync.service';
+import { ExamRiskRuleAcgihBeiSyncService } from './exam-risk-rule/exam-risk-rule-acgih-bei-sync.service';
 import { ExamRiskRuleSpreadsheetExportService } from './exam-risk-rule/exam-risk-rule-spreadsheet-export.service';
 import { ExamRiskRuleController } from './exam-risk-rule/exam-risk-rule.controller';
 import { ExamRiskRuleRepository } from './exam-risk-rule/exam-risk-rule.repository';
@@ -92,6 +93,7 @@ import { ExamRiskRuleReferenceService } from './exam-risk-rule-reference/exam-ri
     ExamRiskRuleRepository,
     ExamRiskRuleService,
     ExamRiskRuleNr07SyncService,
+    ExamRiskRuleAcgihBeiSyncService,
     ExamRiskRuleSpreadsheetExportService,
     ExamRiskRuleImportPreviewService,
     ExamRiskRuleImportApplyService,

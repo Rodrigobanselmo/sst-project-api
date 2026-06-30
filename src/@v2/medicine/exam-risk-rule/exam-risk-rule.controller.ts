@@ -42,6 +42,8 @@ import {
 import { ExamRiskRuleImportApplyService } from './exam-risk-rule-import-apply.service';
 import { ExamRiskRuleImportPreviewService } from './exam-risk-rule-import-preview.service';
 import { ExamRiskRuleNr07SyncService } from './exam-risk-rule-nr07-sync.service';
+import { ExamRiskRuleAcgihBeiSyncService } from './exam-risk-rule-acgih-bei-sync.service';
+import { ExamRiskRuleSyncAcgihBody } from './exam-risk-rule-acgih-bei-sync.dto';
 import { ExamRiskRuleSpreadsheetExportService } from './exam-risk-rule-spreadsheet-export.service';
 import { ExamRiskRuleService } from './exam-risk-rule.service';
 
@@ -55,6 +57,7 @@ export class ExamRiskRuleController {
   constructor(
     private readonly service: ExamRiskRuleService,
     private readonly nr07SyncService: ExamRiskRuleNr07SyncService,
+    private readonly acgihSyncService: ExamRiskRuleAcgihBeiSyncService,
     private readonly exportService: ExamRiskRuleSpreadsheetExportService,
     private readonly previewService: ExamRiskRuleImportPreviewService,
     private readonly applyService: ExamRiskRuleImportApplyService,
@@ -87,6 +90,17 @@ export class ExamRiskRuleController {
   @Post(MedicineRoutes.EXAM_RISK_RULES.SYNC_NR07)
   syncNr07() {
     return this.nr07SyncService.sync();
+  }
+
+  @Post(MedicineRoutes.EXAM_RISK_RULES.SYNC_ACGIH_BEI)
+  syncAcgihBei(
+    @Body() body: ExamRiskRuleSyncAcgihBody,
+    @User() user: UserPayloadDto,
+  ) {
+    return this.acgihSyncService.sync({
+      userId: user.userId,
+      dryRun: body.dryRun,
+    });
   }
 
   @Get(MedicineRoutes.EXAM_RISK_RULES.EXPORT)

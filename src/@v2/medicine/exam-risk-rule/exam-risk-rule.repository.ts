@@ -239,6 +239,70 @@ export class ExamRiskRuleRepository {
     });
   }
 
+  /** Regra por fonte + chave de proveniência (ex.: TECHNICAL + indicatorId::riskId). */
+  findRuleBySourceAndIndicator(
+    source: PcmsoExamRiskRuleSourceEnum,
+    sourceIndicatorId: string,
+  ) {
+    return this.prisma.pcmsoExamRiskRule.findFirst({
+      where: { source, sourceIndicatorId, deleted_at: null },
+      include: ruleInclude,
+    });
+  }
+
+  /**
+   * Regra NR-07 existente para o mesmo agente (fator de risco) e exame — base
+   * para anexar ACGIH/BEI como fonte complementar sem duplicar regra.
+   */
+  findNr07RuleByAgentAndExam(params: {
+    agentNameNormalized: string | null;
+    examId: number;
+  }) {
+    if (!params.agentNameNormalized) return Promise.resolve(null);
+    return this.prisma.pcmsoExamRiskRule.findFirst({
+      where: {
+        deleted_at: null,
+        source: PcmsoExamRiskRuleSourceEnum.NR_07,
+        scope: PcmsoExamRiskRuleScopeEnum.AGENT,
+        agentNameNormalized: params.agentNameNormalized,
+        exams: {
+          some: { deleted_at: null, examId: params.examId },
+        },
+      },
+      include: ruleInclude,
+    });
+  }
+
+  /** Indicadores oficiais ACGIH/BEI consolidados com vínculos de risco e exame. */
+  findAcgihIndicatorsForSync() {
+    return this.prisma.occupationalBiologicalIndicator.findMany({
+      where: {
+        deleted_at: null,
+        normativeSource: 'ACGIH_BEI',
+        acgihBeiIndicatorId: { not: null },
+      },
+      include: {
+        riskLinks: {
+          where: { deleted_at: null },
+          include: {
+            riskFactor: {
+              select: { id: true, name: true, cas: true, system: true, deleted_at: true },
+            },
+          },
+        },
+        examLinks: {
+          where: { deleted_at: null },
+          include: {
+            exam: {
+              select: { id: true, name: true, system: true, deleted_at: true },
+            },
+          },
+        },
+      },
+      orderBy: [{ substanceName: 'asc' }, { id: 'asc' }],
+    });
+  }
+
   searchExamCandidates(params: { search?: string; limit?: number }) {
     const search = params.search?.trim();
     return this.prisma.exam.findMany({
