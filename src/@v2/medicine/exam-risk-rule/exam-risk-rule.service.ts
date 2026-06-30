@@ -20,6 +20,10 @@ import {
   resolveExamRiskRuleNormativeOriginLabel,
   resolveExamRiskRuleRiskFactorDisplayName,
 } from './exam-risk-rule-riskfactor-display.util';
+import {
+  parseAcgihOfficialIndicatorId,
+  resolveExamRiskRuleSourceDisplay,
+} from './exam-risk-rule-source-display.util';
 import { ExamRiskRuleRepository } from './exam-risk-rule.repository';
 
 type RuleWithRelations = NonNullable<
@@ -28,6 +32,10 @@ type RuleWithRelations = NonNullable<
 
 type IndicatorRiskFactorMap = Awaited<
   ReturnType<ExamRiskRuleRepository['findNr07IndicatorRiskFactorsByIds']>
+>;
+
+type AcgihBeiOriginMap = Awaited<
+  ReturnType<ExamRiskRuleRepository['findAcgihBeiOriginsByOfficialIndicatorIds']>
 >;
 
 type ScopeReference = {
@@ -78,6 +86,7 @@ export class ExamRiskRuleService {
     }
 
     let indicatorRiskMap: IndicatorRiskFactorMap | undefined;
+    let acgihOriginMap: AcgihBeiOriginMap | undefined;
     if (
       rule.source === PcmsoExamRiskRuleSourceEnum.NR_07 &&
       rule.sourceIndicatorId
@@ -87,8 +96,20 @@ export class ExamRiskRuleService {
           rule.sourceIndicatorId,
         ]);
     }
+    if (
+      rule.source === PcmsoExamRiskRuleSourceEnum.TECHNICAL &&
+      rule.sourceIndicatorId
+    ) {
+      const officialId = parseAcgihOfficialIndicatorId(rule.sourceIndicatorId);
+      if (officialId) {
+        acgihOriginMap =
+          await this.repository.findAcgihBeiOriginsByOfficialIndicatorIds([
+            officialId,
+          ]);
+      }
+    }
 
-    return this.enrichRule(rule, indicatorRiskMap);
+    return this.enrichRule(rule, indicatorRiskMap, acgihOriginMap);
   }
 
   private async enrichBrowsePage(
@@ -106,18 +127,37 @@ export class ExamRiskRuleService {
       ),
     ];
 
-    const indicatorRiskMap =
-      await this.repository.findNr07IndicatorRiskFactorsByIds(indicatorIds);
+    const acgihOfficialIds = [
+      ...new Set(
+        result.data
+          .filter(
+            (rule) =>
+              rule.source === PcmsoExamRiskRuleSourceEnum.TECHNICAL &&
+              rule.sourceIndicatorId,
+          )
+          .map((rule) => parseAcgihOfficialIndicatorId(rule.sourceIndicatorId))
+          .filter((id): id is string => Boolean(id)),
+      ),
+    ];
+
+    const [indicatorRiskMap, acgihOriginMap] = await Promise.all([
+      this.repository.findNr07IndicatorRiskFactorsByIds(indicatorIds),
+      this.repository.findAcgihBeiOriginsByOfficialIndicatorIds(acgihOfficialIds),
+    ]);
 
     return {
       ...result,
       data: result.data.map((rule) =>
-        this.enrichRule(rule, indicatorRiskMap),
+        this.enrichRule(rule, indicatorRiskMap, acgihOriginMap),
       ),
     };
   }
 
-  private enrichRule(rule: RuleWithRelations, indicatorRiskMap?: IndicatorRiskFactorMap) {
+  private enrichRule(
+    rule: RuleWithRelations,
+    indicatorRiskMap?: IndicatorRiskFactorMap,
+    acgihOriginMap?: AcgihBeiOriginMap,
+  ) {
     const indicatorRiskFactor =
       rule.source === PcmsoExamRiskRuleSourceEnum.NR_07 && rule.sourceIndicatorId
         ? indicatorRiskMap?.get(rule.sourceIndicatorId) ?? null
@@ -137,6 +177,21 @@ export class ExamRiskRuleService {
       indicatorRiskFactor,
     };
 
+    const officialIndicatorId =
+      rule.source === PcmsoExamRiskRuleSourceEnum.TECHNICAL
+        ? parseAcgihOfficialIndicatorId(rule.sourceIndicatorId)
+        : null;
+    const acgihOrigin =
+      officialIndicatorId && acgihOriginMap
+        ? acgihOriginMap.get(officialIndicatorId) ?? null
+        : null;
+
+    const sourceDisplay = resolveExamRiskRuleSourceDisplay({
+      source: rule.source,
+      sourceIndicatorId: rule.sourceIndicatorId,
+      acgihOrigin,
+    });
+
     return {
       ...rule,
       linkedRiskFactorId:
@@ -145,6 +200,7 @@ export class ExamRiskRuleService {
         resolveExamRiskRuleRiskFactorDisplayName(displayInput),
       normativeOriginLabel:
         resolveExamRiskRuleNormativeOriginLabel(displayInput),
+      ...sourceDisplay,
     };
   }
 

@@ -26,6 +26,7 @@ describe('ExamRiskRuleService', () => {
     searchExamCandidates: jest.Mock;
     findNr07IndicatorIdsByRiskFactorNameSearch: jest.Mock;
     findNr07IndicatorRiskFactorsByIds: jest.Mock;
+    findAcgihBeiOriginsByOfficialIndicatorIds: jest.Mock;
   };
 
   beforeEach(() => {
@@ -49,6 +50,7 @@ describe('ExamRiskRuleService', () => {
       searchExamCandidates: jest.fn(),
       findNr07IndicatorIdsByRiskFactorNameSearch: jest.fn(() => Promise.resolve([])),
       findNr07IndicatorRiskFactorsByIds: jest.fn(() => Promise.resolve(new Map())),
+      findAcgihBeiOriginsByOfficialIndicatorIds: jest.fn(() => Promise.resolve(new Map())),
     };
 
     service = new ExamRiskRuleService(repository as never);
@@ -110,6 +112,52 @@ describe('ExamRiskRuleService', () => {
       );
       expect(result.data[0].normativeOriginLabel).toBe('Origem normativa: Benzeno');
       expect(result.data[0].linkedRiskFactorId).toBe('risk-benzeno');
+    });
+
+    it('expõe ACGIH/BEI como fonte para regra técnica originada do sync ACGIH', async () => {
+      repository.browse.mockResolvedValueOnce({
+        count: 1,
+        page: 1,
+        limit: 20,
+        data: [
+          {
+            id: 'rule-heptano',
+            scope: PcmsoExamRiskRuleScopeEnum.AGENT,
+            source: PcmsoExamRiskRuleSourceEnum.TECHNICAL,
+            sourceIndicatorId: 'official-heptano::risk-heptano',
+            agentName: 'Heptano, todos os isômeros',
+            agentCas: null,
+            riskNameSnapshot: 'Heptano, todos os isômeros',
+            riskFactorId: null,
+            riskCategory: null,
+            riskSubTypeId: null,
+            subTypeNameSnapshot: null,
+            exams: [],
+            references: [],
+          },
+        ],
+      } as never);
+
+      repository.findAcgihBeiOriginsByOfficialIndicatorIds.mockResolvedValueOnce(
+        new Map([
+          [
+            'official-heptano',
+            {
+              acgihBeiIndicatorId: 'staging-heptano',
+              substanceName: 'n-Heptano',
+            },
+          ],
+        ]) as never,
+      );
+
+      const result = await service.browse({ page: 1, limit: 20 });
+
+      expect(
+        repository.findAcgihBeiOriginsByOfficialIndicatorIds,
+      ).toHaveBeenCalledWith(['official-heptano']);
+      expect(result.data[0].sourceDisplayLabel).toBe('ACGIH/BEI');
+      expect(result.data[0].sourceOriginType).toBe('ACGIH_BEI');
+      expect(result.data[0].sourceOriginId).toBe('staging-heptano');
     });
 
     it('inclui indicadores NR-7 na busca por nome do fator de risco', async () => {

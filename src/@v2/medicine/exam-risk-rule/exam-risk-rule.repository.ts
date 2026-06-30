@@ -406,6 +406,49 @@ export class ExamRiskRuleRepository {
       });
   }
 
+  /** Origem ACGIH/BEI (staging) a partir do indicador oficial consolidado. */
+  findAcgihBeiOriginsByOfficialIndicatorIds(officialIndicatorIds: string[]) {
+    if (!officialIndicatorIds.length) {
+      return Promise.resolve(
+        new Map<
+          string,
+          { acgihBeiIndicatorId: string; substanceName: string | null }
+        >(),
+      );
+    }
+
+    return this.prisma.occupationalBiologicalIndicator
+      .findMany({
+        where: {
+          id: { in: officialIndicatorIds },
+          deleted_at: null,
+          normativeSource: 'ACGIH_BEI',
+          acgihBeiIndicatorId: { not: null },
+        },
+        select: {
+          id: true,
+          substanceName: true,
+          acgihBeiIndicatorId: true,
+        },
+      })
+      .then((rows) => {
+        const map = new Map<
+          string,
+          { acgihBeiIndicatorId: string; substanceName: string | null }
+        >();
+
+        for (const row of rows) {
+          if (!row.acgihBeiIndicatorId) continue;
+          map.set(row.id, {
+            acgihBeiIndicatorId: row.acgihBeiIndicatorId,
+            substanceName: row.substanceName,
+          });
+        }
+
+        return map;
+      });
+  }
+
   searchExamCandidates(params: { search?: string; limit?: number }) {
     const search = params.search?.trim();
     return this.prisma.exam.findMany({
