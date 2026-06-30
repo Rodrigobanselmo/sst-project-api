@@ -27,6 +27,8 @@ import { AcgihOfficialIndicatorPreviewService } from './biological-indicator/acg
 import { AcgihRiskCorrelationController } from './biological-indicator/acgih-risk-correlation/acgih-risk-correlation.controller';
 import { AcgihRiskCorrelationRepository } from './biological-indicator/acgih-risk-correlation/acgih-risk-correlation.repository';
 import { AcgihRiskCorrelationService } from './biological-indicator/acgih-risk-correlation/acgih-risk-correlation.service';
+import { AcgihRiskCorrelationApplyController } from './biological-indicator/acgih-risk-correlation/acgih-risk-correlation-apply.controller';
+import { AcgihRiskCorrelationApplyService } from './biological-indicator/acgih-risk-correlation/acgih-risk-correlation-apply.service';
 import { BiologicalIndicatorApplicationController } from './biological-indicator/application/application/biological-indicator-application.controller';
 import { BiologicalIndicatorCurationController } from './biological-indicator/application/curation/biological-indicator-curation.controller';
 import { BiologicalIndicatorMaintenanceController } from './biological-indicator/application/maintenance/biological-indicator-maintenance.controller';
@@ -68,6 +70,7 @@ import { ExamRiskRuleReferenceService } from './exam-risk-rule-reference/exam-ri
     AcgihOfficialIndicatorPreviewController,
     AcgihOfficialIndicatorApplyController,
     AcgihRiskCorrelationController,
+    AcgihRiskCorrelationApplyController,
   ],
   providers: [
     BiologicalIndicatorDAO,
@@ -115,6 +118,7 @@ import { ExamRiskRuleReferenceService } from './exam-risk-rule-reference/exam-ri
     // Frente A.1 — preview de correlação ACGIH/BEI × Fatores de Risco (read-only).
     AcgihRiskCorrelationRepository,
     AcgihRiskCorrelationService,
+    AcgihRiskCorrelationApplyService,
     // Leitura apenas do catálogo oficial da Tabela 27 (não altera eSocial).
     FindAllTable27Service,
     ESocial27TableRepository,

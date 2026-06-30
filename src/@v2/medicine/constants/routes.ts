@@ -17,6 +17,9 @@ export const MedicineRoutes = {
     // Frente A.1 — preview/dry-run (somente leitura) da correlação ACGIH/BEI ×
     // Fatores de Risco, com overrides manuais versionados. Não cria dados.
     ACGIH_RISK_CORRELATION_PREVIEW: 'acgih-risk-correlation/preview',
+    // Frente A.3 — apply seguro (escrita controlada) da correlação ACGIH/BEI ×
+    // Fatores de Risco. Cria APENAS BiologicalIndicatorToRisk. MASTER-only.
+    ACGIH_RISK_CORRELATION_APPLY: 'acgih-risk-correlation/apply',
     RISK_LINKS: {
       CONFIRM: 'risk-links/:id/confirm',
       REJECT: 'risk-links/:id/reject',
