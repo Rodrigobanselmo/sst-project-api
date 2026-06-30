@@ -71,6 +71,12 @@ describe('resolveExamOrigin', () => {
 describe('resolveExamOriginSources', () => {
   const SYSTEM_EXAM = { id: 1, companyId: simpleCompanyId, system: true };
   const CLIENT_EXAM = { id: 2, companyId: CLIENT_COMPANY, system: false };
+  const ESOCIAL_EXAM = {
+    id: 1,
+    companyId: simpleCompanyId,
+    system: true,
+    esocial27Code: '0295',
+  };
 
   it('exame só com indicador NR-7 → ["NR_07"]', () => {
     expect(
@@ -116,6 +122,78 @@ describe('resolveExamOriginSources', () => {
     expect(
       resolveExamOriginSources(CLIENT_EXAM, new Set(), new Set([2])),
     ).toEqual([ExamOriginSourceEnum.ACGIH_BEI]);
+  });
+
+  // ── eSocial Tabela 27 (fonte estrutural, acumulativa) ────────────────────
+  it('(1) exame com esocial27Code e sem NR-7/ACGIH → ["ESOCIAL_T27"]', () => {
+    expect(resolveExamOriginSources(ESOCIAL_EXAM, new Set(), new Set())).toEqual(
+      [ExamOriginSourceEnum.ESOCIAL_T27],
+    );
+  });
+
+  it('(2) esocial27Code + NR-7 → ["ESOCIAL_T27", "NR_07"]', () => {
+    expect(
+      resolveExamOriginSources(ESOCIAL_EXAM, new Set([1]), new Set()),
+    ).toEqual([ExamOriginSourceEnum.ESOCIAL_T27, ExamOriginSourceEnum.NR_07]);
+  });
+
+  it('(3) esocial27Code + ACGIH/BEI → ["ESOCIAL_T27", "ACGIH_BEI"]', () => {
+    expect(
+      resolveExamOriginSources(ESOCIAL_EXAM, new Set(), new Set([1])),
+    ).toEqual([
+      ExamOriginSourceEnum.ESOCIAL_T27,
+      ExamOriginSourceEnum.ACGIH_BEI,
+    ]);
+  });
+
+  it('(4) esocial27Code + NR-7 + ACGIH/BEI → as três na ordem T27, NR-7, ACGIH', () => {
+    expect(
+      resolveExamOriginSources(ESOCIAL_EXAM, new Set([1]), new Set([1])),
+    ).toEqual([
+      ExamOriginSourceEnum.ESOCIAL_T27,
+      ExamOriginSourceEnum.NR_07,
+      ExamOriginSourceEnum.ACGIH_BEI,
+    ]);
+  });
+
+  it('(6) esocial27Code vazio não vira ESOCIAL_T27 (cai no bucket sistêmico)', () => {
+    expect(
+      resolveExamOriginSources(
+        { id: 9, companyId: simpleCompanyId, system: true, esocial27Code: '' },
+        new Set(),
+        new Set(),
+      ),
+    ).toEqual([ExamOriginSourceEnum.SYSTEM]);
+  });
+
+  it('(6b) esocial27Code só com espaços não vira ESOCIAL_T27', () => {
+    expect(
+      resolveExamOriginSources(
+        { id: 9, companyId: simpleCompanyId, system: true, esocial27Code: '   ' },
+        new Set(),
+        new Set(),
+      ),
+    ).toEqual([ExamOriginSourceEnum.SYSTEM]);
+  });
+
+  it('(6c) esocial27Code null não vira ESOCIAL_T27', () => {
+    expect(
+      resolveExamOriginSources(
+        { id: 9, companyId: simpleCompanyId, system: true, esocial27Code: null },
+        new Set(),
+        new Set(),
+      ),
+    ).toEqual([ExamOriginSourceEnum.SYSTEM]);
+  });
+
+  it('eSocial acumula mesmo em exame de empresa (CLIENT + esocial27Code → só ESOCIAL_T27)', () => {
+    expect(
+      resolveExamOriginSources(
+        { ...CLIENT_EXAM, esocial27Code: '0658' },
+        new Set(),
+        new Set(),
+      ),
+    ).toEqual([ExamOriginSourceEnum.ESOCIAL_T27]);
   });
 });
 

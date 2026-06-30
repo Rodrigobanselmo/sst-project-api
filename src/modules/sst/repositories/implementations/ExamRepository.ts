@@ -265,11 +265,13 @@ export class ExamRepository {
       ]);
     }
 
-    // Accumulative technical/normative sources (NR-07 / ACGIH-BEI / ...). The
-    // NR-07 set is reused as-is (preserves the legacy chip); ACGIH/BEI links are
-    // fetched in a single batched query scoped to the current page's exam ids
+    // Accumulative technical/normative sources (eSocial T27 / NR-07 / ACGIH-BEI).
+    // The NR-07 set is reused as-is (preserves the legacy chip); ACGIH/BEI links
+    // are fetched in a single batched query scoped to the current page's exam ids
     // (no N+1), restricted to active + confirmed links over a non-deleted
-    // indicator. Only computed when origin metadata is requested.
+    // indicator. The eSocial T27 source is derived in-memory from the exam's own
+    // esocial27Code (already selected) — no extra query. Only computed when
+    // origin metadata is requested.
     const acgihBeiExamIds = extra.withOrigin
       ? await this.getAcgihBeiExamIds(response[1].map((exam) => exam.id))
       : new Set<number>();

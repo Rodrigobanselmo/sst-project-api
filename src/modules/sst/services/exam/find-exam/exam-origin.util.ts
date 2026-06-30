@@ -28,6 +28,8 @@ export enum ExamOriginEnum {
  * CLIENT / OTHER only appear when there is no specific normative source.
  */
 export enum ExamOriginSourceEnum {
+  /** Structural catalog source: exam tied to an eSocial Table 27 code. */
+  ESOCIAL_T27 = 'ESOCIAL_T27',
   /** Linked to an NR-07 biological indicator. */
   NR_07 = 'NR_07',
   /** Linked to an ACGIH/BEI biological indicator. */
@@ -55,23 +57,37 @@ export const resolveExamOrigin = (
   return ExamOriginEnum.OTHER;
 };
 
+/** True when an exam carries a non-empty eSocial Table 27 code. */
+const hasEsocialT27Code = (esocial27Code: string | null | undefined): boolean =>
+  typeof esocial27Code === 'string' && esocial27Code.trim() !== '';
+
 /**
- * Resolves the accumulative technical/normative sources of an exam. Normative
- * sources (NR-07, ACGIH/BEI) stack and take precedence in a fixed order
- * (NR_07 first, then ACGIH_BEI). Only when no normative link exists does the
- * exam fall back to a single systemic/ownership bucket (SYSTEM / CLIENT /
- * OTHER), mirroring {@link resolveExamOrigin}. This guarantees:
- *  - a pure NR-07 exam → ["NR_07"];
+ * Resolves the accumulative technical/normative sources of an exam. Structural
+ * and normative sources stack in a fixed, product-defined order:
+ * ESOCIAL_T27 → NR_07 → ACGIH_BEI. Only when none of them apply does the exam
+ * fall back to a single systemic/ownership bucket (SYSTEM / CLIENT / OTHER),
+ * mirroring {@link resolveExamOrigin}. This guarantees:
+ *  - an exam with only an eSocial T27 code → ["ESOCIAL_T27"];
+ *  - eSocial T27 + NR-07 → ["ESOCIAL_T27", "NR_07"];
+ *  - eSocial T27 + ACGIH/BEI → ["ESOCIAL_T27", "ACGIH_BEI"];
+ *  - the three together → ["ESOCIAL_T27", "NR_07", "ACGIH_BEI"];
  *  - a pure ACGIH/BEI exam → ["ACGIH_BEI"] (never masked as "SYSTEM");
- *  - an exam linked to both → ["NR_07", "ACGIH_BEI"] (NR-07 never replaced);
- *  - a generic catalog exam → ["SYSTEM"].
+ *  - a generic system catalog exam (no code, no link) → ["SYSTEM"].
  */
 export const resolveExamOriginSources = (
-  exam: { id: number; companyId: string; system: boolean },
+  exam: {
+    id: number;
+    companyId: string;
+    system: boolean;
+    esocial27Code?: string | null;
+  },
   nr07ExamIds: Set<number>,
   acgihBeiExamIds: Set<number>,
 ): ExamOriginSourceEnum[] => {
   const sources: ExamOriginSourceEnum[] = [];
+  if (hasEsocialT27Code(exam.esocial27Code)) {
+    sources.push(ExamOriginSourceEnum.ESOCIAL_T27);
+  }
   if (nr07ExamIds.has(exam.id)) sources.push(ExamOriginSourceEnum.NR_07);
   if (acgihBeiExamIds.has(exam.id)) sources.push(ExamOriginSourceEnum.ACGIH_BEI);
   if (sources.length > 0) return sources;

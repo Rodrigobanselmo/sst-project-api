@@ -42,7 +42,12 @@ interface MockData {
   /** examId[] linked to confirmed ACGIH/BEI indicators (origin enrichment). */
   acgihBeiExamIds: number[];
   /** Exam rows returned by the final exam.findMany (origin chips). */
-  examRows: { id: number; companyId: string; system: boolean }[];
+  examRows: {
+    id: number;
+    companyId: string;
+    system: boolean;
+    esocial27Code?: string | null;
+  }[];
 }
 
 const emptyData = (): MockData => ({
@@ -483,6 +488,64 @@ describe('ExamRepository.find — accumulative originSources enrichment', () => 
 
     expect((result.data[0] as any).origin).toBe('NR07');
     expect((result.data[0] as any).originSources).toEqual(['NR_07']);
+  });
+
+  it('(eSocial 1) exame com esocial27Code e sem vínculos → ["ESOCIAL_T27"]', async () => {
+    data.examRows = [
+      { id: 100, companyId: SYSTEM_COMPANY, system: true, esocial27Code: '0295' },
+    ];
+    const { prisma } = buildPrisma(data);
+    const repo = new ExamRepository(prisma as any);
+
+    const result = await repo.find(
+      { companyId: COMPANY },
+      { skip: 0, take: 20 },
+      {},
+      { withOrigin: true },
+    );
+
+    expect(originSourcesById(result)[100]).toEqual(['ESOCIAL_T27']);
+  });
+
+  it('(eSocial 2/3/4) acumula eSocial T27 + NR-7 + ACGIH/BEI na ordem definida', async () => {
+    data.examRows = [
+      { id: 101, companyId: SYSTEM_COMPANY, system: true, esocial27Code: '0658' },
+      { id: 102, companyId: SYSTEM_COMPANY, system: true, esocial27Code: '0693' },
+      { id: 103, companyId: SYSTEM_COMPANY, system: true, esocial27Code: '0974' },
+    ];
+    data.nr07ExamIds = [101, 103];
+    data.acgihBeiExamIds = [102, 103];
+    const { prisma } = buildPrisma(data);
+    const repo = new ExamRepository(prisma as any);
+
+    const result = await repo.find(
+      { companyId: COMPANY },
+      { skip: 0, take: 20 },
+      {},
+      { withOrigin: true },
+    );
+
+    const byId = originSourcesById(result);
+    expect(byId[101]).toEqual(['ESOCIAL_T27', 'NR_07']);
+    expect(byId[102]).toEqual(['ESOCIAL_T27', 'ACGIH_BEI']);
+    expect(byId[103]).toEqual(['ESOCIAL_T27', 'NR_07', 'ACGIH_BEI']);
+  });
+
+  it('(eSocial 6) esocial27Code vazio não vira ESOCIAL_T27 (cai em SYSTEM)', async () => {
+    data.examRows = [
+      { id: 104, companyId: SYSTEM_COMPANY, system: true, esocial27Code: '' },
+    ];
+    const { prisma } = buildPrisma(data);
+    const repo = new ExamRepository(prisma as any);
+
+    const result = await repo.find(
+      { companyId: COMPANY },
+      { skip: 0, take: 20 },
+      {},
+      { withOrigin: true },
+    );
+
+    expect(originSourcesById(result)[104]).toEqual(['SYSTEM']);
   });
 
   it('sem withOrigin: não enriquece origin nem originSources (picker de clínica)', async () => {
