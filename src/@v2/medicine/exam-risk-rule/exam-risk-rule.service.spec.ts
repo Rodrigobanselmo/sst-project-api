@@ -24,6 +24,8 @@ describe('ExamRiskRuleService', () => {
     findExamById: jest.Mock;
     searchRiskCandidates: jest.Mock;
     searchExamCandidates: jest.Mock;
+    findNr07IndicatorIdsByRiskFactorNameSearch: jest.Mock;
+    findNr07IndicatorRiskFactorsByIds: jest.Mock;
   };
 
   beforeEach(() => {
@@ -45,6 +47,8 @@ describe('ExamRiskRuleService', () => {
       ),
       searchRiskCandidates: jest.fn(),
       searchExamCandidates: jest.fn(),
+      findNr07IndicatorIdsByRiskFactorNameSearch: jest.fn(() => Promise.resolve([])),
+      findNr07IndicatorRiskFactorsByIds: jest.fn(() => Promise.resolve(new Map())),
     };
 
     service = new ExamRiskRuleService(repository as never);
@@ -57,6 +61,85 @@ describe('ExamRiskRuleService', () => {
     riskFactorId: 'risk-1',
     source: PcmsoExamRiskRuleSourceEnum.NR_07,
     ...overrides,
+  });
+
+  describe('browse enriquecido', () => {
+    it('expõe riskFactorDisplayName para NR-7 via indicador correlacionado', async () => {
+      repository.browse.mockResolvedValueOnce({
+        count: 1,
+        page: 1,
+        limit: 20,
+        data: [
+          {
+            id: 'rule-benzeno',
+            scope: PcmsoExamRiskRuleScopeEnum.AGENT,
+            source: PcmsoExamRiskRuleSourceEnum.NR_07,
+            sourceIndicatorId: 'ind-benzeno',
+            agentName: 'Benzeno',
+            agentCas: '71-43-2',
+            riskNameSnapshot: null,
+            riskFactorId: null,
+            riskCategory: null,
+            riskSubTypeId: null,
+            subTypeNameSnapshot: null,
+            exams: [],
+            references: [],
+          },
+        ],
+      } as never);
+
+      repository.findNr07IndicatorRiskFactorsByIds.mockResolvedValueOnce(
+        new Map([
+          [
+            'ind-benzeno',
+            {
+              riskFactorId: 'risk-benzeno',
+              riskFactorName: 'Benzeno e seus compostos tóxicos',
+            },
+          ],
+        ]) as never,
+      );
+
+      const result = await service.browse({ page: 1, limit: 20 });
+
+      expect(repository.findNr07IndicatorRiskFactorsByIds).toHaveBeenCalledWith([
+        'ind-benzeno',
+      ]);
+      expect(result.data[0].riskFactorDisplayName).toBe(
+        'Benzeno e seus compostos tóxicos',
+      );
+      expect(result.data[0].normativeOriginLabel).toBe('Origem normativa: Benzeno');
+      expect(result.data[0].linkedRiskFactorId).toBe('risk-benzeno');
+    });
+
+    it('inclui indicadores NR-7 na busca por nome do fator de risco', async () => {
+      repository.findNr07IndicatorIdsByRiskFactorNameSearch.mockResolvedValueOnce([
+        'ind-benzeno',
+      ] as never);
+      repository.browse.mockResolvedValueOnce({
+        count: 0,
+        page: 1,
+        limit: 20,
+        data: [],
+      } as never);
+
+      await service.browse({
+        page: 1,
+        limit: 20,
+        filters: { search: 'compostos tóxicos' },
+      });
+
+      expect(
+        repository.findNr07IndicatorIdsByRiskFactorNameSearch,
+      ).toHaveBeenCalledWith('compostos tóxicos');
+      expect(repository.browse).toHaveBeenCalledWith(
+        expect.objectContaining({
+          filters: expect.objectContaining({
+            nr07SourceIndicatorIds: ['ind-benzeno'],
+          }),
+        }),
+      );
+    });
   });
 
   describe('validação de escopo', () => {

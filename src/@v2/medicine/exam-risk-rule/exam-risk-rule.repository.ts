@@ -8,11 +8,15 @@ import {
 
 import { PrismaService } from '@/prisma/prisma.service';
 
+import { resolveIndicatorRiskFactorForDisplay } from './exam-risk-rule-riskfactor-display.util';
+
 export type BrowseExamRiskRulesFilters = {
   search?: string;
   scope?: PcmsoExamRiskRuleScopeEnum;
   status?: PcmsoExamRiskRuleStatusEnum;
   source?: PcmsoExamRiskRuleSourceEnum;
+  /** IDs de indicadores NR-7 cujo RiskFactor correlacionado casa com a busca. */
+  nr07SourceIndicatorIds?: string[];
 };
 
 export type BrowseExamRiskRulesParams = {
@@ -60,7 +64,7 @@ export class ExamRiskRuleRepository {
 
     if (filters.search?.trim()) {
       const search = filters.search.trim();
-      where.OR = [
+      const searchOr: Prisma.PcmsoExamRiskRuleWhereInput[] = [
         { riskNameSnapshot: { contains: search, mode: 'insensitive' } },
         { subTypeNameSnapshot: { contains: search, mode: 'insensitive' } },
         { agentName: { contains: search, mode: 'insensitive' } },
@@ -68,6 +72,14 @@ export class ExamRiskRuleRepository {
         { agentCas: { contains: search, mode: 'insensitive' } },
         { rationale: { contains: search, mode: 'insensitive' } },
       ];
+
+      if (filters.nr07SourceIndicatorIds?.length) {
+        searchOr.push({
+          sourceIndicatorId: { in: filters.nr07SourceIndicatorIds },
+        });
+      }
+
+      where.OR = searchOr;
     }
 
     return where;
@@ -319,6 +331,79 @@ export class ExamRiskRuleRepository {
       },
       orderBy: [{ substanceName: 'asc' }, { id: 'asc' }],
     });
+  }
+
+  /** IDs de indicadores NR-7 cujo RiskFactor correlacionado casa com a busca. */
+  findNr07IndicatorIdsByRiskFactorNameSearch(search: string) {
+    const term = search.trim();
+    if (!term) return Promise.resolve([] as string[]);
+
+    return this.prisma.biologicalIndicatorToRisk
+      .findMany({
+        where: {
+          deleted_at: null,
+          isConfirmed: true,
+          indicator: {
+            deleted_at: null,
+            normativeSource: 'NR_07',
+          },
+          riskFactor: {
+            deleted_at: null,
+            name: { contains: term, mode: 'insensitive' },
+          },
+        },
+        select: { indicatorId: true },
+        distinct: ['indicatorId'],
+      })
+      .then((rows) => rows.map((row) => row.indicatorId));
+  }
+
+  /** Fatores de risco correlacionados (read-only) para enriquecer browse NR-7. */
+  findNr07IndicatorRiskFactorsByIds(indicatorIds: string[]) {
+    if (!indicatorIds.length) {
+      return Promise.resolve(
+        new Map<string, { riskFactorId: string; riskFactorName: string }>(),
+      );
+    }
+
+    return this.prisma.occupationalBiologicalIndicator
+      .findMany({
+        where: {
+          id: { in: indicatorIds },
+          deleted_at: null,
+          normativeSource: 'NR_07',
+        },
+        select: {
+          id: true,
+          riskLinks: {
+            where: { deleted_at: null, isConfirmed: true },
+            select: {
+              deleted_at: true,
+              isConfirmed: true,
+              isPrimary: true,
+              riskFactorId: true,
+              riskFactor: {
+                select: { id: true, name: true, deleted_at: true },
+              },
+            },
+          },
+        },
+      })
+      .then((indicators) => {
+        const map = new Map<
+          string,
+          { riskFactorId: string; riskFactorName: string }
+        >();
+
+        for (const indicator of indicators) {
+          const resolved = resolveIndicatorRiskFactorForDisplay(
+            indicator.riskLinks,
+          );
+          if (resolved) map.set(indicator.id, resolved);
+        }
+
+        return map;
+      });
   }
 
   searchExamCandidates(params: { search?: string; limit?: number }) {

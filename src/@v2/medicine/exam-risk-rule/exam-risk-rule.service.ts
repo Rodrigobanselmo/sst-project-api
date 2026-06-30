@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import {
   PcmsoExamRiskRuleScopeEnum,
+  PcmsoExamRiskRuleSourceEnum,
   PcmsoExamRiskRuleStatusEnum,
   Prisma,
   RiskFactorsEnum,
@@ -15,7 +16,19 @@ import {
   ExamRiskRuleExamInput,
   UpdateExamRiskRuleBody,
 } from './exam-risk-rule.dto';
+import {
+  resolveExamRiskRuleNormativeOriginLabel,
+  resolveExamRiskRuleRiskFactorDisplayName,
+} from './exam-risk-rule-riskfactor-display.util';
 import { ExamRiskRuleRepository } from './exam-risk-rule.repository';
+
+type RuleWithRelations = NonNullable<
+  Awaited<ReturnType<ExamRiskRuleRepository['findById']>>
+>;
+
+type IndicatorRiskFactorMap = Awaited<
+  ReturnType<ExamRiskRuleRepository['findNr07IndicatorRiskFactorsByIds']>
+>;
 
 type ScopeReference = {
   scope: PcmsoExamRiskRuleScopeEnum;
@@ -40,7 +53,22 @@ export class ExamRiskRuleService {
   constructor(private readonly repository: ExamRiskRuleRepository) {}
 
   browse(params: Parameters<ExamRiskRuleRepository['browse']>[0]) {
-    return this.repository.browse(params);
+    return this.browseEnriched(params);
+  }
+
+  private async browseEnriched(
+    params: Parameters<ExamRiskRuleRepository['browse']>[0],
+  ) {
+    const filters = { ...params.filters };
+    const search = filters.search?.trim();
+
+    if (search) {
+      filters.nr07SourceIndicatorIds =
+        await this.repository.findNr07IndicatorIdsByRiskFactorNameSearch(search);
+    }
+
+    const result = await this.repository.browse({ ...params, filters });
+    return this.enrichBrowsePage(result);
   }
 
   async getById(id: string) {
@@ -48,7 +76,76 @@ export class ExamRiskRuleService {
     if (!rule) {
       throw new NotFoundException('Regra Exame × Risco não encontrada.');
     }
-    return rule;
+
+    let indicatorRiskMap: IndicatorRiskFactorMap | undefined;
+    if (
+      rule.source === PcmsoExamRiskRuleSourceEnum.NR_07 &&
+      rule.sourceIndicatorId
+    ) {
+      indicatorRiskMap =
+        await this.repository.findNr07IndicatorRiskFactorsByIds([
+          rule.sourceIndicatorId,
+        ]);
+    }
+
+    return this.enrichRule(rule, indicatorRiskMap);
+  }
+
+  private async enrichBrowsePage(
+    result: Awaited<ReturnType<ExamRiskRuleRepository['browse']>>,
+  ) {
+    const indicatorIds = [
+      ...new Set(
+        result.data
+          .filter(
+            (rule) =>
+              rule.source === PcmsoExamRiskRuleSourceEnum.NR_07 &&
+              rule.sourceIndicatorId,
+          )
+          .map((rule) => rule.sourceIndicatorId as string),
+      ),
+    ];
+
+    const indicatorRiskMap =
+      await this.repository.findNr07IndicatorRiskFactorsByIds(indicatorIds);
+
+    return {
+      ...result,
+      data: result.data.map((rule) =>
+        this.enrichRule(rule, indicatorRiskMap),
+      ),
+    };
+  }
+
+  private enrichRule(rule: RuleWithRelations, indicatorRiskMap?: IndicatorRiskFactorMap) {
+    const indicatorRiskFactor =
+      rule.source === PcmsoExamRiskRuleSourceEnum.NR_07 && rule.sourceIndicatorId
+        ? indicatorRiskMap?.get(rule.sourceIndicatorId) ?? null
+        : null;
+
+    const displayInput = {
+      scope: rule.scope,
+      source: rule.source,
+      riskFactorId: rule.riskFactorId,
+      riskCategory: rule.riskCategory,
+      riskSubTypeId: rule.riskSubTypeId,
+      agentName: rule.agentName,
+      agentCas: rule.agentCas,
+      riskNameSnapshot: rule.riskNameSnapshot,
+      subTypeNameSnapshot: rule.subTypeNameSnapshot,
+      sourceIndicatorId: rule.sourceIndicatorId,
+      indicatorRiskFactor,
+    };
+
+    return {
+      ...rule,
+      linkedRiskFactorId:
+        indicatorRiskFactor?.riskFactorId ?? rule.riskFactorId ?? null,
+      riskFactorDisplayName:
+        resolveExamRiskRuleRiskFactorDisplayName(displayInput),
+      normativeOriginLabel:
+        resolveExamRiskRuleNormativeOriginLabel(displayInput),
+    };
   }
 
   searchRiskCandidates(params: Parameters<ExamRiskRuleRepository['searchRiskCandidates']>[0]) {
