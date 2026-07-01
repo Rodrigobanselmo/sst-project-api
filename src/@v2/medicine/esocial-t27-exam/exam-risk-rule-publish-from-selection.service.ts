@@ -19,6 +19,8 @@ import {
   buildEsocialT27SourceIndicatorId,
   isEsocialT27SourceIndicatorId,
 } from './esocial-t27-exam.util';
+import { ResolveSystemExamForRulePublicationService } from './resolve-system-exam-for-rule-publication.service';
+import { SystemExamPublicationAction } from './resolve-system-exam-for-rule-publication.util';
 
 export type PublishSystemRuleAction = 'created' | 'alreadyExists' | 'skipped';
 
@@ -26,6 +28,8 @@ export type PublishSystemRuleResult = {
   action: PublishSystemRuleAction;
   ruleId?: string;
   reason?: string;
+  systemExamId?: number;
+  examPublicationAction?: SystemExamPublicationAction;
 };
 
 export type PublishSystemRuleInput = {
@@ -53,6 +57,7 @@ export class ExamRiskRulePublishFromSelectionService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly ruleRepository: ExamRiskRuleRepository,
+    private readonly resolveSystemExamService: ResolveSystemExamForRulePublicationService,
   ) {}
 
   async publish(
@@ -77,17 +82,20 @@ export class ExamRiskRulePublishFromSelectionService {
       };
     }
 
-    const exam = await this.prisma.exam.findFirst({
-      where: { id: input.examId, deleted_at: null },
-      select: { id: true, name: true, esocial27Code: true },
-    });
-
-    if (!exam) {
+    const resolvedSystemExam = await this.resolveSystemExamService.resolve(input.examId);
+    if (!resolvedSystemExam) {
       return {
         action: 'skipped',
         reason: 'Exame não encontrado para publicar regra padrão.',
       };
     }
+
+    const systemExam = {
+      id: resolvedSystemExam.systemExamId,
+      name: resolvedSystemExam.systemExamName,
+      esocial27Code: resolvedSystemExam.esocial27Code,
+    };
+    const examPublicationAction = resolvedSystemExam.action;
 
     const agentName = riskFactor.name?.trim() || null;
     const agentNameNormalized = normalizeAgentName(agentName);
@@ -100,7 +108,7 @@ export class ExamRiskRulePublishFromSelectionService {
 
     const sourceIndicatorId = buildEsocialT27SourceIndicatorId(
       riskFactor.id,
-      exam.id,
+      systemExam.id,
     );
 
     const existingByIndicator = await this.ruleRepository.findRuleBySourceAndIndicator(
@@ -118,7 +126,7 @@ export class ExamRiskRulePublishFromSelectionService {
 
     const existingNr07 = await this.ruleRepository.findNr07RuleByAgentAndExam({
       agentNameNormalized,
-      examId: exam.id,
+      examId: systemExam.id,
     });
     if (existingNr07) {
       return {
@@ -131,7 +139,7 @@ export class ExamRiskRulePublishFromSelectionService {
 
     const existingAgentExam = await this.ruleRepository.findAgentRuleByExam({
       agentNameNormalized,
-      examId: exam.id,
+      examId: systemExam.id,
     });
     if (existingAgentExam) {
       if (existingAgentExam.source === PcmsoExamRiskRuleSourceEnum.NR_07) {
@@ -170,16 +178,16 @@ export class ExamRiskRulePublishFromSelectionService {
       `Usuário MASTER: ${user.userId}.`,
       input.esocial27Code
         ? `Procedimento eSocial T27: ${input.esocial27Code}.`
-        : exam.esocial27Code
-          ? `Procedimento eSocial T27: ${exam.esocial27Code}.`
+        : systemExam.esocial27Code
+          ? `Procedimento eSocial T27: ${systemExam.esocial27Code}.`
           : null,
     ]
       .filter(Boolean)
       .join(' ');
 
     const examRow: Prisma.PcmsoExamRiskRuleExamCreateManyRuleInput = {
-      examId: exam.id,
-      examNameSnapshot: exam.name,
+      examId: systemExam.id,
+      examNameSnapshot: systemExam.name,
       isAdmission: input.isAdmission ?? true,
       isPeriodic: input.isPeriodic ?? true,
       isChange: input.isChange ?? true,
@@ -214,6 +222,8 @@ export class ExamRiskRulePublishFromSelectionService {
       action: 'created',
       ruleId: created.id,
       reason: 'Regra padrão publicada na Biblioteca Risco × Exame.',
+      systemExamId: systemExam.id,
+      examPublicationAction,
     };
   }
 }

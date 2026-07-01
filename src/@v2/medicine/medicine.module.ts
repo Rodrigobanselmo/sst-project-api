@@ -64,6 +64,7 @@ import { ExamRiskRuleReferenceService } from './exam-risk-rule-reference/exam-ri
 import { EsocialT27ExamController } from './esocial-t27-exam/esocial-t27-exam.controller';
 import { EsocialT27ExamService } from './esocial-t27-exam/esocial-t27-exam.service';
 import { ExamRiskRulePublishFromSelectionService } from './esocial-t27-exam/exam-risk-rule-publish-from-selection.service';
+import { ResolveSystemExamForRulePublicationService } from './esocial-t27-exam/resolve-system-exam-for-rule-publication.service';
 import { ExamTechnicalSuggestionController } from './exam/exam-technical-suggestion.controller';
 import { ExamTechnicalSuggestionService } from './exam/exam-technical-suggestion.service';
 
@@ -141,6 +142,7 @@ import { ExamTechnicalSuggestionService } from './exam/exam-technical-suggestion
     AcgihExamLinkService,
     EsocialT27ExamService,
     ExamRiskRulePublishFromSelectionService,
+    ResolveSystemExamForRulePublicationService,
     ExamTechnicalSuggestionService,
     // Leitura apenas do catálogo oficial da Tabela 27 (não altera eSocial).
     FindAllTable27Service,
