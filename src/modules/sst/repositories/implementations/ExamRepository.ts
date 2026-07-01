@@ -13,6 +13,7 @@ import {
   buildAgentLibraryWhere,
   buildExamOrderBy,
   buildExamOriginConstraint,
+  buildExamSearchConstraint,
   buildRiskApplicabilityConstraint,
   buildRiskIndicatorExamWhere,
   buildRiskIndicatorLinkWhere,
@@ -115,9 +116,10 @@ export class ExamRepository {
     }
 
     if ('search' in query && query.search) {
-      (where.AND as any).push({
-        OR: [{ name: { contains: query.search, mode: 'insensitive' } }],
-      } as typeof options.where);
+      const searchConstraint = buildExamSearchConstraint(query.search);
+      if (searchConstraint) {
+        (where.AND as any).push(searchConstraint);
+      }
     }
 
     // Origin support (opt-in). Keeps legacy behavior untouched when withOrigin
@@ -236,11 +238,8 @@ export class ExamRepository {
     let response: [number, any[]];
 
     if (extraConstraints.length > 0) {
-      // When applying extra constraints (origin and/or risk applicability),
-      // count and data must share the same where so totals stay consistent
-      // with the visible rows.
       const consistentWhere = {
-        AND: [{ OR: [where, { system: true }] }, ...extraConstraints],
+        AND: [where, ...extraConstraints],
       };
       response = await this.prisma.$transaction([
         this.prisma.exam.count({ where: consistentWhere }),
@@ -256,7 +255,7 @@ export class ExamRepository {
       response = await this.prisma.$transaction([
         this.prisma.exam.count({ where }),
         this.prisma.exam.findMany({
-          where: { OR: [where, { system: true }] },
+          where,
           include: Object.keys(include).length > 0 ? include : undefined,
           take: pagination.take || 20,
           skip: pagination.skip || 0,

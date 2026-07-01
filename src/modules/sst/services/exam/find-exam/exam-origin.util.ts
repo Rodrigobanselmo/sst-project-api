@@ -307,6 +307,26 @@ export const mergeRecommendedExamIds = (
   ...sources: number[][]
 ): Set<number> => new Set<number>(sources.flat());
 
+/**
+ * Restringe a lista por termo de busca do seletor de exames. Campos: name,
+ * esocial27Code, analyses e material (case-insensitive contains).
+ */
+export const buildExamSearchConstraint = (
+  search: string | undefined,
+): Prisma.ExamWhereInput | null => {
+  const term = search?.trim();
+  if (!term) return null;
+
+  return {
+    OR: [
+      { name: { contains: term, mode: 'insensitive' } },
+      { esocial27Code: { contains: term, mode: 'insensitive' } },
+      { analyses: { contains: term, mode: 'insensitive' } },
+      { material: { contains: term, mode: 'insensitive' } },
+    ],
+  };
+};
+
 const SORTABLE_FIELDS = new Set([
   'name',
   'analyses',

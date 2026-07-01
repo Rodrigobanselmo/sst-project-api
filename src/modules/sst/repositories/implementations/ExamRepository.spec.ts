@@ -568,4 +568,25 @@ describe('ExamRepository.find — accumulative originSources enrichment', () => 
       .filter((args: any) => args?.where?.indicator?.normativeSource === 'ACGIH_BEI');
     expect(acgihCalls).toHaveLength(0);
   });
+
+  it('(11) includeIncompatible + search usa where único sem bypass { system: true }', async () => {
+    const { prisma, examFindMany } = buildPrisma(data);
+    const repo = new ExamRepository(prisma as any);
+
+    await repo.find(
+      {
+        companyId: COMPANY,
+        includeIncompatible: true,
+        search: 'Hemograma',
+        riskType: 'QUI' as any,
+      },
+      { skip: 0, take: 15 },
+      {},
+      { withOrigin: true },
+    );
+
+    const examWhere = lastExamWhere(examFindMany);
+    expect(examWhere.OR).toBeUndefined();
+    expect(JSON.stringify(examWhere)).toContain('Hemograma');
+  });
 });

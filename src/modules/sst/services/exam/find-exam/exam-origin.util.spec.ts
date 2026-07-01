@@ -12,6 +12,7 @@ import {
   buildAgentLibraryWhere,
   buildExamOrderBy,
   buildExamOriginConstraint,
+  buildExamSearchConstraint,
   buildRiskIndicatorExamWhere,
   buildRiskIndicatorLinkWhere,
   ExamOriginEnum,
@@ -399,6 +400,34 @@ describe('mergeRecommendedExamIds', () => {
   it('inclui exame vindo apenas do riskFactorId (grupo/isômero, sem CAS/nome)', () => {
     const merged = mergeRecommendedExamIds([], [], [99]);
     expect(Array.from(merged)).toEqual([99]);
+  });
+});
+
+describe('buildExamSearchConstraint', () => {
+  it('retorna null para busca vazia', () => {
+    expect(buildExamSearchConstraint('')).toBeNull();
+    expect(buildExamSearchConstraint('   ')).toBeNull();
+  });
+
+  it('busca em name, esocial27Code, analyses e material', () => {
+    const constraint = buildExamSearchConstraint('Hemograma');
+    expect(constraint?.OR).toEqual(
+      expect.arrayContaining([
+        { name: { contains: 'Hemograma', mode: 'insensitive' } },
+        { esocial27Code: { contains: 'Hemograma', mode: 'insensitive' } },
+        { analyses: { contains: 'Hemograma', mode: 'insensitive' } },
+        { material: { contains: 'Hemograma', mode: 'insensitive' } },
+      ]),
+    );
+  });
+
+  it('permite localizar por código eSocial', () => {
+    const constraint = buildExamSearchConstraint('0693');
+    expect(constraint?.OR).toEqual(
+      expect.arrayContaining([
+        { esocial27Code: { contains: '0693', mode: 'insensitive' } },
+      ]),
+    );
   });
 });
 
