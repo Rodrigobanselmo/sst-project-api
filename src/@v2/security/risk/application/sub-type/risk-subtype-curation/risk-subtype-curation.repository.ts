@@ -8,6 +8,7 @@ import {
   RiskSubtypeCurationFilterEnum,
   RiskSubtypeCurationRiskRow,
 } from './risk-subtype-curation.types';
+import type { RiskSubtypeCurationSuggestEligibleRisk } from './risk-subtype-curation-suggest.types';
 
 export type BrowseCurationRisksParams = {
   page: number;
@@ -30,6 +31,32 @@ const riskSelect = {
   esocialCode: true,
   status: true,
   isPCMSO: true,
+  subTypes: {
+    select: {
+      sub_type: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+  },
+} satisfies Prisma.RiskFactorsSelect;
+
+const suggestRiskSelect = {
+  id: true,
+  name: true,
+  cas: true,
+  synonymous: true,
+  esocialCode: true,
+  risk: true,
+  symptoms: true,
+  coments: true,
+  method: true,
+  nr15lt: true,
+  twa: true,
+  stel: true,
+  ipvs: true,
   subTypes: {
     select: {
       sub_type: {
@@ -90,10 +117,41 @@ export class RiskSubtypeCurationRepository {
       select: {
         id: true,
         name: true,
+        description: true,
         type: true,
         status: true,
       },
     });
+  }
+
+  async findEligibleRisksForSuggestion(params: {
+    type: RiskTypeEnum;
+    onlyPcmso: boolean;
+    search?: string;
+    take: number;
+  }): Promise<{ rows: RiskSubtypeCurationSuggestEligibleRisk[]; total: number }> {
+    const where = this.buildRiskWhere({
+      type: params.type,
+      status: StatusEnum.ACTIVE,
+      onlyPcmso: params.onlyPcmso,
+      search: params.search,
+      subtypeFilter: RiskSubtypeCurationFilterEnum.NONE,
+    });
+
+    const [rows, total] = await Promise.all([
+      this.prisma.riskFactors.findMany({
+        where,
+        select: suggestRiskSelect,
+        orderBy: [{ name: 'asc' }],
+        take: params.take,
+      }),
+      this.prisma.riskFactors.count({ where }),
+    ]);
+
+    return {
+      rows: rows.map((row) => this.mapSuggestRiskRow(row)),
+      total,
+    };
   }
 
   replaceRiskSubTypes(riskId: string, subTypeId: number) {
@@ -175,6 +233,30 @@ export class RiskSubtypeCurationRepository {
       esocialCode: row.esocialCode,
       status: row.status,
       isPCMSO: row.isPCMSO,
+      subTypes: row.subTypes.map((link) => ({
+        id: link.sub_type.id,
+        name: link.sub_type.name,
+      })),
+    };
+  }
+
+  private mapSuggestRiskRow(
+    row: Prisma.RiskFactorsGetPayload<{ select: typeof suggestRiskSelect }>,
+  ): RiskSubtypeCurationSuggestEligibleRisk {
+    return {
+      id: row.id,
+      name: row.name,
+      cas: row.cas,
+      synonymous: row.synonymous ?? [],
+      esocialCode: row.esocialCode,
+      risk: row.risk,
+      symptoms: row.symptoms,
+      coments: row.coments,
+      method: row.method,
+      nr15lt: row.nr15lt,
+      twa: row.twa,
+      stel: row.stel,
+      ipvs: row.ipvs,
       subTypes: row.subTypes.map((link) => ({
         id: link.sub_type.id,
         name: link.sub_type.name,

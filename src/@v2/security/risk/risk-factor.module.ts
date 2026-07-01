@@ -13,6 +13,9 @@ import { RiskSubTypeMasterService } from './application/sub-type/risk-sub-type-m
 import { RiskSubtypeCurationController } from './application/sub-type/risk-subtype-curation/risk-subtype-curation.controller';
 import { RiskSubtypeCurationRepository } from './application/sub-type/risk-subtype-curation/risk-subtype-curation.repository';
 import { RiskSubtypeCurationService } from './application/sub-type/risk-subtype-curation/risk-subtype-curation.service';
+import { RiskSubtypeCurationSuggestService } from './application/sub-type/risk-subtype-curation/risk-subtype-curation-suggest.service';
+import { ChemicalIdentityEnrichmentService } from './application/sub-type/risk-subtype-curation/chemical-identity-enrichment/chemical-identity-enrichment.service';
+import { PubChemPugRestClient } from './application/sub-type/risk-subtype-curation/chemical-identity-enrichment/pubchem-pug-rest.client';
 import { SubTypeDAO } from './database/dao/sub-type/sub-type.dao';
 
 @Module({
@@ -32,6 +35,9 @@ import { SubTypeDAO } from './database/dao/sub-type/sub-type.dao';
     RiskSubTypeMasterService,
     RiskSubtypeCurationRepository,
     RiskSubtypeCurationService,
+    RiskSubtypeCurationSuggestService,
+    ChemicalIdentityEnrichmentService,
+    PubChemPugRestClient,
   ],
   exports: [],
 })

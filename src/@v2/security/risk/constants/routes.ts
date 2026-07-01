@@ -13,6 +13,7 @@ export const SubTypeRoutes = {
     RISKS: 'risks',
     BULK_ASSIGN: 'risks/bulk-assign',
     BULK_CLEAR: 'risks/bulk-clear',
+    SUGGEST_CANDIDATES: 'risks/suggest-candidates',
   },
 } as const;
 
