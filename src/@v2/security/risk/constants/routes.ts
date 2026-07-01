@@ -7,6 +7,7 @@ export const SubTypeRoutes = {
     BASE: 'v2/master/risk-sub-types',
     BY_ID: 'v2/master/risk-sub-types/:id',
     STATUS: 'v2/master/risk-sub-types/:id/status',
+    AI_INSTRUCTION: ':id/ai-instruction',
   },
   MASTER_CURATION: {
     BASE: 'v2/master/risk-subtype-curation',
@@ -14,6 +15,7 @@ export const SubTypeRoutes = {
     BULK_ASSIGN: 'risks/bulk-assign',
     BULK_CLEAR: 'risks/bulk-clear',
     SUGGEST_CANDIDATES: 'risks/suggest-candidates',
+    AI_PROMPT_PREVIEW: 'ai-prompt/preview',
   },
 } as const;
 

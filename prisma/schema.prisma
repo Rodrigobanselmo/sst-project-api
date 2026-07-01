@@ -2160,6 +2160,7 @@ model RiskSubType {
 
   RiskToRiskSubType            RiskToRiskSubType[]
   ActionPlanRulesOnRiskSubType ActionPlanRulesOnRiskSubType[]
+  aiInstruction                RiskSubTypeAiInstruction?
 
   @@unique([type, slug])
   @@index([type])
@@ -2175,6 +2176,26 @@ model RiskToRiskSubType {
 
   risk_id String
   risk    RiskFactors @relation(fields: [risk_id], references: [id], onDelete: Cascade)
+}
+
+model RiskSubTypeAiInstruction {
+  id               Int         @id @default(autoincrement())
+  subTypeId        Int         @unique
+  subType          RiskSubType @relation(fields: [subTypeId], references: [id], onDelete: Cascade)
+  useSystemDefault Boolean     @default(true)
+  instructions     String?     @db.Text
+  positiveExamples String?     @db.Text
+  negativeExamples String?     @db.Text
+  cautionRules     String?     @db.Text
+  preferredModel   String?
+  revision         Int         @default(1)
+  updatedById      Int?
+  created_at       DateTime    @default(now())
+  updated_at       DateTime    @updatedAt
+
+  updatedByUser User? @relation("RiskSubTypeAiInstructionUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@index([subTypeId])
 }
 
 model RiskFactorsDocInfo {
@@ -2601,6 +2622,7 @@ model User {
   aiFiles                AiFile[]                    @relation("AiFileUploader")
   aiPendingActions       AiPendingAction[]
   systemAiPromptsUpdated              SystemAiPrompt[]              @relation("SystemAiPromptUpdatedBy")
+  riskSubTypeAiInstructionsUpdated    RiskSubTypeAiInstruction[]    @relation("RiskSubTypeAiInstructionUpdatedBy")
   formRiskNarrativeDiagnosticsCreated       FormRiskNarrativeDiagnostic[]       @relation("FormRiskNarrativeDiagnosticGeneratedBy")
   formIndicatorsNarrativeDiagnosticsCreated FormIndicatorsNarrativeDiagnostic[] @relation("FormIndicatorsNarrativeDiagnosticGeneratedBy")
   biologicalIndicatorImports              BiologicalIndicatorImportBatch[]      @relation("BiologicalIndicatorImportedBy")
@@ -3169,6 +3191,7 @@ enum SystemAiPromptKeyEnum {
   RISK_FACTOR_ACCIDENT_AI_SUGGESTIONS
   RISK_FACTOR_OTHER_AI_SUGGESTIONS
   HO_METHOD_IMPORT_AI_REVIEW
+  RISK_SUBTYPE_CURATION_SUGGESTIONS
 }
 
 enum RiskRecTypeEnum {

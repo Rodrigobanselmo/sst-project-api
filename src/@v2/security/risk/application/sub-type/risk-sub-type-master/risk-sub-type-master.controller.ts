@@ -5,6 +5,7 @@ import {
   Param,
   Patch,
   Post,
+  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -23,13 +24,18 @@ import {
   UpdateMasterRiskSubTypeBody,
   UpdateMasterRiskSubTypeStatusBody,
 } from './risk-sub-type-master.dto';
+import { UpsertRiskSubTypeAiInstructionBody } from '../risk-subtype-curation/risk-subtype-curation-ai-instruction.dto';
+import { RiskSubTypeAiInstructionService } from '../risk-subtype-curation/risk-subtype-ai-instruction.service';
 import { RiskSubTypeMasterService } from './risk-sub-type-master.service';
 
 @Controller(SubTypeRoutes.MASTER.BASE)
 @UseGuards(JwtAuthGuard)
 @Roles(RoleEnum.MASTER)
 export class RiskSubTypeMasterController {
-  constructor(private readonly service: RiskSubTypeMasterService) {}
+  constructor(
+    private readonly service: RiskSubTypeMasterService,
+    private readonly aiInstructionService: RiskSubTypeAiInstructionService,
+  ) {}
 
   @Get()
   browse(@Query() query: BrowseMasterRiskSubTypesQuery) {
@@ -66,5 +72,19 @@ export class RiskSubTypeMasterController {
     @Body() body: UpdateMasterRiskSubTypeBody,
   ) {
     return this.service.update(path.id, body);
+  }
+
+  @Get(SubTypeRoutes.MASTER.AI_INSTRUCTION)
+  getAiInstruction(@Param() path: RiskSubTypeIdPath) {
+    return this.aiInstructionService.getInstruction(path.id);
+  }
+
+  @Put(SubTypeRoutes.MASTER.AI_INSTRUCTION)
+  upsertAiInstruction(
+    @Param() path: RiskSubTypeIdPath,
+    @Body() body: UpsertRiskSubTypeAiInstructionBody,
+    @User() user: UserPayloadDto,
+  ) {
+    return this.aiInstructionService.upsertInstruction(path.id, body, user.userId);
   }
 }

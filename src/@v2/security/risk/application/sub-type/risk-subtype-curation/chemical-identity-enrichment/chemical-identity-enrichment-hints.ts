@@ -26,7 +26,8 @@ const NITRO_AROMATIC_TEXT = /nitrobenzene|nitrobenzeno|nitrotoluene|trinitrotolu
 
 const AROMATIC_AMINE_TEXT = /aniline|anilina|aromatic amine|amina arom/i;
 
-const PHENOL_TEXT = /phenol|fenol|cresol|cresol/i;
+const PHENOL_TEXT =
+  /phenol|fenol|cresol|cresói|xilenol|xylenol|catecol|catechol|resorcinol|hidroquinona|hydroquinone|clorofenol|chlorophenol|nitrofenol|nitrophenol|dinitrofenol|aminofenol|aminophenol|pirógalo|pyrogallol/i;
 
 function buildCorpus(parts: (string | undefined)[]): string {
   return parts
@@ -76,6 +77,7 @@ export function buildNormalizedHints(params: {
   if (hasPattern(corpus, HALOGENATED_TEXT)) classHints.push('halogenated');
 
   const smilesAromatic = inferAromaticRingFromSmiles(params.canonicalSmiles);
+  const isIsocyanateHint = hasPattern(corpus, ISOCYANATE_TEXT) ? true : null;
 
   return {
     hasAromaticRing:
@@ -87,10 +89,15 @@ export function buildNormalizedHints(params: {
       : null,
     isAliphaticHint: hasPattern(corpus, ALIPHATIC_TEXT) ? true : null,
     isHalogenatedHint: hasPattern(corpus, HALOGENATED_TEXT) ? true : null,
-    isIsocyanateHint: hasPattern(corpus, ISOCYANATE_TEXT) ? true : null,
+    isIsocyanateHint,
     isNitroAromaticHint: hasPattern(corpus, NITRO_AROMATIC_TEXT) ? true : null,
     isAromaticAmineHint: hasPattern(corpus, AROMATIC_AMINE_TEXT) ? true : null,
-    isPhenolOrCresolHint: hasPattern(corpus, PHENOL_TEXT) ? true : null,
+    isPhenolOrCresolHint:
+      isIsocyanateHint === true
+        ? null
+        : hasPattern(corpus, PHENOL_TEXT)
+          ? true
+          : null,
     matchedSynonyms: (params.synonyms ?? []).slice(0, 8),
     classHints: [...new Set(classHints)],
   };

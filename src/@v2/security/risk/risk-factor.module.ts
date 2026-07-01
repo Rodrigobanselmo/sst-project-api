@@ -14,6 +14,9 @@ import { RiskSubtypeCurationController } from './application/sub-type/risk-subty
 import { RiskSubtypeCurationRepository } from './application/sub-type/risk-subtype-curation/risk-subtype-curation.repository';
 import { RiskSubtypeCurationService } from './application/sub-type/risk-subtype-curation/risk-subtype-curation.service';
 import { RiskSubtypeCurationSuggestService } from './application/sub-type/risk-subtype-curation/risk-subtype-curation-suggest.service';
+import { RiskSubtypeCurationAiPromptService } from './application/sub-type/risk-subtype-curation/risk-subtype-curation-ai-prompt.service';
+import { RiskSubTypeAiInstructionRepository } from './application/sub-type/risk-subtype-curation/risk-subtype-ai-instruction.repository';
+import { RiskSubTypeAiInstructionService } from './application/sub-type/risk-subtype-curation/risk-subtype-ai-instruction.service';
 import { ChemicalIdentityEnrichmentService } from './application/sub-type/risk-subtype-curation/chemical-identity-enrichment/chemical-identity-enrichment.service';
 import { PubChemPugRestClient } from './application/sub-type/risk-subtype-curation/chemical-identity-enrichment/pubchem-pug-rest.client';
 import { SubTypeDAO } from './database/dao/sub-type/sub-type.dao';
@@ -36,6 +39,9 @@ import { SubTypeDAO } from './database/dao/sub-type/sub-type.dao';
     RiskSubtypeCurationRepository,
     RiskSubtypeCurationService,
     RiskSubtypeCurationSuggestService,
+    RiskSubtypeCurationAiPromptService,
+    RiskSubTypeAiInstructionRepository,
+    RiskSubTypeAiInstructionService,
     ChemicalIdentityEnrichmentService,
     PubChemPugRestClient,
   ],

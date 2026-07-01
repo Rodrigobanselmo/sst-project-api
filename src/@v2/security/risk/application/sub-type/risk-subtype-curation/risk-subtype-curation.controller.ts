@@ -11,6 +11,7 @@ import {
   BrowseRiskSubtypeCurationRisksQuery,
   SuggestRiskSubtypeCandidatesBody,
 } from './risk-subtype-curation.dto';
+import { PreviewRiskSubtypeCurationAiPromptBody } from './risk-subtype-curation-ai-instruction.dto';
 import { RiskSubtypeCurationService } from './risk-subtype-curation.service';
 import { RiskSubtypeCurationSuggestService } from './risk-subtype-curation-suggest.service';
 
@@ -41,5 +42,10 @@ export class RiskSubtypeCurationController {
   @Post(SubTypeRoutes.MASTER_CURATION.SUGGEST_CANDIDATES)
   suggestCandidates(@Body() body: SuggestRiskSubtypeCandidatesBody) {
     return this.suggestService.suggestCandidates(body);
+  }
+
+  @Post(SubTypeRoutes.MASTER_CURATION.AI_PROMPT_PREVIEW)
+  previewAiPrompt(@Body() body: PreviewRiskSubtypeCurationAiPromptBody) {
+    return this.suggestService.previewAiPrompt(body);
   }
 }

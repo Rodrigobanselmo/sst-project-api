@@ -109,6 +109,28 @@ export class SuggestRiskSubtypeCandidatesBody {
   @Type(() => Number)
   @IsInt()
   @Min(1)
+  page?: number = 1;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
   @Max(RISK_SUBTYPE_CURATION_SUGGEST_ABSOLUTE_MAX)
-  maxCandidates?: number = RISK_SUBTYPE_CURATION_SUGGEST_DEFAULT_MAX;
+  limit?: number = RISK_SUBTYPE_CURATION_SUGGEST_DEFAULT_MAX;
+
+  /** @deprecated Use `limit` — mantido por compatibilidade */
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(RISK_SUBTYPE_CURATION_SUGGEST_ABSOLUTE_MAX)
+  maxCandidates?: number;
+
+  @IsOptional()
+  @IsString()
+  customPrompt?: string;
+
+  @IsOptional()
+  @IsString()
+  model?: string;
 }

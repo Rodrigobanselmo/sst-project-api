@@ -55,6 +55,13 @@ export type RiskSubtypeCurationSuggestResponse = {
     truncated: boolean;
     onlyPcmso: boolean;
     search?: string | null;
+    page: number;
+    limit: number;
+    hasNextPage: boolean;
+    nextPage: number | null;
+    rangeStart: number;
+    rangeEnd: number;
+    /** @deprecated Use `limit` */
     maxCandidates?: number;
   };
   summary: {

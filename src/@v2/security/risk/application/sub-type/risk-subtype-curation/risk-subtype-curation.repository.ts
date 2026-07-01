@@ -128,7 +128,8 @@ export class RiskSubtypeCurationRepository {
     type: RiskTypeEnum;
     onlyPcmso: boolean;
     search?: string;
-    take: number;
+    page: number;
+    limit: number;
   }): Promise<{ rows: RiskSubtypeCurationSuggestEligibleRisk[]; total: number }> {
     const where = this.buildRiskWhere({
       type: params.type,
@@ -138,12 +139,15 @@ export class RiskSubtypeCurationRepository {
       subtypeFilter: RiskSubtypeCurationFilterEnum.NONE,
     });
 
+    const skip = (params.page - 1) * params.limit;
+
     const [rows, total] = await Promise.all([
       this.prisma.riskFactors.findMany({
         where,
         select: suggestRiskSelect,
         orderBy: [{ name: 'asc' }],
-        take: params.take,
+        skip,
+        take: params.limit,
       }),
       this.prisma.riskFactors.count({ where }),
     ]);

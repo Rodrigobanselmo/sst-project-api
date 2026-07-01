@@ -9,8 +9,6 @@ import {
 } from '@nestjs/common';
 import { RiskFactorsEnum, StatusEnum } from '@prisma/client';
 
-import { SystemAiPromptKeyEnum } from '@/@v2/forms/application/system-ai-prompt/constants/system-ai-prompt-key.enum';
-import { getSystemAiPromptDefaultContent } from '@/@v2/forms/application/system-ai-prompt/shared/system-ai-prompt-defaults';
 import { AiAdapter } from '@/@v2/shared/adapters/ai/ai.interface';
 import { SharedTokens } from '@/@v2/shared/constants/tokens';
 import { arrayChunks } from '@/@v2/shared/utils/helpers/array-chunks';
@@ -23,7 +21,6 @@ import {
   RISK_SUBTYPE_CURATION_SUGGEST_CHUNK_SIZE,
   RISK_SUBTYPE_CURATION_SUGGEST_CHUNK_TIMEOUT_MS,
   RISK_SUBTYPE_CURATION_SUGGEST_DEFAULT_MAX,
-  RISK_SUBTYPE_CURATION_SUGGEST_MODEL,
 } from './constants/risk-subtype-curation-suggest.constants';
 import {
   normalizeSuggestCandidate,
@@ -36,6 +33,8 @@ import type {
   RiskSubtypeCurationSuggestEligibleRisk,
   RiskSubtypeCurationSuggestResponse,
 } from './risk-subtype-curation-suggest.types';
+import { RiskSubtypeCurationAiPromptService } from './risk-subtype-curation-ai-prompt.service';
+import type { PreviewRiskSubtypeCurationAiPromptBody } from './risk-subtype-curation-ai-instruction.dto';
 
 @Injectable()
 export class RiskSubtypeCurationSuggestService {
@@ -46,6 +45,7 @@ export class RiskSubtypeCurationSuggestService {
     @Inject(SharedTokens.AI)
     private readonly aiAdapter: AiAdapter,
     private readonly chemicalIdentityEnrichmentService: ChemicalIdentityEnrichmentService,
+    private readonly aiPromptService: RiskSubtypeCurationAiPromptService,
   ) {}
 
   async suggestCandidates(
@@ -91,8 +91,9 @@ export class RiskSubtypeCurationSuggestService {
       );
     }
 
-    const maxCandidates = Math.min(
-      body.maxCandidates ?? RISK_SUBTYPE_CURATION_SUGGEST_DEFAULT_MAX,
+    const page = Math.max(1, body.page ?? 1);
+    const limit = Math.min(
+      body.limit ?? body.maxCandidates ?? RISK_SUBTYPE_CURATION_SUGGEST_DEFAULT_MAX,
       RISK_SUBTYPE_CURATION_SUGGEST_ABSOLUTE_MAX,
     );
     const onlyPcmso = body.onlyPcmso !== false;
@@ -102,13 +103,40 @@ export class RiskSubtypeCurationSuggestService {
         type: body.type,
         onlyPcmso,
         search: body.search?.trim() || undefined,
-        take: maxCandidates,
+        page,
+        limit,
       },
     );
 
     const search = body.search?.trim() || null;
+    const skip = (page - 1) * limit;
+    const rangeStart = total > 0 && rows.length > 0 ? skip + 1 : 0;
+    const rangeEnd = skip + rows.length;
+    const hasNextPage = page * limit < total;
+    const nextPage = hasNextPage ? page + 1 : null;
+    const truncated = hasNextPage;
+
+    const buildScope = (analyzed: number) => ({
+      analyzed,
+      eligibleTotal: total,
+      truncated,
+      onlyPcmso,
+      search,
+      page,
+      limit,
+      hasNextPage,
+      nextPage,
+      rangeStart: analyzed > 0 ? rangeStart : 0,
+      rangeEnd: analyzed > 0 ? rangeEnd : 0,
+      maxCandidates: limit,
+    });
 
     if (!rows.length) {
+      const emptyMessage =
+        page > 1 && total > 0
+          ? `Nenhum risco elegível no lote ${page} (${skip + 1}–${Math.min(skip + limit, total)} de ${total}).`
+          : 'Nenhum risco químico elegível sem subtipo foi encontrado para análise.';
+
       return {
         targetSubType: {
           id: subType.id,
@@ -117,14 +145,7 @@ export class RiskSubtypeCurationSuggestService {
           type: subType.type,
           status: subType.status,
         },
-        scope: {
-          analyzed: 0,
-          eligibleTotal: total,
-          truncated: total > 0,
-          onlyPcmso,
-          search,
-          maxCandidates,
-        },
+        scope: buildScope(0),
         summary: {
           suggestedInclude: 0,
           suggestedExclude: 0,
@@ -133,19 +154,17 @@ export class RiskSubtypeCurationSuggestService {
           excludedWithConfidence: 0,
         },
         candidates: [],
-        warnings: [
-          ...warnings,
-          'Nenhum risco químico elegível sem subtipo foi encontrado para análise.',
-        ],
-        model: RISK_SUBTYPE_CURATION_SUGGEST_MODEL,
+        warnings: [...warnings, emptyMessage],
+        model: this.aiPromptService.resolveModel({
+          sessionModel: body.model,
+        }),
         generatedAt: new Date().toISOString(),
       };
     }
 
-    const truncated = total > rows.length;
     if (truncated) {
       warnings.push(
-        `Foram analisados ${rows.length} de ${total} riscos elegíveis. Refine a busca para analisar o restante.`,
+        `Lote ${page}: analisados ${rangeStart}–${rangeEnd} de ${total} riscos elegíveis. Use o próximo lote para continuar.`,
       );
     }
 
@@ -169,7 +188,22 @@ export class RiskSubtypeCurationSuggestService {
       warnings.push(ENRICHMENT_PARTIAL_WARNING);
     }
 
-    const systemPrompt = this.resolveSystemPrompt();
+    const promptBuild = await this.aiPromptService.buildPrompt({
+      subType,
+      sessionCustomPrompt: body.customPrompt,
+    });
+    const systemPrompt = promptBuild.assembledPrompt;
+    const selectedModel = this.aiPromptService.resolveModel({
+      sessionModel: body.model,
+      preferredModel: promptBuild.preferredModel,
+    });
+
+    if (!systemPrompt.trim()) {
+      throw new BadRequestException(
+        'Prompt de sugestão de subtipo não configurado.',
+      );
+    }
+
     const chunks = arrayChunks(rows, RISK_SUBTYPE_CURATION_SUGGEST_CHUNK_SIZE);
     const aiByRiskId = new Map<string, RiskSubtypeCurationSuggestChunkAiItem>();
 
@@ -180,6 +214,7 @@ export class RiskSubtypeCurationSuggestService {
           risks: chunk,
           systemPrompt,
           enrichmentByRiskId,
+          model: selectedModel,
         });
         for (const item of chunkItems) {
           if (!chunk.some((risk) => risk.id === item.riskFactorId)) {
@@ -201,6 +236,7 @@ export class RiskSubtypeCurationSuggestService {
       const enrichment = enrichmentByRiskId.get(risk.id);
       const candidate = normalizeSuggestCandidate({
         subTypeName: subType.name,
+        subTypeDescription: subType.description,
         risk,
         ai: aiByRiskId.get(risk.id),
         enrichment,
@@ -222,14 +258,7 @@ export class RiskSubtypeCurationSuggestService {
         type: subType.type,
         status: subType.status,
       },
-      scope: {
-        analyzed: rows.length,
-        eligibleTotal: total,
-        truncated,
-        onlyPcmso,
-        search,
-        maxCandidates,
-      },
+      scope: buildScope(rows.length),
       summary: this.buildSummary(candidates),
       candidates,
       warnings,
@@ -239,20 +268,41 @@ export class RiskSubtypeCurationSuggestService {
         failed: failedEnrichmentCount,
         sources: ['PUBCHEM'],
       },
-      model: RISK_SUBTYPE_CURATION_SUGGEST_MODEL,
+      model: selectedModel,
       generatedAt: new Date().toISOString(),
     };
   }
 
-  private resolveSystemPrompt(): string {
-    const key = SystemAiPromptKeyEnum.RISK_SUBTYPE_CURATION_SUGGESTIONS;
-    const content = getSystemAiPromptDefaultContent(key);
-    if (!content.trim()) {
-      throw new BadRequestException(
-        'Prompt de sugestão de subtipo não configurado.',
-      );
+  async previewAiPrompt(body: PreviewRiskSubtypeCurationAiPromptBody) {
+    const subType = await this.repository.findSubTypeById(body.subTypeId);
+    if (!subType) {
+      throw new NotFoundException('Subtipo de risco não encontrado.');
     }
-    return content;
+
+    const promptBuild = await this.aiPromptService.buildPrompt({
+      subType,
+      draft: {
+        useSystemDefault: body.useSystemDefault,
+        instructions: body.instructions,
+        positiveExamples: body.positiveExamples,
+        negativeExamples: body.negativeExamples,
+        cautionRules: body.cautionRules,
+        preferredModel: body.preferredModel,
+      },
+      sessionCustomPrompt: body.customPrompt,
+    });
+
+    return {
+      assembledPrompt: promptBuild.assembledPrompt,
+      sections: promptBuild.sections,
+      selectedModel: this.aiPromptService.resolveModel({
+        sessionModel: body.model,
+        preferredModel: body.preferredModel ?? promptBuild.preferredModel,
+      }),
+      sources: promptBuild.sources,
+      useSystemDefault: promptBuild.useSystemDefault,
+      revision: promptBuild.revision,
+    };
   }
 
   private async analyzeChunk(params: {
@@ -268,6 +318,7 @@ export class RiskSubtypeCurationSuggestService {
       string,
       import('./chemical-identity-enrichment/chemical-identity-enrichment.types').ChemicalIdentityEnrichmentResult
     >;
+    model: string;
   }): Promise<RiskSubtypeCurationSuggestChunkAiItem[]> {
     const userPrompt = this.buildChunkUserPrompt(
       params.subType,
@@ -282,7 +333,7 @@ export class RiskSubtypeCurationSuggestService {
           'Classifique cada risco do lote pelo critério estrutural/químico do subtipo alvo (não por toxicidade ou órgão-alvo). Retorne apenas o array items com riskFactorId, suggestedInclude, confidence, rationale e warnings.',
         language: 'pt-BR',
         systemPrompt: params.systemPrompt,
-        model: RISK_SUBTYPE_CURATION_SUGGEST_MODEL,
+        model: params.model,
         responseFormat: {
           type: 'json_schema',
           json_schema: {

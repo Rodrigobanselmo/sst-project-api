@@ -143,6 +143,9 @@ export class ChemicalIdentityEnrichmentService {
         isAliphatic: hints.isAliphaticHint ?? null,
         isHalogenated: hints.isHalogenatedHint ?? null,
         isIsocyanate: hints.isIsocyanateHint ?? null,
+        isPhenolOrCresol: hints.isPhenolOrCresolHint ?? null,
+        isNitroAromatic: hints.isNitroAromaticHint ?? null,
+        isAromaticAmine: hints.isAromaticAmineHint ?? null,
       },
       warnings: pubchem.warnings ?? [],
     };

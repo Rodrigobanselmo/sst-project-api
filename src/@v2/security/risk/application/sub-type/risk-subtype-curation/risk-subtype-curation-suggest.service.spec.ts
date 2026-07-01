@@ -23,6 +23,10 @@ describe('RiskSubtypeCurationSuggestService', () => {
     toCandidateChemicalIdentity: ReturnType<typeof jest.fn>;
     toAiChemicalIdentitySummary: ReturnType<typeof jest.fn>;
   };
+  let aiPromptService: {
+    buildPrompt: ReturnType<typeof jest.fn>;
+    resolveModel: ReturnType<typeof jest.fn>;
+  };
 
   const emptyEnrichment = {
     sourceResults: [{ source: 'PUBCHEM', found: false, confidence: 'low' }],
@@ -78,10 +82,38 @@ describe('RiskSubtypeCurationSuggestService', () => {
     );
     enrichmentService.toCandidateChemicalIdentity.mockImplementation(() => undefined);
     enrichmentService.toAiChemicalIdentitySummary.mockImplementation(() => null);
+    aiPromptService = {
+      buildPrompt: jest.fn(),
+      resolveModel: jest.fn(),
+    };
+    aiPromptService.buildPrompt.mockImplementation(
+      async ({ subType }: { subType: { name: string } }) => ({
+        assembledPrompt: `Prompt para ${subType.name}`,
+        sections: [],
+        useSystemDefault: true,
+        preferredModel: null,
+        selectedModel: 'gpt-4o-mini',
+        sources: {
+          globalPrompt: 'fallback',
+          instruction: 'default',
+          sessionCustom: false,
+        },
+      }),
+    );
+    aiPromptService.resolveModel.mockImplementation(
+      ({
+        sessionModel,
+        preferredModel,
+      }: {
+        sessionModel?: string;
+        preferredModel?: string | null;
+      }) => sessionModel || preferredModel || 'gpt-4o-mini',
+    );
     service = new RiskSubtypeCurationSuggestService(
       repository as never,
       aiAdapter as never,
       enrichmentService as never,
+      aiPromptService as never,
     );
   });
 
@@ -137,7 +169,7 @@ describe('RiskSubtypeCurationSuggestService', () => {
     ).rejects.toBeInstanceOf(BadRequestException);
   });
 
-  it('3. busca só riscos QUI sem subtipo com cap', async () => {
+  it('3. busca só riscos QUI sem subtipo com paginação', async () => {
     repository.findSubTypeById.mockImplementation(() =>
       Promise.resolve(activeSubType),
     );
@@ -148,15 +180,97 @@ describe('RiskSubtypeCurationSuggestService', () => {
     await service.suggestCandidates({
       type: RiskFactorsEnum.QUI,
       subTypeId: 10,
-      maxCandidates: 100,
+      page: 1,
+      limit: 100,
     } as never);
 
     expect(repository.findEligibleRisksForSuggestion).toHaveBeenCalledWith(
       expect.objectContaining({
         type: RiskFactorsEnum.QUI,
-        take: 100,
+        page: 1,
+        limit: 100,
       }),
     );
+  });
+
+  it('3b. página 2 usa skip correto e retorna metadados de lote', async () => {
+    repository.findSubTypeById.mockImplementation(() =>
+      Promise.resolve(activeSubType),
+    );
+    repository.findEligibleRisksForSuggestion.mockImplementation(() =>
+      Promise.resolve({
+        rows: [{ ...eligibleRisk, id: 'risk-101', name: 'Xileno' }],
+        total: 841,
+      }),
+    );
+    aiAdapter.analyze.mockImplementation(() =>
+      Promise.resolve({
+        analysis: JSON.stringify({
+          items: [
+            {
+              riskFactorId: 'risk-101',
+              suggestedInclude: false,
+              confidence: 'high',
+              rationale: 'Não é fenol',
+              warnings: [],
+            },
+          ],
+        }),
+      }),
+    );
+
+    const result = await service.suggestCandidates({
+      type: RiskFactorsEnum.QUI,
+      subTypeId: 10,
+      page: 2,
+      limit: 100,
+    } as never);
+
+    expect(repository.findEligibleRisksForSuggestion).toHaveBeenCalledWith(
+      expect.objectContaining({ page: 2, limit: 100 }),
+    );
+    expect(result.scope.page).toBe(2);
+    expect(result.scope.rangeStart).toBe(101);
+    expect(result.scope.rangeEnd).toBe(101);
+    expect(result.scope.hasNextPage).toBe(true);
+    expect(result.scope.nextPage).toBe(3);
+    expect(result.scope.eligibleTotal).toBe(841);
+  });
+
+  it('3c. último lote sem próxima página', async () => {
+    repository.findSubTypeById.mockImplementation(() =>
+      Promise.resolve(activeSubType),
+    );
+    repository.findEligibleRisksForSuggestion.mockImplementation(() =>
+      Promise.resolve({ rows: [eligibleRisk], total: 4 }),
+    );
+    aiAdapter.analyze.mockImplementation(() =>
+      Promise.resolve({
+        analysis: JSON.stringify({
+          items: [
+            {
+              riskFactorId: 'risk-1',
+              suggestedInclude: true,
+              confidence: 'high',
+              rationale: 'Match',
+              warnings: [],
+            },
+          ],
+        }),
+      }),
+    );
+
+    const result = await service.suggestCandidates({
+      type: RiskFactorsEnum.QUI,
+      subTypeId: 10,
+      page: 1,
+      limit: 100,
+      search: 'xileno',
+    } as never);
+
+    expect(result.scope.hasNextPage).toBe(false);
+    expect(result.scope.nextPage).toBeNull();
+    expect(result.scope.truncated).toBe(false);
   });
 
   it('4. respeita onlyPcmso', async () => {
