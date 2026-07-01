@@ -21,6 +21,10 @@ import {
   RiskFactorsEnum,
 } from '@prisma/client';
 
+import { ToBoolean } from '@/shared/decorators/boolean.decorator';
+
+import { ExamRiskRuleCoverageStatusEnum } from './exam-risk-rule-coverage-gaps.types';
+
 export class BrowseExamRiskRulesQuery {
   @IsOptional()
   @Type(() => Number)
@@ -279,4 +283,39 @@ export class ImportExamRiskRuleApplyBody {
     message: `confirmText deve ser exatamente "${EXAM_RISK_RULE_APPLY_CONFIRM_TEXT}".`,
   })
   confirmText!: string;
+}
+
+export class BrowseExamRiskRuleCoverageGapsQuery {
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page?: number = 1;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  limit?: number = 20;
+
+  @IsOptional()
+  @IsEnum(RiskFactorsEnum)
+  type?: RiskFactorsEnum;
+
+  @IsOptional()
+  @IsString()
+  search?: string;
+
+  @IsOptional()
+  @IsEnum(ExamRiskRuleCoverageStatusEnum)
+  coverageStatus?: ExamRiskRuleCoverageStatusEnum;
+
+  @IsOptional()
+  @ToBoolean()
+  includeIndirect?: boolean = true;
+
+  @IsOptional()
+  @ToBoolean()
+  onlyPcmso?: boolean = true;
 }

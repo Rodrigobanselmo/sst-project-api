@@ -56,6 +56,8 @@ import { ExamRiskRuleNr07SyncService } from './exam-risk-rule/exam-risk-rule-nr0
 import { ExamRiskRuleAcgihBeiSyncService } from './exam-risk-rule/exam-risk-rule-acgih-bei-sync.service';
 import { ExamRiskRuleSpreadsheetExportService } from './exam-risk-rule/exam-risk-rule-spreadsheet-export.service';
 import { ExamRiskRuleController } from './exam-risk-rule/exam-risk-rule.controller';
+import { ExamRiskRuleCoverageGapsRepository } from './exam-risk-rule/exam-risk-rule-coverage-gaps.repository';
+import { ExamRiskRuleCoverageGapsService } from './exam-risk-rule/exam-risk-rule-coverage-gaps.service';
 import { ExamRiskRuleRepository } from './exam-risk-rule/exam-risk-rule.repository';
 import { ExamRiskRuleService } from './exam-risk-rule/exam-risk-rule.service';
 import { ExamRiskRuleReferenceController } from './exam-risk-rule-reference/exam-risk-rule-reference.controller';
@@ -104,6 +106,8 @@ import { ExamTechnicalSuggestionService } from './exam/exam-technical-suggestion
     BiologicalIndicatorImportApplyService,
     ExamRiskRuleRepository,
     ExamRiskRuleService,
+    ExamRiskRuleCoverageGapsRepository,
+    ExamRiskRuleCoverageGapsService,
     ExamRiskRuleNr07SyncService,
     ExamRiskRuleAcgihBeiSyncService,
     ExamRiskRuleSpreadsheetExportService,

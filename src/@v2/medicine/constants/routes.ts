@@ -67,6 +67,7 @@ export const MedicineRoutes = {
     TEMPLATE: 'template',
     IMPORT_PREVIEW: 'import/preview',
     IMPORT_APPLY: 'import/apply',
+    COVERAGE_GAPS: 'coverage-gaps',
     REFERENCES: ':ruleId/references',
     REFERENCE_BY_ID: ':ruleId/references/:referenceId',
     BY_ID: {

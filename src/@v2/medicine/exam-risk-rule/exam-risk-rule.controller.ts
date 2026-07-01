@@ -31,6 +31,7 @@ import { UserPayloadDto } from '@/shared/dto/user-payload.dto';
 
 import {
   BrowseExamRiskRulesQuery,
+  BrowseExamRiskRuleCoverageGapsQuery,
   CreateExamRiskRuleBody,
   ExamRiskRuleIdPath,
   ImportExamRiskRuleApplyBody,
@@ -46,6 +47,7 @@ import { ExamRiskRuleAcgihBeiSyncService } from './exam-risk-rule-acgih-bei-sync
 import { ExamRiskRuleSyncAcgihBody } from './exam-risk-rule-acgih-bei-sync.dto';
 import { ExamRiskRuleSpreadsheetExportService } from './exam-risk-rule-spreadsheet-export.service';
 import { ExamRiskRuleService } from './exam-risk-rule.service';
+import { ExamRiskRuleCoverageGapsService } from './exam-risk-rule-coverage-gaps.service';
 
 const XLSX_CONTENT_TYPE =
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
@@ -61,6 +63,7 @@ export class ExamRiskRuleController {
     private readonly exportService: ExamRiskRuleSpreadsheetExportService,
     private readonly previewService: ExamRiskRuleImportPreviewService,
     private readonly applyService: ExamRiskRuleImportApplyService,
+    private readonly coverageGapsService: ExamRiskRuleCoverageGapsService,
   ) {}
 
   @Get()
@@ -80,6 +83,19 @@ export class ExamRiskRuleController {
   @Get(MedicineRoutes.EXAM_RISK_RULES.RISK_CANDIDATES)
   searchRiskCandidates(@Query() query: SearchRiskCandidatesQuery) {
     return this.service.searchRiskCandidates(query);
+  }
+
+  @Get(MedicineRoutes.EXAM_RISK_RULES.COVERAGE_GAPS)
+  coverageGaps(@Query() query: BrowseExamRiskRuleCoverageGapsQuery) {
+    return this.coverageGapsService.getCoverageGaps({
+      page: query.page ?? 1,
+      limit: query.limit ?? 20,
+      type: query.type,
+      search: query.search,
+      coverageStatus: query.coverageStatus,
+      includeIndirect: query.includeIndirect ?? true,
+      onlyPcmso: query.onlyPcmso ?? true,
+    });
   }
 
   @Get(MedicineRoutes.EXAM_RISK_RULES.EXAM_CANDIDATES)
