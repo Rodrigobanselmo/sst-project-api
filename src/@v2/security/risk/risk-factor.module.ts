@@ -7,16 +7,25 @@ import { RiskFactorAiSuggestionsPromptService } from './application/risk-factor-
 import { RiskFactorAiSuggestionsUseCase } from './application/risk-factor-ai-suggestions/use-cases/risk-factor-ai-suggestions.usecase';
 import { BrowseSubTypeController } from './application/sub-type/browse-sub-type/controllers/browse-sub-type.controller';
 import { BrowseSubTypeUseCase } from './application/sub-type/browse-sub-type/use-cases/browse-sub-type.usecase';
+import { RiskSubTypeMasterController } from './application/sub-type/risk-sub-type-master/risk-sub-type-master.controller';
+import { RiskSubTypeMasterRepository } from './application/sub-type/risk-sub-type-master/risk-sub-type-master.repository';
+import { RiskSubTypeMasterService } from './application/sub-type/risk-sub-type-master/risk-sub-type-master.service';
 import { SubTypeDAO } from './database/dao/sub-type/sub-type.dao';
 
 @Module({
   imports: [SharedModule, FormModule],
-  controllers: [BrowseSubTypeController, RiskFactorAiSuggestionsController],
+  controllers: [
+    BrowseSubTypeController,
+    RiskFactorAiSuggestionsController,
+    RiskSubTypeMasterController,
+  ],
   providers: [
     SubTypeDAO,
     BrowseSubTypeUseCase,
     RiskFactorAiSuggestionsPromptService,
     RiskFactorAiSuggestionsUseCase,
+    RiskSubTypeMasterRepository,
+    RiskSubTypeMasterService,
   ],
   exports: [],
 })

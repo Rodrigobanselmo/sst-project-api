@@ -2145,17 +2145,25 @@ model RiskFactors {
 }
 
 model RiskSubType {
-  id         Int             @id @default(autoincrement())
-  name       String
-  type       RiskFactorsEnum
-  sub_type   RiskSubTypeEnum @default(PSICOSOCIAL)
-  created_at DateTime        @default(now())
-  updated_at DateTime        @updatedAt
+  id          Int              @id @default(autoincrement())
+  name        String
+  type        RiskFactorsEnum
+  /// Legado ergonômico/outros; subtipos dinâmicos MASTER ficam null.
+  sub_type    RiskSubTypeEnum?
+  slug        String
+  description String?
+  status      StatusEnum       @default(ACTIVE)
+  system      Boolean          @default(false)
+  createdById Int?
+  created_at  DateTime         @default(now())
+  updated_at  DateTime         @updatedAt
 
   RiskToRiskSubType            RiskToRiskSubType[]
   ActionPlanRulesOnRiskSubType ActionPlanRulesOnRiskSubType[]
 
+  @@unique([type, slug])
   @@index([type])
+  @@index([type, status])
 }
 
 model RiskToRiskSubType {

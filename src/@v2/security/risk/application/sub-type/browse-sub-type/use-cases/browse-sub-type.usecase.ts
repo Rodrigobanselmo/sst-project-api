@@ -1,3 +1,4 @@
+import { StatusEnum } from '@prisma/client';
 import { Injectable } from '@nestjs/common';
 import { SubTypeDAO } from '../../../../database/dao/sub-type/sub-type.dao';
 import { ISubTypeUseCase } from './browse-sub-type.types';
@@ -14,6 +15,7 @@ export class BrowseSubTypeUseCase {
       filters: {
         types: params.types,
         search: params.search,
+        status: params.status ?? StatusEnum.ACTIVE,
       },
     });
 

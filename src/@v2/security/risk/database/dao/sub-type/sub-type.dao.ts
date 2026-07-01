@@ -64,6 +64,10 @@ export class SubTypeDAO {
       where.push(Prisma.sql`sub_risk.type::text = ANY(${filters.types})`);
     }
 
+    if (filters.status) {
+      where.push(Prisma.sql`sub_risk.status::text = ${filters.status}`);
+    }
+
     return where;
   }
 

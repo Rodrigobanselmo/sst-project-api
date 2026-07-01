@@ -31,6 +31,7 @@ import { RiskDocInfoRepository } from './repositories/implementations/RiskDocInf
 import { RiskDocumentRepository } from './repositories/implementations/RiskDocumentRepository';
 import { RiskGroupDataRepository } from './repositories/implementations/RiskGroupDataRepository';
 import { RiskRepository } from './repositories/implementations/RiskRepository';
+import { RiskSubTypeLinkValidator } from './shared/risk-sub-type-link.validator';
 import { CreateChecklistService } from './services/checklist/create-checklist/create-checklist.service';
 import { FindAvailableChecklistService } from './services/checklist/find-available-checklist/find-available-checklist.service';
 import { FindChecklistDataService } from './services/checklist/find-checklist-data/find-checklist-data.service';
@@ -139,6 +140,7 @@ import { RiskCatalogEquivalenceModule } from '@/shared/risk-catalog-equivalence/
     CreateGenerateSourceService,
     CreateRecMedService,
     CreateRiskService,
+    RiskSubTypeLinkValidator,
     DayJSProvider,
     DeleteManyRiskDataService,
     DeleteSoftExamService,

@@ -25,6 +25,7 @@ export class BrowseSubTypeController {
       orderBy: query.orderBy,
       search: query.search,
       types: query.types,
+      status: query.status,
       pagination: {
         page: query.page,
         limit: query.limit,

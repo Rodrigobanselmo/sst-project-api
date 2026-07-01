@@ -16,6 +16,7 @@ export namespace ISubTypeDAO {
     filters: {
       search?: string;
       types?: RiskTypeEnum[];
+      status?: string;
     };
   };
 }
