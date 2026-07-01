@@ -57,6 +57,7 @@ export type ExamCreatePayload = {
   companyId: string;
   material: string;
   analyses: string;
+  instruction?: string;
   type: ExamTypeEnum;
   system: boolean;
   isAttendance: boolean;

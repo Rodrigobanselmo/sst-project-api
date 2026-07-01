@@ -3,6 +3,7 @@ import {
   BiologicalIndicatorMatchConfidenceEnum,
   BiologicalIndicatorMatchMethodEnum,
   BiologicalNormativeSourceEnum,
+  BiologicalCollectionMomentEnum,
   ExamTypeEnum,
   StatusEnum,
 } from '@prisma/client';
@@ -23,6 +24,13 @@ export type AcgihOfficialIndicatorRow = {
   biologicalIndicatorNormalized: string;
   biologicalMatrix: string;
   casPrimary: string | null;
+  collectionMoment: BiologicalCollectionMomentEnum;
+  referenceValue: string | null;
+  unit: string | null;
+  technicalObservationsRaw: string | null;
+  samplingTime: string | null;
+  notation: string | null;
+  internalNotes: string | null;
   examLinks: Array<{
     id: string;
     examId: number;
@@ -65,6 +73,17 @@ export class AcgihExamLinkRepository {
         biologicalIndicatorNormalized: true,
         biologicalMatrix: true,
         casPrimary: true,
+        collectionMoment: true,
+        referenceValue: true,
+        unit: true,
+        technicalObservationsRaw: true,
+        acgihBeiIndicator: {
+          select: {
+            samplingTime: true,
+            notation: true,
+            internalNotes: true,
+          },
+        },
         examLinks: {
           where: { deleted_at: null },
           select: {
@@ -106,6 +125,13 @@ export class AcgihExamLinkRepository {
       biologicalIndicatorNormalized: row.biologicalIndicatorNormalized,
       biologicalMatrix: row.biologicalMatrix,
       casPrimary: row.casPrimary,
+      collectionMoment: row.collectionMoment,
+      referenceValue: row.referenceValue,
+      unit: row.unit,
+      technicalObservationsRaw: row.technicalObservationsRaw,
+      samplingTime: row.acgihBeiIndicator?.samplingTime ?? null,
+      notation: row.acgihBeiIndicator?.notation ?? null,
+      internalNotes: row.acgihBeiIndicator?.internalNotes ?? null,
       examLinks: row.examLinks.map((link) => ({
         id: link.id,
         examId: link.examId,
@@ -181,6 +207,8 @@ export class AcgihExamLinkRepository {
   async createSystemExam(params: {
     name: string;
     material: string | null;
+    analyses: string | null;
+    instruction: string | null;
     obsProc: string;
   }): Promise<AcgihExamCatalogEntry> {
     const created = await this.prisma.exam.create({
@@ -188,7 +216,8 @@ export class AcgihExamLinkRepository {
         name: params.name,
         companyId: simpleCompanyId,
         material: params.material,
-        analyses: params.name,
+        analyses: params.analyses?.trim() || params.name,
+        instruction: params.instruction,
         type: ExamTypeEnum.LAB,
         system: true,
         isAttendance: false,

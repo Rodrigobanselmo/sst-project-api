@@ -19,6 +19,11 @@ import {
 import { BiologicalIndicatorMatchInput } from './biological-indicator-match.types';
 import { normalizeText } from './biological-indicator-normalize.util';
 import { tokenizeForFuzzyMatch } from './biological-indicator-risk-match.util';
+import {
+  applyExamTechnicalFields,
+  buildNr7TechnicalInstructionBlock,
+  NR7_INSTRUCTION_BLOCK_PREFIX,
+} from '../exam/exam-technical-fields.util';
 import { simpleCompanyId } from '@/shared/constants/ids';
 
 const MATRIX_SUFFIX_PATTERN =
@@ -324,14 +329,39 @@ export const buildExamCreatePayload = (
   const referenceEsocialCode = referenceExam?.esocial27Code?.trim() || undefined;
   const esocial27Code = suggestedEsocial?.code ?? referenceEsocialCode;
 
-  const analyses =
+  const technicalObservations =
+    indicator.technicalObservationsRaw?.trim() ||
+    (indicator.technicalObservations.length
+      ? indicator.technicalObservations.join(', ')
+      : null);
+
+  const suggestedAnalyses =
     referenceExam?.analyses?.trim() || indicator.biologicalIndicatorOriginal;
+
+  const technicalFields = applyExamTechnicalFields({
+    suggested: {
+      material: indicator.biologicalMatrix,
+      analyses: suggestedAnalyses,
+      instructionBlock: buildNr7TechnicalInstructionBlock({
+        collectionMoment: indicator.collectionMoment,
+        referenceValue: indicator.referenceValue,
+        unit: indicator.unit,
+        technicalObservations,
+      }),
+      instructionBlockPrefix: NR7_INSTRUCTION_BLOCK_PREFIX,
+    },
+    mode: 'create',
+  });
 
   return {
     name: indicator.biologicalIndicatorOriginal,
     companyId: simpleCompanyId,
-    material: indicator.biologicalMatrix,
-    analyses,
+    material: technicalFields.material ?? indicator.biologicalMatrix,
+    analyses:
+      technicalFields.analyses ??
+      referenceExam?.analyses?.trim() ??
+      indicator.biologicalIndicatorOriginal,
+    ...(technicalFields.instruction ? { instruction: technicalFields.instruction } : {}),
     type: ExamTypeEnum.LAB,
     system: true,
     isAttendance: false,

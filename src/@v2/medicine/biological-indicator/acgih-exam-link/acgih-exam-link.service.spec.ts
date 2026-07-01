@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
-import { Prisma } from '@prisma/client';
+import { Prisma, BiologicalCollectionMomentEnum } from '@prisma/client';
 import { validate } from 'class-validator';
 import { plainToInstance } from 'class-transformer';
 
@@ -28,6 +28,13 @@ type IndicatorRow = {
   biologicalIndicatorNormalized: string;
   biologicalMatrix: string;
   casPrimary: string | null;
+  collectionMoment: BiologicalCollectionMomentEnum;
+  referenceValue: string | null;
+  unit: string | null;
+  technicalObservationsRaw: string | null;
+  samplingTime: string | null;
+  notation: string | null;
+  internalNotes: string | null;
   examLinks: Array<{
     id?: string;
     examId: number;
@@ -51,6 +58,13 @@ const indicator = (over: Partial<IndicatorRow> = {}): IndicatorRow => ({
   biologicalIndicatorNormalized: '2,5 hexanodiona urina',
   biologicalMatrix: 'urina',
   casPrimary: '142-82-5',
+  collectionMoment: BiologicalCollectionMomentEnum.FJ,
+  referenceValue: '0,4',
+  unit: 'mg/L',
+  technicalObservationsRaw: null,
+  samplingTime: 'Final da jornada',
+  notation: 'B',
+  internalNotes: null,
   examLinks: [],
   riskLinks: [],
   ...over,
@@ -576,6 +590,13 @@ describe('AcgihExamLinkService.resolve', () => {
     const res = await service.resolve({ userId: 1, dryRun: false });
     expect(repo.createExamLink).toHaveBeenCalledTimes(2);
     expect(repo.createSystemExam).toHaveBeenCalledTimes(1);
+    expect(repo.createSystemExam).toHaveBeenCalledWith(
+      expect.objectContaining({
+        material: 'urina',
+        analyses: 'Fluoreto urinário',
+        instruction: expect.stringContaining('Orientação técnica ACGIH/BEI:'),
+      }),
+    );
     expect(res.totals.linksCreated).toBe(1);
     expect(res.totals.examsCreated).toBe(1);
   });
@@ -618,6 +639,41 @@ describe('AcgihExamLinkService.resolve', () => {
     const res = await service.resolve({ userId: 1, dryRun: false });
     expect(repo.createSystemExam).not.toHaveBeenCalled();
     expect(res.items[0].action).toBe('linkedExistingExam');
+  });
+
+  it('preenche instruction técnica ACGIH com BEI e notação ao criar exame', async () => {
+    const createSystemExam = jest.fn().mockResolvedValue({
+      id: 101,
+      name: 'Fluoreto urinário na urina',
+      material: 'urina',
+      esocial27Code: null,
+    } as never);
+
+    const repo = buildRepo({
+      indicators: [
+        indicator({
+          biologicalIndicatorOriginal: 'Fluoreto urinário',
+          biologicalIndicatorNormalized: 'fluoreto urinario',
+          referenceValue: '2,0',
+          unit: 'mg/L',
+          notation: 'Sq',
+          samplingTime: 'Final da jornada e da semana',
+        }),
+      ],
+      catalog: [],
+      createSystemExam,
+    });
+    const service = new AcgihExamLinkService(repo as never);
+    await service.resolve({ userId: 1, dryRun: false });
+
+    expect(createSystemExam).toHaveBeenCalledWith(
+      expect.objectContaining({
+        analyses: 'Fluoreto urinário',
+        instruction: expect.stringMatching(
+          /Orientação técnica ACGIH\/BEI:.*BEI: 2,0 mg\/L\..*Notação: Sq\./,
+        ),
+      }),
+    );
   });
 });
 

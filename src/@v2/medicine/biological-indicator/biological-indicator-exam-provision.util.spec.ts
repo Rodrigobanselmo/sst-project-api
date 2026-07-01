@@ -16,6 +16,11 @@ import {
   materialsAreCompatible,
   suggestEsocialEntry,
 } from './biological-indicator-exam-provision.util';
+import {
+  applyExamTechnicalFields,
+  buildNr7TechnicalInstructionBlock,
+  NR7_INSTRUCTION_BLOCK_PREFIX,
+} from '../exam/exam-technical-fields.util';
 import { IndicatorExamProvisionInput } from './biological-indicator-exam-provision.types';
 import { simpleCompanyId } from '@/shared/constants/ids';
 
@@ -193,5 +198,56 @@ describe('biological-indicator-exam-provision.util', () => {
     expect(notes).toContain('Valor IBE/EE: 10 mg/L');
     expect(notes).toContain('Observações: NE');
     expect(notes).toContain('Provisionado automaticamente');
+  });
+
+  it('cria payload NR-7 com material, analyses e instruction técnica', () => {
+    const payload = buildExamCreatePayload(baseIndicator(), esocialCatalog);
+
+    expect(payload.material).toBe('urina');
+    expect(payload.analyses).toBe('Ácido tricloroacético na urina');
+    expect(payload.instruction).toContain('Orientação técnica: coletar em');
+    expect(payload.instruction).toContain('Valor de referência: 10 mg/L');
+  });
+
+  it('não sobrescreve exame existente com material/analyses/instruction já preenchidos', () => {
+    const result = applyExamTechnicalFields({
+      existing: {
+        material: 'sangue',
+        analyses: 'Determinante curado',
+        instruction: 'Instrução manual.',
+      },
+      suggested: {
+        material: 'urina',
+        analyses: 'Ácido tricloroacético na urina',
+        instructionBlock: buildNr7TechnicalInstructionBlock({
+          collectionMoment: BiologicalCollectionMomentEnum.FJFS,
+          referenceValue: '10',
+          unit: 'mg/L',
+        }),
+        instructionBlockPrefix: NR7_INSTRUCTION_BLOCK_PREFIX,
+      },
+      mode: 'preserve',
+    });
+
+    expect(result.material).toBe('sangue');
+    expect(result.analyses).toBe('Determinante curado');
+    expect(result.instruction).toBe('Instrução manual.');
+  });
+
+  it('reutiliza analyses do exame de referência tenant ao criar exame sistêmico', () => {
+    const payload = buildExamCreatePayload(baseIndicator(), esocialCatalog, {
+      id: 22,
+      name: 'Exame tenant',
+      material: 'Urina',
+      analyses: 'Determinante curado',
+      instruction: null,
+      esocial27Code: '0133',
+      companyId: 'tenant',
+      system: false,
+    });
+
+    expect(payload.analyses).toBe('Determinante curado');
+    expect(payload.esocial27Code).toBe('0133');
+    expect(payload.instruction).toContain('Orientação técnica: coletar em');
   });
 });

@@ -11,6 +11,11 @@ import {
   AcgihOfficialIndicatorRow,
 } from './acgih-exam-link.repository';
 import {
+  applyExamTechnicalFields,
+  buildAcgihTechnicalInstructionBlock,
+  ACGIH_INSTRUCTION_BLOCK_PREFIX,
+} from '../../exam/exam-technical-fields.util';
+import {
   AcgihExamCandidate,
   AcgihExamCatalogEntry,
   AcgihExamPreviewResult,
@@ -1000,9 +1005,33 @@ export class AcgihExamLinkService {
     }
 
     try {
+      const technicalObservations =
+        indicator.internalNotes?.trim() ||
+        indicator.technicalObservationsRaw?.trim() ||
+        null;
+
+      const technicalFields = applyExamTechnicalFields({
+        suggested: {
+          material: indicator.biologicalMatrix || null,
+          analyses: indicator.biologicalIndicatorOriginal,
+          instructionBlock: buildAcgihTechnicalInstructionBlock({
+            samplingMoment: indicator.samplingTime,
+            collectionMoment: indicator.collectionMoment,
+            referenceValue: indicator.referenceValue,
+            unit: indicator.unit,
+            notation: indicator.notation,
+            technicalObservations,
+          }),
+          instructionBlockPrefix: ACGIH_INSTRUCTION_BLOCK_PREFIX,
+        },
+        mode: 'create',
+      });
+
       const created = await this.repository.createSystemExam({
         name: suggestedName,
-        material: indicator.biologicalMatrix || null,
+        material: technicalFields.material ?? (indicator.biologicalMatrix || null),
+        analyses: technicalFields.analyses ?? indicator.biologicalIndicatorOriginal,
+        instruction: technicalFields.instruction ?? null,
         obsProc: `Criado a partir do indicador ACGIH/BEI ${indicator.substanceName} (determinante: ${indicator.biologicalIndicatorOriginal}, matriz: ${indicator.biologicalMatrix}).`,
       });
       pool.push(created);

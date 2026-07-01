@@ -124,7 +124,9 @@ describe('EsocialT27ExamService', () => {
     expect(prisma.exam.create).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({
+          name: '1,2-ciclo-hexanediol',
           esocial27Code: '0005',
+          analyses: '1,2-ciclo-hexanediol',
           system: true,
           companyId: simpleCompanyId,
           status: StatusEnum.ACTIVE,
@@ -132,6 +134,10 @@ describe('EsocialT27ExamService', () => {
         }),
       }),
     );
+    const createData = (prisma.exam.create.mock.calls[0][0] as { data: Record<string, unknown> })
+      .data;
+    expect(createData.material).toBeUndefined();
+    expect(createData.instruction).toBeUndefined();
     expect(result).toMatchObject({
       examId: 99,
       created: true,
