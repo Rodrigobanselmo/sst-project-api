@@ -103,6 +103,10 @@ export const MedicineRoutes = {
       SEARCH: 'search',
       MATERIALIZE: 'materialize',
     },
+    TECHNICAL_SUGGESTION: {
+      BASE: 'v2/exams/technical-suggestion',
+      SUGGEST: 'suggest',
+    },
   },
   ACGIH_BEI_COMPARISON: {
     BASE: 'v2/master/acgih-bei-comparison',

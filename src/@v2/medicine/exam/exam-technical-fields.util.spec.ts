@@ -23,7 +23,7 @@ describe('exam-technical-fields.util', () => {
     });
 
     expect(block).toBe(
-      'Orientação técnica: coletar em final da jornada (FJ). Valor de referência: 40 ppm.',
+      'Orientação técnica NR-7: coletar em final da jornada (FJ). Valor de referência: 40 ppm.',
     );
   });
 

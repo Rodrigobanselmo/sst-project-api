@@ -4,7 +4,7 @@ import { normalizeText } from '../biological-indicator/biological-indicator-norm
 
 export const EXAM_INSTRUCTION_SEPARATOR = '(//)';
 
-export const NR7_INSTRUCTION_BLOCK_PREFIX = 'Orientação técnica:';
+export const NR7_INSTRUCTION_BLOCK_PREFIX = 'Orientação técnica NR-7:';
 export const ACGIH_INSTRUCTION_BLOCK_PREFIX = 'Orientação técnica ACGIH/BEI:';
 
 export type ExamFieldMergeMode = 'create' | 'preserve';

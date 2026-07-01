@@ -64,6 +64,8 @@ import { ExamRiskRuleReferenceService } from './exam-risk-rule-reference/exam-ri
 import { EsocialT27ExamController } from './esocial-t27-exam/esocial-t27-exam.controller';
 import { EsocialT27ExamService } from './esocial-t27-exam/esocial-t27-exam.service';
 import { ExamRiskRulePublishFromSelectionService } from './esocial-t27-exam/exam-risk-rule-publish-from-selection.service';
+import { ExamTechnicalSuggestionController } from './exam/exam-technical-suggestion.controller';
+import { ExamTechnicalSuggestionService } from './exam/exam-technical-suggestion.service';
 
 @Module({
   imports: [SharedModule, PrismaModule],
@@ -83,6 +85,7 @@ import { ExamRiskRulePublishFromSelectionService } from './esocial-t27-exam/exam
     AcgihRiskCorrelationConsolidateController,
     AcgihExamLinkController,
     EsocialT27ExamController,
+    ExamTechnicalSuggestionController,
   ],
   providers: [
     BiologicalIndicatorDAO,
@@ -138,6 +141,7 @@ import { ExamRiskRulePublishFromSelectionService } from './esocial-t27-exam/exam
     AcgihExamLinkService,
     EsocialT27ExamService,
     ExamRiskRulePublishFromSelectionService,
+    ExamTechnicalSuggestionService,
     // Leitura apenas do catálogo oficial da Tabela 27 (não altera eSocial).
     FindAllTable27Service,
     ESocial27TableRepository,

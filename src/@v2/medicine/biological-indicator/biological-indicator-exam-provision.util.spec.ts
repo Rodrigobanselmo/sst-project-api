@@ -205,7 +205,7 @@ describe('biological-indicator-exam-provision.util', () => {
 
     expect(payload.material).toBe('urina');
     expect(payload.analyses).toBe('Ácido tricloroacético na urina');
-    expect(payload.instruction).toContain('Orientação técnica: coletar em');
+    expect(payload.instruction).toContain('Orientação técnica NR-7: coletar em');
     expect(payload.instruction).toContain('Valor de referência: 10 mg/L');
   });
 
@@ -248,6 +248,6 @@ describe('biological-indicator-exam-provision.util', () => {
 
     expect(payload.analyses).toBe('Determinante curado');
     expect(payload.esocial27Code).toBe('0133');
-    expect(payload.instruction).toContain('Orientação técnica: coletar em');
+    expect(payload.instruction).toContain('Orientação técnica NR-7: coletar em');
   });
 });
