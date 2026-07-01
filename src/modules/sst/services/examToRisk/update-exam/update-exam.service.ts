@@ -1,11 +1,12 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 
+import { ExamRiskRulePublishFromSelectionService } from '@/@v2/medicine/esocial-t27-exam/exam-risk-rule-publish-from-selection.service';
 import { UserPayloadDto } from '../../../../../shared/dto/user-payload.dto';
+import { asyncEach } from '../../../../../shared/utils/asyncEach';
 import { UpdateExamRiskDto } from '../../../dto/exam-risk.dto';
 import { ExamRiskRepository } from '../../../repositories/implementations/ExamRiskRepository';
 import { CheckEmployeeExamService } from '../../exam/check-employee-exam/check-employee-exam.service';
 import { CreateExamRiskService } from '../create-exam/create-exam.service';
-import { asyncEach } from '../../../../../shared/utils/asyncEach';
 
 @Injectable()
 export class UpdateExamRiskService {
@@ -13,9 +14,14 @@ export class UpdateExamRiskService {
     private readonly createExamRiskService: CreateExamRiskService,
     private readonly examRiskRepository: ExamRiskRepository,
     private readonly checkEmployeeExamService: CheckEmployeeExamService,
+    private readonly publishSystemRuleService: ExamRiskRulePublishFromSelectionService,
   ) {}
 
-  async execute(id: number, { realCompanyId, ...updateExamDto }: UpdateExamRiskDto, user: UserPayloadDto) {
+  async execute(
+    id: number,
+    { realCompanyId, publishAsSystemRule, ...updateExamDto }: UpdateExamRiskDto,
+    user: UserPayloadDto,
+  ) {
     const found = await this.examRiskRepository.findFirstNude({
       where: { id, companyId: user.targetCompanyId, deletedAt: null },
       select: {
@@ -63,6 +69,7 @@ export class UpdateExamRiskService {
           toAge: updateExamDto.toAge,
           validityInMonths: updateExamDto.validityInMonths,
           isMale: updateExamDto.isMale,
+          publishAsSystemRule,
         },
         { ...user, targetCompanyId: realCompanyId },
       );
@@ -93,7 +100,38 @@ export class UpdateExamRiskService {
       riskId: updateExamDto.riskId,
     });
 
-    return exam;
+    let systemRule:
+      | Awaited<ReturnType<ExamRiskRulePublishFromSelectionService['publish']>>
+      | undefined;
+
+    if (publishAsSystemRule && updateExamDto.riskId && updateExamDto.examId) {
+      systemRule = await this.publishSystemRuleService.publish(
+        {
+          riskFactorId: updateExamDto.riskId,
+          examId: updateExamDto.examId,
+          companyId: user.targetCompanyId,
+          validityInMonths: updateExamDto.validityInMonths,
+          considerBetweenDays: updateExamDto.considerBetweenDays,
+          fromAge: updateExamDto.fromAge,
+          toAge: updateExamDto.toAge,
+          minRiskDegree: updateExamDto.minRiskDegree,
+          minRiskDegreeQuantity: updateExamDto.minRiskDegreeQuantity,
+          isAdmission: updateExamDto.isAdmission,
+          isPeriodic: updateExamDto.isPeriodic,
+          isChange: updateExamDto.isChange,
+          isReturn: updateExamDto.isReturn,
+          isDismissal: updateExamDto.isDismissal,
+          isMale: updateExamDto.isMale,
+          isFemale: updateExamDto.isFemale,
+        },
+        user,
+      );
+    }
+
+    return {
+      ...exam,
+      ...(systemRule ? { systemRule } : {}),
+    };
   }
 
   private async checkEmployeeExam({
