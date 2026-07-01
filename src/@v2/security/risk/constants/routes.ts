@@ -8,6 +8,12 @@ export const SubTypeRoutes = {
     BY_ID: 'v2/master/risk-sub-types/:id',
     STATUS: 'v2/master/risk-sub-types/:id/status',
   },
+  MASTER_CURATION: {
+    BASE: 'v2/master/risk-subtype-curation',
+    RISKS: 'risks',
+    BULK_ASSIGN: 'risks/bulk-assign',
+    BULK_CLEAR: 'risks/bulk-clear',
+  },
 } as const;
 
 export const RiskFactorRoutes = {

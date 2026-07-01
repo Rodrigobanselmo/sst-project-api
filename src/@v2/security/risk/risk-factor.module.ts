@@ -10,6 +10,9 @@ import { BrowseSubTypeUseCase } from './application/sub-type/browse-sub-type/use
 import { RiskSubTypeMasterController } from './application/sub-type/risk-sub-type-master/risk-sub-type-master.controller';
 import { RiskSubTypeMasterRepository } from './application/sub-type/risk-sub-type-master/risk-sub-type-master.repository';
 import { RiskSubTypeMasterService } from './application/sub-type/risk-sub-type-master/risk-sub-type-master.service';
+import { RiskSubtypeCurationController } from './application/sub-type/risk-subtype-curation/risk-subtype-curation.controller';
+import { RiskSubtypeCurationRepository } from './application/sub-type/risk-subtype-curation/risk-subtype-curation.repository';
+import { RiskSubtypeCurationService } from './application/sub-type/risk-subtype-curation/risk-subtype-curation.service';
 import { SubTypeDAO } from './database/dao/sub-type/sub-type.dao';
 
 @Module({
@@ -18,6 +21,7 @@ import { SubTypeDAO } from './database/dao/sub-type/sub-type.dao';
     BrowseSubTypeController,
     RiskFactorAiSuggestionsController,
     RiskSubTypeMasterController,
+    RiskSubtypeCurationController,
   ],
   providers: [
     SubTypeDAO,
@@ -26,6 +30,8 @@ import { SubTypeDAO } from './database/dao/sub-type/sub-type.dao';
     RiskFactorAiSuggestionsUseCase,
     RiskSubTypeMasterRepository,
     RiskSubTypeMasterService,
+    RiskSubtypeCurationRepository,
+    RiskSubtypeCurationService,
   ],
   exports: [],
 })
