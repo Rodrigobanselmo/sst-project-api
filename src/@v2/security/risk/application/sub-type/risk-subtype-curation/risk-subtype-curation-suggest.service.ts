@@ -35,6 +35,7 @@ import type {
 } from './risk-subtype-curation-suggest.types';
 import { RiskSubtypeCurationAiPromptService } from './risk-subtype-curation-ai-prompt.service';
 import type { PreviewRiskSubtypeCurationAiPromptBody } from './risk-subtype-curation-ai-instruction.dto';
+import { RiskSubtypeSuggestObservability } from './risk-subtype-curation-suggest-observability.util';
 
 @Injectable()
 export class RiskSubtypeCurationSuggestService {
@@ -51,91 +52,287 @@ export class RiskSubtypeCurationSuggestService {
   async suggestCandidates(
     body: SuggestRiskSubtypeCandidatesBody,
   ): Promise<RiskSubtypeCurationSuggestResponse> {
-    if (body.type !== RiskFactorsEnum.QUI) {
-      throw new BadRequestException(
-        'Nesta fase apenas fatores químicos (QUI) são suportados.',
+    const observability = new RiskSubtypeSuggestObservability(this.logger);
+
+    try {
+      if (body.type !== RiskFactorsEnum.QUI) {
+        throw new BadRequestException(
+          'Nesta fase apenas fatores químicos (QUI) são suportados.',
+        );
+      }
+
+      if (!process.env.OPENAI_API_KEY?.trim()) {
+        throw new ServiceUnavailableException(
+          'Serviço de IA não configurado neste ambiente.',
+        );
+      }
+
+      const subType = await this.repository.findSubTypeById(body.subTypeId);
+      if (!subType) {
+        throw new NotFoundException('Subtipo de risco não encontrado.');
+      }
+
+      if (subType.status !== StatusEnum.ACTIVE) {
+        throw new BadRequestException(
+          'Subtipo inativo não pode ser usado para sugestão de candidatos.',
+        );
+      }
+
+      if (subType.type !== RiskFactorsEnum.QUI) {
+        throw new BadRequestException(
+          'Subtipo deve ser do tipo químico (QUI) nesta fase.',
+        );
+      }
+
+      if (!subType.name?.trim()) {
+        throw new BadRequestException('Subtipo sem nome não pode ser analisado.');
+      }
+
+      const warnings: string[] = [];
+      if (!subType.description?.trim()) {
+        warnings.push(
+          'Subtipo sem descrição — a IA terá menos contexto para classificar candidatos.',
+        );
+      }
+
+      const page = Math.max(1, body.page ?? 1);
+      const limit = Math.min(
+        body.limit ?? body.maxCandidates ?? RISK_SUBTYPE_CURATION_SUGGEST_DEFAULT_MAX,
+        RISK_SUBTYPE_CURATION_SUGGEST_ABSOLUTE_MAX,
       );
-    }
+      const onlyPcmso = body.onlyPcmso !== false;
+      const search = body.search?.trim() || null;
+      const sessionModel = this.aiPromptService.resolveModel({
+        sessionModel: body.model,
+      });
 
-    if (!process.env.OPENAI_API_KEY?.trim()) {
-      throw new ServiceUnavailableException(
-        'Serviço de IA não configurado neste ambiente.',
-      );
-    }
-
-    const subType = await this.repository.findSubTypeById(body.subTypeId);
-    if (!subType) {
-      throw new NotFoundException('Subtipo de risco não encontrado.');
-    }
-
-    if (subType.status !== StatusEnum.ACTIVE) {
-      throw new BadRequestException(
-        'Subtipo inativo não pode ser usado para sugestão de candidatos.',
-      );
-    }
-
-    if (subType.type !== RiskFactorsEnum.QUI) {
-      throw new BadRequestException(
-        'Subtipo deve ser do tipo químico (QUI) nesta fase.',
-      );
-    }
-
-    if (!subType.name?.trim()) {
-      throw new BadRequestException('Subtipo sem nome não pode ser analisado.');
-    }
-
-    const warnings: string[] = [];
-    if (!subType.description?.trim()) {
-      warnings.push(
-        'Subtipo sem descrição — a IA terá menos contexto para classificar candidatos.',
-      );
-    }
-
-    const page = Math.max(1, body.page ?? 1);
-    const limit = Math.min(
-      body.limit ?? body.maxCandidates ?? RISK_SUBTYPE_CURATION_SUGGEST_DEFAULT_MAX,
-      RISK_SUBTYPE_CURATION_SUGGEST_ABSOLUTE_MAX,
-    );
-    const onlyPcmso = body.onlyPcmso !== false;
-
-    const { rows, total } = await this.repository.findEligibleRisksForSuggestion(
-      {
-        type: body.type,
-        onlyPcmso,
-        search: body.search?.trim() || undefined,
+      observability.log('risk_subtype_suggest_start', {
+        subTypeId: subType.id,
+        subTypeName: subType.name,
         page,
         limit,
-      },
-    );
+        search,
+        onlyPcmso,
+        model: sessionModel,
+      });
 
-    const search = body.search?.trim() || null;
-    const skip = (page - 1) * limit;
-    const rangeStart = total > 0 && rows.length > 0 ? skip + 1 : 0;
-    const rangeEnd = skip + rows.length;
-    const hasNextPage = page * limit < total;
-    const nextPage = hasNextPage ? page + 1 : null;
-    const truncated = hasNextPage;
+      observability.setStage('db');
+      const dbStartedAt = Date.now();
+      const { rows, total } = await this.repository.findEligibleRisksForSuggestion(
+        {
+          type: body.type,
+          onlyPcmso,
+          search: body.search?.trim() || undefined,
+          page,
+          limit,
+        },
+      );
+      observability.log('risk_subtype_suggest_db_done', {
+        durationMs: Date.now() - dbStartedAt,
+        eligibleTotal: total,
+        rowsInBatch: rows.length,
+      });
 
-    const buildScope = (analyzed: number) => ({
-      analyzed,
-      eligibleTotal: total,
-      truncated,
-      onlyPcmso,
-      search,
-      page,
-      limit,
-      hasNextPage,
-      nextPage,
-      rangeStart: analyzed > 0 ? rangeStart : 0,
-      rangeEnd: analyzed > 0 ? rangeEnd : 0,
-      maxCandidates: limit,
-    });
+      const skip = (page - 1) * limit;
+      const rangeStart = total > 0 && rows.length > 0 ? skip + 1 : 0;
+      const rangeEnd = skip + rows.length;
+      const hasNextPage = page * limit < total;
+      const nextPage = hasNextPage ? page + 1 : null;
+      const truncated = hasNextPage;
 
-    if (!rows.length) {
-      const emptyMessage =
-        page > 1 && total > 0
-          ? `Nenhum risco elegível no lote ${page} (${skip + 1}–${Math.min(skip + limit, total)} de ${total}).`
-          : 'Nenhum risco químico elegível sem subtipo foi encontrado para análise.';
+      const buildScope = (analyzed: number) => ({
+        analyzed,
+        eligibleTotal: total,
+        truncated,
+        onlyPcmso,
+        search,
+        page,
+        limit,
+        hasNextPage,
+        nextPage,
+        rangeStart: analyzed > 0 ? rangeStart : 0,
+        rangeEnd: analyzed > 0 ? rangeEnd : 0,
+        maxCandidates: limit,
+      });
+
+      if (!rows.length) {
+        const emptyMessage =
+          page > 1 && total > 0
+            ? `Nenhum risco elegível no lote ${page} (${skip + 1}–${Math.min(skip + limit, total)} de ${total}).`
+            : 'Nenhum risco químico elegível sem subtipo foi encontrado para análise.';
+
+        const emptyWarnings = [...warnings, emptyMessage];
+        observability.setStage('response');
+        observability.log('risk_subtype_suggest_done', {
+          totalDurationMs: observability.elapsedMs(),
+          warningsCount: emptyWarnings.length,
+          candidatesCount: 0,
+          analyzed: 0,
+          eligibleTotal: total,
+          hasNextPage,
+        });
+
+        return {
+          targetSubType: {
+            id: subType.id,
+            name: subType.name,
+            description: subType.description,
+            type: subType.type,
+            status: subType.status,
+          },
+          scope: buildScope(0),
+          summary: {
+            suggestedInclude: 0,
+            suggestedExclude: 0,
+            lowConfidence: 0,
+            includedWithConfidence: 0,
+            excludedWithConfidence: 0,
+          },
+          candidates: [],
+          warnings: emptyWarnings,
+          model: sessionModel,
+          generatedAt: new Date().toISOString(),
+        };
+      }
+
+      if (truncated) {
+        warnings.push(
+          `Lote ${page}: analisados ${rangeStart}–${rangeEnd} de ${total} riscos elegíveis. Use o próximo lote para continuar.`,
+        );
+      }
+
+      observability.setStage('enrichment');
+      const enrichmentStartedAt = Date.now();
+      const enrichmentByRiskId =
+        await this.chemicalIdentityEnrichmentService.enrichBatch(
+          rows.map((risk) => ({
+            riskFactorId: risk.id,
+            name: risk.name,
+            cas: risk.cas,
+            synonyms: risk.synonymous,
+          })),
+        );
+
+      const enrichedCount = rows.filter((risk) =>
+        enrichmentByRiskId
+          .get(risk.id)
+          ?.sourceResults.some((result) => result.source === 'PUBCHEM' && result.found),
+      ).length;
+      const failedEnrichmentCount = rows.length - enrichedCount;
+      observability.log('risk_subtype_suggest_enrichment_done', {
+        durationMs: Date.now() - enrichmentStartedAt,
+        attempted: rows.length,
+        enriched: enrichedCount,
+        failed: failedEnrichmentCount,
+        unavailable: failedEnrichmentCount,
+      });
+      if (failedEnrichmentCount > 0) {
+        warnings.push(ENRICHMENT_PARTIAL_WARNING);
+      }
+
+      observability.setStage('prompt');
+      const promptStartedAt = Date.now();
+      const promptBuild = await this.aiPromptService.buildPrompt({
+        subType,
+        sessionCustomPrompt: body.customPrompt,
+      });
+      const systemPrompt = promptBuild.assembledPrompt;
+      const selectedModel = this.aiPromptService.resolveModel({
+        sessionModel: body.model,
+        preferredModel: promptBuild.preferredModel,
+      });
+      observability.log('risk_subtype_suggest_prompt_built', {
+        durationMs: Date.now() - promptStartedAt,
+        systemPromptChars: systemPrompt.length,
+        useSystemDefault: promptBuild.useSystemDefault,
+        revision: promptBuild.revision ?? 0,
+      });
+
+      if (!systemPrompt.trim()) {
+        throw new BadRequestException(
+          'Prompt de sugestão de subtipo não configurado.',
+        );
+      }
+
+      const chunks = arrayChunks(rows, RISK_SUBTYPE_CURATION_SUGGEST_CHUNK_SIZE);
+      const aiByRiskId = new Map<string, RiskSubtypeCurationSuggestChunkAiItem>();
+
+      observability.setStage('openai');
+      for (let chunkIndex = 0; chunkIndex < chunks.length; chunkIndex++) {
+        const chunk = chunks[chunkIndex];
+        const chunkStartedAt = Date.now();
+        try {
+          const chunkItems = await this.analyzeChunk({
+            subType,
+            risks: chunk,
+            systemPrompt,
+            enrichmentByRiskId,
+            model: selectedModel,
+          });
+          observability.log('risk_subtype_suggest_openai_chunk_done', {
+            chunkIndex,
+            chunkSize: chunk.length,
+            durationMs: Date.now() - chunkStartedAt,
+            itemsReturned: chunkItems.length,
+          });
+          for (const item of chunkItems) {
+            if (!chunk.some((risk) => risk.id === item.riskFactorId)) {
+              continue;
+            }
+            aiByRiskId.set(item.riskFactorId, item);
+          }
+        } catch (error) {
+          const message =
+            error instanceof Error ? error.message : 'Erro ao analisar lote com IA.';
+          this.logger.warn(
+            `Falha parcial na sugestão de candidatos (requestId=${observability.requestId}, chunkIndex=${chunkIndex}): ${message}`,
+          );
+          observability.log('risk_subtype_suggest_openai_chunk_done', {
+            chunkIndex,
+            chunkSize: chunk.length,
+            durationMs: Date.now() - chunkStartedAt,
+            itemsReturned: 0,
+            error: message,
+            warning: message,
+          });
+          warnings.push(
+            `Falha ao analisar um lote de ${chunk.length} risco(s) com IA. Os riscos desse lote retornarão como baixa confiança.`,
+          );
+        }
+      }
+
+      observability.setStage('normalize');
+      const normalizeStartedAt = Date.now();
+      const candidates = rows.map((risk) => {
+        const enrichment = enrichmentByRiskId.get(risk.id);
+        const candidate = normalizeSuggestCandidate({
+          subTypeName: subType.name,
+          subTypeDescription: subType.description,
+          risk,
+          ai: aiByRiskId.get(risk.id),
+          enrichment,
+        });
+        return {
+          ...candidate,
+          chemicalIdentity:
+            this.chemicalIdentityEnrichmentService.toCandidateChemicalIdentity(
+              enrichment,
+            ),
+        };
+      });
+      observability.log('risk_subtype_suggest_normalize_done', {
+        durationMs: Date.now() - normalizeStartedAt,
+      });
+
+      observability.setStage('response');
+      observability.log('risk_subtype_suggest_done', {
+        totalDurationMs: observability.elapsedMs(),
+        warningsCount: warnings.length,
+        candidatesCount: candidates.length,
+        analyzed: rows.length,
+        eligibleTotal: total,
+        hasNextPage,
+      });
 
       return {
         targetSubType: {
@@ -145,132 +342,23 @@ export class RiskSubtypeCurationSuggestService {
           type: subType.type,
           status: subType.status,
         },
-        scope: buildScope(0),
-        summary: {
-          suggestedInclude: 0,
-          suggestedExclude: 0,
-          lowConfidence: 0,
-          includedWithConfidence: 0,
-          excludedWithConfidence: 0,
+        scope: buildScope(rows.length),
+        summary: this.buildSummary(candidates),
+        candidates,
+        warnings,
+        enrichment: {
+          attempted: rows.length,
+          enriched: enrichedCount,
+          failed: failedEnrichmentCount,
+          sources: ['PUBCHEM'],
         },
-        candidates: [],
-        warnings: [...warnings, emptyMessage],
-        model: this.aiPromptService.resolveModel({
-          sessionModel: body.model,
-        }),
+        model: selectedModel,
         generatedAt: new Date().toISOString(),
       };
+    } catch (error) {
+      observability.logError(error);
+      throw error;
     }
-
-    if (truncated) {
-      warnings.push(
-        `Lote ${page}: analisados ${rangeStart}–${rangeEnd} de ${total} riscos elegíveis. Use o próximo lote para continuar.`,
-      );
-    }
-
-    const enrichmentByRiskId =
-      await this.chemicalIdentityEnrichmentService.enrichBatch(
-        rows.map((risk) => ({
-          riskFactorId: risk.id,
-          name: risk.name,
-          cas: risk.cas,
-          synonyms: risk.synonymous,
-        })),
-      );
-
-    const enrichedCount = rows.filter((risk) =>
-      enrichmentByRiskId
-        .get(risk.id)
-        ?.sourceResults.some((result) => result.source === 'PUBCHEM' && result.found),
-    ).length;
-    const failedEnrichmentCount = rows.length - enrichedCount;
-    if (failedEnrichmentCount > 0) {
-      warnings.push(ENRICHMENT_PARTIAL_WARNING);
-    }
-
-    const promptBuild = await this.aiPromptService.buildPrompt({
-      subType,
-      sessionCustomPrompt: body.customPrompt,
-    });
-    const systemPrompt = promptBuild.assembledPrompt;
-    const selectedModel = this.aiPromptService.resolveModel({
-      sessionModel: body.model,
-      preferredModel: promptBuild.preferredModel,
-    });
-
-    if (!systemPrompt.trim()) {
-      throw new BadRequestException(
-        'Prompt de sugestão de subtipo não configurado.',
-      );
-    }
-
-    const chunks = arrayChunks(rows, RISK_SUBTYPE_CURATION_SUGGEST_CHUNK_SIZE);
-    const aiByRiskId = new Map<string, RiskSubtypeCurationSuggestChunkAiItem>();
-
-    for (const chunk of chunks) {
-      try {
-        const chunkItems = await this.analyzeChunk({
-          subType,
-          risks: chunk,
-          systemPrompt,
-          enrichmentByRiskId,
-          model: selectedModel,
-        });
-        for (const item of chunkItems) {
-          if (!chunk.some((risk) => risk.id === item.riskFactorId)) {
-            continue;
-          }
-          aiByRiskId.set(item.riskFactorId, item);
-        }
-      } catch (error) {
-        const message =
-          error instanceof Error ? error.message : 'Erro ao analisar lote com IA.';
-        this.logger.warn(`Falha parcial na sugestão de candidatos: ${message}`);
-        warnings.push(
-          `Falha ao analisar um lote de ${chunk.length} risco(s) com IA. Os riscos desse lote retornarão como baixa confiança.`,
-        );
-      }
-    }
-
-    const candidates = rows.map((risk) => {
-      const enrichment = enrichmentByRiskId.get(risk.id);
-      const candidate = normalizeSuggestCandidate({
-        subTypeName: subType.name,
-        subTypeDescription: subType.description,
-        risk,
-        ai: aiByRiskId.get(risk.id),
-        enrichment,
-      });
-      return {
-        ...candidate,
-        chemicalIdentity:
-          this.chemicalIdentityEnrichmentService.toCandidateChemicalIdentity(
-            enrichment,
-          ),
-      };
-    });
-
-    return {
-      targetSubType: {
-        id: subType.id,
-        name: subType.name,
-        description: subType.description,
-        type: subType.type,
-        status: subType.status,
-      },
-      scope: buildScope(rows.length),
-      summary: this.buildSummary(candidates),
-      candidates,
-      warnings,
-      enrichment: {
-        attempted: rows.length,
-        enriched: enrichedCount,
-        failed: failedEnrichmentCount,
-        sources: ['PUBCHEM'],
-      },
-      model: selectedModel,
-      generatedAt: new Date().toISOString(),
-    };
   }
 
   async previewAiPrompt(body: PreviewRiskSubtypeCurationAiPromptBody) {
